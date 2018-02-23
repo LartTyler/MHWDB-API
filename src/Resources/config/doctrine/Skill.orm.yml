@@ -14,6 +14,11 @@ App\Entity\Skill:
             type: string
             length: 64
             nullable: false
+            unique: true
+    oneToMany:
         ranks:
-            type: json
-            nullable: false
+            targetEntity: App\Entity\SkillRank
+            mappedBy: skill
+            orphanRemoval: true
+            cascade:
+                - all

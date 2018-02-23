@@ -9,7 +9,7 @@ doctrine:
     dbal:
         # configure these for your database server
         driver: 'pdo_mysql'
-        server_version: '5.7'
+        server_version: '5.6'
         charset: utf8mb4
 
         # With Symfony 3.3, remove the `resolve:` prefix

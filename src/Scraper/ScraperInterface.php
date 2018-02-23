@@ -1,8 +1,6 @@
 <?php
 	namespace App\Scraper;
 
-	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-
 	interface ScraperInterface {
 		/**
 		 * Returns the type of the scraper. Must be one of the {@see ScraperType} class constants.
@@ -13,9 +11,9 @@
 		public function getType(): string;
 
 		/**
-		 * Scrapes the resource, adding any new entities to the database, and updating existing ones.
+		 * Scrapes the resource and updates the application state to match what was scraped.
 		 *
-		 * @return \Generator|EntityInterface[]
+		 * @return void
 		 */
-		public function scrape(): \Generator;
+		public function scrape(): void;
 	}

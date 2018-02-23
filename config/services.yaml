@@ -22,6 +22,23 @@ services:
         tags:
             - console.command
 
-    App\Scraper\Kiranico\KiranicoScrapeTarget:
-        calls: ~
+    App\Command\ScrapeKiranicoCommand:
+        arguments:
+            - '@App\Scraper\Kiranico\KiranicoScrapeTarget'
+            - '@doctrine'
+        tags:
+            -
+                name: console.command
+                command: scrape:kiranico
 
+    App\Scraper\Kiranico\KiranicoScrapeTarget:
+        calls:
+            -
+                - 'addScraper'
+                -
+                    - '@App\Scraper\Kiranico\Scrapers\KiranicoSkillsScraper'
+
+    App\Scraper\Kiranico\Scrapers\KiranicoSkillsScraper:
+        arguments:
+            - '@App\Scraper\Kiranico\KiranicoScrapeTarget'
+            - '@doctrine'

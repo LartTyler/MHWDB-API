@@ -3,6 +3,10 @@
 
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
+	use Doctrine\Common\Collections\ArrayCollection;
+	use Doctrine\Common\Collections\Collection;
+	use Doctrine\Common\Collections\Criteria;
+	use Doctrine\Common\Collections\Selectable;
 
 	class Skill implements EntityInterface {
 		use EntityTrait;
@@ -13,7 +17,7 @@
 		private $name;
 
 		/**
-		 * @var string[]
+		 * @var Collection|Selectable|SkillRank[]
 		 */
 		private $ranks;
 
@@ -21,11 +25,10 @@
 		 * Skill constructor.
 		 *
 		 * @param string   $name
-		 * @param string[] $ranks
 		 */
-		public function __construct($name, array $ranks) {
+		public function __construct($name) {
 			$this->name = $name;
-			$this->ranks = $ranks;
+			$this->ranks = new ArrayCollection();
 		}
 
 		/**
@@ -47,20 +50,27 @@
 		}
 
 		/**
-		 * @return string[]
+		 * @return Collection|Selectable|SkillRank[]
 		 */
-		public function getRanks(): array {
+		public function getRanks(): Collection {
 			return $this->ranks;
 		}
 
 		/**
-		 * @param string[] $ranks
+		 * @param int $level
 		 *
-		 * @return $this
+		 * @return SkillRank|null
 		 */
-		public function setRanks(array $ranks) {
-			$this->ranks = $ranks;
+		public function getRank(int $level) {
+			$criteria = Criteria::create()
+				->where(Criteria::expr()->eq('level', $level))
+				->setMaxResults(1);
 
-			return $this;
+			$matched = $this->getRanks()->matching($criteria);
+
+			if ($matched->count())
+				return $matched->first();
+
+			return null;
 		}
 	}

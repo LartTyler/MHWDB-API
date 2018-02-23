@@ -64,8 +64,6 @@
 
 		/**
 		 * {@inheritdoc}
-		 *
-		 * @return $this
 		 */
 		public function addScraper(ScraperInterface $scraper): ScrapeTargetInterface {
 			$this->scrapers[$scraper->getType()] = $scraper;
@@ -93,16 +91,9 @@
 
 		/**
 		 * {@inheritdoc}
-		 *
-		 * @return EntityInterface[]|\Generator
 		 */
-		public function scrape(): \Generator {
-			$results = [];
-
+		public function scrape(): void {
 			foreach ($this->getScrapers() as $scraper)
-				foreach ($scraper->scrape() as $item)
-					yield $item;
-
-			return $results;
+				$scraper->scrape();
 		}
 	}

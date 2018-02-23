@@ -52,10 +52,10 @@
 		public function getTypes(): array;
 
 		/**
-		 * Calls the `scrape()` method on all supported scrapers, and a single array containing all the resulting
-		 * entities.
+		 * Calls the `scrape()` method on all supported scrapers.
 		 *
-		 * @return EntityInterface[]|\Generator
+		 * @return void
+		 * @see ScraperInterface::scrape()
 		 */
-		public function scrape(): \Generator;
+		public function scrape(): void;
 	}

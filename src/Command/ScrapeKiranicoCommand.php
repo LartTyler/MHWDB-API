@@ -2,22 +2,51 @@
 	namespace App\Command;
 
 	use App\Scraper\Kiranico\KiranicoScrapeTarget;
-	use App\Scraper\Kiranico\Scrapers\KiranicoSkillsScraper;
+	use Doctrine\Bundle\DoctrineBundle\Registry;
 	use Symfony\Component\Console\Command\Command;
 	use Symfony\Component\Console\Input\InputInterface;
 	use Symfony\Component\Console\Output\OutputInterface;
 
 	class ScrapeKiranicoCommand extends Command {
+		/**
+		 * @var KiranicoScrapeTarget
+		 */
+		protected $target;
+
+		/**
+		 * @var \Doctrine\Common\Persistence\ObjectManager|object
+		 */
+		protected $manager;
+
+		/**
+		 * ScrapeKiranicoCommand constructor.
+		 *
+		 * @param KiranicoScrapeTarget $target
+		 * @param Registry             $doctrine
+		 */
+		public function __construct(KiranicoScrapeTarget $target, Registry $doctrine) {
+			parent::__construct();
+
+			$this->target = $target;
+			$this->manager = $doctrine->getManager();
+		}
+
+		/**
+		 * {@inheritdoc}
+		 */
 		protected function configure() {
 			$this
 				->setName('scrape:kiranico');
 		}
 
+		/**
+		 * {@inheritdoc}
+		 */
 		protected function execute(InputInterface $input, OutputInterface $output) {
-			$target = new KiranicoScrapeTarget();
-			$target->addScraper(new KiranicoSkillsScraper($target));
+			$this->target->scrape();
 
-			foreach ($target->scrape() as $item)
-				var_dump($item);
+			$this->manager->flush();
+
+			$output->writeln('Done!');
 		}
 	}

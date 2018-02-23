@@ -1,0 +1,36 @@
+App\Entity\SkillRank:
+    type: entity
+    table: skill_ranks
+    uniqueConstraints:
+        skill_level_idx:
+            columns:
+                - skill_id
+                - level
+    id:
+        id:
+            type: integer
+            nullable: false
+            options:
+                unsigned: true
+            generator:
+                strategy: IDENTITY
+    fields:
+        level:
+            type: smallint
+            nullable: false
+            options:
+                unsigned: true
+        description:
+            type: text
+            nullable: false
+        modifiers:
+            type: json
+            nullable: false
+    manyToOne:
+        skill:
+            targetEntity: App\Entity\Skill
+            inversedBy: ranks
+            joinColumn:
+                nullable: false
+                options:
+                    unsigned: true
