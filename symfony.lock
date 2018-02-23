@@ -1,4 +1,7 @@
 {
+    "clue/stream-filter": {
+        "version": "v1.4.0"
+    },
     "dbstudios/doctrine-entities": {
         "version": "1.0.0"
     },
@@ -65,6 +68,15 @@
     "doctrine/orm": {
         "version": "v2.6.0"
     },
+    "guzzlehttp/guzzle": {
+        "version": "6.3.0"
+    },
+    "guzzlehttp/promises": {
+        "version": "v1.3.1"
+    },
+    "guzzlehttp/psr7": {
+        "version": "1.4.2"
+    },
     "jdorn/sql-formatter": {
         "version": "v1.2.17"
     },
@@ -74,11 +86,35 @@
     "ocramius/proxy-manager": {
         "version": "2.2.0"
     },
+    "php-http/client-common": {
+        "version": "1.7.0"
+    },
+    "php-http/discovery": {
+        "version": "1.4.0"
+    },
+    "php-http/guzzle6-adapter": {
+        "version": "v1.1.1"
+    },
+    "php-http/httplug": {
+        "version": "v1.1.0"
+    },
+    "php-http/message": {
+        "version": "1.6.0"
+    },
+    "php-http/message-factory": {
+        "version": "v1.0.2"
+    },
+    "php-http/promise": {
+        "version": "v1.0.0"
+    },
     "psr/cache": {
         "version": "1.0.1"
     },
     "psr/container": {
         "version": "1.0.0"
+    },
+    "psr/http-message": {
+        "version": "1.0.1"
     },
     "psr/log": {
         "version": "1.0.2"
@@ -104,6 +140,9 @@
             "ref": "c646e4b71af082e94b5014daca36ef6812bad076"
         }
     },
+    "symfony/css-selector": {
+        "version": "v4.0.4"
+    },
     "symfony/debug": {
         "version": "v4.0.4"
     },
@@ -111,6 +150,9 @@
         "version": "v4.0.4"
     },
     "symfony/doctrine-bridge": {
+        "version": "v4.0.4"
+    },
+    "symfony/dom-crawler": {
         "version": "v4.0.4"
     },
     "symfony/dotenv": {
@@ -154,6 +196,9 @@
     },
     "symfony/lts": {
         "version": "4-dev"
+    },
+    "symfony/options-resolver": {
+        "version": "v4.0.4"
     },
     "symfony/orm-pack": {
         "version": "v1.0.5"

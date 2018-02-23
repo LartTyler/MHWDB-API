@@ -1,0 +1,19 @@
+App\Entity\Skill:
+    type: entity
+    table: skills
+    id:
+        id:
+            type: integer
+            nullable: false
+            options:
+                unsigned: true
+            generator:
+                strategy: IDENTITY
+    fields:
+        name:
+            type: string
+            length: 64
+            nullable: false
+        ranks:
+            type: json
+            nullable: false

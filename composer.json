@@ -12,7 +12,14 @@
         "symfony/orm-pack": "^1.0",
         "symfony/yaml": "^4.0",
         "dbstudios/doctrine-entities": "^1.0",
-        "dbstudios/doze-bundle": "^1.4"
+        "dbstudios/doze-bundle": "^1.4",
+        "php-http/httplug": "^1.0",
+        "php-http/client-common": "^1.0",
+        "php-http/message": "^1.0",
+        "php-http/discovery": "^1.0",
+        "php-http/guzzle6-adapter": "^1.0",
+        "symfony/dom-crawler": "^4.0",
+        "symfony/css-selector": "^4.0"
     },
     "require-dev": {
         "symfony/dotenv": "^4.0"
