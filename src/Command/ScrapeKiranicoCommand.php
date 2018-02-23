@@ -17,6 +17,7 @@
 			$target = new KiranicoScrapeTarget();
 			$target->addScraper(new KiranicoSkillsScraper($target));
 
-			var_dump($target->scrape());
+			foreach ($target->scrape() as $item)
+				var_dump($item);
 		}
 	}

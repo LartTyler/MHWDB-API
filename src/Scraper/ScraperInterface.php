@@ -15,7 +15,7 @@
 		/**
 		 * Scrapes the resource, adding any new entities to the database, and updating existing ones.
 		 *
-		 * @return EntityInterface[]
+		 * @return \Generator|EntityInterface[]
 		 */
-		public function scrape(): array;
+		public function scrape(): \Generator;
 	}

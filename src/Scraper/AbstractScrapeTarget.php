@@ -94,13 +94,14 @@
 		/**
 		 * {@inheritdoc}
 		 *
-		 * @return EntityInterface[]
+		 * @return EntityInterface[]|\Generator
 		 */
-		public function scrape(): array {
+		public function scrape(): \Generator {
 			$results = [];
 
 			foreach ($this->getScrapers() as $scraper)
-				$results = array_merge($results, $scraper->scrape());
+				foreach ($scraper->scrape() as $item)
+					yield $item;
 
 			return $results;
 		}

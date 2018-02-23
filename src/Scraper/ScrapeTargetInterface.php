@@ -55,7 +55,7 @@
 		 * Calls the `scrape()` method on all supported scrapers, and a single array containing all the resulting
 		 * entities.
 		 *
-		 * @return EntityInterface[]
+		 * @return EntityInterface[]|\Generator
 		 */
-		public function scrape(): array;
+		public function scrape(): \Generator;
 	}
