@@ -5,8 +5,9 @@
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
 
-	class SkillRank implements EntityInterface {
+	class SkillRank implements EntityInterface, SluggableInterface {
 		use EntityTrait;
+		use SluggableTrait;
 
 		/**
 		 * @var Skill
@@ -39,6 +40,8 @@
 			$this->skill = $skill;
 			$this->level = $level;
 			$this->description = $description;
+
+			$this->updateSlug();
 		}
 
 		/**
@@ -62,6 +65,8 @@
 		 */
 		public function setLevel(int $level) {
 			$this->level = $level;
+
+			$this->updateSlug();
 
 			return $this;
 		}
@@ -128,5 +133,12 @@
 				return $this->modifiers[$attribute];
 
 			return '0';
+		}
+
+		/**
+		 * @return void
+		 */
+		protected function updateSlug(): void {
+			$this->setSlug($this->getSkill() . '-rank-' . $this->getLevel());
 		}
 	}

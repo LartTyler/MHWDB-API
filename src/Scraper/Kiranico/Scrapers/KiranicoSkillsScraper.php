@@ -3,33 +3,32 @@
 
 	use App\Entity\Skill;
 	use App\Entity\SkillRank;
-	use App\Game\Attribute;
 	use App\Scraper\AbstractScraper;
 	use App\Scraper\Kiranico\KiranicoScrapeTarget;
 	use App\Scraper\ScraperType;
-	use Doctrine\Bundle\DoctrineBundle\Registry;
 	use Doctrine\ORM\EntityManager;
+	use Symfony\Bridge\Doctrine\RegistryInterface;
 	use Symfony\Component\DomCrawler\Crawler;
 	use Symfony\Component\HttpFoundation\Response;
 
 	class KiranicoSkillsScraper extends AbstractScraper {
-		/**
-		 * @var EntityManager
-		 */
-		protected $manager;
-
 		/**
 		 * @var KiranicoScrapeTarget
 		 */
 		protected $target;
 
 		/**
+		 * @var EntityManager
+		 */
+		protected $manager;
+
+		/**
 		 * KiranicoSkillsScraper constructor.
 		 *
 		 * @param KiranicoScrapeTarget $target
-		 * @param Registry             $doctrine
+		 * @param RegistryInterface    $doctrine
 		 */
-		public function __construct(KiranicoScrapeTarget $target, Registry $doctrine) {
+		public function __construct(KiranicoScrapeTarget $target, RegistryInterface $doctrine) {
 			parent::__construct($target, ScraperType::SKILLS);
 
 			$this->manager = $doctrine->getManager();
@@ -47,13 +46,10 @@
 			if ($response->getStatusCode() !== Response::HTTP_OK)
 				throw new \Exception('Could not retrieve ' . $uri);
 
-			$crawler = new Crawler($response->getBody()->getContents());
-			$skillsCrawler = $crawler->filter('.container table tr');
+			$crawler = (new Crawler($response->getBody()->getContents()))->filter('.container table tr');
 
-			$skills = [];
-
-			for ($i = 0, $ii = $skillsCrawler->count(); $i < $ii; $i++) {
-				$node = $skillsCrawler->eq($i);
+			for ($i = 0, $ii = $crawler->count(); $i < $ii; $i++) {
+				$node = $crawler->eq($i);
 
 				if ($rowCount = $node->children()->first()->attr('rowspan'))
 					// For some reason, rows on Kiranico are level count + 1 for rowspan

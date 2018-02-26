@@ -8,8 +8,9 @@
 	use Doctrine\Common\Collections\Criteria;
 	use Doctrine\Common\Collections\Selectable;
 
-	class Skill implements EntityInterface {
+	class Skill implements EntityInterface, SluggableInterface {
 		use EntityTrait;
+		use SluggableTrait;
 
 		/**
 		 * @var string
@@ -29,6 +30,8 @@
 		public function __construct($name) {
 			$this->name = $name;
 			$this->ranks = new ArrayCollection();
+
+			$this->updateSlug();
 		}
 
 		/**
@@ -45,6 +48,8 @@
 		 */
 		public function setName(string $name) {
 			$this->name = $name;
+
+			$this->updateSlug();
 
 			return $this;
 		}
@@ -72,5 +77,12 @@
 				return $matched->first();
 
 			return null;
+		}
+
+		/**
+		 * @return void
+		 */
+		protected function updateSlug(): void {
+			$this->setSlug($this->getName());
 		}
 	}

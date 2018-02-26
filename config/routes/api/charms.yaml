@@ -1,0 +1,11 @@
+api.charms.list:
+    methods:
+        - GET
+    path: /charms
+    controller: 'App\Controller\CharmsDataController::listAction'
+
+api.charms.read:
+    methods:
+        - GET
+    path: /charms/{idOrSlug}
+    controller: 'App\Controller\CharmsDataController::readAction'

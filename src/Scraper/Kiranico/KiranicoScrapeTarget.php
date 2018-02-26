@@ -37,6 +37,8 @@
 		 * @return array
 		 */
 		public function parseRankDescriptions(string $description): array {
+			$modifiers = [];
+
 			foreach (self::MODIFIER_MATCHERS as $regex => $attribute) {
 				if (!preg_match($regex, $description, $matches))
 					continue;
@@ -45,17 +47,15 @@
 				array_shift($matches);
 
 				if (is_string($attribute))
-					return [
-						$attribute => $matches[0],
-					];
+					$modifiers[$attribute] = $matches[0];
 				else if (is_callable($attribute))
-					return call_user_func_array($attribute, $matches);
+					$modifiers = array_merge($modifiers, call_user_func_array($attribute, $matches));
 				else
 					throw new \InvalidArgumentException('Can\'t handle modifier value. Check ' . static::class .
 						'::MODIFIER_MATCHES');
 			}
 
-			return [];
+			return $modifiers;
 		}
 
 		/**

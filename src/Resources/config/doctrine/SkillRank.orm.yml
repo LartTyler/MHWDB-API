@@ -26,6 +26,11 @@ App\Entity\SkillRank:
         modifiers:
             type: json
             nullable: false
+        slug:
+            type: string
+            length: 64
+            nullable: false
+            unique: true
     manyToOne:
         skill:
             targetEntity: App\Entity\Skill

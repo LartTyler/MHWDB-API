@@ -15,6 +15,11 @@ App\Entity\Skill:
             length: 64
             nullable: false
             unique: true
+        slug:
+            type: string
+            length: 64
+            nullable: false
+            unique: true
     oneToMany:
         ranks:
             targetEntity: App\Entity\SkillRank

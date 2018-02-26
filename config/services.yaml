@@ -1,3 +1,9 @@
+imports:
+    -
+        resource: 'services/responder.yaml'
+    -
+        resource: 'services/scrapers.yaml'
+
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
@@ -5,7 +11,7 @@ parameters:
 services:
     # default configuration for services in *this* file
     _defaults:
-        autowire: false      # Automatically injects dependencies in your services.
+        autowire: true       # Automatically injects dependencies in your services.
         autoconfigure: false # Automatically registers your services as commands, event subscribers, etc.
         public: false        # Allows optimizing the container by removing unused services; this also means
                              # fetching services directly from the container via $container->get() won't work.
@@ -23,22 +29,7 @@ services:
             - console.command
 
     App\Command\ScrapeKiranicoCommand:
-        arguments:
-            - '@App\Scraper\Kiranico\KiranicoScrapeTarget'
-            - '@doctrine'
         tags:
             -
                 name: console.command
                 command: scrape:kiranico
-
-    App\Scraper\Kiranico\KiranicoScrapeTarget:
-        calls:
-            -
-                - 'addScraper'
-                -
-                    - '@App\Scraper\Kiranico\Scrapers\KiranicoSkillsScraper'
-
-    App\Scraper\Kiranico\Scrapers\KiranicoSkillsScraper:
-        arguments:
-            - '@App\Scraper\Kiranico\KiranicoScrapeTarget'
-            - '@doctrine'
