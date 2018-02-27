@@ -139,6 +139,6 @@
 		 * @return void
 		 */
 		protected function updateSlug(): void {
-			$this->setSlug($this->getSkill() . '-rank-' . $this->getLevel());
+			$this->setSlug($this->getSkill()->getName() . '-rank-' . $this->getLevel());
 		}
 	}

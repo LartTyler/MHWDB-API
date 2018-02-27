@@ -1,0 +1,50 @@
+App\Entity\Weapon:
+    type: entity
+    table: weapons
+    indexes:
+        type_idx:
+            columns:
+                - type
+    id:
+        id:
+            type: integer
+            nullable: false
+            options:
+                unsigned: true
+            generator:
+                strategy: IDENTITY
+    fields:
+        name:
+            type: string
+            length: 64
+            nullable: false
+            unique: true
+        type:
+            type: string
+            length: 32
+            nullable: false
+        rarity:
+            type: smallint
+            nullable: false
+            options:
+                unsigned: true
+        slug:
+            type: string
+            length: 64
+            nullable: false
+            unique: true
+    manyToMany:
+        attributes:
+            targetEntity: App\Entity\ItemAttribute
+            joinTable:
+                name: weapons_item_attributes
+                joinColumn:
+                    weapon_id:
+                        nullable: false
+                        options:
+                            unsigned: true
+                inverseJoinColumn:
+                    item_attribute_id:
+                        nullable: false
+                        options:
+                            unsigned: true

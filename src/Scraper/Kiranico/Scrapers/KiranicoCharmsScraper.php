@@ -30,6 +30,7 @@
 
 		/**
 		 * @return void
+		 * @throws \Http\Client\Exception
 		 */
 		public function scrape(): void {
 			$uri = $this->target->getBaseUri()->withPath('/charm');
@@ -51,7 +52,7 @@
 		 */
 		protected function process(Crawler $node): void {
 			$children = $node->children();
-			$name = trim($children->first()->text());
+			$name = StringUtil::replaceNumeralRank(trim($children->first()->text()));
 
 			/** @var Charm|null $charm */
 			$charm = $this->manager->getRepository('App:Charm')->findOneBy([

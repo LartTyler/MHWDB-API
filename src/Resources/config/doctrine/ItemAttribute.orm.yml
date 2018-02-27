@@ -1,0 +1,20 @@
+App\Entity\ItemAttribute:
+    type: entity
+    table: item_attributes
+    id:
+        id:
+            type: integer
+            nullable: false
+            options:
+                unsigned: true
+            generator:
+                strategy: IDENTITY
+    fields:
+        name:
+            type: string
+            length: 64
+            nullable: false
+        value:
+            type: json
+            nullable: false
+            column: _value

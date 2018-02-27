@@ -7,6 +7,7 @@
 	use Symfony\Component\Console\Command\Command;
 	use Symfony\Component\Console\Input\InputInterface;
 	use Symfony\Component\Console\Output\OutputInterface;
+	use Symfony\Component\Console\Style\SymfonyStyle;
 
 	class ScrapeKiranicoCommand extends Command {
 		/**
@@ -44,10 +45,23 @@
 		 * {@inheritdoc}
 		 */
 		protected function execute(InputInterface $input, OutputInterface $output) {
-			$this->target->scrape();
+			$io = new SymfonyStyle($input, $output);
+			$scrapers = $this->target->getScrapers();
 
+			$io->progressStart(sizeof($scrapers));
+
+			foreach ($scrapers as $scraper) {
+				$scraper->scrape();
+
+				$this->manager->flush();
+
+				$io->progressAdvance();
+			}
+
+			$this->target->scrape();
 			$this->manager->flush();
 
-			$output->writeln('Done!');
+			$io->progressFinish();
+			$io->success('Done!');
 		}
 	}

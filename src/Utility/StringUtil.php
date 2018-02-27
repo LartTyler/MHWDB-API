@@ -24,6 +24,26 @@
 		}
 
 		/**
+		 * @param string $string
+		 *
+		 * @return string
+		 */
+		public static function replaceNumeralRank(string $string): string {
+			$lastChar = $string[strlen($string) - 1];
+
+			// A valid numeral ranked item name will always end in one of the following (case-sensitive)
+			if (!in_array($lastChar, ['I', 'V', 'X', 'L']))
+				return $string;
+
+			$pos = strrpos($string, ' ');
+
+			$rank = trim(substr($string, $pos + 1));
+			$title = trim(substr($string, 0, $pos));
+
+			return $title . ' ' . StringUtil::convertNumeralToDecimal($rank);
+		}
+
+		/**
 		 * @param string $numeral
 		 *
 		 * @return int
@@ -34,11 +54,11 @@
 			$decimal = 0;
 			$previous = 0;
 
-			for ($i = strlen($numeral) - 1, $ii = 0; $i >= $ii; $i++) {
+			for ($i = strlen($numeral) - 1; $i >= 0; $i--) {
 				$char = $numeral[$i];
 
 				if ($char === 'I')
-					$value = 0;
+					$value = 1;
 				else if ($char === 'V')
 					$value = 5;
 				else if ($char === 'X')
