@@ -4,6 +4,7 @@
 	use App\Entity\Weapon;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use Symfony\Bridge\Doctrine\RegistryInterface;
+	use Symfony\Component\HttpFoundation\Request;
 	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\Routing\RouterInterface;
 
@@ -28,5 +29,19 @@
 			return $this->respond($this->manager->getRepository(Weapon::class)->findBy([
 				'type' => $type,
 			]));
+		}
+
+		/**
+		 * @param string  $type
+		 * @param Request $request
+		 *
+		 * @return Response
+		 */
+		public function searchByTypeAction(string $type, Request $request): Response {
+			$query = $request->query->all();
+
+			$query['type'] = $type;
+
+			return $this->getSearchResults($query);
 		}
 	}

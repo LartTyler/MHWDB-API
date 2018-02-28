@@ -4,6 +4,12 @@ api.weapons.list:
     path: /weapons
     controller: 'App\Controller\WeaponsDataController::listAction'
 
+api.weapons.search:
+    methods:
+        - GET
+    path: /weapons/search
+    controller: 'App\Controller\WeaponsDataController::searchAction'
+
 api.weapons.list-by-type:
     methods:
         - GET

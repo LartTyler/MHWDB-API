@@ -20,7 +20,8 @@ doctrine:
         auto_mapping: true
         dql:
             string_functions:
-                JSON_CONTAINS: Syslogic\DoctrineJsonFunctions\Query\AST\Functions\Mysql\JsonContains
+                JSON_EXTRACT: Syslogic\DoctrineJsonFunctions\Query\AST\Functions\Mysql\JsonExtract
+                JSON_UNQUOTE: Syslogic\DoctrineJsonFunctions\Query\AST\Functions\Mysql\JsonUnquote
         mappings:
             App:
                 is_bundle: false
