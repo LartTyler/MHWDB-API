@@ -2,6 +2,7 @@
 	namespace App\Command;
 
 	use App\Scraper\Kiranico\KiranicoScrapeTarget;
+	use App\Scraper\SubtypeAwareScraperInterface;
 	use Doctrine\ORM\EntityManager;
 	use Symfony\Bridge\Doctrine\RegistryInterface;
 	use Symfony\Component\Console\Command\Command;
@@ -40,7 +41,8 @@
 		protected function configure() {
 			$this
 				->setName('scrape:kiranico')
-				->addOption('type', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY);
+				->addOption('type', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY)
+				->addOption('subtype', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY);
 		}
 
 		/**
@@ -51,6 +53,16 @@
 			$scrapers = $this->target->getScrapers();
 
 			$types = $input->getOption('type');
+			$subtypes = [];
+
+			foreach ($input->getOption('subtype') as $item) {
+				$key = strtok($item, ':');
+
+				if (!isset($subtypes[$key]))
+					$subtypes[$key] = [];
+
+				$subtypes[$key][] = strtok('');
+			}
 
 			$io->progressStart($types ? sizeof($types) : sizeof($scrapers));
 
@@ -58,7 +70,10 @@
 				if ($types && !in_array($scraper->getType(), $types))
 					continue;
 
-				$scraper->scrape();
+				if ($scraper instanceof SubtypeAwareScraperInterface)
+					$scraper->scrape($subtypes[$scraper->getType()] ?? []);
+				else
+					$scraper->scrape();
 
 				$this->manager->flush();
 

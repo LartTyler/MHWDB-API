@@ -41,6 +41,14 @@
 		// -- Switch Axe / Charge Blade Attributes --
 		const PHIAL_TYPE = 'phialType';
 
+		// -- Bow Attributes --
+		const COATINGS = 'coatings';
+
+		// -- Bowgun Attributes --
+		const AMMO_CAPACITIES = 'ammoCapacities';
+		const DEVIATION = 'deviation';
+		const SPECIAL_AMMO = 'specialAmmo';
+
 		// -- Armor Attributes --
 		const DEFENSE = 'defense';
 		const RES_FIRE = 'resistFire';

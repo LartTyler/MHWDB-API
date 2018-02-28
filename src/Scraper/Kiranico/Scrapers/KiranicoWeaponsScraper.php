@@ -7,13 +7,14 @@
 	use App\Scraper\AbstractScraper;
 	use App\Scraper\Kiranico\KiranicoScrapeTarget;
 	use App\Scraper\ScraperType;
+	use App\Scraper\SubtypeAwareScraperInterface;
 	use App\Utility\StringUtil;
 	use Doctrine\ORM\EntityManager;
 	use Symfony\Bridge\Doctrine\RegistryInterface;
 	use Symfony\Component\DomCrawler\Crawler;
 	use Symfony\Component\HttpFoundation\Response;
 
-	class KiranicoWeaponsScraper extends AbstractScraper {
+	class KiranicoWeaponsScraper extends AbstractScraper implements SubtypeAwareScraperInterface {
 		private const PATHS = [
 			WeaponType::GREAT_SWORD => '/great-sword',
 			WeaponType::LONG_SWORD => '/long-sword',
@@ -26,9 +27,9 @@
 			WeaponType::SWITCH_AXE => '/switch-axe',
 			WeaponType::CHARGE_BLADE => '/charge-blade',
 			WeaponType::INSECT_GLAIVE => '/insect-glaive',
-			// WeaponType::LIGHT_BOWGUN => '/light-bowgun',
-			// WeaponType::HEAVY_BOWGUN => '/heavy-bowgun',
-			// WeaponType::BOW => '/bow',
+			WeaponType::LIGHT_BOWGUN => '/light-bowgun',
+			WeaponType::HEAVY_BOWGUN => '/heavy-bowgun',
+			WeaponType::BOW => '/bow',
 		];
 
 		private const SHARPNESS_NODES = [
@@ -47,6 +48,40 @@
 			'/((?:Normal|Wide|Long) Lv\d+)/' => Attribute::GL_SHELLING_TYPE,
 			'/((?:Poison|Para|Dragon|Exhaust) Phial \d+)/' => Attribute::PHIAL_TYPE,
 			'/(?:Power)?((?:Power|Element|Impact) Phial)/' => Attribute::PHIAL_TYPE,
+			'/(None|Low|Average|High) Dev./' => Attribute::DEVIATION,
+			'/(Wyvern(?:blast|snipe|heart))/' => Attribute::SPECIAL_AMMO,
+		];
+
+		private const COATING_TRANSLATIONS = [
+			'Cls' => 'Close Range',
+			'Pow' => 'Power',
+			'Par' => 'Paralysis',
+			'Poi' => 'Poison',
+			'Sle' => 'Sleep',
+			'Bla' => 'Blast',
+		];
+
+		private const CAPACITY_TRANSLATIONS = [
+			'Nrm' => 'normal',
+			'Prc' => 'pierce',
+			'Spr' => 'spread',
+			'Sti' => 'sticky',
+			'Clu' => 'cluster',
+			'Rec' => 'recover',
+			'Poi' => 'poison',
+			'Par' => 'paralysis',
+			'Sle' => 'sleep',
+			'Exh' => 'exhaust',
+			'Fla' => 'flaming',
+			'Wat' => 'water',
+			'Fre' => 'freeze',
+			'Thn' => 'thunder',
+			'Dra' => 'dragon',
+			'Sli' => 'slicing',
+			'Wyv' => 'wyvern',
+			'Dem' => 'demon',
+			'Arm' => 'armor',
+			'Tra' => 'tranq',
 		];
 
 		/**
@@ -74,8 +109,11 @@
 		/**
 		 * {@inheritdoc}
 		 */
-		public function scrape(): void {
+		public function scrape(array $subtypes = []): void {
 			foreach (self::PATHS as $weaponType => $path) {
+				if ($subtypes && !in_array($weaponType, $subtypes))
+					continue;
+
 				$uri = $this->target->getBaseUri()->withPath($path);
 				$response = $this->target->getHttpClient()->get($uri);
 
@@ -144,23 +182,75 @@
 				}
 			}
 
-			$sharpnessNodes = $nodes->eq(4)->children();
+			if ($weaponType === WeaponType::BOW) {
+				$coatingNodes = $nodes->eq(4)->filter('span');
+				$coatings = [];
 
-			if ($sharpnessNodes->count()) {
-				$sharpnessNodes = $sharpnessNodes->first()->children();
+				for ($i = 0, $ii = $coatingNodes->count(); $i < $ii; $i ++) {
+					$node = $coatingNodes->eq($i);
+					$classList = $node->attr('class');
 
-				foreach (self::SHARPNESS_NODES as $index => $sharpness) {
-					$styles = $sharpnessNodes->eq($index)->attr('style');
-
-					if (!$styles || !preg_match('/width: ?(\d+)px/', $styles, $matches))
+					if (!$classList || stripos($classList, 'text-muted') !== false)
 						continue;
 
-					$value = (int)$matches[1];
+					$coating = trim($node->text());
 
-					if ($value === 0)
-						break;
+					$coatings[] = self::COATING_TRANSLATIONS[$coating] ?? $coating;
+				}
 
-					$weapon->setAttribute($sharpness, (int)$matches[1]);
+				$weapon->setAttribute(Attribute::COATINGS, $coatings);
+			} else if (in_array($weaponType, [WeaponType::LIGHT_BOWGUN, WeaponType::HEAVY_BOWGUN])) {
+				$capacityNodes = $nodes->eq(4)->filter('div');
+				$capacities = [];
+
+				for ($i = 0, $ii = $capacityNodes->count(); $i < $ii; $i++) {
+					$row = trim(preg_replace('/\s+/', ' ', $capacityNodes->eq($i)->text()));
+					$data = explode(' ', $row);
+
+					if (sizeof($data) === 0)
+						throw new \RuntimeException('Could not properly interpret capacities row: ' . $row);
+
+					$currentType = static::getTranslatedCapacityType(array_shift($data));
+
+					while (($next = array_shift($data)) !== null) {
+						if (!is_numeric($next)) {
+							$currentType = static::getTranslatedCapacityType($next);
+
+							$capacities[$currentType] = [];
+
+							continue;
+						}
+
+						$capacities[$currentType][] = (int)$next;
+					}
+				}
+				
+				$positions = array_flip(array_values(self::CAPACITY_TRANSLATIONS));
+				
+				uksort($capacities, function(string $a, string $b) use ($positions): int {
+					return $positions[$a] - $positions[$b];
+				});
+
+				$weapon->setAttribute(Attribute::AMMO_CAPACITIES, $capacities);
+			} else {
+				$sharpnessNodes = $nodes->eq(4)->children();
+
+				if ($sharpnessNodes->count()) {
+					$sharpnessNodes = $sharpnessNodes->first()->children();
+
+					foreach (self::SHARPNESS_NODES as $i => $sharpness) {
+						$styles = $sharpnessNodes->eq($i)->attr('style');
+
+						if (!$styles || !preg_match('/width: ?(\d+)px/', $styles, $matches))
+							continue;
+
+						$value = (int)$matches[1];
+
+						if ($value === 0)
+							break;
+
+						$weapon->setAttribute($sharpness, (int)$matches[1]);
+					}
 				}
 			}
 
@@ -201,5 +291,14 @@
 				->setAttribute(Attribute::ELEM_TYPE, $element)
 				->setAttribute(Attribute::ELEM_DAMAGE, (int)$value)
 				->setAttribute(Attribute::ELEM_HIDDEN, $hiddenChar !== null);
+		}
+
+		/**
+		 * @param string $type
+		 *
+		 * @return string
+		 */
+		protected static function getTranslatedCapacityType(string $type): string {
+			return self::CAPACITY_TRANSLATIONS[$type] ?? $type;
 		}
 	}

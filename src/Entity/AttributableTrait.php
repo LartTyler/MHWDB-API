@@ -18,13 +18,10 @@
 		 * @param string $attribute
 		 * @param mixed  $def
 		 *
-		 * @return string|int|bool|null
+		 * @return mixed|null
 		 */
 		public function getAttribute(string $attribute, $def = null) {
-			if (isset($this->attributes[$attribute]))
-				return $this->attributes[$attribute];
-
-			return $def;
+			return $this->attributes[$attribute] ?? $def;
 		}
 
 		/**
@@ -42,8 +39,8 @@
 		}
 
 		/**
-		 * @param string               $attribute
-		 * @param string|int|bool|null $value
+		 * @param string     $attribute
+		 * @param mixed|null $value
 		 *
 		 * @return $this
 		 */

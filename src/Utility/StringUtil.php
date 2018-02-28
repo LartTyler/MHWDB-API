@@ -17,8 +17,10 @@
 			return strtolower(str_replace([
 				' ',
 				'\'',
+				'"',
 			], [
 				'-',
+				'',
 				'',
 			], $string));
 		}
