@@ -33,18 +33,6 @@ App\Entity\Weapon:
             length: 64
             nullable: false
             unique: true
-    manyToMany:
         attributes:
-            targetEntity: App\Entity\ItemAttribute
-            joinTable:
-                name: weapons_item_attributes
-                joinColumn:
-                    weapon_id:
-                        nullable: false
-                        options:
-                            unsigned: true
-                inverseJoinColumn:
-                    item_attribute_id:
-                        nullable: false
-                        options:
-                            unsigned: true
+            type: json
+            nullable: false

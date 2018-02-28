@@ -40,6 +40,15 @@
 			Attribute::SHARP_WHITE,
 		];
 
+		private const ATTRIBUTE_MATCHERS = [
+			'/(\d+) (Fire|Water|Ice|Thunder|Dragon|Blast|Poison|Paralysis|Sleep)(\))?/' => [self::class, 'parseElemDamageAttribute'],
+			'/((?:Sever|Speed|Element|Health|Stamina|Blunt) Boost)/' => Attribute::IG_BOOST_TYPE,
+			'/Affinity +?(-?\d+%?)/' => Attribute::AFFINITY,
+			'/((?:Normal|Wide|Long) Lv\d+)/' => Attribute::GL_SHELLING_TYPE,
+			'/((?:Poison|Para|Dragon|Exhaust) Phial \d+)/' => Attribute::PHIAL_TYPE,
+			'/(?:Power)?((?:Power|Element|Impact) Phial)/' => Attribute::PHIAL_TYPE,
+		];
+
 		/**
 		 * @var KiranicoScrapeTarget
 		 */
@@ -78,8 +87,15 @@
 				for ($i = 0, $ii = $crawler->count(); $i < $ii; $i++) {
 					$nodes = $crawler->eq($i)->children();
 
+					// Skip table header rows
+					if ($nodes->filter('th')->count())
+						continue;
+
 					$this->process($nodes, $weaponType);
 				}
+
+				// We sleep to avoid hitting the target too fast
+				sleep(2);
 			}
 		}
 
@@ -90,41 +106,69 @@
 		 * @return void
 		 */
 		protected function process(Crawler $nodes, string $weaponType): void {
-			$name = StringUtil::replaceNumeralRank(trim($nodes->first()->children()->filter('a')->text()));
+			$name = StringUtil::replaceNumeralRank(trim($nodes->first()->filter('a')->text()));
 			$rarity = (int)str_replace('RARE', '', trim($nodes->last()->text()));
 
-			$weapon = new Weapon($name, $weaponType, $rarity);
+			/** @var Weapon|null $weapon */
+			$weapon = $this->manager->getRepository('App:Weapon')->findOneBy([
+				'name' => $name,
+			]);
+
+			if (!$weapon) {
+				$weapon = new Weapon($name, $weaponType, $rarity);
+
+				$this->manager->persist($weapon);
+			} else
+				$weapon->setAttributes([]);
 
 			$weapon->setAttribute(Attribute::ATTACK, (int)trim($nodes->eq(1)->text()));
 
-			if ($elemDescription = trim($nodes->eq(3)->text())) {
-				if (strpos($elemDescription, '(') === 0) {
-					$weapon->setAttribute(Attribute::ELEM_HIDDEN, true);
+			if ($attributeDescription = trim($nodes->eq(3)->text())) {
+				// This fixes a ton of whitespace between phrases in the element description
+				$attributeDescription = trim(preg_replace('/\s+/', ' ', $attributeDescription));
 
-					$elemDescription = substr($elemDescription, 1, strlen($elemDescription) - 2);
+				foreach (self::ATTRIBUTE_MATCHERS as $regex => $attribute) {
+					if (!preg_match($regex, $attributeDescription, $matches))
+						continue;
+
+					// Throw away the full pattern match, we don't want it
+					array_shift($matches);
+
+					if (is_string($attribute))
+						$weapon->setAttribute($attribute, is_numeric($matches[0]) ? (int)$matches[0] : $matches[0]);
+					else if (is_callable($attribute))
+						call_user_func($attribute, $weapon, ...$matches);
+					else
+						throw new \InvalidArgumentException('Can\'t hand attribute value. Check ' . static::class .
+							'::ATTRIBUTE_MATCHERS');
 				}
-
-				$weapon
-					->setAttribute(Attribute::ELEM_DAMAGE, (int)strtok($elemDescription, ' '))
-					->setAttribute(Attribute::ELEM_TYPE, strtok(''));
 			}
 
-			$sharpnessNodes = $nodes->eq(4)->filter('div div');
+			$sharpnessNodes = $nodes->eq(4)->children();
 
-			foreach (self::SHARPNESS_NODES as $index => $sharpness) {
-				$styles = $sharpnessNodes->eq($index)->attr('style');
+			if ($sharpnessNodes->count()) {
+				$sharpnessNodes = $sharpnessNodes->first()->children();
 
-				if (!$styles || !preg_match('/width: ?(\d+)px/', $styles, $matches))
-					continue;
+				foreach (self::SHARPNESS_NODES as $index => $sharpness) {
+					$styles = $sharpnessNodes->eq($index)->attr('style');
 
-				$weapon->setAttribute($sharpness, (int)$matches[1]);
+					if (!$styles || !preg_match('/width: ?(\d+)px/', $styles, $matches))
+						continue;
+
+					$value = (int)$matches[1];
+
+					if ($value === 0)
+						break;
+
+					$weapon->setAttribute($sharpness, (int)$matches[1]);
+				}
 			}
 
-			$slotNodes = $nodes->eq(5)->filter('small i');
+			$slotNodes = $nodes->eq(5)->children()->first()->children();
 			$slotCounts = [];
 
-			for ($j = 0, $jj = $slotNodes->count(); $j < $jj; $j++) {
-				if (!preg_match('/zmdi-n-(\d+)-square/', $slotNodes->eq($j)->attr('class'), $matches))
+			for ($i = 0, $ii = $slotNodes->count(); $i < $ii; $i++) {
+				if (!preg_match('/zmdi-n-(\d+)-square/', $slotNodes->eq($i)->attr('class'), $matches))
 					continue;
 
 				$key = (int)$matches[1];
@@ -137,5 +181,25 @@
 
 			foreach ($slotCounts as $rank => $count)
 				$weapon->setAttribute('slotsRank' . $rank, $count);
+		}
+
+		/**
+		 * @param Weapon      $weapon
+		 * @param string      $value
+		 * @param string      $element
+		 * @param null|string $hiddenChar
+		 *
+		 * @return void
+		 */
+		public static function parseElemDamageAttribute(
+			Weapon $weapon,
+			string $value,
+			string $element,
+			?string $hiddenChar = null
+		): void {
+			$weapon
+				->setAttribute(Attribute::ELEM_TYPE, $element)
+				->setAttribute(Attribute::ELEM_DAMAGE, (int)$value)
+				->setAttribute(Attribute::ELEM_HIDDEN, $hiddenChar !== null);
 		}
 	}

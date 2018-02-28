@@ -32,6 +32,15 @@
 		const SHARP_BLUE = 'sharpnessBlue';
 		const SHARP_WHITE = 'sharpnessWhite';
 
+		// -- Insect Glaive Attributes --
+		const IG_BOOST_TYPE = 'boostType';
+
+		// -- Gunlance Attributes --
+		const GL_SHELLING_TYPE = 'shellingType';
+
+		// -- Switch Axe / Charge Blade Attributes --
+		const PHIAL_TYPE = 'phialType';
+
 		// -- Armor Attributes --
 		const DEFENSE = 'defense';
 		const RES_FIRE = 'resistFire';
