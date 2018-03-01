@@ -8,6 +8,7 @@
 		const SLOT_RANK_1 = 'slotsRank1';
 		const SLOT_RANK_2 = 'slotsRank2';
 		const SLOT_RANK_3 = 'slotsRank3';
+		const REQUIRED_GENDER = 'requiredGender';
 
 		// -- Skill Attribute Modifiers --
 		const SHARP_BONUS = 'sharpnessBonus';

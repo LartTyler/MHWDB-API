@@ -1,0 +1,48 @@
+App\Entity\Armor:
+    type: entity
+    table: armor
+    indexes:
+        type_idx:
+            columns:
+                - type
+    id:
+        id:
+            type: integer
+            nullable: false
+            options:
+                unsigned: true
+            generator:
+                strategy: IDENTITY
+    fields:
+        name:
+            type: string
+            length: 64
+            nullable: false
+            unique: true
+        slug:
+            type: string
+            length: 64
+            nullable: false
+            unique: true
+        type:
+            type: string
+            length: 32
+            nullable: false
+        attributes:
+            type: json
+            nullable: false
+    manyToMany:
+        skills:
+            targetEntity: App\Entity\SkillRank
+            joinTable:
+                name: armor_skill_ranks
+                joinColumns:
+                    armor_id:
+                        nullable: false
+                        options:
+                            unsigned: true
+                inverseJoinColumns:
+                    skill_rank_id:
+                        nullable: false
+                        options:
+                            unsigned: true
