@@ -4,11 +4,13 @@
 	use App\Entity\Armor;
 	use App\Entity\SkillRank;
 	use App\Game\ArmorType;
+	use App\Game\Attribute;
 	use App\Scraper\AbstractScraper;
 	use App\Scraper\Kiranico\KiranicoScrapeTarget;
 	use App\Scraper\ScraperType;
 	use Doctrine\ORM\EntityManagerInterface;
 	use Symfony\Bridge\Doctrine\RegistryInterface;
+	use Symfony\Component\CssSelector\Node\AttributeNode;
 	use Symfony\Component\DomCrawler\Crawler;
 	use Symfony\Component\HttpFoundation\Response;
 
@@ -157,6 +159,29 @@
 				$armor->setAttributes([]);
 				$armor->getSkills()->clear();
 			}
+
+			$infoNodes = $crawler->filter('.card')->eq(1)->filter('.card-footer .p-3');
+
+			$armor
+				->setAttribute(Attribute::DEFENSE, (int)strtok(trim($infoNodes->eq(0)->filter('.lead')->text()), ' '));
+
+			$slotNodes = $infoNodes->eq(1)->filter('.zmdi');
+			$slotCounts = [];
+
+			for ($i = 0, $ii = $slotNodes->count(); $i < $ii; $i++) {
+				if (!preg_match('/zmdi-n-(\d+)-square/', $slotNodes->eq($i)->attr('class'), $matches))
+					continue;
+
+				$key = (int)$matches[1];
+
+				if (!isset($slotCounts[$key]))
+					$slotCounts[$key] = 0;
+
+				++$slotCounts[$key];
+			}
+
+			foreach ($slotCounts as $rank => $count)
+				$armor->setAttribute('slotsRank' . $rank, $count);
 
 			$attributeNodes = $crawler->filter('.row.no-gutters')->children();
 
