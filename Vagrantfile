@@ -24,6 +24,9 @@ Vagrant.configure(2) do |config|
 
     sh -lc 'mysql -u root -e "CREATE SCHEMA IF NOT EXISTS application;"'
 
+    sudo sh -c 'echo "[client]" >> ~/.my.cnf'
+    sudo sh -c 'echo "user=root" >> ~/.my.cnf'
+
     sudo yum install -y rh-php71 rh-php71-php rh-php71-php-mysqlnd rh-php71-php-xml
     sudo sh -c 'echo "source scl_source enable rh-php71" >> /etc/profile.d/scl.sh'
 

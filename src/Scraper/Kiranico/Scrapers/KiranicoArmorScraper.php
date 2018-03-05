@@ -183,6 +183,15 @@
 			foreach ($slotCounts as $rank => $count)
 				$armor->setAttribute('slotsRank' . $rank, $count);
 
+			$genderNodes = $infoNodes->eq(3)->filter('.zmdi:not(.text-dark)');
+
+			if ($genderNodes->count() < 2) {
+				preg_match('/zmdi-(female|male)/', $genderNodes->first()->attr('class'), $matches);
+
+				if (sizeof($matches) >= 2)
+					$armor->setAttribute(Attribute::REQUIRED_GENDER, $matches[1]);
+			}
+
 			$attributeNodes = $crawler->filter('.row.no-gutters')->children();
 
 			$elemResists = $attributeNodes->eq(0)->filter('.card-body table tr');
