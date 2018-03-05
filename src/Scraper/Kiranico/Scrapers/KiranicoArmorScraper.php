@@ -3,6 +3,7 @@
 
 	use App\Entity\Armor;
 	use App\Entity\SkillRank;
+	use App\Game\ArmorRank;
 	use App\Game\ArmorType;
 	use App\Game\Attribute;
 	use App\Scraper\AbstractScraper;
@@ -15,11 +16,6 @@
 	use Symfony\Component\HttpFoundation\Response;
 
 	class KiranicoArmorScraper extends AbstractScraper {
-		private const HIGH_RANK_SUFFIX_TRANSLATIONS = [
-			'Alpha' => 'α',
-			'Beta' => 'β',
-		];
-
 		private const ARMOR_TYPE_PHRASES = [
 			// -- Standard --
 			'Headgear' => ArmorType::HEAD,
@@ -111,6 +107,7 @@
 				throw new \RuntimeException('Could not retrieve ' . $uri);
 
 			$crawler = (new Crawler($response->getBody()->getContents()))->filter('.container .tab-content .card');
+			$currentRank = ArmorRank::LOW;
 
 			for ($i = 0, $ii = $crawler->count(); $i < $ii; $i++) {
 				$setPieceNodes = $crawler->eq($i)->filter('.card-body table')->eq(0)->filter('tr');
@@ -118,17 +115,21 @@
 				for ($j = 0, $jj = $setPieceNodes->count(); $j < $jj; $j++) {
 					$link = $setPieceNodes->eq($j)->filter('a')->attr('href');
 
-					$this->process(parse_url($link, PHP_URL_PATH));
+					if (stripos($link, 'Alpha'))
+						$currentRank = ArmorRank::HIGH;
+
+					$this->process(parse_url($link, PHP_URL_PATH), $currentRank);
 				}
 			}
 		}
 
 		/**
 		 * @param string $path
+		 * @param string $rank
 		 *
-		 * @throws \Http\Client\Exception
+		 * @return void
 		 */
-		protected function process(string $path) {
+		protected function process(string $path, string $rank): void {
 			$uri = $this->target->getBaseUri()->withPath($path);
 			$response = $this->target->getHttpClient()->get($uri);
 
@@ -152,7 +153,7 @@
 			]);
 
 			if (!$armor) {
-				$armor = new Armor($name, $armorType);
+				$armor = new Armor($name, $armorType, $rank);
 
 				$this->manager->persist($armor);
 			} else {
@@ -271,8 +272,8 @@
 
 			$partCount = sizeof($parts);
 
-			if (isset(KiranicoArmorScraper::HIGH_RANK_SUFFIX_TRANSLATIONS[$parts[$partCount - 1]])) {
-				$rank = KiranicoArmorScraper::HIGH_RANK_SUFFIX_TRANSLATIONS[array_pop($parts)];
+			if (in_array($parts[$partCount - 1], ['Alpha', 'Beta'])) {
+				$rank = array_pop($parts);
 
 				--$partCount;
 			} else

@@ -23,6 +23,11 @@
 		private $type;
 
 		/**
+		 * @var string
+		 */
+		private $rank;
+
+		/**
 		 * @var Collection|Selectable|SkillRank[]
 		 */
 		private $skills;
@@ -33,9 +38,10 @@
 		 * @param string $name
 		 * @param string $type
 		 */
-		public function __construct(string $name, string $type) {
+		public function __construct(string $name, string $type, string $rank) {
 			$this->name = $name;
 			$this->type = $type;
+			$this->rank = $rank;
 			$this->skills = new ArrayCollection();
 
 			$this->setSlug($name);
@@ -60,5 +66,23 @@
 		 */
 		public function getSkills() {
 			return $this->skills;
+		}
+
+		/**
+		 * @return string
+		 */
+		public function getRank(): string {
+			return $this->rank;
+		}
+
+		/**
+		 * @param string $rank
+		 *
+		 * @return $this
+		 */
+		public function setRank(string $rank) {
+			$this->rank = $rank;
+
+			return $this;
 		}
 	}

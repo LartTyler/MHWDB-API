@@ -28,6 +28,10 @@ App\Entity\Armor:
             type: string
             length: 32
             nullable: false
+        rank:
+            type: string
+            length: 16
+            nullable: false
         attributes:
             type: json
             nullable: false
