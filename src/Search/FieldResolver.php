@@ -4,6 +4,7 @@
 	use App\Search\Exception\CannotDirectlySearchRelationshipException;
 	use App\Search\Exception\UnknownFieldException;
 	use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+	use Doctrine\DBAL\Types\Type;
 	use Doctrine\ORM\QueryBuilder;
 	use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -34,6 +35,11 @@
 		protected $joins = [];
 
 		/**
+		 * @var array
+		 */
+		protected $resolveCache = [];
+
+		/**
 		 * FieldResolver constructor.
 		 *
 		 * @param RegistryInterface $registry
@@ -50,11 +56,14 @@
 		/**
 		 * @param string $field
 		 *
-		 * @return string
+		 * @return FieldInfo
 		 * @throws CannotDirectlySearchRelationshipException
 		 * @throws UnknownFieldException
 		 */
-		public function resolve(string $field): string {
+		public function resolve(string $field): FieldInfo {
+			if (isset($this->resolveCache[$field]))
+				return $this->resolveCache[$field];
+
 			$parts = explode('.', $field);
 			$actualField = array_pop($parts);
 
@@ -79,7 +88,9 @@
 				$alias = $this->getJoinAlias($alias, $part);
 			}
 
-			return $alias . '.' . $actualField;
+			$isJson = $metadata->getTypeOfField($actualField) === Type::JSON;
+
+			return $this->resolveCache[$field] = new FieldInfo($alias . '.' . $actualField, $isJson);
 		}
 
 		/**
