@@ -93,6 +93,11 @@
 		 * @return Response
 		 */
 		public function searchAction(Request $request): Response {
+			$query = $request->query->all();
+
+			if (isset($query['fields']))
+				unset($query['fields']);
+
 			return $this->getSearchResults($request->query->all());
 		}
 
