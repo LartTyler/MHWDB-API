@@ -3,9 +3,12 @@
 
 	use App\Exceptions\JsonSearchOnNonJsonFieldException;
 	use App\Entity\SluggableInterface;
+	use App\Response\BadQueryObjectError;
 	use App\Response\BadSearchParametersError;
 	use App\Response\EmptySearchParametersError;
+	use App\Response\SearchError;
 	use App\Response\SlugNotSupportedError;
+	use App\Search\SearchManager;
 	use DaybreakStudios\Doze\Errors\ApiErrorInterface;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -70,9 +73,14 @@
 		}
 
 		/**
+		 * @param Request $request
+		 *
 		 * @return Response
 		 */
-		public function listAction(): Response {
+		public function listAction(Request $request): Response {
+			if ($request->query->has('q'))
+				return $this->getSearchResults($request->query->all());
+
 			$items = $this->manager->getRepository($this->entityClass)->findAll();
 
 			return $this->responder->createResponse($items);
@@ -85,20 +93,6 @@
 		 */
 		public function readAction(string $idOrSlug): Response {
 			return $this->respond($this->getEntity($idOrSlug));
-		}
-
-		/**
-		 * @param Request $request
-		 *
-		 * @return Response
-		 */
-		public function searchAction(Request $request): Response {
-			$query = $request->query->all();
-
-			if (isset($query['fields']))
-				unset($query['fields']);
-
-			return $this->getSearchResults($request->query->all());
 		}
 
 		/**
@@ -116,75 +110,31 @@
 			if (!sizeof($query))
 				return $this->responder->createErrorResponse(new EmptySearchParametersError());
 
-			$qb = $this->manager->createQueryBuilder()
-				->from($this->entityClass, $alias = 'e')
-				->select($alias)
+			$queryBuilder = $this->manager->createQueryBuilder()
+				->from($this->entityClass, 'e')
+				->select('e')
 				->setMaxResults($limit)
 				->setFirstResult($offset);
 
-			foreach ($query as $field => $value)
-				try {
-					$this->addSearchFieldClauses($qb, $alias, $field, $value);
-				} catch (JsonSearchOnNonJsonFieldException $e) {
-					return $this->responder->createErrorResponse(new BadSearchParametersError($e->getMessage()));
-				}
+			$queryObject = $query['q'] ?? [];
 
-			return $this->respond($qb->getQuery()->getResult());
-		}
+			if (is_string($queryObject)) {
+				$queryObject = json_decode($queryObject, true);
 
-		/**
-		 * @param QueryBuilder $qb
-		 * @param string       $alias
-		 * @param string       $field
-		 * @param              $value
-		 *
-		 * @return void
-		 */
-		protected function addSearchFieldClauses(QueryBuilder $qb, string $alias, string $field, $value): void {
-			$parts = array_map(function(string $item): string {
-				return trim($item);
-			}, explode(',', $value));
-
-			foreach ($parts as $i => $part) {
-				$operator = '=';
-
-				foreach (self::SEARCH_OPERATORS as $symbol => $op) {
-					if (strpos($part, $symbol) !== 0)
-						continue;
-
-					$operator = $op;
-					$part = substr($part, strlen($symbol));
-
-					break;
-				}
-
-				// For searching JSON attributes, in the form 'field_attribute'
-				if (strpos($field, '_')) {
-					$actualField = strtok($field, '_');
-
-					if (!$this->isJsonField($actualField))
-						throw new JsonSearchOnNonJsonFieldException($actualField);
-
-					$fieldKey = sprintf("JSON_UNQUOTE(JSON_EXTRACT(%s.%s, '$.%s'))", $alias, $actualField, strtok(''));
-				} else
-					$fieldKey = sprintf('%s.%s', $alias, $field);
-
-				$paramKey = sprintf('%s_%d', $field, $i);
-
-				$qb
-					// sprintf("{alias}.{field} {operator} :{paramKey}", ...)
-					->andWhere($_ = sprintf('%s %s :%s', $fieldKey, $operator, $paramKey))
-					->setParameter($paramKey, $part);
+				if (json_last_error() !== JSON_ERROR_NONE)
+					return $this->responder->createErrorResponse(new BadQueryObjectError());
 			}
-		}
 
-		/**
-		 * @param string $field
-		 *
-		 * @return bool
-		 */
-		protected function isJsonField(string $field): bool {
-			return $this->manager->getClassMetadata($this->entityClass)->getTypeOfField($field) === Type::JSON;
+			if (!$queryObject)
+				return $this->responder->createErrorResponse(new EmptySearchParametersError());
+
+			try {
+				$this->get(SearchManager::class)->create($this->manager, $queryBuilder)->process($queryObject);
+			} catch (\Exception $e) {
+				return $this->responder->createErrorResponse(new SearchError($e->getMessage()));
+			}
+
+			return $this->respond($queryBuilder->getQuery()->getResult());
 		}
 
 		/**

@@ -1,7 +1,7 @@
 <?php
 	namespace App\Search\Exception;
 
-	class UnknownOperatorException extends \Exception {
+	class UnknownOperatorException extends SearchException {
 		/**
 		 * UnknownOperatorException constructor.
 		 *

@@ -1,6 +1,10 @@
 <?php
 	namespace App\Search;
 
+	use Doctrine\Common\Persistence\ObjectManager;
+	use Doctrine\ORM\QueryBuilder;
+	use Symfony\Bridge\Doctrine\RegistryInterface;
+
 	class SearchManager {
 		protected $operators;
 
@@ -53,5 +57,15 @@
 			unset($this->operators[$key]);
 
 			return $this;
+		}
+
+		/**
+		 * @param ObjectManager $entityManager
+		 * @param QueryBuilder  $queryBuilder
+		 *
+		 * @return SearchQuery
+		 */
+		public function create(ObjectManager $entityManager, QueryBuilder $queryBuilder): SearchQuery {
+			return new SearchQuery($this, $queryBuilder, $entityManager);
 		}
 	}

@@ -1,15 +1,17 @@
 <?php
 	namespace App\Search;
 
-	use Doctrine\ORM\Query\Expr\Base;
+	use Doctrine\ORM\Query\Expr\Composite;
 
 	interface OperatorInterface {
 		/**
 		 * @param SearchQuery  $query
+		 * @param string       $key
 		 * @param string|array $argument
 		 * @param int          $paramIndex
+		 * @param Composite    $node
 		 *
-		 * @return Base
+		 * @return void
 		 */
-		public function process(SearchQuery $query, $argument, int &$paramIndex = 0): Base;
+		public function process(SearchQuery $query, string $key, $argument, int &$paramIndex, Composite $node): void;
 	}

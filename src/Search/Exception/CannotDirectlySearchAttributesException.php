@@ -1,9 +1,9 @@
 <?php
 	namespace App\Search\Exception;
 
-	class CannotDirectlySearchRelationshipException extends SearchException {
+	class CannotDirectlySearchAttributesException extends SearchException {
 		/**
-		 * CannotSearchByDirectRelationshipException constructor.
+		 * CannotDirectlySearchAttributesException constructor.
 		 *
 		 * @param string $field
 		 */

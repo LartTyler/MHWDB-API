@@ -1,7 +1,7 @@
 <?php
 	namespace App\Search\Exception;
 
-	class UnknownFieldException extends \Exception {
+	class UnknownFieldException extends SearchException {
 		/**
 		 * UnknownFieldException constructor.
 		 *

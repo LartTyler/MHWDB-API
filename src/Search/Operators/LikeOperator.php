@@ -5,21 +5,16 @@
 	use App\Search\OperatorInterface;
 	use App\Search\SearchQuery;
 	use Doctrine\ORM\Query\Expr\Composite;
-	use Doctrine\ORM\Query\Expr\Orx;
 
-	class OrOperator implements OperatorInterface {
+	class LikeOperator implements OperatorInterface {
 		/**
 		 * {@inheritdoc}
 		 */
 		public function process(SearchQuery $query, string $key, $argument, int &$paramIndex, Composite $node): void {
-			if (!is_array($argument))
-				throw new InvalidFieldValueException($key . '.$or', 'array');
+			if (!is_string($argument))
+				throw new InvalidFieldValueException($key . '.$like', 'string');
 
-			$orX = new Orx();
-
-			foreach ($argument as $arg)
-				$query->process($arg, $paramIndex, $orX);
-
-			$node->add($orX);
+			$node->add($query->expr()->like($query->resolveField($key), '?' . $paramIndex));
+			$query->setParameter($paramIndex++, $argument);
 		}
 	}

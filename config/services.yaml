@@ -33,3 +33,25 @@ services:
             -
                 name: console.command
                 command: scrape:kiranico
+
+    App\Search\SearchManager:
+        public: true
+        arguments:
+            -
+                or: '@App\Search\Operators\OrOperator'
+                neq: '@App\Search\Operators\NotEqualOperator'
+                gt: '@App\Search\Operators\GreaterThanOperator'
+                gte: '@App\Search\Operators\GreaterThanEqualOperator'
+                lt: '@App\Search\Operators\LessThanOperator'
+                lte: '@App\Search\Operators\LessThanEqualOperator'
+                like: '@App\Search\Operators\LikeOperator'
+                in: '@App\Search\Operators\InOperator'
+
+    App\Search\Operators\NotEqualOperator: ~
+    App\Search\Operators\OrOperator: ~
+    App\Search\Operators\GreaterThanOperator: ~
+    App\Search\Operators\GreaterThanEqualOperator: ~
+    App\Search\Operators\LessThanOperator: ~
+    App\Search\Operators\LessThanEqualOperator: ~
+    App\Search\Operators\LikeOperator: ~
+    App\Search\Operators\InOperator: ~

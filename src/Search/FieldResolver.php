@@ -1,9 +1,12 @@
 <?php
 	namespace App\Search;
 
+	use App\Search\Exception\CannotDirectlySearchAttributesException;
 	use App\Search\Exception\CannotDirectlySearchRelationshipException;
+	use App\Search\Exception\SearchException;
 	use App\Search\Exception\UnknownFieldException;
 	use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+	use Doctrine\Common\Persistence\ObjectManager;
 	use Doctrine\DBAL\Types\Type;
 	use Doctrine\ORM\QueryBuilder;
 	use Symfony\Bridge\Doctrine\RegistryInterface;
@@ -42,11 +45,11 @@
 		/**
 		 * FieldResolver constructor.
 		 *
-		 * @param RegistryInterface $registry
-		 * @param QueryBuilder      $queryBuilder
+		 * @param ObjectManager $entityManager
+		 * @param QueryBuilder  $queryBuilder
 		 */
-		public function __construct(RegistryInterface $registry, QueryBuilder $queryBuilder) {
-			$this->entityManager = $registry->getManager();
+		public function __construct(ObjectManager $entityManager, QueryBuilder $queryBuilder) {
+			$this->entityManager = $entityManager;
 			$this->queryBuilder = $queryBuilder;
 
 			$this->rootMetadata = $this->entityManager->getClassMetadata($queryBuilder->getRootEntities()[0]);
@@ -56,11 +59,10 @@
 		/**
 		 * @param string $field
 		 *
-		 * @return FieldInfo
-		 * @throws CannotDirectlySearchRelationshipException
-		 * @throws UnknownFieldException
+		 * @return string
+		 * @throws SearchException
 		 */
-		public function resolve(string $field): FieldInfo {
+		public function resolve(string $field): string {
 			if (isset($this->resolveCache[$field]))
 				return $this->resolveCache[$field];
 
@@ -71,7 +73,7 @@
 				if ($this->rootMetadata->hasAssociation($actualField))
 					throw new CannotDirectlySearchRelationshipException($actualField);
 
-				return $actualField;
+				return $this->rootAlias . '.' . $actualField;
 			}
 
 			// skills.level
@@ -80,17 +82,29 @@
 			$metadata = $this->rootMetadata;
 			$alias = $this->rootAlias;
 
-			foreach ($parts as $part) {
-				if (!$metadata->hasAssociation($part))
+			foreach ($parts as $i => $part) {
+				if ($metadata->getTypeOfField($part) === Type::JSON) {
+					if (isset($parts[$i + 1]))
+						$items = array_slice($parts, $i + 1);
+					else
+						$items = [];
+
+					$items[] = $actualField;
+
+					$jsonKey = implode('.', $items);
+
+					return sprintf("JSON_UNQUOTE(JSON_EXTRACT(%s.%s, '\$.%s'))", $alias, $part, $jsonKey);
+				} else if (!$metadata->hasAssociation($part))
 					throw new UnknownFieldException($field);
 
 				$metadata = $this->entityManager->getClassMetadata($metadata->getAssociationTargetClass($part));
 				$alias = $this->getJoinAlias($alias, $part);
 			}
 
-			$isJson = $metadata->getTypeOfField($actualField) === Type::JSON;
+			if (!$metadata->hasField($actualField))
+				throw new UnknownFieldException($field);
 
-			return $this->resolveCache[$field] = new FieldInfo($alias . '.' . $actualField, $isJson);
+			return $alias . '.' . $actualField;
 		}
 
 		/**

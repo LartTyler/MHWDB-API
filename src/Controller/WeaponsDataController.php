@@ -19,29 +19,4 @@
 		public function __construct(RegistryInterface $doctrine, ResponderService $responder, RouterInterface $router) {
 			parent::__construct($doctrine, $responder, $router, Weapon::class);
 		}
-
-		/**
-		 * @param string $type
-		 *
-		 * @return Response
-		 */
-		public function listByTypeAction(string $type): Response {
-			return $this->respond($this->manager->getRepository(Weapon::class)->findBy([
-				'type' => $type,
-			]));
-		}
-
-		/**
-		 * @param string  $type
-		 * @param Request $request
-		 *
-		 * @return Response
-		 */
-		public function searchByTypeAction(string $type, Request $request): Response {
-			$query = $request->query->all();
-
-			$query['type'] = $type;
-
-			return $this->getSearchResults($query);
-		}
 	}

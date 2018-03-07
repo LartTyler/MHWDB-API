@@ -4,20 +4,6 @@ api.weapons.list:
     path: /weapons
     controller: 'App\Controller\WeaponsDataController::listAction'
 
-api.weapons.search:
-    methods:
-        - GET
-    path: /weapons/search
-    controller: 'App\Controller\WeaponsDataController::searchAction'
-
-api.weapons.list-by-type:
-    methods:
-        - GET
-    path: /weapons/{type}
-    controller: 'App\Controller\WeaponsDataController::listByTypeAction'
-    requirements:
-        type: great-sword|long-sword|sword-and-shield|dual-blades|hammer|hunting-horn|lance|gunlance|switch-axe|charge-blade|insect-glaive|light-bowgun|heavy-bowgun|bow
-
 api.weapons.read:
     methods:
         - GET

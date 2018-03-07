@@ -4,12 +4,6 @@ api.armor.list:
     path: /armor
     controller: 'App\Controller\ArmorDataController::listAction'
 
-api.armor.search:
-    methods:
-        - GET
-    path: /armor/search
-    controller: 'App\Controller\ArmorDataController::searchAction'
-
 api.armor.read:
     methods:
         - GET

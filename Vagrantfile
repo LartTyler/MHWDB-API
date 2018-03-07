@@ -27,7 +27,7 @@ Vagrant.configure(2) do |config|
     sudo sh -c 'echo "[client]" >> ~/.my.cnf'
     sudo sh -c 'echo "user=root" >> ~/.my.cnf'
 
-    sudo yum install -y rh-php71 rh-php71-php rh-php71-php-mysqlnd rh-php71-php-xml
+    sudo yum install -y rh-php71 rh-php71-php rh-php71-php-mysqlnd rh-php71-php-xml rh-php71-php-process
     sudo sh -c 'echo "source scl_source enable rh-php71" >> /etc/profile.d/scl.sh'
 
     wget https://gist.githubusercontent.com/LartTyler/56966b744b9f60ab050e64091d6296dd/raw/e9192ed8149eeb8698b5c1fc862bb9872fc6faf3/install-composer.sh
