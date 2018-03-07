@@ -125,6 +125,15 @@
     "sensio/framework-extra-bundle": {
         "version": "v3.0.29"
     },
+    "symfony/apache-pack": {
+        "version": "1.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "master",
+            "version": "1.0",
+            "ref": "c82bead70f9a4f656354a193df7bf0ca2114efa0"
+        }
+    },
     "symfony/cache": {
         "version": "v4.0.4"
     },
