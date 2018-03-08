@@ -9,6 +9,7 @@
 	use App\Response\SearchError;
 	use App\Response\SlugNotSupportedError;
 	use App\Search\SearchManager;
+	use DaybreakStudios\DoctrineQueryDocument\QueryManager;
 	use DaybreakStudios\Doze\Errors\ApiErrorInterface;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -129,7 +130,7 @@
 				return $this->responder->createErrorResponse(new EmptySearchParametersError());
 
 			try {
-				$this->get(SearchManager::class)->create($this->manager, $queryBuilder)->process($queryObject);
+				$this->get(QueryManager::class)->apply($queryBuilder, $queryObject);
 			} catch (\Exception $e) {
 				return $this->responder->createErrorResponse(new SearchError($e->getMessage()));
 			}
