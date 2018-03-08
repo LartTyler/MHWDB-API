@@ -1,3 +1,9 @@
 api._routes:
     resource: 'routes/api'
     type: directory
+
+index:
+    path: /
+    controller: 'FrameworkBundle:Redirect:urlRedirect'
+    defaults:
+        path: https://github.com/LartTyler/MHWDB-Docs/blob/master/README.md
