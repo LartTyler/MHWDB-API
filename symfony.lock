@@ -5,6 +5,9 @@
     "dbstudios/doctrine-entities": {
         "version": "1.0.0"
     },
+    "dbstudios/doctrine-query-document": {
+        "version": "0.1.1"
+    },
     "dbstudios/doze": {
         "version": "1.1.0"
     },
