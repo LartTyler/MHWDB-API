@@ -4,7 +4,6 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "4f835632e62b152b4df86b05eec9ce0b",
     "content-hash": "ad34e74f0b2962e8b48ae3027545c82c",
     "packages": [
         {
@@ -57,7 +56,7 @@
                 "stream_filter_append",
                 "stream_filter_register"
             ],
-            "time": "2017-08-18 09:54:01"
+            "time": "2017-08-18T09:54:01+00:00"
         },
         {
             "name": "dbstudios/doctrine-entities",
@@ -92,20 +91,20 @@
                     "email": "tyler@gravitationalmarketing.com"
                 }
             ],
-            "time": "2017-06-26 19:31:21"
+            "time": "2017-06-26T19:31:21+00:00"
         },
         {
             "name": "dbstudios/doctrine-query-document",
-            "version": "0.1.1",
+            "version": "0.1.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/LartTyler/doctrine-query-document.git",
-                "reference": "f9b61f766fbf0798e58eda1a2105b1d5ff4a16b6"
+                "reference": "c41f49cc2384c10ca313a118bca2549b5a669693"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/LartTyler/doctrine-query-document/zipball/f9b61f766fbf0798e58eda1a2105b1d5ff4a16b6",
-                "reference": "f9b61f766fbf0798e58eda1a2105b1d5ff4a16b6",
+                "url": "https://api.github.com/repos/LartTyler/doctrine-query-document/zipball/c41f49cc2384c10ca313a118bca2549b5a669693",
+                "reference": "c41f49cc2384c10ca313a118bca2549b5a669693",
                 "shasum": ""
             },
             "require": {
@@ -130,7 +129,7 @@
                 }
             ],
             "description": "Allows building Doctrine queries using MongoDB-style query documents",
-            "time": "2018-03-08 01:03:40"
+            "time": "2018-03-08T17:16:26+00:00"
         },
         {
             "name": "dbstudios/doze",
@@ -174,7 +173,7 @@
                 }
             ],
             "description": "An easy to use library for building REST APIs",
-            "time": "2017-12-19 21:47:32"
+            "time": "2017-12-19T21:47:32+00:00"
         },
         {
             "name": "dbstudios/doze-bundle",
@@ -215,7 +214,7 @@
                 }
             ],
             "description": "An easy to use library for building REST APIs in Symfony",
-            "time": "2017-12-20 21:26:18"
+            "time": "2017-12-20T21:26:18+00:00"
         },
         {
             "name": "doctrine/annotations",
@@ -283,7 +282,7 @@
                 "docblock",
                 "parser"
             ],
-            "time": "2017-12-06 07:11:42"
+            "time": "2017-12-06T07:11:42+00:00"
         },
         {
             "name": "doctrine/cache",
@@ -357,7 +356,7 @@
                 "cache",
                 "caching"
             ],
-            "time": "2017-08-25 07:02:50"
+            "time": "2017-08-25T07:02:50+00:00"
         },
         {
             "name": "doctrine/collections",
@@ -424,7 +423,7 @@
                 "collections",
                 "iterator"
             ],
-            "time": "2017-07-22 10:37:32"
+            "time": "2017-07-22T10:37:32+00:00"
         },
         {
             "name": "doctrine/common",
@@ -497,7 +496,7 @@
                 "persistence",
                 "spl"
             ],
-            "time": "2017-08-31 08:43:38"
+            "time": "2017-08-31T08:43:38+00:00"
         },
         {
             "name": "doctrine/dbal",
@@ -570,7 +569,7 @@
                 "persistence",
                 "queryobject"
             ],
-            "time": "2017-11-19 13:38:54"
+            "time": "2017-11-19T13:38:54+00:00"
         },
         {
             "name": "doctrine/doctrine-bundle",
@@ -655,7 +654,7 @@
                 "orm",
                 "persistence"
             ],
-            "time": "2017-11-24 13:09:19"
+            "time": "2017-11-24T13:09:19+00:00"
         },
         {
             "name": "doctrine/doctrine-cache-bundle",
@@ -743,7 +742,7 @@
                 "cache",
                 "caching"
             ],
-            "time": "2017-10-12 17:23:29"
+            "time": "2017-10-12T17:23:29+00:00"
         },
         {
             "name": "doctrine/doctrine-migrations-bundle",
@@ -804,7 +803,7 @@
                 "migrations",
                 "schema"
             ],
-            "time": "2017-11-01 09:13:26"
+            "time": "2017-11-01T09:13:26+00:00"
         },
         {
             "name": "doctrine/inflector",
@@ -871,7 +870,7 @@
                 "singularize",
                 "string"
             ],
-            "time": "2018-01-09 20:05:19"
+            "time": "2018-01-09T20:05:19+00:00"
         },
         {
             "name": "doctrine/instantiator",
@@ -925,7 +924,7 @@
                 "constructor",
                 "instantiate"
             ],
-            "time": "2017-07-22 11:58:36"
+            "time": "2017-07-22T11:58:36+00:00"
         },
         {
             "name": "doctrine/lexer",
@@ -979,7 +978,7 @@
                 "lexer",
                 "parser"
             ],
-            "time": "2014-09-09 13:34:57"
+            "time": "2014-09-09T13:34:57+00:00"
         },
         {
             "name": "doctrine/migrations",
@@ -1051,7 +1050,7 @@
                 "database",
                 "migrations"
             ],
-            "time": "2017-11-24 14:13:17"
+            "time": "2017-11-24T14:13:17+00:00"
         },
         {
             "name": "doctrine/orm",
@@ -1133,7 +1132,7 @@
                 "database",
                 "orm"
             ],
-            "time": "2018-02-27 07:30:56"
+            "time": "2018-02-27T07:30:56+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -1198,7 +1197,7 @@
                 "rest",
                 "web service"
             ],
-            "time": "2017-06-22 18:50:49"
+            "time": "2017-06-22T18:50:49+00:00"
         },
         {
             "name": "guzzlehttp/promises",
@@ -1249,7 +1248,7 @@
             "keywords": [
                 "promise"
             ],
-            "time": "2016-12-20 10:07:11"
+            "time": "2016-12-20T10:07:11+00:00"
         },
         {
             "name": "guzzlehttp/psr7",
@@ -1314,7 +1313,7 @@
                 "uri",
                 "url"
             ],
-            "time": "2017-03-20 17:10:46"
+            "time": "2017-03-20T17:10:46+00:00"
         },
         {
             "name": "jdorn/sql-formatter",
@@ -1364,7 +1363,7 @@
                 "highlight",
                 "sql"
             ],
-            "time": "2014-01-12 16:20:24"
+            "time": "2014-01-12T16:20:24+00:00"
         },
         {
             "name": "ocramius/package-versions",
@@ -1413,7 +1412,7 @@
                 }
             ],
             "description": "Composer plugin that provides efficient querying for installed package versions (no runtime IO)",
-            "time": "2018-02-05 13:05:30"
+            "time": "2018-02-05T13:05:30+00:00"
         },
         {
             "name": "ocramius/proxy-manager",
@@ -1482,7 +1481,7 @@
                 "proxy pattern",
                 "service proxies"
             ],
-            "time": "2017-05-04 11:12:50"
+            "time": "2017-05-04T11:12:50+00:00"
         },
         {
             "name": "php-http/client-common",
@@ -1543,7 +1542,7 @@
                 "http",
                 "httplug"
             ],
-            "time": "2017-11-30 11:06:59"
+            "time": "2017-11-30T11:06:59+00:00"
         },
         {
             "name": "php-http/discovery",
@@ -1605,7 +1604,7 @@
                 "message",
                 "psr7"
             ],
-            "time": "2018-02-06 10:55:24"
+            "time": "2018-02-06T10:55:24+00:00"
         },
         {
             "name": "php-http/guzzle6-adapter",
@@ -1665,7 +1664,7 @@
                 "Guzzle",
                 "http"
             ],
-            "time": "2016-05-10 06:13:32"
+            "time": "2016-05-10T06:13:32+00:00"
         },
         {
             "name": "php-http/httplug",
@@ -1721,7 +1720,7 @@
                 "client",
                 "http"
             ],
-            "time": "2016-08-31 08:30:17"
+            "time": "2016-08-31T08:30:17+00:00"
         },
         {
             "name": "php-http/message",
@@ -1793,7 +1792,7 @@
                 "message",
                 "psr-7"
             ],
-            "time": "2017-07-05 06:40:53"
+            "time": "2017-07-05T06:40:53+00:00"
         },
         {
             "name": "php-http/message-factory",
@@ -1843,7 +1842,7 @@
                 "stream",
                 "uri"
             ],
-            "time": "2015-12-19 14:08:53"
+            "time": "2015-12-19T14:08:53+00:00"
         },
         {
             "name": "php-http/promise",
@@ -1893,7 +1892,7 @@
             "keywords": [
                 "promise"
             ],
-            "time": "2016-01-26 13:27:02"
+            "time": "2016-01-26T13:27:02+00:00"
         },
         {
             "name": "psr/cache",
@@ -1939,7 +1938,7 @@
                 "psr",
                 "psr-6"
             ],
-            "time": "2016-08-06 20:24:11"
+            "time": "2016-08-06T20:24:11+00:00"
         },
         {
             "name": "psr/container",
@@ -1988,7 +1987,7 @@
                 "container-interop",
                 "psr"
             ],
-            "time": "2017-02-14 16:28:37"
+            "time": "2017-02-14T16:28:37+00:00"
         },
         {
             "name": "psr/http-message",
@@ -2038,7 +2037,7 @@
                 "request",
                 "response"
             ],
-            "time": "2016-08-06 14:39:51"
+            "time": "2016-08-06T14:39:51+00:00"
         },
         {
             "name": "psr/log",
@@ -2085,7 +2084,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2016-10-10 12:19:37"
+            "time": "2016-10-10T12:19:37+00:00"
         },
         {
             "name": "psr/simple-cache",
@@ -2133,7 +2132,7 @@
                 "psr-16",
                 "simple-cache"
             ],
-            "time": "2017-10-23 01:57:42"
+            "time": "2017-10-23T01:57:42+00:00"
         },
         {
             "name": "sensio/framework-extra-bundle",
@@ -2203,7 +2202,7 @@
                 "annotations",
                 "controllers"
             ],
-            "time": "2017-12-14 19:03:23"
+            "time": "2017-12-14T19:03:23+00:00"
         },
         {
             "name": "symfony/apache-pack",
@@ -2225,7 +2224,7 @@
                 "MIT"
             ],
             "description": "A pack for Apache support in Symfony",
-            "time": "2017-12-12 01:46:35"
+            "time": "2017-12-12T01:46:35+00:00"
         },
         {
             "name": "symfony/cache",
@@ -2294,7 +2293,7 @@
                 "caching",
                 "psr6"
             ],
-            "time": "2018-02-11 17:17:44"
+            "time": "2018-02-11T17:17:44+00:00"
         },
         {
             "name": "symfony/config",
@@ -2356,7 +2355,7 @@
             ],
             "description": "Symfony Config Component",
             "homepage": "https://symfony.com",
-            "time": "2018-02-04 16:43:51"
+            "time": "2018-02-04T16:43:51+00:00"
         },
         {
             "name": "symfony/console",
@@ -2424,7 +2423,7 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-            "time": "2018-02-26 15:55:47"
+            "time": "2018-02-26T15:55:47+00:00"
         },
         {
             "name": "symfony/css-selector",
@@ -2477,7 +2476,7 @@
             ],
             "description": "Symfony CssSelector Component",
             "homepage": "https://symfony.com",
-            "time": "2018-02-03 14:58:37"
+            "time": "2018-02-03T14:58:37+00:00"
         },
         {
             "name": "symfony/debug",
@@ -2533,7 +2532,7 @@
             ],
             "description": "Symfony Debug Component",
             "homepage": "https://symfony.com",
-            "time": "2018-02-28 21:50:02"
+            "time": "2018-02-28T21:50:02+00:00"
         },
         {
             "name": "symfony/dependency-injection",
@@ -2604,7 +2603,7 @@
             ],
             "description": "Symfony DependencyInjection Component",
             "homepage": "https://symfony.com",
-            "time": "2018-03-04 03:54:53"
+            "time": "2018-03-04T03:54:53+00:00"
         },
         {
             "name": "symfony/doctrine-bridge",
@@ -2683,7 +2682,7 @@
             ],
             "description": "Symfony Doctrine Bridge",
             "homepage": "https://symfony.com",
-            "time": "2018-02-04 13:08:26"
+            "time": "2018-02-04T13:08:26+00:00"
         },
         {
             "name": "symfony/dom-crawler",
@@ -2739,7 +2738,7 @@
             ],
             "description": "Symfony DomCrawler Component",
             "homepage": "https://symfony.com",
-            "time": "2018-02-22 10:50:29"
+            "time": "2018-02-22T10:50:29+00:00"
         },
         {
             "name": "symfony/event-dispatcher",
@@ -2802,7 +2801,7 @@
             ],
             "description": "Symfony EventDispatcher Component",
             "homepage": "https://symfony.com",
-            "time": "2018-02-14 14:11:10"
+            "time": "2018-02-14T14:11:10+00:00"
         },
         {
             "name": "symfony/filesystem",
@@ -2851,7 +2850,7 @@
             ],
             "description": "Symfony Filesystem Component",
             "homepage": "https://symfony.com",
-            "time": "2018-02-22 10:50:29"
+            "time": "2018-02-22T10:50:29+00:00"
         },
         {
             "name": "symfony/finder",
@@ -2900,7 +2899,7 @@
             ],
             "description": "Symfony Finder Component",
             "homepage": "https://symfony.com",
-            "time": "2018-03-05 18:28:26"
+            "time": "2018-03-05T18:28:26+00:00"
         },
         {
             "name": "symfony/flex",
@@ -2946,7 +2945,7 @@
                     "email": "fabien.potencier@gmail.com"
                 }
             ],
-            "time": "2018-02-22 07:00:47"
+            "time": "2018-02-22T07:00:47+00:00"
         },
         {
             "name": "symfony/framework-bundle",
@@ -3060,7 +3059,7 @@
             ],
             "description": "Symfony FrameworkBundle",
             "homepage": "https://symfony.com",
-            "time": "2018-03-02 08:28:17"
+            "time": "2018-03-02T08:28:17+00:00"
         },
         {
             "name": "symfony/http-foundation",
@@ -3114,7 +3113,7 @@
             ],
             "description": "Symfony HttpFoundation Component",
             "homepage": "https://symfony.com",
-            "time": "2018-02-22 10:48:49"
+            "time": "2018-02-22T10:48:49+00:00"
         },
         {
             "name": "symfony/http-kernel",
@@ -3200,7 +3199,7 @@
             ],
             "description": "Symfony HttpKernel Component",
             "homepage": "https://symfony.com",
-            "time": "2018-03-05 22:27:01"
+            "time": "2018-03-05T22:27:01+00:00"
         },
         {
             "name": "symfony/inflector",
@@ -3257,7 +3256,7 @@
                 "symfony",
                 "words"
             ],
-            "time": "2018-01-03 17:15:19"
+            "time": "2018-01-03T17:15:19+00:00"
         },
         {
             "name": "symfony/lts",
@@ -3349,7 +3348,7 @@
             ],
             "description": "Enforces Long Term Supported versions of Symfony components",
             "homepage": "https://symfony.com",
-            "time": "2017-10-19 02:16:32"
+            "time": "2017-10-19T02:16:32+00:00"
         },
         {
             "name": "symfony/options-resolver",
@@ -3403,7 +3402,7 @@
                 "configuration",
                 "options"
             ],
-            "time": "2018-01-18 22:19:33"
+            "time": "2018-01-18T22:19:33+00:00"
         },
         {
             "name": "symfony/orm-pack",
@@ -3431,7 +3430,7 @@
                 "MIT"
             ],
             "description": "A pack for the Doctrine ORM",
-            "time": "2017-12-12 01:47:50"
+            "time": "2017-12-12T01:47:50+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -3490,7 +3489,7 @@
                 "portable",
                 "shim"
             ],
-            "time": "2018-01-30 19:27:44"
+            "time": "2018-01-30T19:27:44+00:00"
         },
         {
             "name": "symfony/property-access",
@@ -3558,7 +3557,7 @@
                 "property path",
                 "reflection"
             ],
-            "time": "2018-01-03 07:37:34"
+            "time": "2018-01-03T07:37:34+00:00"
         },
         {
             "name": "symfony/routing",
@@ -3636,7 +3635,7 @@
                 "uri",
                 "url"
             ],
-            "time": "2018-02-28 21:50:02"
+            "time": "2018-02-28T21:50:02+00:00"
         },
         {
             "name": "symfony/serializer",
@@ -3714,7 +3713,7 @@
             ],
             "description": "Symfony Serializer Component",
             "homepage": "https://symfony.com",
-            "time": "2018-02-14 14:07:03"
+            "time": "2018-02-14T14:07:03+00:00"
         },
         {
             "name": "symfony/yaml",
@@ -3772,7 +3771,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2018-02-19 20:08:53"
+            "time": "2018-02-19T20:08:53+00:00"
         },
         {
             "name": "syslogic/doctrine-json-functions",
@@ -3827,7 +3826,7 @@
                 "postgres",
                 "postgresql"
             ],
-            "time": "2018-01-31 09:12:42"
+            "time": "2018-01-31T09:12:42+00:00"
         },
         {
             "name": "zendframework/zend-code",
@@ -3880,7 +3879,7 @@
                 "code",
                 "zf2"
             ],
-            "time": "2017-10-20 15:21:32"
+            "time": "2017-10-20T15:21:32+00:00"
         },
         {
             "name": "zendframework/zend-eventmanager",
@@ -3934,7 +3933,7 @@
                 "events",
                 "zf2"
             ],
-            "time": "2017-07-11 19:17:22"
+            "time": "2017-07-11T19:17:22+00:00"
         }
     ],
     "packages-dev": [
@@ -3993,7 +3992,7 @@
                 "env",
                 "environment"
             ],
-            "time": "2018-01-03 17:15:19"
+            "time": "2018-01-03T17:15:19+00:00"
         },
         {
             "name": "symfony/process",
@@ -4042,7 +4041,7 @@
             ],
             "description": "Symfony Process Component",
             "homepage": "https://symfony.com",
-            "time": "2018-02-19 12:18:43"
+            "time": "2018-02-19T12:18:43+00:00"
         },
         {
             "name": "symfony/web-server-bundle",
@@ -4100,7 +4099,7 @@
             ],
             "description": "Symfony WebServerBundle",
             "homepage": "https://symfony.com",
-            "time": "2018-01-03 17:15:19"
+            "time": "2018-01-03T17:15:19+00:00"
         }
     ],
     "aliases": [],
