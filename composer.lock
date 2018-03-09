@@ -95,21 +95,24 @@
         },
         {
             "name": "dbstudios/doctrine-query-document",
-            "version": "0.1.9",
+            "version": "0.1.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/LartTyler/doctrine-query-document.git",
-                "reference": "53f59b0a356528ea3451bd6b12b42871350c300e"
+                "reference": "254817a6d0df44ea48220a53a8ac6756d02b7e35"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/LartTyler/doctrine-query-document/zipball/53f59b0a356528ea3451bd6b12b42871350c300e",
-                "reference": "53f59b0a356528ea3451bd6b12b42871350c300e",
+                "url": "https://api.github.com/repos/LartTyler/doctrine-query-document/zipball/254817a6d0df44ea48220a53a8ac6756d02b7e35",
+                "reference": "254817a6d0df44ea48220a53a8ac6756d02b7e35",
                 "shasum": ""
             },
             "require": {
                 "doctrine/orm": "^2.6",
                 "php": "^7.1"
+            },
+            "suggest": {
+                "syslogic/doctrine-json-functions": "If you want to use the JSON type for fields"
             },
             "type": "library",
             "autoload": {
@@ -129,7 +132,7 @@
                 }
             ],
             "description": "Allows building Doctrine queries using MongoDB-style query documents",
-            "time": "2018-03-09T14:19:23+00:00"
+            "time": "2018-03-09T17:08:17+00:00"
         },
         {
             "name": "dbstudios/doze",
