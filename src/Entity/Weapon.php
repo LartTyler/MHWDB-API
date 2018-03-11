@@ -26,6 +26,11 @@
 		private $rarity;
 
 		/**
+		 * @var WeaponUpgradeNode|null
+		 */
+		private $upgradeNode;
+
+		/**
 		 * Weapon constructor.
 		 *
 		 * @param string $name
@@ -70,5 +75,12 @@
 			$this->rarity = $rarity;
 
 			return $this;
+		}
+
+		/**
+		 * @return WeaponUpgradeNode|null
+		 */
+		public function getUpgradeNode(): ?WeaponUpgradeNode {
+			return $this->upgradeNode;
 		}
 	}

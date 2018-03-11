@@ -36,3 +36,7 @@ App\Entity\Weapon:
         attributes:
             type: json
             nullable: false
+    oneToOne:
+        upgradeNode:
+            targetEntity: App\Entity\WeaponUpgradeNode
+            mappedBy: weapon

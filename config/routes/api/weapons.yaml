@@ -9,3 +9,9 @@ api.weapons.read:
         - GET
     path: /weapons/{idOrSlug}
     controller: 'App\Controller\WeaponsDataController::readAction'
+
+api.weapons.upgrade-tree:
+    methods:
+        - GET
+    path: /weapons/{idOrSlug}/upgrade-tree
+    controller: 'App\Controller\WeaponsDataController::upgradeTreeAction'

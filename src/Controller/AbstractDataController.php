@@ -79,8 +79,14 @@
 		 * @return Response
 		 */
 		public function listAction(Request $request): Response {
-			if ($request->query->has('q'))
-				return $this->getSearchResults($request->query->all());
+			if ($request->query->has('q')) {
+				$results = $this->getSearchResults($request->query->all());
+
+				if ($results instanceof Response)
+					return $results;
+
+				return $this->respond($results);
+			}
 
 			$items = $this->manager->getRepository($this->entityClass)->findAll();
 
@@ -99,9 +105,9 @@
 		/**
 		 * @param array $query
 		 *
-		 * @return Response
+		 * @return EntityInterface[]|Response
 		 */
-		protected function getSearchResults(array $query): Response {
+		protected function getSearchResults(array $query) {
 			if ($limit = ($query['limit'] ?? null))
 				unset($query['limit']);
 
@@ -135,7 +141,7 @@
 				return $this->responder->createErrorResponse(new SearchError($e->getMessage()));
 			}
 
-			return $this->respond($queryBuilder->getQuery()->getResult());
+			return $queryBuilder->getQuery()->getResult();
 		}
 
 		/**

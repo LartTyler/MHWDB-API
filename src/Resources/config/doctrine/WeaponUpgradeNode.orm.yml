@@ -1,0 +1,45 @@
+App\Entity\WeaponUpgradeNode:
+    type: entity
+    table: weapon_upgrade_nodes
+    id:
+        id:
+            type: integer
+            nullable: false
+            options:
+                unsigned: true
+            generator:
+                strategy: IDENTITY
+    fields:
+        craftable:
+            type: boolean
+            nullable: false
+    oneToOne:
+        weapon:
+            targetEntity: App\Entity\Weapon
+            inversedBy: upgradeNode
+            joinColumn:
+                nullable: false
+                options:
+                    unsigned: true
+    manyToOne:
+        previous:
+            targetEntity: App\Entity\WeaponUpgradeNode
+            joinColumn:
+                nullable: true
+                options:
+                    unsigned: true
+    manyToMany:
+        branches:
+            targetEntity: App\Entity\WeaponUpgradeNode
+            joinTable:
+                name: weapon_upgrade_nodes_branches
+                joinColumns:
+                    node_id:
+                        nullable: false
+                        options:
+                            unsigned: true
+                inverseJoinColumns:
+                    branch_id:
+                        nullable: false
+                        options:
+                            unsigned: true
