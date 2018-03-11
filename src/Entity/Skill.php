@@ -66,7 +66,7 @@
 		 *
 		 * @return SkillRank|null
 		 */
-		public function getRank(int $level) {
+		public function getRank(int $level): ?SkillRank {
 			$criteria = Criteria::create()
 				->where(Criteria::expr()->eq('level', $level))
 				->setMaxResults(1);

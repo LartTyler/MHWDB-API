@@ -25,10 +25,13 @@ services:
                 -
                     - '@App\Scraper\Kiranico\Scrapers\KiranicoArmorScraper'
 
+            -
+                - 'addScraper'
+                -
+                    - '@App\Scraper\Kiranico\Scrapers\KiranicoDecorationsScraper'
+
     App\Scraper\Kiranico\Scrapers\KiranicoSkillsScraper: ~
-
     App\Scraper\Kiranico\Scrapers\KiranicoCharmsScraper: ~
-
     App\Scraper\Kiranico\Scrapers\KiranicoWeaponsScraper: ~
-
     App\Scraper\Kiranico\Scrapers\KiranicoArmorScraper: ~
+    App\Scraper\Kiranico\Scrapers\KiranicoDecorationsScraper: ~

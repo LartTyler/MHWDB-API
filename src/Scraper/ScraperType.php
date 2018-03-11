@@ -6,6 +6,7 @@
 		const CHARMS = 'charms';
 		const WEAPONS = 'weapons';
 		const ARMOR = 'armor';
+		const DECORATIONS = 'decorations';
 
 		/**
 		 * ScraperType constructor.

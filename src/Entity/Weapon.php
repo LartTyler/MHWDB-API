@@ -1,6 +1,7 @@
 <?php
 	namespace App\Entity;
 
+	use App\Game\Attribute;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
 
