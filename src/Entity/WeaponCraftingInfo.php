@@ -7,13 +7,8 @@
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\Common\Collections\Selectable;
 
-	class WeaponUpgradeNode implements EntityInterface {
+	class WeaponCraftingInfo implements EntityInterface {
 		use EntityTrait;
-
-		/**
-		 * @var Weapon
-		 */
-		private $weapon;
 
 		/**
 		 * @var bool
@@ -21,35 +16,32 @@
 		private $craftable;
 
 		/**
-		 * @var WeaponUpgradeNode|null
+		 * @var Weapon|null
 		 */
 		private $previous;
 
 		/**
-		 * @var ArrayCollection
+		 * @var Collection|Selectable|Weapon[]
 		 */
 		private $branches;
 
 		/**
-		 * WeaponUpgradeNode constructor.
-		 *
-		 * @param Weapon                 $weapon
-		 * @param bool                   $craftable
-		 * @param WeaponUpgradeNode|null $previous
+		 * @internal
+		 * @var Weapon|null
 		 */
-		public function __construct(Weapon $weapon, bool $craftable, ?WeaponUpgradeNode $previous = null) {
-			$this->weapon = $weapon;
+		private $weapon = null;
+
+		/**
+		 * WeaponCraftingInfo constructor.
+		 *
+		 * @param bool        $craftable
+		 * @param Weapon|null $previous
+		 */
+		public function __construct(bool $craftable, ?Weapon $previous = null) {
 			$this->craftable = $craftable;
 			$this->previous = $previous;
 
 			$this->branches = new ArrayCollection();
-		}
-
-		/**
-		 * @return Weapon
-		 */
-		public function getWeapon(): Weapon {
-			return $this->weapon;
 		}
 
 		/**
@@ -66,32 +58,30 @@
 		 */
 		public function setCraftable(bool $craftable) {
 			$this->craftable = $craftable;
-
 			return $this;
 		}
 
 		/**
-		 * @return WeaponUpgradeNode|null
+		 * @return Weapon|null
 		 */
-		public function getPrevious(): ?WeaponUpgradeNode {
+		public function getPrevious() {
 			return $this->previous;
 		}
 
 		/**
-		 * @param WeaponUpgradeNode $previous
+		 * @param Weapon|null $previous
 		 *
 		 * @return $this
 		 */
-		public function setPrevious(WeaponUpgradeNode $previous) {
+		public function setPrevious(?Weapon $previous) {
 			$this->previous = $previous;
-
 			return $this;
 		}
 
 		/**
-		 * @return Collection|Selectable|WeaponUpgradeNode[]
+		 * @return Weapon[]|Collection|Selectable
 		 */
-		public function getBranches(): Collection {
+		public function getBranches() {
 			return $this->branches;
 		}
 	}

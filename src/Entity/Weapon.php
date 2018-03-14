@@ -26,9 +26,9 @@
 		private $rarity;
 
 		/**
-		 * @var WeaponUpgradeNode|null
+		 * @var WeaponCraftingInfo|null
 		 */
-		private $upgradeNode;
+		private $crafting = null;
 
 		/**
 		 * Weapon constructor.
@@ -78,9 +78,20 @@
 		}
 
 		/**
-		 * @return WeaponUpgradeNode|null
+		 * @return WeaponCraftingInfo|null
 		 */
-		public function getUpgradeNode(): ?WeaponUpgradeNode {
-			return $this->upgradeNode;
+		public function getCrafting(): ?WeaponCraftingInfo {
+			return $this->crafting;
+		}
+
+		/**
+		 * @param WeaponCraftingInfo|null $crafting
+		 *
+		 * @return $this
+		 */
+		public function setCrafting(WeaponCraftingInfo $crafting) {
+			$this->crafting = $crafting;
+
+			return $this;
 		}
 	}

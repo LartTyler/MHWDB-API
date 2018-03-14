@@ -37,6 +37,13 @@ App\Entity\Weapon:
             type: json
             nullable: false
     oneToOne:
-        upgradeNode:
-            targetEntity: App\Entity\WeaponUpgradeNode
-            mappedBy: weapon
+        crafting:
+            targetEntity: App\Entity\WeaponCraftingInfo
+            inversedBy: weapon
+            orphanRemoval: true
+            cascade:
+                - persist
+            joinColumn:
+                nullable: true
+                options:
+                    unsigned: true

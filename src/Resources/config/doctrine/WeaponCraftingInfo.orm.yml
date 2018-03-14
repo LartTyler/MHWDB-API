@@ -1,6 +1,6 @@
-App\Entity\WeaponUpgradeNode:
+App\Entity\WeaponCraftingInfo:
     type: entity
-    table: weapon_upgrade_nodes
+    table: weapon_crafting_info
     id:
         id:
             type: integer
@@ -16,25 +16,21 @@ App\Entity\WeaponUpgradeNode:
     oneToOne:
         weapon:
             targetEntity: App\Entity\Weapon
-            inversedBy: upgradeNode
-            joinColumn:
-                nullable: false
-                options:
-                    unsigned: true
+            mappedBy: crafting
     manyToOne:
         previous:
-            targetEntity: App\Entity\WeaponUpgradeNode
+            targetEntity: App\Entity\Weapon
             joinColumn:
                 nullable: true
                 options:
                     unsigned: true
     manyToMany:
         branches:
-            targetEntity: App\Entity\WeaponUpgradeNode
+            targetEntity: App\Entity\Weapon
             joinTable:
-                name: weapon_upgrade_nodes_branches
+                name: weapon_crafting_info_branches
                 joinColumns:
-                    node_id:
+                    weapon_crafting_info_id:
                         nullable: false
                         options:
                             unsigned: true

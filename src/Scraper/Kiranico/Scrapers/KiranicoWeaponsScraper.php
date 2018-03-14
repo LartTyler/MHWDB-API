@@ -2,7 +2,7 @@
 	namespace App\Scraper\Kiranico\Scrapers;
 
 	use App\Entity\Weapon;
-	use App\Entity\WeaponUpgradeNode;
+	use App\Entity\WeaponCraftingInfo;
 	use App\Game\Attribute;
 	use App\Game\WeaponType;
 	use App\Scraper\AbstractScraper;
@@ -101,11 +101,6 @@
 		protected $weaponCache = [];
 
 		/**
-		 * @var WeaponUpgradeNode[]
-		 */
-		protected $upgradeNodeCache = [];
-
-		/**
 		 * KiranicoWeaponsScraper constructor.
 		 *
 		 * @param KiranicoScrapeTarget $target
@@ -121,6 +116,15 @@
 		 * {@inheritdoc}
 		 */
 		public function scrape(array $subtypes = []): void {
+			if (in_array('skip-weapon-data', $subtypes)) {
+				$skipWeaponData = true;
+
+				$subtypes = array_filter($subtypes, function($item) {
+					return $item !== 'skip-weapon-data';
+				});
+			} else
+				$skipWeaponData = false;
+
 			foreach (self::PATHS as $weaponType => $path) {
 				if ($subtypes && !in_array($weaponType, $subtypes))
 					continue;
@@ -133,15 +137,16 @@
 
 				$crawler = (new Crawler($response->getBody()->getContents()))->filter('.container table tr');
 
-				for ($i = 0, $ii = $crawler->count(); $i < $ii; $i++) {
-					$nodes = $crawler->eq($i)->children();
+				if (!$skipWeaponData)
+					for ($i = 0, $ii = $crawler->count(); $i < $ii; $i++) {
+						$nodes = $crawler->eq($i)->children();
 
-					// Skip table header rows
-					if ($nodes->filter('th')->count())
-						continue;
+						// Skip table header rows
+						if ($nodes->filter('th')->count())
+							continue;
 
-					$this->process($nodes, $weaponType);
-				}
+						$this->process($nodes, $weaponType);
+					}
 
 				$stack = [];
 				$previousDepth = 0;
@@ -165,7 +170,7 @@
 					$previousName = $stack[sizeof($stack) - 1] ?? null;
 					$stack[] = $name;
 
-					$this->addUpgradeNode($name, $craftable, $previousName);
+					$this->addCraftingInfo($name, $craftable, $previousName);
 
 					$previousDepth = $depth;
 				}
@@ -314,37 +319,39 @@
 		 * @param string      $weaponName
 		 * @param bool        $craftable
 		 * @param null|string $previousWeaponName
+		 *
+		 * @return void
 		 */
-		protected function addUpgradeNode(string $weaponName, bool $craftable, ?string $previousWeaponName): void {
+		protected function addCraftingInfo(string $weaponName, bool $craftable, ?string $previousWeaponName): void {
 			$weaponName = StringUtil::replaceNumeralRank($weaponName);
 			$weapon = $this->getWeapon($weaponName);
 
 			if (!$weapon)
 				throw new \RuntimeException('Could not find weapon named ' . $weaponName);
 
-			$node = $this->getUpgradeNode($weaponName);
+			$info = $weapon->getCrafting();
 
-			if (!$node) {
-				$node = new WeaponUpgradeNode($weapon, $craftable);
+			if (!$info) {
+				$info = new WeaponCraftingInfo($craftable);
 
-				$this->manager->persist($node);
+				$weapon->setCrafting($info);
 			} else
-				$node->setCraftable($craftable);
-
-			$this->upgradeNodeCache[$weaponName] = $node;
+				$info->setCraftable($craftable);
 
 			if ($previousWeaponName) {
 				$previousWeaponName = StringUtil::replaceNumeralRank($previousWeaponName);
-				$previousNode = $this->getUpgradeNode($previousWeaponName);
+				$previousWeapon = $this->getWeapon($previousWeaponName);
 
-				if (!$previousNode)
-					throw new \RuntimeException('Could not find previous upgrade for weapon named ' .
+				$previousInfo = $previousWeapon->getCrafting();
+
+				if (!$previousInfo)
+					throw new \RuntimeException('Could not find previous crafting info for weapon named ' .
 						$previousWeaponName);
 
-				if (!$previousNode->getBranches()->contains($node))
-					$previousNode->getBranches()->add($node);
+				if (!$previousInfo->getBranches()->contains($weapon))
+					$previousInfo->getBranches()->add($weapon);
 
-				$node->setPrevious($previousNode);
+				$info->setPrevious($previousWeapon);
 			}
 		}
 
@@ -391,28 +398,5 @@
 			return $this->manager->getRepository('App:Weapon')->findOneBy([
 				'name' => $name,
 			]);
-		}
-
-		/**
-		 * @param string $weaponName
-		 *
-		 * @return WeaponUpgradeNode|null
-		 */
-		protected function getUpgradeNode(string $weaponName): ?WeaponUpgradeNode {
-			$weaponName = StringUtil::replaceNumeralRank($weaponName);
-
-			if (isset($this->upgradeNodeCache[$weaponName]))
-				return $this->upgradeNodeCache[$weaponName];
-
-			$weapon = $this->getWeapon($weaponName);
-
-			if (!$weapon)
-				throw new \RuntimeException('Could not find weapon named ' . $weaponName . '; upgrade node failed');
-
-			$node = $this->manager->getRepository('App:WeaponUpgradeNode')->findOneBy([
-				'weapon' => $weapon,
-			]);
-
-			return $node;
 		}
 	}
