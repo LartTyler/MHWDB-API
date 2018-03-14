@@ -26,32 +26,108 @@
 		 *
 		 * @return Response
 		 */
-		public function upgradeTreeAction(string $idOrSlug): Response {
-			/** @var Weapon|null $weapon */
-			$weapon = $this->getEntity($idOrSlug);
+		public function readAction(string $idOrSlug): Response {
+			/** @var Weapon|null $entity */
+			$entity = $this->getEntity($idOrSlug);
 
-			if (!$weapon)
-				return $this->responder->createNotFoundResponse();
-
-			$node = $weapon->getUpgradeNode();
-
-			return $this->respond($this->nodeToArray($node));
+			return $this->respond($this->normalizeEntity($entity));
 		}
 
 		/**
-		 * @param WeaponUpgradeNode $node
+		 * @param Request $request
+		 *
+		 * @return Response
+		 */
+		public function listAction(Request $request): Response {
+			if ($request->query->has('q')) {
+				$query = $request->query->all();
+
+				if (isset($query['q']))
+					$query['q'] = $query = $this->denormalizeQueryFields(json_decode($query['q'], true));
+
+				$results = $this->getSearchResults($query);
+
+				if ($results instanceof Response)
+					return $results;
+
+				return $this->respond($this->normalizeEntityArray($results));
+			}
+
+			$items = $this->manager->getRepository($this->entityClass)->findAll();
+
+			return $this->responder->createResponse($this->normalizeEntityArray($items));
+		}
+
+		/**
+		 * @param array|null $array
 		 *
 		 * @return array
 		 */
-		protected function nodeToArray(WeaponUpgradeNode $node): array {
+		protected function normalizeEntityArray(?array $array): array {
+			if (!$array)
+				return [];
+
+			$self = $this;
+
+			return array_map(function(Weapon $weapon) use ($self): array {
+				return $self->normalizeEntity($weapon);
+			}, $array);
+		}
+
+		/**
+		 * @param Weapon|null $weapon
+		 *
+		 * @return array|null
+		 */
+		public function normalizeEntity(?Weapon $weapon): ?array {
+			if (!$weapon)
+				return null;
+
+			if ($node = $weapon->getUpgradeNode())
+				$craftingInfo = [
+					'craftable' => $node->isCraftable(),
+					'previous' => $node->getPrevious() ? $node->getPrevious()->getWeapon()->getId() : null,
+					'branches' => array_map(function(WeaponUpgradeNode $branch) {
+						return $branch->getWeapon()->getId();
+					}, $node->getBranches()->toArray()),
+				];
+			else
+				$craftingInfo = [];
+
 			return [
-				'id' => $node->getId(),
-				'weapon' => $node->getWeapon()->getId(),
-				'craftable' => $node->isCraftable(),
-				'previous' => $node->getPrevious()->getId(),
-				'branches' => array_map(function(WeaponUpgradeNode $branch) {
-					return $branch->getId();
-				}, $node->getBranches()->toArray()),
+				'id' => $weapon->getId(),
+				'name' => $weapon->getName(),
+				'slug' => $weapon->getSlug(),
+				'type' => $weapon->getType(),
+				'rarity' => $weapon->getRarity(),
+				'attributes' => $weapon->getAttributes(),
+				'crafting' => $craftingInfo,
 			];
+		}
+
+		/**
+		 * @param array $query
+		 *
+		 * @return array
+		 */
+		protected function denormalizeQueryFields(array $query): array {
+			$out = [];
+
+			foreach ($query as $key => $value) {
+				if (is_array($value))
+					$value = $this->denormalizeQueryFields($query);
+
+				$key = str_replace([
+					'crafting.',
+					'upgradeNode.previous.',
+				], [
+					'upgradeNode.',
+					'upgradeNode.previous.weapon.',
+				], $key);
+
+				$out[$key] = $value;
+			}
+
+			return $out;
 		}
 	}
