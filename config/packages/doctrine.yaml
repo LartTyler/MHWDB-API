@@ -18,11 +18,11 @@ doctrine:
         auto_generate_proxy_classes: '%kernel.debug%'
         naming_strategy: doctrine.orm.naming_strategy.underscore
         auto_mapping: true
-        metadata_cache_driver: apcu
+        metadata_cache_driver: memcached
         result_cache_driver:
-            type: apcu
+            type: memcached
         query_cache_driver:
-            type: apcu
+            type: memcached
         dql:
             string_functions:
                 JSON_EXTRACT: Syslogic\DoctrineJsonFunctions\Query\AST\Functions\Mysql\JsonExtract
