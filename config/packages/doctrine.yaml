@@ -4,6 +4,10 @@ parameters:
     # environment variables are not available yet.
     # You should not need to change this value.
     env(DATABASE_URL): ''
+    doctrine_memcached_config:
+        type: memcached
+        host: '%env(resolve:DATABASE_MEMCACHED_HOST)%'
+        port: '%env(resolve:DATABASE_MEMCACHED_PORT)%'
 
 doctrine:
     dbal:
@@ -18,6 +22,9 @@ doctrine:
         auto_generate_proxy_classes: '%kernel.debug%'
         naming_strategy: doctrine.orm.naming_strategy.underscore
         auto_mapping: true
+        metadata_cache_driver: '%doctrine_memcached_config%'
+        result_cache_driver: '%doctrine_memcached_config%'
+        query_cache_driver: '%doctrine_memcached_config%'
         dql:
             string_functions:
                 JSON_EXTRACT: Syslogic\DoctrineJsonFunctions\Query\AST\Functions\Mysql\JsonExtract
