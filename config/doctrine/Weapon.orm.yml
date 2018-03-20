@@ -39,7 +39,6 @@ App\Entity\Weapon:
     oneToOne:
         crafting:
             targetEntity: App\Entity\WeaponCraftingInfo
-            inversedBy: weapon
             orphanRemoval: true
             cascade:
                 - persist
