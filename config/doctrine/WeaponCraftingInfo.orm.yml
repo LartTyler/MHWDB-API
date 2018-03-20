@@ -35,3 +35,17 @@ App\Entity\WeaponCraftingInfo:
                         nullable: false
                         options:
                             unsigned: true
+        materials:
+            targetEntity: App\Entity\CraftingMaterialCost
+            joinTable:
+                name: weapon_crafting_info_crafting_material_costs
+                joinColumns:
+                    weapon_crafting_info_id:
+                        nullable: false
+                        options:
+                            unsigned: true
+                inverseJoinColumns:
+                    crafting_material_cost_id:
+                        nullable: false
+                        options:
+                            unsigned: true

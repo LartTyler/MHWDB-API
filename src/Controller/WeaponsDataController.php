@@ -1,6 +1,7 @@
 <?php
 	namespace App\Controller;
 
+	use App\Entity\CraftingMaterialCost;
 	use App\Entity\Weapon;
 	use App\Entity\WeaponCraftingInfo;
 	use App\Entity\WeaponUpgradeNode;
@@ -106,6 +107,22 @@
 				'branches' => array_map(function(Weapon $branch) {
 					return $branch->getId();
 				}, $info->getBranches()->toArray()),
+				'materials' => array_map(function(CraftingMaterialCost $materialCost): array {
+					$item = $materialCost->getItem();
+
+					return [
+						'quantity' => $materialCost->getQuantity(),
+						'item' => [
+							'id' => $item->getId(),
+							'name' => $item->getName(),
+							'description' => $item->getDescription(),
+							'rarity' => $item->getRarity(),
+							'sellPrice' => $item->getSellPrice(),
+							'buyPrice' => $item->getBuyPrice(),
+							'carryLimit' => $item->getCarryLimit(),
+						],
+					];
+				}, $info->getMaterials()->toArray()),
 			];
 		}
 	}
