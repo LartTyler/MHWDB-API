@@ -7,6 +7,7 @@
 	use App\Game\WeaponType;
 	use App\Scraper\AbstractScraper;
 	use App\Scraper\Kiranico\KiranicoScrapeTarget;
+	use App\Scraper\Kiranico\Scrapers\Helpers\WeaponMainDataSection;
 	use App\Scraper\ScraperType;
 	use App\Scraper\SubtypeAwareScraperInterface;
 	use App\Utility\StringUtil;
@@ -135,44 +136,13 @@
 				if ($response->getStatusCode() !== Response::HTTP_OK)
 					throw new \RuntimeException('Could not retrieve ' . $uri);
 
-				$crawler = (new Crawler($response->getBody()->getContents()))->filter('.container table tr');
-
-				if (!$skipWeaponData)
-					for ($i = 0, $ii = $crawler->count(); $i < $ii; $i++) {
-						$nodes = $crawler->eq($i)->children();
-
-						// Skip table header rows
-						if ($nodes->filter('th')->count())
-							continue;
-
-						$this->process($nodes, $weaponType);
-					}
-
-				$stack = [];
-				$previousDepth = 0;
+				$crawler = (new Crawler($response->getBody()->getContents()))
+					->filter('.container table tr td:first-child a');
 
 				for ($i = 0, $ii = $crawler->count(); $i < $ii; $i++) {
-					$node = $crawler->eq($i)->children()->first();
+					$node = $crawler->eq($i);
 
-					// Skip table header rows (again)
-					if ($node->filter('th')->count())
-						continue;
-
-					$name = trim($node->filter('a')->text());
-					$depth = substr_count($node->filter('.d-sm-inline')->text(), '┗');
-					$craftable = $node->filter('small')->count() > 0;
-
-					if ($depth === $previousDepth)
-						array_pop($stack);
-					else if ($depth < $previousDepth)
-						$stack = array_slice($stack, 0, $depth);
-
-					$previousName = $stack[sizeof($stack) - 1] ?? null;
-					$stack[] = $name;
-
-					$this->addCraftingInfo($name, $craftable, $previousName);
-
-					$previousDepth = $depth;
+					$this->process(parse_url($node->attr('href'), PHP_URL_PATH), $weaponType);
 				}
 
 				// We sleep to avoid hitting the target too fast
@@ -181,12 +151,130 @@
 		}
 
 		/**
+		 * @param string $path
+		 * @param string $weaponType
+		 *
+		 * @return void
+		 */
+		protected function process(string $path, string $weaponType): void {
+			$uri = $this->target->getBaseUri()->withPath($path);
+			$result = $this->target->getHttpClient()->get($uri);
+
+			if ($result->getStatusCode() !== Response::HTTP_OK)
+				throw new \RuntimeException('Could not retrieve ' . $uri);
+
+			/**
+			 * 0 = Top navigation
+			 * 1 = Main data section (name, stats, etc.)
+			 * 2 = Upgrade path
+			 * 3 = Craft / obtain info
+			 * 4 = Bottom navigation
+			 */
+			$sections = (new Crawler($result->getBody()->getContents()))->filter('.container .col-lg-9.px-2 .card');
+
+			$mainSection = $sections->eq(1);
+
+			$weaponName = StringUtil::clean($mainSection->filter('.card-body .media-body h1 span')->text());
+			$weaponName = StringUtil::replaceNumeralRank($weaponName);
+
+			$mainData = $mainSection->filter('.card-footer .p-3');
+			$rarityIndex = $mainData->count() === 4 ? 3 : 4;
+
+			$rarity = (int)StringUtil::clean($mainData->eq($rarityIndex)->filter('.lead')->text());
+
+			$weapon = $this->getWeapon($weaponName);
+
+			if (!$weapon) {
+				$weapon = new Weapon($weaponName, $weaponType, $rarity);
+
+				$this->weaponCache[$weaponName] = $weapon;
+				$this->manager->persist($weapon);
+			} else
+				$weapon->setRarity($rarity);
+
+			$weapon->setAttributes($this->getMeleeWeaponMainData($mainSection->filter('.card-footer .p-3')));
+		}
+
+		/**
+		 * Parses main data from a melee weapon's main section.
+		 *
+		 * @param Crawler $nodes
+		 *
+		 * @return array
+		 */
+		protected function getMeleeWeaponMainData(Crawler $nodes): array {
+			$attributes = [];
+
+			$attributes[Attribute::ATTACK] = StringUtil::clean($nodes->eq(0)->text());
+
+			$slotNodes = $nodes->eq(1)->filter('.lead .zmdi');
+			$slots = [];
+
+			for ($i = 0, $ii = $slotNodes->count(); $i < $ii; $i++) {
+				if (!preg_match('/zmdi-n-(\d+)-square/', $slotNodes->eq($i)->attr('class'), $matches))
+					continue;
+
+				$key = 'slotsRank' . $matches[1];
+
+				if (!isset($slots[$key]))
+					$slots[$key] = 0;
+
+				++$slots[$key];
+			}
+
+			$attributes += $slots;
+
+			$offset = 0;
+
+			if ($nodes->count() === 5) {
+				$offset = 1;
+
+				$rawElem = StringUtil::clean($nodes->eq(2)->filter('.lead')->text());
+
+				if (strpos($rawElem, '(') === 0) {
+					$attributes[Attribute::ELEM_HIDDEN] = true;
+
+					$rawElem = substr($rawElem, 1, -1);
+				}
+
+				/**
+				 * @var string $elemDamage
+				 * @var string $elemType
+				 */
+				list($elemDamage, $elemType) = explode(' ', $rawElem);
+
+				$attributes += [
+					Attribute::ELEM_TYPE => $elemType,
+					Attribute::ELEM_DAMAGE => (int)$elemDamage,
+				];
+			}
+
+			$sharpnessNodes = $nodes->eq(2 + $offset)->filter('.d-flex.flex-row')->children();
+
+			foreach (self::SHARPNESS_NODES as $i => $sharpness) {
+				$styles = $sharpnessNodes->eq($i)->attr('style');
+
+				if (!$styles || !preg_match('/width: ?(\d+)px/', $styles, $matches))
+					continue;
+
+				$value = (int)$matches[1];
+
+				if ($value === 0)
+					break;
+
+				$attributes[$sharpness] = $value;
+			}
+
+			return $attributes;
+		}
+
+		/**
 		 * @param Crawler $nodes
 		 * @param string  $weaponType
 		 *
 		 * @return void
 		 */
-		protected function process(Crawler $nodes, string $weaponType): void {
+		protected function _process(Crawler $nodes, string $weaponType): void {
 			$name = StringUtil::replaceNumeralRank(trim($nodes->first()->filter('a')->text()));
 			$rarity = (int)str_replace('RARE', '', trim($nodes->last()->text()));
 
