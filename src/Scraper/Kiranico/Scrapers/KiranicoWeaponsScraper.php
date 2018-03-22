@@ -8,6 +8,8 @@
 	use App\Scraper\AbstractScraper;
 	use App\Scraper\Kiranico\KiranicoScrapeTarget;
 	use App\Scraper\Kiranico\Scrapers\Helpers\WeaponMainDataSection;
+	use App\Scraper\Kiranico\Scrapers\Helpers\Weapons\WeaponData;
+	use App\Scraper\Kiranico\Scrapers\Helpers\Weapons\WeaponDataParserInterface;
 	use App\Scraper\ScraperType;
 	use App\Scraper\SubtypeAwareScraperInterface;
 	use App\Utility\StringUtil;
@@ -44,7 +46,10 @@
 		];
 
 		private const ATTRIBUTE_MATCHERS = [
-			'/(\d+) (Fire|Water|Ice|Thunder|Dragon|Blast|Poison|Paralysis|Sleep)(\))?/' => [self::class, 'parseElemDamageAttribute'],
+			'/(\d+) (Fire|Water|Ice|Thunder|Dragon|Blast|Poison|Paralysis|Sleep)(\))?/' => [
+				self::class,
+				'parseElemDamageAttribute',
+			],
 			'/((?:Sever|Speed|Element|Health|Stamina|Blunt) Boost)/' => Attribute::IG_BOOST_TYPE,
 			'/Affinity +?(-?\d+%?)/' => Attribute::AFFINITY,
 			'/((?:Normal|Wide|Long) Lv\d+)/' => Attribute::GL_SHELLING_TYPE,
@@ -97,6 +102,11 @@
 		protected $manager;
 
 		/**
+		 * @var WeaponDataParserInterface[]
+		 */
+		protected $parsers;
+
+		/**
 		 * @var Weapon[]
 		 */
 		protected $weaponCache = [];
@@ -104,13 +114,15 @@
 		/**
 		 * KiranicoWeaponsScraper constructor.
 		 *
-		 * @param KiranicoScrapeTarget $target
-		 * @param RegistryInterface    $registry
+		 * @param KiranicoScrapeTarget        $target
+		 * @param RegistryInterface           $registry
+		 * @param WeaponDataParserInterface[] $parsers MUST be passed in section index order
 		 */
-		public function __construct(KiranicoScrapeTarget $target, RegistryInterface $registry) {
+		public function __construct(KiranicoScrapeTarget $target, RegistryInterface $registry, array $parsers) {
 			parent::__construct($target, ScraperType::WEAPONS);
 
 			$this->manager = $registry->getManager();
+			$this->parsers = $parsers;
 		}
 
 		/**
@@ -172,37 +184,67 @@
 			 */
 			$sections = (new Crawler($result->getBody()->getContents()))->filter('.container .col-lg-9.px-2 .card');
 
-			$mainSection = $sections->eq(1);
+			$data = new WeaponData();
 
-			$weaponName = StringUtil::clean($mainSection->filter('.card-body .media-body h1 span')->text());
-			$weaponName = StringUtil::replaceNumeralRank($weaponName);
+			foreach ($this->parsers as $key => $parser)
+				$parser->parse($sections->eq($key), $data);
 
-			$mainData = $mainSection->filter('.card-footer .p-3');
-			$rarityIndex = $mainData->count() === 4 ? 3 : 4;
-
-			$rarity = (int)StringUtil::clean($mainData->eq($rarityIndex)->filter('.lead')->text());
-
-			$weapon = $this->getWeapon($weaponName);
+			$weapon = $this->manager->getRepository('App:Weapon')->findOneBy([
+				'name' => $data->getName(),
+			]);
 
 			if (!$weapon) {
-				$weapon = new Weapon($weaponName, $weaponType, $rarity);
+				$weapon = new Weapon($data->getName(), $weaponType, $data->getRarity());
+			}
 
-				$this->weaponCache[$weaponName] = $weapon;
-				$this->manager->persist($weapon);
-			} else
-				$weapon->setRarity($rarity);
-
-			$weapon->setAttributes($this->getMeleeWeaponMainData($mainSection->filter('.card-footer .p-3')));
+			// $mainSection = $sections->eq(1);
+			//
+			// $weaponName = StringUtil::clean($mainSection->filter('.card-body .media-body h1 span')->text());
+			// $weaponName = StringUtil::replaceNumeralRank($weaponName);
+			//
+			// $mainData = $mainSection->filter('.card-footer .p-3');
+			//
+			// $rarity = (int)StringUtil::clean($mainData->last()->filter('.lead')->text());
+			//
+			// $weapon = $this->getWeapon($weaponName);
+			//
+			// if (!$weapon) {
+			// 	$weapon = new Weapon($weaponName, $weaponType, $rarity);
+			//
+			// 	$this->weaponCache[$weaponName] = $weapon;
+			// 	$this->manager->persist($weapon);
+			// } else
+			// 	$weapon->setRarity($rarity);
+			//
+			// $weapon->setAttributes($this->getWeaponMainData($weaponType, $mainSection->filter('.card-footer .p-3')));
 		}
 
 		/**
 		 * Parses main data from a melee weapon's main section.
 		 *
+		 * @param string  $weaponType
 		 * @param Crawler $nodes
 		 *
 		 * @return array
 		 */
-		protected function getMeleeWeaponMainData(Crawler $nodes): array {
+		protected function getWeaponMainData(string $weaponType, Crawler $nodes): array {
+			/**
+			 * Possible Layouts:
+			 *  0 = Attack
+			 *  1 = Slots
+			 *  2 = Sharpness
+			 *  3 = Rarity
+			 *  --
+			 *  0 = Attack
+			 *  1 = Slots
+			 *  2 = Element
+			 *  3 = Sharpness
+			 *  4 = Rarity
+			 *  --
+			 *  0 = Attack
+			 *  1 =
+			 */
+
 			$attributes = [];
 
 			$attributes[Attribute::ATTACK] = StringUtil::clean($nodes->eq(0)->text());
@@ -316,7 +358,7 @@
 				$coatingNodes = $nodes->eq(4)->filter('span');
 				$coatings = [];
 
-				for ($i = 0, $ii = $coatingNodes->count(); $i < $ii; $i ++) {
+				for ($i = 0, $ii = $coatingNodes->count(); $i < $ii; $i++) {
 					$node = $coatingNodes->eq($i);
 					$classList = $node->attr('class');
 
@@ -354,9 +396,9 @@
 						$capacities[$currentType][] = (int)$next;
 					}
 				}
-				
+
 				$positions = array_flip(array_values(self::CAPACITY_TRANSLATIONS));
-				
+
 				uksort($capacities, function(string $a, string $b) use ($positions): int {
 					return $positions[$a] - $positions[$b];
 				});

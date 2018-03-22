@@ -37,6 +37,14 @@ services:
     App\Scraper\Kiranico\Scrapers\KiranicoItemsScraper: ~
     App\Scraper\Kiranico\Scrapers\KiranicoSkillsScraper: ~
     App\Scraper\Kiranico\Scrapers\KiranicoCharmsScraper: ~
-    App\Scraper\Kiranico\Scrapers\KiranicoWeaponsScraper: ~
     App\Scraper\Kiranico\Scrapers\KiranicoArmorScraper: ~
     App\Scraper\Kiranico\Scrapers\KiranicoDecorationsScraper: ~
+
+    App\Scraper\Kiranico\Scrapers\KiranicoWeaponsScraper:
+        arguments:
+            - '@App\Scraper\Kiranico\KiranicoScrapeTarget'
+            - '@doctrine'
+            -
+                - '@App\Scraper\Kiranico\Scrapers\Helpers\Weapons\MainWeaponDataParser'
+
+    App\Scraper\Kiranico\Scrapers\Helpers\Weapons\MainWeaponDataParser: ~
