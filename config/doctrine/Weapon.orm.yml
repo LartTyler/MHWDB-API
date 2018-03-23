@@ -41,7 +41,7 @@ App\Entity\Weapon:
             targetEntity: App\Entity\WeaponCraftingInfo
             orphanRemoval: true
             cascade:
-                - persist
+                - all
             joinColumn:
                 nullable: true
                 options:
