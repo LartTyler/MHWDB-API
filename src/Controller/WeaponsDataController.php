@@ -1,6 +1,7 @@
 <?php
 	namespace App\Controller;
 
+	use App\Entity\CraftingMaterialCost;
 	use App\Entity\Weapon;
 	use App\Entity\WeaponCraftingInfo;
 	use App\Entity\WeaponUpgradeNode;
@@ -106,6 +107,45 @@
 				'branches' => array_map(function(Weapon $branch) {
 					return $branch->getId();
 				}, $info->getBranches()->toArray()),
+				'craftingMaterials' => $this->normalizeCraftingMaterialCosts($info->getCraftingMaterials()->toArray()),
+				'upgradeMaterials' => $this->normalizeCraftingMaterialCosts($info->getUpgradeMaterials()->toArray()),
+			];
+		}
+
+		/**
+		 * @param CraftingMaterialCost[] $costs
+		 *
+		 * @return array
+		 */
+		protected function normalizeCraftingMaterialCosts(array $costs): array {
+			$noramlizer = (function(CraftingMaterialCost $cost): array {
+				return $this->normalizeCraftingMaterialCost($cost);
+			})->bindTo($this);
+
+			return array_map(function(CraftingMaterialCost $cost) use ($noramlizer): array {
+				return call_user_func($noramlizer, $cost);
+			}, $costs);
+		}
+
+		/**
+		 * @param CraftingMaterialCost $cost
+		 *
+		 * @return array
+		 */
+		protected function normalizeCraftingMaterialCost(CraftingMaterialCost $cost): array {
+			$item = $cost->getItem();
+
+			return [
+				'quantity' => $cost->getQuantity(),
+				'item' => [
+					'id' => $item->getId(),
+					'name' => $item->getName(),
+					'description' => $item->getDescription(),
+					'rarity' => $item->getRarity(),
+					'sellPrice' => $item->getSellPrice(),
+					'buyPrice' => $item->getBuyPrice(),
+					'carryLimit' => $item->getCarryLimit(),
+				],
 			];
 		}
 	}

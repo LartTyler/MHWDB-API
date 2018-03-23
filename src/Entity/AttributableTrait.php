@@ -32,8 +32,17 @@
 		public function setAttributes(array $attributes) {
 			$this->attributes = [];
 
-			foreach ($attributes as $attribute => $value)
-				$this->setAttribute($attribute, $value);
+			return $this->addAttributes($attributes);
+		}
+
+		/**
+		 * @param array $attributes
+		 *
+		 * @return $this
+		 */
+		public function addAttributes(array $attributes) {
+			foreach ($attributes as $key => $value)
+				$this->setAttribute($key, $value);
 
 			return $this;
 		}

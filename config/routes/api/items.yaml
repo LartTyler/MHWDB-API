@@ -1,0 +1,11 @@
+api.items.list:
+    methods:
+        - GET
+    path: /items
+    controller: 'App\Controller\ItemsDataController::listAction'
+
+api.items.read:
+    methods:
+        - GET
+    path: /items/{idOrSlug}
+    controller: 'App\Controller\ItemsDataController::readAction'
