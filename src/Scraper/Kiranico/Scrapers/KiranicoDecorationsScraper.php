@@ -92,7 +92,7 @@
 					->setSlot($slot)
 					->setRarity($rarity);
 
-			preg_match('/· (.+)/', $subtext, $matches);
+			preg_match('/· (.+) ·/', $subtext, $matches);
 
 			if (sizeof($matches) < 2)
 				throw new \RuntimeException('Could not determine effect name for ' . $name);

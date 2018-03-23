@@ -1,15 +1,21 @@
 <?php
 	namespace App\Scraper\Kiranico\Scrapers;
 
+	use App\Entity\CraftingMaterialCost;
 	use App\Entity\Weapon;
 	use App\Entity\WeaponCraftingInfo;
 	use App\Game\Attribute;
 	use App\Game\WeaponType;
 	use App\Scraper\AbstractScraper;
 	use App\Scraper\Kiranico\KiranicoScrapeTarget;
+	use App\Scraper\Kiranico\Scrapers\Helpers\WeaponMainDataSection;
+	use App\Scraper\Kiranico\Scrapers\Helpers\Weapons\ParserType;
+	use App\Scraper\Kiranico\Scrapers\Helpers\Weapons\WeaponData;
+	use App\Scraper\Kiranico\Scrapers\Helpers\Weapons\WeaponDataParserInterface;
 	use App\Scraper\ScraperType;
 	use App\Scraper\SubtypeAwareScraperInterface;
 	use App\Utility\StringUtil;
+	use Doctrine\Common\Collections\Criteria;
 	use Doctrine\ORM\EntityManager;
 	use Symfony\Bridge\Doctrine\RegistryInterface;
 	use Symfony\Component\DomCrawler\Crawler;
@@ -33,56 +39,24 @@
 			WeaponType::BOW => '/bow',
 		];
 
-		private const SHARPNESS_NODES = [
-			Attribute::SHARP_RED,
-			Attribute::SHARP_ORANAGE,
-			Attribute::SHARP_YELLOW,
-			Attribute::SHARP_GREEN,
-			Attribute::SHARP_BLUE,
-			Attribute::SHARP_WHITE,
-		];
-
-		private const ATTRIBUTE_MATCHERS = [
-			'/(\d+) (Fire|Water|Ice|Thunder|Dragon|Blast|Poison|Paralysis|Sleep)(\))?/' => [self::class, 'parseElemDamageAttribute'],
-			'/((?:Sever|Speed|Element|Health|Stamina|Blunt) Boost)/' => Attribute::IG_BOOST_TYPE,
-			'/Affinity +?(-?\d+%?)/' => Attribute::AFFINITY,
-			'/((?:Normal|Wide|Long) Lv\d+)/' => Attribute::GL_SHELLING_TYPE,
-			'/((?:Poison|Para|Dragon|Exhaust) Phial \d+)/' => Attribute::PHIAL_TYPE,
-			'/(?:Power)?((?:Power|Element|Impact) Phial)/' => Attribute::PHIAL_TYPE,
-			'/(None|Low|Average|High) Dev./' => Attribute::DEVIATION,
-			'/(Wyvern(?:blast|snipe|heart))/' => Attribute::SPECIAL_AMMO,
-		];
-
-		private const COATING_TRANSLATIONS = [
-			'Cls' => 'Close Range',
-			'Pow' => 'Power',
-			'Par' => 'Paralysis',
-			'Poi' => 'Poison',
-			'Sle' => 'Sleep',
-			'Bla' => 'Blast',
-		];
-
-		private const CAPACITY_TRANSLATIONS = [
-			'Nrm' => 'normal',
-			'Prc' => 'pierce',
-			'Spr' => 'spread',
-			'Sti' => 'sticky',
-			'Clu' => 'cluster',
-			'Rec' => 'recover',
-			'Poi' => 'poison',
-			'Par' => 'paralysis',
-			'Sle' => 'sleep',
-			'Exh' => 'exhaust',
-			'Fla' => 'flaming',
-			'Wat' => 'water',
-			'Fre' => 'freeze',
-			'Thn' => 'thunder',
-			'Dra' => 'dragon',
-			'Sli' => 'slicing',
-			'Wyv' => 'wyvern',
-			'Dem' => 'demon',
-			'Arm' => 'armor',
-			'Tra' => 'tranq',
+		private const LAYOUTS = [
+			'' => [
+				ParserType::MAIN => 1,
+				ParserType::UPGRADE => 2,
+				ParserType::MATERIALS => 3,
+			],
+			WeaponType::LIGHT_BOWGUN => [
+				ParserType::MAIN => 1,
+				ParserType::AMMO => 2,
+				ParserType::UPGRADE => 3,
+				ParserType::MATERIALS => 4,
+			],
+			WeaponType::HEAVY_BOWGUN => [
+				ParserType::MAIN => 1,
+				ParserType::AMMO => 2,
+				ParserType::UPGRADE => 3,
+				ParserType::MATERIALS => 4,
+			],
 		];
 
 		/**
@@ -96,6 +70,11 @@
 		protected $manager;
 
 		/**
+		 * @var WeaponDataParserInterface[]
+		 */
+		protected $parsers;
+
+		/**
 		 * @var Weapon[]
 		 */
 		protected $weaponCache = [];
@@ -103,28 +82,21 @@
 		/**
 		 * KiranicoWeaponsScraper constructor.
 		 *
-		 * @param KiranicoScrapeTarget $target
-		 * @param RegistryInterface    $registry
+		 * @param KiranicoScrapeTarget        $target
+		 * @param RegistryInterface           $registry
+		 * @param WeaponDataParserInterface[] $parsers MUST be passed in section index order
 		 */
-		public function __construct(KiranicoScrapeTarget $target, RegistryInterface $registry) {
+		public function __construct(KiranicoScrapeTarget $target, RegistryInterface $registry, array $parsers) {
 			parent::__construct($target, ScraperType::WEAPONS);
 
 			$this->manager = $registry->getManager();
+			$this->parsers = $parsers;
 		}
 
 		/**
 		 * {@inheritdoc}
 		 */
 		public function scrape(array $subtypes = []): void {
-			if (in_array('skip-weapon-data', $subtypes)) {
-				$skipWeaponData = true;
-
-				$subtypes = array_filter($subtypes, function($item) {
-					return $item !== 'skip-weapon-data';
-				});
-			} else
-				$skipWeaponData = false;
-
 			foreach (self::PATHS as $weaponType => $path) {
 				if ($subtypes && !in_array($weaponType, $subtypes))
 					continue;
@@ -135,44 +107,13 @@
 				if ($response->getStatusCode() !== Response::HTTP_OK)
 					throw new \RuntimeException('Could not retrieve ' . $uri);
 
-				$crawler = (new Crawler($response->getBody()->getContents()))->filter('.container table tr');
-
-				if (!$skipWeaponData)
-					for ($i = 0, $ii = $crawler->count(); $i < $ii; $i++) {
-						$nodes = $crawler->eq($i)->children();
-
-						// Skip table header rows
-						if ($nodes->filter('th')->count())
-							continue;
-
-						$this->process($nodes, $weaponType);
-					}
-
-				$stack = [];
-				$previousDepth = 0;
+				$crawler = (new Crawler($response->getBody()->getContents()))
+					->filter('.container table tr td:first-child a');
 
 				for ($i = 0, $ii = $crawler->count(); $i < $ii; $i++) {
-					$node = $crawler->eq($i)->children()->first();
+					$node = $crawler->eq($i);
 
-					// Skip table header rows (again)
-					if ($node->filter('th')->count())
-						continue;
-
-					$name = trim($node->filter('a')->text());
-					$depth = substr_count($node->filter('.d-sm-inline')->text(), '┗');
-					$craftable = $node->filter('small')->count() > 0;
-
-					if ($depth === $previousDepth)
-						array_pop($stack);
-					else if ($depth < $previousDepth)
-						$stack = array_slice($stack, 0, $depth);
-
-					$previousName = $stack[sizeof($stack) - 1] ?? null;
-					$stack[] = $name;
-
-					$this->addCraftingInfo($name, $craftable, $previousName);
-
-					$previousDepth = $depth;
+					$this->process(parse_url($node->attr('href'), PHP_URL_PATH), $weaponType);
 				}
 
 				// We sleep to avoid hitting the target too fast
@@ -181,207 +122,117 @@
 		}
 
 		/**
-		 * @param Crawler $nodes
-		 * @param string  $weaponType
+		 * @param string $path
+		 * @param string $weaponType
 		 *
 		 * @return void
+		 * @throws \Http\Client\Exception
 		 */
-		protected function process(Crawler $nodes, string $weaponType): void {
-			$name = StringUtil::replaceNumeralRank(trim($nodes->first()->filter('a')->text()));
-			$rarity = (int)str_replace('RARE', '', trim($nodes->last()->text()));
+		protected function process(string $path, string $weaponType): void {
+			$uri = $this->target->getBaseUri()->withPath($path);
 
-			$weapon = $this->getWeapon($name);
+			try {
+				$result = $this->target->getHttpClient()->get($uri);
+			} catch (\Exception $e) {
+				// An exception here means we were hitting the target too hard (99% of the time at least)
+				// Sleep and then try again
+				sleep(3);
 
-			if (!$weapon) {
-				$weapon = new Weapon($name, $weaponType, $rarity);
-
-				$this->manager->persist($weapon);
-			} else
-				$weapon->setAttributes([]);
-
-			$this->weaponCache[$name] = $weapon;
-
-			$weapon->setAttribute(Attribute::ATTACK, (int)trim($nodes->eq(1)->text()));
-
-			if ($attributeDescription = trim($nodes->eq(3)->text())) {
-				// This fixes a ton of whitespace between phrases in the element description
-				$attributeDescription = trim(preg_replace('/\s+/', ' ', $attributeDescription));
-
-				foreach (self::ATTRIBUTE_MATCHERS as $regex => $attribute) {
-					if (!preg_match($regex, $attributeDescription, $matches))
-						continue;
-
-					// Throw away the full pattern match, we don't want it
-					array_shift($matches);
-
-					if (is_string($attribute))
-						$weapon->setAttribute($attribute, is_numeric($matches[0]) ? (int)$matches[0] : $matches[0]);
-					else if (is_callable($attribute))
-						call_user_func($attribute, $weapon, ...$matches);
-					else
-						throw new \InvalidArgumentException('Can\'t hand attribute value. Check ' . static::class .
-							'::ATTRIBUTE_MATCHERS');
-				}
+				$result = $this->target->getHttpClient()->get($uri);
 			}
 
-			if ($weaponType === WeaponType::BOW) {
-				$coatingNodes = $nodes->eq(4)->filter('span');
-				$coatings = [];
+			if ($result->getStatusCode() !== Response::HTTP_OK)
+				throw new \RuntimeException('Could not retrieve ' . $uri);
 
-				for ($i = 0, $ii = $coatingNodes->count(); $i < $ii; $i ++) {
-					$node = $coatingNodes->eq($i);
-					$classList = $node->attr('class');
+			$sections = (new Crawler($result->getBody()->getContents()))->filter('.container .col-lg-9.px-2 .card');
 
-					if (!$classList || stripos($classList, 'text-muted') !== false)
-						continue;
+			$data = new WeaponData();
 
-					$coating = trim($node->text());
+			if (isset(self::LAYOUTS[$weaponType]))
+				$layout = self::LAYOUTS[$weaponType];
+			else
+				$layout = self::LAYOUTS[''];
 
-					$coatings[] = self::COATING_TRANSLATIONS[$coating] ?? $coating;
-				}
-
-				$weapon->setAttribute(Attribute::COATINGS, $coatings);
-			} else if (in_array($weaponType, [WeaponType::LIGHT_BOWGUN, WeaponType::HEAVY_BOWGUN])) {
-				$capacityNodes = $nodes->eq(4)->filter('div');
-				$capacities = [];
-
-				for ($i = 0, $ii = $capacityNodes->count(); $i < $ii; $i++) {
-					$row = trim(preg_replace('/\s+/', ' ', $capacityNodes->eq($i)->text()));
-					$data = explode(' ', $row);
-
-					if (sizeof($data) === 0)
-						throw new \RuntimeException('Could not properly interpret capacities row: ' . $row);
-
-					$currentType = static::getTranslatedCapacityType(array_shift($data));
-
-					while (($next = array_shift($data)) !== null) {
-						if (!is_numeric($next)) {
-							$currentType = static::getTranslatedCapacityType($next);
-
-							$capacities[$currentType] = [];
-
-							continue;
-						}
-
-						$capacities[$currentType][] = (int)$next;
-					}
-				}
-				
-				$positions = array_flip(array_values(self::CAPACITY_TRANSLATIONS));
-				
-				uksort($capacities, function(string $a, string $b) use ($positions): int {
-					return $positions[$a] - $positions[$b];
-				});
-
-				$weapon->setAttribute(Attribute::AMMO_CAPACITIES, $capacities);
-			} else {
-				$sharpnessNodes = $nodes->eq(4)->children();
-
-				if ($sharpnessNodes->count()) {
-					$sharpnessNodes = $sharpnessNodes->first()->children();
-
-					foreach (self::SHARPNESS_NODES as $i => $sharpness) {
-						$styles = $sharpnessNodes->eq($i)->attr('style');
-
-						if (!$styles || !preg_match('/width: ?(\d+)px/', $styles, $matches))
-							continue;
-
-						$value = (int)$matches[1];
-
-						if ($value === 0)
-							break;
-
-						$weapon->setAttribute($sharpness, (int)$matches[1]);
-					}
-				}
-			}
-
-			$slotNodes = $nodes->eq(5)->children()->first()->children();
-			$slotCounts = [];
-
-			for ($i = 0, $ii = $slotNodes->count(); $i < $ii; $i++) {
-				if (!preg_match('/zmdi-n-(\d+)-square/', $slotNodes->eq($i)->attr('class'), $matches))
+			foreach ($this->parsers as $key => $parser) {
+				if (!isset($layout[$key]))
 					continue;
 
-				$key = (int)$matches[1];
-
-				if (!isset($slotCounts[$key]))
-					$slotCounts[$key] = 0;
-
-				++$slotCounts[$key];
+				$parser->parse($sections->eq($layout[$key]), $data);
 			}
 
-			foreach ($slotCounts as $rank => $count)
-				$weapon->setAttribute('slotsRank' . $rank, $count);
-		}
+			$weapon = $this->getWeapon($data->getName());
 
-		/**
-		 * @param string      $weaponName
-		 * @param bool        $craftable
-		 * @param null|string $previousWeaponName
-		 *
-		 * @return void
-		 */
-		protected function addCraftingInfo(string $weaponName, bool $craftable, ?string $previousWeaponName): void {
-			$weaponName = StringUtil::replaceNumeralRank($weaponName);
-			$weapon = $this->getWeapon($weaponName);
+			if (!$weapon) {
+				$weapon = new Weapon($data->getName(), $weaponType, $data->getRarity());
 
-			if (!$weapon)
-				throw new \RuntimeException('Could not find weapon named ' . $weaponName);
+				$this->manager->persist($weapon);
+				$this->weaponCache[$data->getName()] = $weapon;
+			} else
+				$weapon->setRarity($data->getRarity());
+
+			$weapon->setAttributes($data->getAttributes());
 
 			$info = $weapon->getCrafting();
 
 			if (!$info) {
-				$info = new WeaponCraftingInfo($craftable);
+				$info = new WeaponCraftingInfo($data->isCraftable());
 
 				$weapon->setCrafting($info);
 			} else
-				$info->setCraftable($craftable);
+				$info->setCraftable($data->isCraftable());
 
-			if ($previousWeaponName) {
-				$previousWeaponName = StringUtil::replaceNumeralRank($previousWeaponName);
-				$previousWeapon = $this->getWeapon($previousWeaponName);
+			if ($data->getCraftingPrevious()) {
+				$previous = $this->getWeapon($data->getCraftingPrevious());
 
-				$previousInfo = $previousWeapon->getCrafting();
+				if (!$previous)
+					throw new \RuntimeException('Could not find previous weapon named ' . $data->getCraftingPrevious());
+				else if (!$previous->getCrafting())
+					throw new \RuntimeException('Could not find crafting info for previous named ' . $previous->getName());
 
-				if (!$previousInfo)
-					throw new \RuntimeException('Could not find previous crafting info for weapon named ' .
-						$previousWeaponName);
+				$prevInfo = $previous->getCrafting();
 
-				if (!$previousInfo->getBranches()->contains($weapon))
-					$previousInfo->getBranches()->add($weapon);
+				if (!$prevInfo->getBranches()->contains($weapon))
+					$prevInfo->getBranches()->add($weapon);
 
-				$info->setPrevious($previousWeapon);
+				$info->setPrevious($previous);
 			}
-		}
 
-		/**
-		 * @param Weapon      $weapon
-		 * @param string      $value
-		 * @param string      $element
-		 * @param null|string $hiddenChar
-		 *
-		 * @return void
-		 */
-		public static function parseElemDamageAttribute(
-			Weapon $weapon,
-			string $value,
-			string $element,
-			?string $hiddenChar = null
-		): void {
-			$weapon
-				->setAttribute(Attribute::ELEM_TYPE, $element)
-				->setAttribute(Attribute::ELEM_DAMAGE, (int)$value)
-				->setAttribute(Attribute::ELEM_HIDDEN, $hiddenChar !== null);
-		}
+			$info->getCraftingMaterials()->clear();
+			$info->getUpgradeMaterials()->clear();
 
-		/**
-		 * @param string $type
-		 *
-		 * @return string
-		 */
-		protected static function getTranslatedCapacityType(string $type): string {
-			return self::CAPACITY_TRANSLATIONS[$type] ?? $type;
+			if ($crafting = $data->getCraftingMaterials()) {
+				/**
+				 * @var string $itemName
+				 * @var int    $amount
+				 */
+				foreach ($crafting as $itemName => $amount) {
+					$item = $this->manager->getRepository('App:Item')->findOneBy([
+						'name' => $itemName,
+					]);
+
+					if (!$item)
+						throw new \RuntimeException('Could not find item named ' . $itemName);
+
+					$info->getCraftingMaterials()->add(new CraftingMaterialCost($item, $amount));
+				}
+			}
+
+			if ($upgrading = $data->getUpgradeMaterials()) {
+				/**
+				 * @var string $itemName
+				 * @var int    $amount
+				 */
+				foreach ($upgrading as $itemName => $amount) {
+					$item = $this->manager->getRepository('App:Item')->findOneBy([
+						'name' => $itemName,
+					]);
+
+					if (!$item)
+						throw new \RuntimeException('Could not find item named ' . $itemName);
+
+					$info->getUpgradeMaterials()->add(new CraftingMaterialCost($item, $amount));
+				}
+			}
 		}
 
 		/**

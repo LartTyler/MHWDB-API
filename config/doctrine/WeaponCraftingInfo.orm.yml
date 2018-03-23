@@ -1,0 +1,71 @@
+App\Entity\WeaponCraftingInfo:
+    type: entity
+    table: weapon_crafting_info
+    id:
+        id:
+            type: integer
+            nullable: false
+            options:
+                unsigned: true
+            generator:
+                strategy: IDENTITY
+    fields:
+        craftable:
+            type: boolean
+            nullable: false
+    manyToOne:
+        previous:
+            targetEntity: App\Entity\Weapon
+            joinColumn:
+                nullable: true
+                options:
+                    unsigned: true
+    manyToMany:
+        branches:
+            targetEntity: App\Entity\Weapon
+            joinTable:
+                name: weapon_crafting_info_branches
+                joinColumns:
+                    weapon_crafting_info_id:
+                        nullable: false
+                        options:
+                            unsigned: true
+                inverseJoinColumns:
+                    branch_id:
+                        nullable: false
+                        options:
+                            unsigned: true
+        craftingMaterials:
+            targetEntity: App\Entity\CraftingMaterialCost
+            cascade:
+                - all
+            orphanRemoval: true
+            joinTable:
+                name: weapon_crafting_info_crafting_material_costs
+                joinColumns:
+                    weapon_crafting_info_id:
+                        nullable: false
+                        options:
+                            unsigned: true
+                inverseJoinColumns:
+                    crafting_material_cost_id:
+                        nullable: false
+                        options:
+                            unsigned: true
+        upgradeMaterials:
+            targetEntity: App\Entity\CraftingMaterialCost
+            cascade:
+                - all
+            orphanRemoval: true
+            joinTable:
+                name: weapon_crafting_info_upgrade_material_costs
+                joinColumns:
+                    weapon_crafting_info_id:
+                        nullable: false
+                        options:
+                            unsigned: true
+                inverseJoinColumns:
+                    crafting_material_cost_id:
+                        nullable: false
+                        options:
+                            unsigned: true
