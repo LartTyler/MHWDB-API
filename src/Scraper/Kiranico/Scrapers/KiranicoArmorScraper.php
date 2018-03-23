@@ -35,6 +35,7 @@
 			'Gorget' => ArmorType::HEAD,
 			'Spectacles' => ArmorType::HEAD,
 			'Eyepatch' => ArmorType::HEAD,
+			'Shades' => ArmorType::HEAD,
 			'Mail' => ArmorType::CHEST,
 			'Vest' => ArmorType::CHEST,
 			'Thorax' => ArmorType::CHEST,
@@ -131,7 +132,14 @@
 		 */
 		protected function process(string $path, string $rank): void {
 			$uri = $this->target->getBaseUri()->withPath($path);
-			$response = $this->target->getHttpClient()->get($uri);
+
+			try {
+				$response = $this->target->getHttpClient()->get($uri);
+			} catch (\Exception $e) {
+				sleep(3);
+
+				$response = $this->target->getHttpClient()->get($uri);
+			}
 
 			if ($response->getStatusCode() !== Response::HTTP_OK)
 				throw new \RuntimeException('Could not retrieve ' . $uri);
@@ -241,9 +249,6 @@
 
 				$armor->getSkills()->add($rank);
 			}
-
-			// We sleep to avoid hitting the target too frequently
-			sleep(1);
 		}
 
 		/**
