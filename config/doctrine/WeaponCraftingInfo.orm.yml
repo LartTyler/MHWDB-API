@@ -37,6 +37,9 @@ App\Entity\WeaponCraftingInfo:
                             unsigned: true
         craftingMaterials:
             targetEntity: App\Entity\CraftingMaterialCost
+            cascade:
+                - all
+            orphanRemoval: true
             joinTable:
                 name: weapon_crafting_info_crafting_material_costs
                 joinColumns:
@@ -51,6 +54,9 @@ App\Entity\WeaponCraftingInfo:
                             unsigned: true
         upgradeMaterials:
             targetEntity: App\Entity\CraftingMaterialCost
+            cascade:
+                - all
+            orphanRemoval: true
             joinTable:
                 name: weapon_crafting_info_upgrade_material_costs
                 joinColumns:
