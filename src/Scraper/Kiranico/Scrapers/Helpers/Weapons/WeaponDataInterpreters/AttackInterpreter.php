@@ -21,6 +21,6 @@
 		public function parse(Crawler $node, WeaponData $target): void {
 			$value = explode(' ', StringUtil::clean($node->filter('.lead')->text()))[0];
 
-			$target->setAttribute(Attribute::ATTACK, $value);
+			$target->setAttribute(Attribute::ATTACK, (int)$value);
 		}
 	}
