@@ -30,6 +30,8 @@
 				$materials[$name] = $amount;
 			}
 
-			$target->setCraftingMaterials($materials);
+			$target
+				->setCraftable(true)
+				->setCraftingMaterials($materials);
 		}
 	}

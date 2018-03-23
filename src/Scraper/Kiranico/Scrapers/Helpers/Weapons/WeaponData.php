@@ -35,7 +35,7 @@
 		/**
 		 * @var bool
 		 */
-		protected $previousCraftable = false;
+		protected $craftable = false;
 
 		/**
 		 * @return string|null
@@ -50,7 +50,7 @@
 		 * @return $this
 		 */
 		public function setName(string $name) {
-			$this->name = $name;
+			$this->name = $this->fixWeaponName($name);
 
 			return $this;
 		}
@@ -86,7 +86,7 @@
 		 * @return $this
 		 */
 		public function setCraftingPrevious(string $craftingPrevious) {
-			$this->craftingPrevious = $craftingPrevious;
+			$this->craftingPrevious = $this->fixWeaponName($craftingPrevious);
 
 			return $this;
 		}
@@ -130,18 +130,31 @@
 		/**
 		 * @return bool
 		 */
-		public function isPreviousCraftable(): bool {
-			return $this->previousCraftable;
+		public function isCraftable(): bool {
+			return $this->craftable;
 		}
 
 		/**
-		 * @param bool $previousCraftable
+		 * @param bool $craftable
 		 *
 		 * @return $this
 		 */
-		public function setPreviousCraftable(bool $previousCraftable) {
-			$this->previousCraftable = $previousCraftable;
+		public function setCraftable(bool $craftable) {
+			$this->craftable = $craftable;
 
 			return $this;
+		}
+
+		/**
+		 * @param string $name
+		 *
+		 * @return string
+		 */
+		protected function fixWeaponName(string $name): string {
+			return str_replace([
+				'Berseker'
+			], [
+				'Berserker'
+			], $name);
 		}
 	}

@@ -27,11 +27,8 @@
 			
 			$name = StringUtil::clean($items->eq($items->count() - 2)->text());
 
-			if (strpos($name, 'creatable') !== false) {
-				$target->setPreviousCraftable(true);
-
+			if (strpos($name, 'creatable') !== false)
 				$name = trim(substr($name, 0, strpos($name, '(') - 1));
-			}
 
 			$target->setCraftingPrevious(StringUtil::replaceNumeralRank($name));
 		}

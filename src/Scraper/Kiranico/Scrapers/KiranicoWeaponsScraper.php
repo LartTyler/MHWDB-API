@@ -160,14 +160,13 @@
 				$parser->parse($sections->eq($layout[$key]), $data);
 			}
 
-			$weapon = $this->manager->getRepository('App:Weapon')->findOneBy([
-				'name' => $data->getName(),
-			]);
+			$weapon = $this->getWeapon($data->getName());
 
 			if (!$weapon) {
 				$weapon = new Weapon($data->getName(), $weaponType, $data->getRarity());
 
 				$this->manager->persist($weapon);
+				$this->weaponCache[$data->getName()] = $weapon;
 			} else
 				$weapon->setRarity($data->getRarity());
 
@@ -176,11 +175,11 @@
 			$info = $weapon->getCrafting();
 
 			if (!$info) {
-				$info = new WeaponCraftingInfo($data->isPreviousCraftable());
+				$info = new WeaponCraftingInfo($data->isCraftable());
 
 				$weapon->setCrafting($info);
 			} else
-				$info->setCraftable($data->isPreviousCraftable());
+				$info->setCraftable($data->isCraftable());
 
 			if ($data->getCraftingPrevious()) {
 				$previous = $this->getWeapon($data->getCraftingPrevious());
@@ -191,7 +190,6 @@
 					throw new \RuntimeException('Could not find crafting info for previous named ' . $previous->getName());
 
 				$prevInfo = $previous->getCrafting();
-				$prevInfo->setCraftable($data->isPreviousCraftable());
 
 				if (!$prevInfo->getBranches()->contains($weapon))
 					$prevInfo->getBranches()->add($weapon);
