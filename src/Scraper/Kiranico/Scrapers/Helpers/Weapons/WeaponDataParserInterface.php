@@ -5,20 +5,6 @@
 
 	interface WeaponDataParserInterface {
 		/**
-		 * @param WeaponDataInterpreterInterface[] $interpreters
-		 *
-		 * @return $this
-		 */
-		public function setInterpreters(array $interpreters);
-
-		/**
-		 * @param WeaponDataInterpreterInterface $interpreter
-		 *
-		 * @return $this
-		 */
-		public function addInterpreter(WeaponDataInterpreterInterface $interpreter);
-
-		/**
 		 * @param Crawler    $section
 		 * @param WeaponData $target
 		 *

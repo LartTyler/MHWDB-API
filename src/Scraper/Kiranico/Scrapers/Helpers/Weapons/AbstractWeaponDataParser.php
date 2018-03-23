@@ -1,8 +1,6 @@
 <?php
 	namespace App\Scraper\Kiranico\Scrapers\Helpers\Weapons;
 
-	use Symfony\Component\DomCrawler\Crawler;
-
 	abstract class AbstractWeaponDataParser implements WeaponDataParserInterface {
 		/**
 		 * @var WeaponDataInterpreterInterface[]

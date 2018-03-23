@@ -122,7 +122,7 @@
 							'carryLimit' => $item->getCarryLimit(),
 						],
 					];
-				}, $info->getMaterials()->toArray()),
+				}, $info->getUpgradeMaterials()->toArray()),
 			];
 		}
 	}

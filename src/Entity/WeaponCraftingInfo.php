@@ -28,7 +28,12 @@
 		/**
 		 * @var Collection|Selectable|CraftingMaterialCost[]
 		 */
-		private $materials;
+		private $craftingMaterials;
+
+		/**
+		 * @var Collection|Selectable|CraftingMaterialCost[]
+		 */
+		private $upgradeMaterials;
 
 		/**
 		 * WeaponCraftingInfo constructor.
@@ -41,7 +46,8 @@
 			$this->previous = $previous;
 
 			$this->branches = new ArrayCollection();
-			$this->materials = new ArrayCollection();
+			$this->craftingMaterials = new ArrayCollection();
+			$this->upgradeMaterials = new ArrayCollection();
 		}
 
 		/**
@@ -88,7 +94,14 @@
 		/**
 		 * @return CraftingMaterialCost[]|Collection|Selectable
 		 */
-		public function getMaterials() {
-			return $this->materials;
+		public function getCraftingMaterials() {
+			return $this->craftingMaterials;
+		}
+
+		/**
+		 * @return CraftingMaterialCost[]|Collection|Selectable
+		 */
+		public function getUpgradeMaterials() {
+			return $this->upgradeMaterials;
 		}
 	}

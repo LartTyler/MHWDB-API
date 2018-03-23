@@ -18,9 +18,29 @@
 		protected $rarity = null;
 
 		/**
+		 * @var string|null
+		 */
+		protected $craftingPrevious = null;
+
+		/**
+		 * @var array
+		 */
+		protected $craftingMaterials = [];
+
+		/**
+		 * @var array
+		 */
+		protected $upgradeMaterials = [];
+
+		/**
+		 * @var bool
+		 */
+		protected $previousCraftable = false;
+
+		/**
 		 * @return string|null
 		 */
-		public function getName(): string {
+		public function getName(): ?string {
 			return $this->name;
 		}
 
@@ -38,7 +58,7 @@
 		/**
 		 * @return int|null
 		 */
-		public function getRarity() {
+		public function getRarity(): ?int {
 			return $this->rarity;
 		}
 
@@ -49,6 +69,78 @@
 		 */
 		public function setRarity(int $rarity) {
 			$this->rarity = $rarity;
+
+			return $this;
+		}
+
+		/**
+		 * @return null|string
+		 */
+		public function getCraftingPrevious(): ?string {
+			return $this->craftingPrevious;
+		}
+
+		/**
+		 * @param null|string $craftingPrevious
+		 *
+		 * @return $this
+		 */
+		public function setCraftingPrevious(string $craftingPrevious) {
+			$this->craftingPrevious = $craftingPrevious;
+
+			return $this;
+		}
+
+		/**
+		 * @return array
+		 */
+		public function getUpgradeMaterials(): array {
+			return $this->upgradeMaterials;
+		}
+
+		/**
+		 * @param array $upgradeMaterials
+		 *
+		 * @return $this
+		 */
+		public function setUpgradeMaterials(array $upgradeMaterials) {
+			$this->upgradeMaterials = $upgradeMaterials;
+
+			return $this;
+		}
+
+		/**
+		 * @return array
+		 */
+		public function getCraftingMaterials(): array {
+			return $this->craftingMaterials;
+		}
+
+		/**
+		 * @param array $craftingMaterials
+		 *
+		 * @return $this
+		 */
+		public function setCraftingMaterials(array $craftingMaterials) {
+			$this->craftingMaterials = $craftingMaterials;
+
+			return $this;
+		}
+
+		/**
+		 * @return bool
+		 */
+		public function isPreviousCraftable(): bool {
+			return $this->previousCraftable;
+		}
+
+		/**
+		 * @param bool $previousCraftable
+		 *
+		 * @return $this
+		 */
+		public function setPreviousCraftable(bool $previousCraftable) {
+			$this->previousCraftable = $previousCraftable;
 
 			return $this;
 		}

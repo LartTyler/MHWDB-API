@@ -61,10 +61,18 @@
 		 * @param string $name
 		 *
 		 * @return void
+		 * @throws \Http\Client\Exception
 		 */
 		protected function process(string $path, string $name): void {
 			$uri = $this->target->getBaseUri()->withPath($path);
-			$response = $this->target->getHttpClient()->get($uri);
+
+			try {
+				$response = $this->target->getHttpClient()->get($uri);
+			} catch (\Exception $e) {
+				sleep(3);
+
+				$response = $this->target->getHttpClient()->get($uri);
+			}
 
 			if ($response->getStatusCode() !== Response::HTTP_OK)
 				throw new \RuntimeException('Could not retrieve ' . $uri);
@@ -112,8 +120,5 @@
 			$item->setCarryLimit($carryLimit);
 
 			$this->manager->persist($item);
-
-			// We sleep to avoid hitting the target too frequently
-			sleep(1);
 		}
 	}

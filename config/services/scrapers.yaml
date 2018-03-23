@@ -45,6 +45,12 @@ services:
             - '@App\Scraper\Kiranico\KiranicoScrapeTarget'
             - '@doctrine'
             -
-                - '@App\Scraper\Kiranico\Scrapers\Helpers\Weapons\MainWeaponDataParser'
+                main: '@App\Scraper\Kiranico\Scrapers\Helpers\Weapons\MainWeaponDataParser'
+                upgrade: '@App\Scraper\Kiranico\Scrapers\Helpers\Weapons\CraftingWeaponDataParser'
+                ammo: '@App\Scraper\Kiranico\Scrapers\Helpers\Weapons\AmmoWeaponDataParser'
+                materials: '@App\Scraper\Kiranico\Scrapers\Helpers\Weapons\MaterialWeaponDataParser'
 
     App\Scraper\Kiranico\Scrapers\Helpers\Weapons\MainWeaponDataParser: ~
+    App\Scraper\Kiranico\Scrapers\Helpers\Weapons\CraftingWeaponDataParser: ~
+    App\Scraper\Kiranico\Scrapers\Helpers\Weapons\AmmoWeaponDataParser: ~
+    App\Scraper\Kiranico\Scrapers\Helpers\Weapons\MaterialWeaponDataParser: ~

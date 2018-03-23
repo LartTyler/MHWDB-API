@@ -7,10 +7,31 @@
 
 	class MainWeaponDataParser extends AbstractWeaponDataParser {
 		const DEFAULT_INTERPRETERS = [
+			// -- All Weapons --
 			Interpreter\AttackInterpreter::class,
 			Interpreter\RarityInterpreter::class,
 			Interpreter\SlotsInterpreter::class,
 			Interpreter\ElementInterpreter::class,
+
+			// -- Melee Only --
+			Interpreter\SharpnessInterpreter::class,
+			Interpreter\SharpnessInterpreter::class,
+
+			// -- Switch Axe / Charge Blade --
+			Interpreter\PhialTypeInterpreter::class,
+
+			// -- Gunlance --
+			Interpreter\ShellingTypeInterpreter::class,
+
+			// -- Insect Glaive --
+			Interpreter\BoostTypeInterpreter::class,
+
+			// -- Bowguns --
+			Interpreter\DeviationInterpreter::class,
+			Interpreter\SpecialAmmoInterpreter::class,
+
+			// -- Bow --
+			Interpreter\CoatingsInterpreter::class,
 		];
 
 		/**
