@@ -23,16 +23,6 @@
 	use Symfony\Component\Routing\RouterInterface;
 
 	abstract class AbstractDataController extends Controller {
-		protected const SEARCH_OPERATORS = [
-			'!' => '!=',
-			'>=' => '>=',
-			'<=' => '<=',
-			'<' => '<',
-			'>' => '>',
-			'~' => 'LIKE',
-			'!~' => 'NOT LIKE',
-		];
-
 		/**
 		 * @var EntityManager
 		 */
@@ -94,12 +84,12 @@
 		}
 
 		/**
-		 * @param string $idOrSlug
+		 * @param string $id
 		 *
 		 * @return Response
 		 */
-		public function readAction(string $idOrSlug): Response {
-			return $this->respond($this->getEntity($idOrSlug));
+		public function readAction(string $id): Response {
+			return $this->respond($this->getEntity($id));
 		}
 
 		/**

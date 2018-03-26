@@ -2,6 +2,7 @@
 	namespace App\Scraper\Kiranico\Scrapers;
 
 	use App\Entity\Armor;
+	use App\Entity\ArmorSet;
 	use App\Entity\SkillRank;
 	use App\Game\ArmorRank;
 	use App\Game\ArmorType;
@@ -9,6 +10,7 @@
 	use App\Scraper\AbstractScraper;
 	use App\Scraper\Kiranico\KiranicoScrapeTarget;
 	use App\Scraper\ScraperType;
+	use App\Utility\StringUtil;
 	use Doctrine\ORM\EntityManagerInterface;
 	use Symfony\Bridge\Doctrine\RegistryInterface;
 	use Symfony\Component\CssSelector\Node\AttributeNode;
@@ -86,6 +88,11 @@
 		protected $manager;
 
 		/**
+		 * @var ArmorSet[]
+		 */
+		private $setCache = [];
+
+		/**
 		 * KiranicoArmorScraper constructor.
 		 *
 		 * @param KiranicoScrapeTarget $target
@@ -111,7 +118,25 @@
 			$currentRank = ArmorRank::LOW;
 
 			for ($i = 0, $ii = $crawler->count(); $i < $ii; $i++) {
-				$setPieceNodes = $crawler->eq($i)->filter('.card-body table')->eq(0)->filter('tr');
+				$setNode = $crawler->eq($i);
+
+				$setName = StringUtil::clean($setNode->filter('.card-header')->text());
+				$setName = trim(str_replace('Set', '', $setName));
+
+				$set = $this->getArmorSet($setName);
+
+				if (!$set) {
+					if (strpos($setName, 'Alpha') || strpos($setName, 'Beta'))
+						$rank = ArmorRank::HIGH;
+					else
+						$rank = ArmorRank::LOW;
+
+					$this->setCache[$setName] = $set = new ArmorSet($setName, $rank);
+
+					$this->manager->persist($set);
+				}
+
+				$setPieceNodes = $setNode->filter('.card-body table')->eq(0)->filter('tr');
 
 				for ($j = 0, $jj = $setPieceNodes->count(); $j < $jj; $j++) {
 					$link = $setPieceNodes->eq($j)->filter('a')->attr('href');
@@ -119,18 +144,20 @@
 					if (stripos($link, 'Alpha'))
 						$currentRank = ArmorRank::HIGH;
 
-					$this->process(parse_url($link, PHP_URL_PATH), $currentRank);
+					$this->process(parse_url($link, PHP_URL_PATH), $currentRank, $set);
 				}
 			}
 		}
 
 		/**
-		 * @param string $path
-		 * @param string $rank
+		 * @param string   $path
+		 * @param string   $rank
+		 * @param ArmorSet $armorSet
 		 *
 		 * @return void
+		 * @throws \Http\Client\Exception
 		 */
-		protected function process(string $path, string $rank): void {
+		protected function process(string $path, string $rank, ArmorSet $armorSet): void {
 			$uri = $this->target->getBaseUri()->withPath($path);
 
 			try {
@@ -168,6 +195,9 @@
 				$armor->setAttributes([]);
 				$armor->getSkills()->clear();
 			}
+
+			if (!$armorSet->getPieces()->contains($armor))
+				$armorSet->getPieces()->add($armor);
 
 			$infoNodes = $crawler->filter('.card')->eq(1)->filter('.card-footer .p-3');
 
@@ -310,5 +340,21 @@
 				trim(implode(' ', $parts) . ' ' . $rank),
 				$armorType,
 			];
+		}
+
+		/**
+		 * @param string $name
+		 *
+		 * @return ArmorSet|null
+		 */
+		protected function getArmorSet(string $name): ?ArmorSet {
+			if (isset($this->setCache[$name]))
+				return $this->setCache[$name];
+
+			$set = $this->manager->getRepository('App:ArmorSet')->findOneBy([
+				'name' => $name,
+			]);
+
+			return $this->setCache[$name] = $set;
 		}
 	}

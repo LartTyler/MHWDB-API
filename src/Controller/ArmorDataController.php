@@ -16,5 +16,5 @@
 		 */
 		public function __construct(RegistryInterface $doctrine, ResponderService $responder, RouterInterface $router) {
 			parent::__construct($doctrine, $responder, $router, Armor::class);
-		}
+		}\
 	}
