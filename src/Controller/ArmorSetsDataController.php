@@ -3,6 +3,8 @@
 
 	use App\Entity\Armor;
 	use App\Entity\ArmorSet;
+	use App\Utility\EntityUtil;
+	use DaybreakStudios\Doze\Errors\ApiErrorInterface;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use Symfony\Bridge\Doctrine\RegistryInterface;
 	use Symfony\Component\HttpFoundation\Request;
@@ -27,30 +29,28 @@
 		 * @return Response
 		 */
 		public function listAction(Request $request): Response {
-			if ($request->query->has('q')) {
-				$results = $this->getSearchResults($request->query->all());
+			/** @var ArmorSet[]|Response $items */
+			$items = $this->doListAction($request);
 
-				if ($results instanceof Response)
-					return $results;
+			if ($items instanceof Response)
+				return $items;
 
-				return $this->respond($this->normalizeManyArmorSets($results));
-			}
-
-			$items = $this->manager->getRepository($this->entityClass)->findAll();
-
-			return $this->responder->createResponse($this->normalizeManyArmorSets($items));
+			return $this->respond($this->normalizeManyArmorSets($items));
 		}
 
 		/**
-		 * @param string $id
+		 * @param string $idOrSlug
 		 *
 		 * @return Response
 		 */
-		public function readAction(string $id): Response {
-			/** @var ArmorSet|null $armor */
-			$armor = $this->getEntity($id);
+		public function readAction(string $idOrSlug): Response {
+			/** @var ArmorSet|null $armorSet */
+			$armorSet = $this->doReadAction($idOrSlug);
 
-			return $this->respond($this->normalizeOneArmorSet($armor));
+			if ($armorSet instanceof ApiErrorInterface)
+				return $this->respond($armorSet);
+
+			return $this->respond($this->normalizeOneArmorSet($armorSet));
 		}
 
 		/**
@@ -73,13 +73,6 @@
 			if (!$armorSet)
 				return null;
 
-			return [
-				'id' => $armorSet->getId(),
-				'name' => $armorSet->getName(),
-				'rank' => $armorSet->getRank(),
-				'pieces' => array_map(function(Armor $armor): array {
-					return $armor->getId();
-				}, $armorSet->getPieces()->toArray()),
-			];
+			return EntityUtil::normalize($armorSet);
 		}
 	}

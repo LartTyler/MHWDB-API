@@ -46,13 +46,13 @@
 		}
 
 		/**
-		 * @param string $id
+		 * @param string $idOrSlug
 		 *
 		 * @return Response
 		 */
-		public function readAction(string $id): Response {
+		public function readAction(string $idOrSlug): Response {
 			/** @var Weapon|null $weapon */
-			$weapon = $this->getEntity($id);
+			$weapon = $this->getEntity($idOrSlug);
 
 			return $this->respond($this->normalizeWeapon($weapon));
 		}

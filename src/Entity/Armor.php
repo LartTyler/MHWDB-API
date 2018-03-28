@@ -105,7 +105,13 @@
 		 * @return $this
 		 */
 		public function setArmorSet(?ArmorSet $armorSet) {
+			if ($armorSet === null && $this->armorSet)
+				$this->armorSet->getPieces()->removeElement($this);
+
 			$this->armorSet = $armorSet;
+
+			if ($armorSet && !$armorSet->getPieces()->contains($this))
+				$armorSet->getPieces()->add($this);
 
 			return $this;
 		}

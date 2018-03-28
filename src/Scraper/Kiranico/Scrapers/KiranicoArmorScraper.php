@@ -196,8 +196,7 @@
 				$armor->getSkills()->clear();
 			}
 
-			if (!$armorSet->getPieces()->contains($armor))
-				$armorSet->getPieces()->add($armor);
+			$armor->setArmorSet($armorSet);
 
 			$infoNodes = $crawler->filter('.card')->eq(1)->filter('.card-footer .p-3');
 

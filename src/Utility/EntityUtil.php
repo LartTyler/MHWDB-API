@@ -10,147 +10,127 @@
 
 	final class EntityUtil {
 		/**
-		 * @param SkillRank|SkillRank[] $subject
-		 * @param array         $fields
+		 * @var ReflectionAttributeCache|null
+		 */
+		private static $attributeCache = null;
+
+		/**
+		 * @param object|array $subject
+		 * @param array        $fields
+		 * @param bool         $isNested
 		 *
 		 * @return array
 		 */
-		public static function normalizeSkillRank($subject, array $fields = []): array {
-			return self::normalize($subject, $fields ?: [
-				'id' => true,
-				'slug' => true,
-				'skill' => [function(Skill $skill): int {
-					return $skill->getId();
-				}],
-				'description' => true,
-				'level' => true,
-				'modifiers' => true,
-			]);
-		}
+		public static function normalize($subject, array $fields = [], $isNested = false): array {
+			$normalized = [];
 
-		/**
-		 * @param ArmorSet|ArmorSet[] $subject
-		 * @param array               $fields
-		 *
-		 * @return array
-		 */
-		public static function normalizeArmorSet($subject, array $fields = []): array {
-			return self::normalize($subject, $fields ?: [
-				'id' => true,
-				'name' => true,
-				'rank' => true,
-				'pieces' => [function(Collection $pieces): array {
-					return array_map(function(Armor $armor): int {
-						return $armor->getId();
-					}, $pieces->toArray());
-				}],
-			]);
-		}
+			if (!$isNested && is_iterable($subject)) {
+				foreach ($subject as $item)
+					$normalized[] = self::normalize($item, $fields, true);
 
-		/**
-		 * @param Armor[]|Armor $subject
-		 * @param array         $fields
-		 *
-		 * @return array
-		 */
-		public static function normalizeArmor($subject, array $fields = []): array {
-			return self::normalize($subject, $fields ?: [
-				'id' => true,
-				'slug' => true,
-				'name' => true,
-				'type' => true,
-				'rank' => true,
-				'attributes' => true,
-				'skills' => [self::class, 'normalizeSkillRank'],
-				'armorSet' => [self::class, 'normalizeArmorSet'],
-			]);
-		}
-
-		/**
-		 * @param EntityInterface|EntityInterface[] $data
-		 * @param array                             $fields
-		 *
-		 * @return array|mixed
-		 */
-		public static function normalizeEntityOrCollection($data, array $fields = []) {
-			if ($data instanceof EntityInterface) {
-				$name = self::getEntityName(get_class($data));
-				$method = 'normalize' . $name;
-
-				if (method_exists(self::class, $method))
-					return call_user_func([self::class, $method], $data);
-			} else if (is_iterable($data)) {
-				$items = [];
-
-				foreach ($data as $datum)
-					$items[] = self::normalizeEntityOrCollection($data, $fields);
-
-				return $items;
+				return $normalized;
 			}
 
-			return $data;
-		}
+			if (!$fields)
+				$fields = array_keys(self::getAttributes($subject));
 
-		/**
-		 * @param EntityInterface|EntityInterface[] $subject
-		 * @param array                             $fields
-		 *
-		 * @return array
-		 */
-		public static function normalize($subject, array $fields): array {
-			if (is_iterable($subject)) {
-				$items = [];
-
-				foreach ($subject as $item)
-					$items[] = self::normalize($item, $fields);
-
-				return $items;
-			} else if (!($subject instanceof EntityInterface))
-				throw new \InvalidArgumentException('Cannot normalize ' .
-					(is_object($subject) ? get_class($subject) : gettype($subject)));
-
-			if (!$subject)
-				return null;
-
-			$normal = [];
-
-			foreach ($fields as $field => $normalizer) {
-				$getter = 'get' . ucfirst($field);
-
-				if (!method_exists($subject, $getter))
-					throw new \InvalidArgumentException('No field named ' . $field . ' exists on ' .
-						get_class($subject));
-
-				$value = call_user_func([$subject, $getter]);
-
-				if (is_array($normalizer) && sizeof($normalizer) >= 1) {
-					if ($normalizer[0] instanceof \Closure) {
-						$callable = $normalizer[0];
-						$args = array_slice($normalizer, 1);
-					} else {
-						$callable = [$normalizer[0], $normalizer[1]];
-						$args = array_slice($normalizer, 2);
-					}
-
-					$value = call_user_func_array($callable, [$value, $args]);
+			foreach ($fields as $field => $argument) {
+				if (is_int($field)) {
+					$field = $argument;
+					$argument = true;
 				}
 
-				$normal[$field] = $value;
+				$value = self::getAttributeValue($field, $subject);
+
+				if (is_array($argument)) {
+					if (is_iterable($value)) {
+						$children = [];
+
+						foreach ($value as $item)
+							$children[] = self::normalize($item, $argument, true);
+
+						$value = $children;
+					} else
+						$value = self::normalize($value, $argument, true);
+				} else if ($argument instanceof \Closure) {
+					if (is_iterable($value)) {
+						$children = [];
+
+						foreach ($value as $item)
+							$children[] = call_user_func($argument, $item);
+
+						$value = $children;
+					} else
+						$value = call_user_func($argument, $value);
+				}
+
+				$normalized[$field] = $value;
 			}
 
-			return $normal;
+			return $normalized;
 		}
 
 		/**
-		 * @param string $class
+		 * @param object $subject
 		 *
-		 * @return string
+		 * @return \ReflectionMethod[]
 		 */
-		public static function getEntityName(string $class): string {
-			if ($pos = strrpos($class, '\\'))
-				return substr($class, $pos + 1);
+		public static function getAttributes($subject): array {
+			if (!self::$attributeCache)
+				self::$attributeCache = new ReflectionAttributeCache();
 
-			return $class;
+			if ($cached = self::$attributeCache->getAll($subject))
+				return $cached;
+
+			$attributes = [];
+			$refl = new \ReflectionClass($subject);
+
+			foreach ($refl->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
+				if (
+					$method->getNumberOfRequiredParameters() > 0 ||
+					$method->isConstructor() ||
+					$method->isDestructor() ||
+					$method->isStatic()
+				) {
+					continue;
+				}
+
+				$name = $method->getName();
+
+				if (strpos($name, 'get') === 0 || strpos($name, 'has') === 0)
+					$attributeName = lcfirst(substr($name, 3));
+				else if (strpos($name, 'is') === 0)
+					$attributeName = lcfirst(substr($name, 2));
+				else
+					continue;
+
+				$attributes[$attributeName] = $method;
+			}
+
+			self::$attributeCache->setAll($subject, $attributes);
+
+			return $attributes;
+		}
+
+		/**
+		 * @param string $attribute
+		 * @param object $subject
+		 *
+		 * @return mixed
+		 */
+		public static function getAttributeValue(string $attribute, $subject) {
+			if (!self::$attributeCache)
+				self::$attributeCache = new ReflectionAttributeCache();
+
+			if ($accessor = self::$attributeCache->get($subject, $attribute))
+				return $accessor->invoke($subject);
+
+			$attributes = self::getAttributes($subject);
+
+			if (!isset($attributes[$attribute]))
+				throw new \InvalidArgumentException('No field named ' . $attribute . ' exists on ' . get_class($subject));
+
+			return $attributes[$attribute]->invoke($subject);
 		}
 
 		/**
