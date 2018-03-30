@@ -35,6 +35,10 @@ App\Entity\Armor:
         attributes:
             type: json
             nullable: false
+    manyToOne:
+        armorSet:
+            targetEntity: App\Entity\ArmorSet
+            inversedBy: pieces
     manyToMany:
         skills:
             targetEntity: App\Entity\SkillRank

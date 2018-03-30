@@ -1,10 +1,8 @@
 <?php
 	namespace App\Controller;
 
-	use App\Exceptions\JsonSearchOnNonJsonFieldException;
 	use App\Entity\SluggableInterface;
 	use App\Response\BadQueryObjectError;
-	use App\Response\BadSearchParametersError;
 	use App\Response\EmptySearchParametersError;
 	use App\Response\SearchError;
 	use App\Response\SlugNotSupportedError;
@@ -13,9 +11,7 @@
 	use DaybreakStudios\Doze\Errors\ApiErrorInterface;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use Doctrine\DBAL\Types\Type;
 	use Doctrine\ORM\EntityManager;
-	use Doctrine\ORM\QueryBuilder;
 	use Symfony\Bridge\Doctrine\RegistryInterface;
 	use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 	use Symfony\Component\HttpFoundation\Request;
@@ -23,16 +19,6 @@
 	use Symfony\Component\Routing\RouterInterface;
 
 	abstract class AbstractDataController extends Controller {
-		protected const SEARCH_OPERATORS = [
-			'!' => '!=',
-			'>=' => '>=',
-			'<=' => '<=',
-			'<' => '<',
-			'>' => '>',
-			'~' => 'LIKE',
-			'!~' => 'NOT LIKE',
-		];
-
 		/**
 		 * @var EntityManager
 		 */
@@ -79,18 +65,25 @@
 		 * @return Response
 		 */
 		public function listAction(Request $request): Response {
+			return $this->respond($this->doListAction($request));
+		}
+
+		/**
+		 * @param Request $request
+		 *
+		 * @return EntityInterface[]|Response
+		 */
+		protected function doListAction(Request $request) {
 			if ($request->query->has('q')) {
 				$results = $this->getSearchResults($request->query->all());
 
 				if ($results instanceof Response)
 					return $results;
 
-				return $this->respond($results);
+				return $results;
 			}
 
-			$items = $this->manager->getRepository($this->entityClass)->findAll();
-
-			return $this->responder->createResponse($items);
+			return $this->manager->getRepository($this->entityClass)->findAll();
 		}
 
 		/**
@@ -99,7 +92,16 @@
 		 * @return Response
 		 */
 		public function readAction(string $idOrSlug): Response {
-			return $this->respond($this->getEntity($idOrSlug));
+			return $this->respond($this->doReadAction($idOrSlug));
+		}
+
+		/**
+		 * @param string $idOrSlug
+		 *
+		 * @return SlugNotSupportedError|EntityInterface|null
+		 */
+		protected function doReadAction(string $idOrSlug) {
+			return $this->getEntity($idOrSlug);
 		}
 
 		/**
@@ -152,6 +154,8 @@
 		protected function respond($data): Response {
 			if ($data instanceof ApiErrorInterface)
 				return $this->responder->createErrorResponse($data);
+			else if ($data instanceof Response)
+				return $data;
 			else if ($data === null)
 				return $this->responder->createNotFoundResponse();
 

@@ -1,3 +1,15 @@
+api.armor_sets.list:
+    methods:
+        - GET
+    path: /armor/sets
+    controller: 'App\Controller\ArmorSetsDataController::listAction'
+
+api.armor_sets.read:
+    methods:
+        - GET
+    path: /armor/sets/{idOrSlug}
+    controller: 'App\Controller\ArmorSetsDataController::readAction'
+
 api.armor.list:
     methods:
         - GET

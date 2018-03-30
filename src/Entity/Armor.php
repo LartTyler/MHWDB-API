@@ -33,10 +33,16 @@
 		private $skills;
 
 		/**
+		 * @var ArmorSet|null
+		 */
+		private $armorSet;
+
+		/**
 		 * Armor constructor.
 		 *
 		 * @param string $name
 		 * @param string $type
+		 * @param string $rank
 		 */
 		public function __construct(string $name, string $type, string $rank) {
 			$this->name = $name;
@@ -82,6 +88,30 @@
 		 */
 		public function setRank(string $rank) {
 			$this->rank = $rank;
+
+			return $this;
+		}
+
+		/**
+		 * @return ArmorSet|null
+		 */
+		public function getArmorSet(): ?ArmorSet {
+			return $this->armorSet;
+		}
+
+		/**
+		 * @param ArmorSet|null $armorSet
+		 *
+		 * @return $this
+		 */
+		public function setArmorSet(?ArmorSet $armorSet) {
+			if ($armorSet === null && $this->armorSet)
+				$this->armorSet->getPieces()->removeElement($this);
+
+			$this->armorSet = $armorSet;
+
+			if ($armorSet && !$armorSet->getPieces()->contains($this))
+				$armorSet->getPieces()->add($this);
 
 			return $this;
 		}
