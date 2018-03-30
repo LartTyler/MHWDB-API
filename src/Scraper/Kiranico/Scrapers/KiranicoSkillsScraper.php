@@ -6,6 +6,7 @@
 	use App\Scraper\AbstractScraper;
 	use App\Scraper\Kiranico\KiranicoScrapeTarget;
 	use App\Scraper\ScraperType;
+	use App\Utility\StringUtil;
 	use Doctrine\ORM\EntityManager;
 	use Symfony\Bridge\Doctrine\RegistryInterface;
 	use Symfony\Component\DomCrawler\Crawler;
@@ -88,5 +89,33 @@
 
 				$rank->setModifiers($this->target->parseRankDescriptions($description));
 			}
+
+			$href = $initialNode->filter('a')->attr('href');
+
+			$uri = $this->target->getBaseUri()->withPath(parse_url($href, PHP_URL_PATH));
+
+			try {
+				$response = $this->target->getHttpClient()->get($uri);
+			} catch (\Exception $e) {
+				sleep(3);
+
+				$response = $this->target->getHttpClient()->get($uri);
+			}
+
+			$sections = (new Crawler($response->getBody()->getContents()))->filter('.container .px-2 .card');
+
+			$description = StringUtil::clean($sections->eq(1)->filter('.card-body p.lead')->eq(0)->text());
+
+			if (($pos = strpos($description, 'This skill can be obtained')) !== false)
+				$description = trim(substr($description, 0, $pos));
+
+			// Typo correction
+			$description = str_replace([
+				'protection form large',
+			], [
+				'protection from large',
+			], $description);
+
+			$skill->setDescription($description);
 		}
 	}

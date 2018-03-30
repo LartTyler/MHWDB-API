@@ -23,9 +23,14 @@
 		private $ranks;
 
 		/**
+		 * @var string|null
+		 */
+		private $description = null;
+
+		/**
 		 * Skill constructor.
 		 *
-		 * @param string   $name
+		 * @param string $name
 		 */
 		public function __construct($name) {
 			$this->name = $name;
@@ -84,5 +89,22 @@
 		 */
 		protected function updateSlug(): void {
 			$this->setSlug($this->getName());
+		}
+
+		/**
+		 * @return null|string
+		 */
+		public function getDescription() {
+			return $this->description;
+		}
+
+		/**
+		 * @param null|string $description
+		 *
+		 * @return $this
+		 */
+		public function setDescription(?string $description) {
+			$this->description = $description;
+			return $this;
 		}
 	}
