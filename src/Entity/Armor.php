@@ -28,6 +28,11 @@
 		private $rank;
 
 		/**
+		 * @var int
+		 */
+		private $rarity;
+
+		/**
 		 * @var Collection|Selectable|SkillRank[]
 		 */
 		private $skills;
@@ -43,11 +48,13 @@
 		 * @param string $name
 		 * @param string $type
 		 * @param string $rank
+		 * @param int    $rarity
 		 */
-		public function __construct(string $name, string $type, string $rank) {
+		public function __construct(string $name, string $type, string $rank, int $rarity) {
 			$this->name = $name;
 			$this->type = $type;
 			$this->rank = $rank;
+			$this->rarity = $rarity;
 			$this->skills = new ArrayCollection();
 
 			$this->setSlug($name);
@@ -113,6 +120,23 @@
 			if ($armorSet && !$armorSet->getPieces()->contains($this))
 				$armorSet->getPieces()->add($this);
 
+			return $this;
+		}
+
+		/**
+		 * @return int
+		 */
+		public function getRarity(): int {
+			return $this->rarity;
+		}
+
+		/**
+		 * @param int $rarity
+		 *
+		 * @return $this
+		 */
+		public function setRarity(int $rarity) {
+			$this->rarity = $rarity;
 			return $this;
 		}
 	}

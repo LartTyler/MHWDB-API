@@ -32,6 +32,9 @@ App\Entity\Armor:
             type: string
             length: 16
             nullable: false
+        rarity:
+            type: smallint
+            nullable: false
         attributes:
             type: json
             nullable: false
