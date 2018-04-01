@@ -17,7 +17,7 @@ App\Entity\Skill:
             unique: true
         description:
             type: text
-            nullable: true
+            nullable: false
         slug:
             type: string
             length: 64
