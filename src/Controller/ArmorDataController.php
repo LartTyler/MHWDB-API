@@ -76,6 +76,7 @@
 				'name',
 				'type',
 				'rank',
+				'rarity',
 				'attributes',
 				'skills' => [
 					'id',
