@@ -187,18 +187,30 @@
 				'name' => $name,
 			]);
 
+			/**
+			 * 0 = Defense
+			 * 1 = Slots
+			 * 2 = Price
+			 * 3 = Gender
+			 * 4 = Rarity
+			 */
+			$infoNodes = $crawler->filter('.card')->eq(1)->filter('.card-footer .p-3');
+
+			$rarity = (int)StringUtil::clean($infoNodes->eq(4)->filter('.lead')->text());
+
 			if (!$armor) {
-				$armor = new Armor($name, $armorType, $rank);
+				$armor = new Armor($name, $armorType, $rank, $rarity);
 
 				$this->manager->persist($armor);
 			} else {
-				$armor->setAttributes([]);
+				$armor
+					->setRarity($rarity)
+					->setAttributes([]);
+
 				$armor->getSkills()->clear();
 			}
 
 			$armor->setArmorSet($armorSet);
-
-			$infoNodes = $crawler->filter('.card')->eq(1)->filter('.card-footer .p-3');
 
 			$armor
 				->setAttribute(Attribute::DEFENSE, (int)strtok(trim($infoNodes->eq(0)->filter('.lead')->text()), ' '));
