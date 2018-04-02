@@ -20,6 +20,9 @@
 		public function parse(Crawler $node, WeaponData $target): void {
 			$rarity = (int)StringUtil::clean($node->filter('.lead')->text());
 
+			if ($target->getName() === 'Holy Sabers')
+				$rarity = 7;
+
 			$target->setRarity($rarity);
 		}
 	}
