@@ -2,6 +2,7 @@
 	namespace App\Scraping;
 
 	final class Type {
+		const CHARMS = 'charms';
 		const ITEMS = 'items';
 		const SKILLS = 'skills';
 

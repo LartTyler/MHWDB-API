@@ -12,11 +12,13 @@ services:
             -
                 - '@App\Scraping\Scrapers\KiranicoItemScraper'
                 - '@App\Scraping\Scrapers\KiranicoSkillsScraper'
+                - '@App\Scraping\Scrapers\KiranicoCharmsScraper'
 
     App\Scraping\Configurations\KiranicoConfiguration: ~
 
     App\Scraping\Scrapers\KiranicoItemScraper: ~
     App\Scraping\Scrapers\KiranicoSkillsScraper: ~
+    App\Scraping\Scrapers\KiranicoCharmsScraper: ~
 
     App\Scraper\Kiranico\KiranicoScrapeTarget:
         calls:
