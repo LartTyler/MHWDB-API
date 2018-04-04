@@ -28,6 +28,14 @@ services:
         tags:
             - console.command
 
+    App\Command\ScrapeCommand:
+        arguments:
+            - '@app.scrapers'
+        tags:
+            -
+                name: console.command
+                command: app:scrape
+
     App\Command\ScrapeKiranicoCommand:
         tags:
             -
