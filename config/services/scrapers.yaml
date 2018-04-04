@@ -11,9 +11,12 @@ services:
         arguments:
             -
                 - '@App\Scraping\Scrapers\KiranicoItemScraper'
+                - '@App\Scraping\Scrapers\KiranicoSkillsScraper'
+
     App\Scraping\Configurations\KiranicoConfiguration: ~
 
     App\Scraping\Scrapers\KiranicoItemScraper: ~
+    App\Scraping\Scrapers\KiranicoSkillsScraper: ~
 
     App\Scraper\Kiranico\KiranicoScrapeTarget:
         calls:
