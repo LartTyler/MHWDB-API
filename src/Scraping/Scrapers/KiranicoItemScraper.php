@@ -57,6 +57,8 @@
 
 				$this->progressBar->advance();
 			}
+
+			$this->manager->flush();
 		}
 
 		/**
