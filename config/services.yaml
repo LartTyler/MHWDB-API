@@ -36,12 +36,6 @@ services:
                 name: console.command
                 command: app:scrape
 
-    App\Command\ScrapeKiranicoCommand:
-        tags:
-            -
-                name: console.command
-                command: scrape:kiranico
-
     DaybreakStudios\DoctrineQueryDocument\QueryManager:
         public: true
         arguments:

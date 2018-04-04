@@ -2,9 +2,9 @@
 	namespace App\Command;
 
 	use App\Console\MultiProgressBar;
-	use App\Scraper\ScraperInterface;
 	use App\Scraping\ProgressAwareInterface;
 	use App\Scraping\ScraperCollection;
+	use App\Scraping\ScraperInterface;
 	use Symfony\Component\Console\Command\Command;
 	use Symfony\Component\Console\Input\InputInterface;
 	use Symfony\Component\Console\Input\InputOption;
@@ -34,7 +34,8 @@
 		protected function configure(): void {
 			$this
 				->setName('app:scrape')
-				->addOption('type', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY);
+				->addOption('type', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY)
+				->addOption('subtype', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY);
 		}
 
 		/**
@@ -42,6 +43,17 @@
 		 */
 		protected function execute(InputInterface $input, OutputInterface $output): void {
 			$types = $input->getOption('type');
+			$subtypes = [];
+
+			foreach ($input->getOption('subtype') as $value) {
+				$type = strtok($value, ':');
+				$subtype = strtok('');
+
+				if (!isset($subtypes[$type]))
+					$subtypes[$type] = [];
+
+				$subtypes[$type][] = $subtype;
+			}
 
 			$progress = new MultiProgressBar($output);
 			$progress->append($types ? sizeof($types) : $this->scrapers->count());
@@ -52,10 +64,14 @@
 				if ($types && !in_array($scraper->getType(), $types))
 					continue;
 
+				$subs = $subtypes[$scraper->getType()] ?? [];
+
 				if ($scraper instanceof ProgressAwareInterface)
 					$scraper->setProgressBar($progress);
 
-				$scraper->scrape();
+				$scraper->scrape([
+					ScraperInterface::CONTEXT_SUBTYPES => $subs,
+				]);
 
 				$progress->advance();
 			}
