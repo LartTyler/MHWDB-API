@@ -28,11 +28,13 @@ services:
         tags:
             - console.command
 
-    App\Command\ScrapeKiranicoCommand:
+    App\Command\ScrapeCommand:
+        arguments:
+            - '@app.scrapers'
         tags:
             -
                 name: console.command
-                command: scrape:kiranico
+                command: app:scrape
 
     DaybreakStudios\DoctrineQueryDocument\QueryManager:
         public: true

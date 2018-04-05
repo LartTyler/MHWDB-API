@@ -6,51 +6,22 @@ services:
                              # fetching services directly from the container via $container->get() won't work.
                              # The best practice is to be explicit about your dependencies anyway.
 
-    App\Scraper\Kiranico\KiranicoScrapeTarget:
-        calls:
-            -
-                - 'addScraper'
-                -
-                    - '@App\Scraper\Kiranico\Scrapers\KiranicoItemsScraper'
-            -
-                - 'addScraper'
-                -
-                    - '@App\Scraper\Kiranico\Scrapers\KiranicoSkillsScraper'
-            -
-                - 'addScraper'
-                -
-                    - '@App\Scraper\Kiranico\Scrapers\KiranicoCharmsScraper'
-            -
-                - 'addScraper'
-                -
-                    - '@App\Scraper\Kiranico\Scrapers\KiranicoWeaponsScraper'
-            -
-                - 'addScraper'
-                -
-                    - '@App\Scraper\Kiranico\Scrapers\KiranicoArmorScraper'
-
-            -
-                - 'addScraper'
-                -
-                    - '@App\Scraper\Kiranico\Scrapers\KiranicoDecorationsScraper'
-
-    App\Scraper\Kiranico\Scrapers\KiranicoItemsScraper: ~
-    App\Scraper\Kiranico\Scrapers\KiranicoSkillsScraper: ~
-    App\Scraper\Kiranico\Scrapers\KiranicoCharmsScraper: ~
-    App\Scraper\Kiranico\Scrapers\KiranicoArmorScraper: ~
-    App\Scraper\Kiranico\Scrapers\KiranicoDecorationsScraper: ~
-
-    App\Scraper\Kiranico\Scrapers\KiranicoWeaponsScraper:
+    app.scrapers:
+        class: App\Scraping\ScraperCollection
         arguments:
-            - '@App\Scraper\Kiranico\KiranicoScrapeTarget'
-            - '@doctrine'
             -
-                main: '@App\Scraper\Kiranico\Scrapers\Helpers\Weapons\MainWeaponDataParser'
-                upgrade: '@App\Scraper\Kiranico\Scrapers\Helpers\Weapons\CraftingWeaponDataParser'
-                ammo: '@App\Scraper\Kiranico\Scrapers\Helpers\Weapons\AmmoWeaponDataParser'
-                materials: '@App\Scraper\Kiranico\Scrapers\Helpers\Weapons\MaterialWeaponDataParser'
+                - '@App\Scraping\Scrapers\KiranicoItemScraper'
+                - '@App\Scraping\Scrapers\KiranicoSkillsScraper'
+                - '@App\Scraping\Scrapers\KiranicoCharmsScraper'
+                - '@App\Scraping\Scrapers\KiranicoWeaponsScraper'
+                - '@App\Scraping\Scrapers\KiranicoArmorScraper'
+                - '@App\Scraping\Scrapers\KiranicoDecorationsScraper'
 
-    App\Scraper\Kiranico\Scrapers\Helpers\Weapons\MainWeaponDataParser: ~
-    App\Scraper\Kiranico\Scrapers\Helpers\Weapons\CraftingWeaponDataParser: ~
-    App\Scraper\Kiranico\Scrapers\Helpers\Weapons\AmmoWeaponDataParser: ~
-    App\Scraper\Kiranico\Scrapers\Helpers\Weapons\MaterialWeaponDataParser: ~
+    App\Scraping\Configurations\KiranicoConfiguration: ~
+
+    App\Scraping\Scrapers\KiranicoItemScraper: ~
+    App\Scraping\Scrapers\KiranicoSkillsScraper: ~
+    App\Scraping\Scrapers\KiranicoCharmsScraper: ~
+    App\Scraping\Scrapers\KiranicoWeaponsScraper: ~
+    App\Scraping\Scrapers\KiranicoArmorScraper: ~
+    App\Scraping\Scrapers\KiranicoDecorationsScraper: ~
