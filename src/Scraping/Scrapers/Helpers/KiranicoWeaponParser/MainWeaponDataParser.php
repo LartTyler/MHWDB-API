@@ -15,6 +15,7 @@
 
 			// -- Melee Only --
 			Interpreter\SharpnessInterpreter::class,
+			Interpreter\AffinityInterpreter::class,
 
 			// -- Switch Axe / Charge Blade --
 			Interpreter\PhialTypeInterpreter::class,
