@@ -1,0 +1,28 @@
+App\Entity\WeaponAssets:
+    type: entity
+    table: weapon_assets
+    id:
+        id:
+            type: integer
+            nullable: false
+            options:
+                unsigned: true
+            generator:
+                strategy: IDENTITY
+    oneToOne:
+        icon:
+            targetEntity: App\Entity\Asset
+            cascade:
+                - persist
+            joinColumn:
+                nullable: false
+                options:
+                    unsigned: true
+        image:
+            targetEntity: App\Entity\Asset
+            cascade:
+                - persist
+            joinColumn:
+                nullable: false
+                options:
+                    unsigned: true

@@ -31,6 +31,11 @@
 		private $crafting = null;
 
 		/**
+		 * @var WeaponAssets|null
+		 */
+		private $assets = null;
+
+		/**
 		 * Weapon constructor.
 		 *
 		 * @param string $name
@@ -91,6 +96,24 @@
 		 */
 		public function setCrafting(WeaponCraftingInfo $crafting) {
 			$this->crafting = $crafting;
+
+			return $this;
+		}
+
+		/**
+		 * @return WeaponAssets|null
+		 */
+		public function getAssets(): ?WeaponAssets {
+			return $this->assets;
+		}
+
+		/**
+		 * @param WeaponAssets|null $assets
+		 *
+		 * @return $this
+		 */
+		public function setAssets(?WeaponAssets $assets) {
+			$this->assets = $assets;
 
 			return $this;
 		}

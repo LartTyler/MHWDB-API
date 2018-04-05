@@ -46,3 +46,12 @@ App\Entity\Weapon:
                 nullable: true
                 options:
                     unsigned: true
+        assets:
+            targetEntity: App\Entity\WeaponAssets
+            orphanRemoval: true
+            cascade:
+                - all
+            joinColumn:
+                nullable: true
+                options:
+                    unsigned: true

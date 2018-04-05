@@ -40,3 +40,9 @@ services:
         public: true
         arguments:
             - '@doctrine.orm.entity_manager'
+
+    Aws\Sdk:
+        arguments:
+            -
+                region: 'us-east-2'
+                version: 'latest'

@@ -26,6 +26,7 @@
         "symfony/dotenv": "^4.0"
     },
     "require-dev": {
+        "aws/aws-sdk-php": "^3.54",
         "symfony/web-server-bundle": "^4.0"
     },
     "config": {

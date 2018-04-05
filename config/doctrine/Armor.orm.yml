@@ -38,6 +38,16 @@ App\Entity\Armor:
         attributes:
             type: json
             nullable: false
+    oneToOne:
+        assets:
+            targetEntity: App\Entity\ArmorAssets
+            orphanRemoval: true
+            cascade:
+                - all
+            joinColumn:
+                nullable: true
+                options:
+                    unsigned: true
     manyToOne:
         armorSet:
             targetEntity: App\Entity\ArmorSet
