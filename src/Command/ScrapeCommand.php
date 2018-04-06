@@ -35,7 +35,7 @@
 			$this
 				->setName('app:scrape')
 				->addOption('type', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY)
-				->addOption('subtype', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY);
+				->addOption('context', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY);
 		}
 
 		/**
@@ -43,16 +43,24 @@
 		 */
 		protected function execute(InputInterface $input, OutputInterface $output): void {
 			$types = $input->getOption('type');
-			$subtypes = [];
+			$contexts = [];
 
-			foreach ($input->getOption('subtype') as $value) {
+			foreach ($input->getOption('context') as $value) {
 				$type = strtok($value, ':');
-				$subtype = strtok('');
+				$key = strtok(':');
+				$value = strtok('');
 
-				if (!isset($subtypes[$type]))
-					$subtypes[$type] = [];
+				if (!$value)
+					$value = [true];
+				else
+					$value = array_filter(array_map(function(string $item): string {
+						return trim($item);
+					}, explode(',', $value)));
 
-				$subtypes[$type][] = $subtype;
+				if (!isset($contexts[$type]))
+					$contexts[$type] = [];
+
+				$contexts[$type][$key] = $value;
 			}
 
 			$progress = new MultiProgressBar($output);
@@ -64,14 +72,12 @@
 				if ($types && !in_array($scraper->getType(), $types))
 					continue;
 
-				$subs = $subtypes[$scraper->getType()] ?? [];
+				$context = $contexts[$scraper->getType()] ?? [];
 
 				if ($scraper instanceof ProgressAwareInterface)
 					$scraper->setProgressBar($progress);
 
-				$scraper->scrape([
-					ScraperInterface::CONTEXT_SUBTYPES => $subs,
-				]);
+				$scraper->scrape($context);
 
 				$progress->advance();
 			}
