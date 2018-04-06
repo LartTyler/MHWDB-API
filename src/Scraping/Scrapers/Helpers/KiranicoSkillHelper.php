@@ -9,7 +9,7 @@
 			'/Defense \\+(\d+%?)/' => Attribute::DEFENSE,
 			'/All Elemental Resistances \\+(\d+%?)/' => Attribute::RES_ALL,
 			'/Health \\+(\d+%?)/' => Attribute::HEALTH,
-			'/Affinity \\+(\d+%?)/' => Attribute::AFFINITY,
+			'/Affinity \\+(\d+)/' => Attribute::AFFINITY,
 			'/(Fire|Water|Ice|Thunder|Fire) [rR]esistance \\+(\d+%?)/' => [self::class, 'parseElemResModifier'],
 			'/(Fire|Water|Ice|Thunder|Fire) [aA]ttack \\+(\d+%?)(?: Bonus: \\+(\d+%?))?/' =>
 				[self::class, 'parseElemDamageModifier'],
@@ -31,9 +31,14 @@
 				// Throw away the full match, we don't need it
 				array_shift($matches);
 
-				if (is_string($attribute))
-					$modifiers[$attribute] = $matches[0];
-				else if (is_callable($attribute))
+				if (is_string($attribute)) {
+					$value = $matches[0];
+
+					if (preg_match('/^\d+$/', $value) === 1)
+						$value = (int)$value;
+
+					$modifiers[$attribute] = $value;
+				} else if (is_callable($attribute))
 					$modifiers = array_merge($modifiers, call_user_func_array($attribute, $matches));
 				else
 					throw new \InvalidArgumentException('Can\'t handle modifier value. Check ' . static::class .
@@ -50,6 +55,9 @@
 		 * @return array
 		 */
 		public static function parseElemResModifier(string $element, string $amount): array {
+			if (strpos($amount, '%') === false)
+				$amount = (int)$amount;
+
 			return [
 				'resist' . ucfirst($element) => $amount,
 			];
@@ -65,6 +73,8 @@
 		public static function parseElemDamageModifier(string $element, string $amount, ?string $bonus = null): array {
 			if ($bonus !== null)
 				$amount = $bonus . '+' . $amount;
+			else
+				$amount = (int)$amount;
 
 			return [
 				'damage' . ucfirst($element) => $amount,

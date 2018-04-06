@@ -111,13 +111,13 @@
 		}
 
 		/**
-		 * @param string $attribute
-		 * @param string $amount
+		 * @param string          $attribute
+		 * @param string|int|bool $amount
 		 *
 		 * @return $this
 		 * @see Attribute
 		 */
-		public function setModifer(string $attribute, string $amount): SkillRank {
+		public function setModifer(string $attribute, $amount): SkillRank {
 			$this->modifiers[$attribute] = $amount;
 
 			return $this;
@@ -126,13 +126,13 @@
 		/**
 		 * @param string $attribute
 		 *
-		 * @return string
+		 * @return string|int|bool
 		 */
-		public function getModifier(string $attribute): string {
+		public function getModifier(string $attribute) {
 			if (isset($this->modifiers[$attribute]))
 				return $this->modifiers[$attribute];
 
-			return '0';
+			return 0;
 		}
 
 		/**
