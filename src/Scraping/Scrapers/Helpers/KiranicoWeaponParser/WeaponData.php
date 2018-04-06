@@ -155,10 +155,14 @@
 				'Berseker',
 				'Gnshing',
 				'Water Golum',
+				'Supermacy',
+				'Hachets',
 			], [
 				'Berserker',
 				'Gnashing',
 				'Water Golem',
+				'Supremacy',
+				'Hatchets',
 			], $name);
 		}
 	}
