@@ -26,7 +26,7 @@
 
 			return $slots;
 		}
-		
+
 		/**
 		 * KiranicoHelper constructor.
 		 */

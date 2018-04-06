@@ -43,6 +43,11 @@
 		private $armorSet;
 
 		/**
+		 * @var ArmorAssets|null
+		 */
+		private $assets = null;
+
+		/**
 		 * Armor constructor.
 		 *
 		 * @param string $name
@@ -137,6 +142,24 @@
 		 */
 		public function setRarity(int $rarity) {
 			$this->rarity = $rarity;
+			return $this;
+		}
+
+		/**
+		 * @return ArmorAssets|null
+		 */
+		public function getAssets(): ?ArmorAssets {
+			return $this->assets;
+		}
+
+		/**
+		 * @param ArmorAssets|null $assets
+		 *
+		 * @return $this
+		 */
+		public function setAssets(?ArmorAssets $assets) {
+			$this->assets = $assets;
+
 			return $this;
 		}
 	}

@@ -2,17 +2,23 @@
 	namespace App\Scraping\Scrapers;
 
 	use App\Entity\Armor;
+	use App\Entity\ArmorAssets;
 	use App\Entity\ArmorSet;
+	use App\Entity\Asset;
 	use App\Game\ArmorRank;
 	use App\Game\Attribute;
+	use App\Game\Gender;
 	use App\Scraping\AbstractScraper;
 	use App\Scraping\Configurations\KiranicoConfiguration;
 	use App\Scraping\ProgressAwareInterface;
 	use App\Scraping\ProgressAwareTrait;
 	use App\Scraping\Scrapers\Helpers\KiranicoArmorHelper;
 	use App\Scraping\Scrapers\Helpers\KiranicoHelper;
+	use App\Scraping\Scrapers\Helpers\SpriteMap;
 	use App\Scraping\Type;
 	use App\Utility\StringUtil;
+	use Aws\S3\S3Client;
+	use Aws\Sdk;
 	use Doctrine\Common\Persistence\ObjectManager;
 	use Symfony\Component\DomCrawler\Crawler;
 	use Symfony\Component\HttpFoundation\Response;
@@ -26,20 +32,32 @@
 		protected $manager;
 
 		/**
+		 * @var S3Client
+		 */
+		protected $s3Client;
+
+		/**
 		 * @var ArmorSet[]
 		 */
 		protected $setCache = [];
+
+		/**
+		 * @var Asset[]
+		 */
+		protected $assetCache = [];
 
 		/**
 		 * KiranicoArmorScraper constructor.
 		 *
 		 * @param KiranicoConfiguration $configuration
 		 * @param ObjectManager         $manager
+		 * @param Sdk                   $aws
 		 */
-		public function __construct(KiranicoConfiguration $configuration, ObjectManager $manager) {
+		public function __construct(KiranicoConfiguration $configuration, ObjectManager $manager, Sdk $aws) {
 			parent::__construct($configuration, Type::ARMOR);
 
 			$this->manager = $manager;
+			$this->s3Client = $aws->createS3();
 		}
 
 		/**
@@ -58,12 +76,24 @@
 			$this->progressBar->append($count);
 
 			$currentRank = ArmorRank::LOW;
+			$spriteMaps = [
+				Gender::MALE => new SpriteMap('https://mhworld.kiranico.com/images/armor_m.png'),
+				Gender::FEMALE => new SpriteMap('https://mhworld.kiranico.com/images/armor_f.png'),
+			];
+
+			$setsContext = $context['sets'] ?? [];
 
 			for ($i = 0; $i < $count; $i++) {
 				$setNode = $crawler->eq($i);
 
 				$setName = StringUtil::clean($setNode->filter('.card-header')->text());
 				$setName = trim(str_replace('Set', '', $setName));
+
+				if ($setsContext && !in_array($setName, $setsContext)) {
+					$this->progressBar->advance();
+
+					continue;
+				}
 
 				$set = $this->getArmorSet($setName);
 
@@ -86,7 +116,7 @@
 					if (stripos($link, 'Alpha'))
 						$currentRank = ArmorRank::HIGH;
 
-					$this->process(parse_url($link, PHP_URL_PATH), $currentRank, $set);
+					$this->process(parse_url($link, PHP_URL_PATH), $currentRank, $set, $spriteMaps);
 				}
 
 				$this->progressBar->advance();
@@ -96,19 +126,19 @@
 		}
 
 		/**
-		 * @param string   $path
-		 * @param string   $rank
-		 * @param ArmorSet $armorSet
+		 * @param string      $path
+		 * @param string      $rank
+		 * @param ArmorSet    $armorSet
+		 * @param SpriteMap[] $spriteMaps
 		 *
 		 * @return void
-		 * @throws \Http\Client\Exception
 		 */
-		protected function process(string $path, string $rank, ArmorSet $armorSet): void {
-			$uri = $this->configuration->getBaseUri()->withPath($path);
-			$response = $this->getWithRetry($uri);
+		protected function process(string $path, string $rank, ArmorSet $armorSet, array $spriteMaps): void {
+			$tmpUri = $this->configuration->getBaseUri()->withPath($path);
+			$response = $this->getWithRetry($tmpUri);
 
 			if ($response->getStatusCode() !== Response::HTTP_OK)
-				throw new \RuntimeException('Could not retrieve ' . $uri);
+				throw new \RuntimeException('Could not retrieve ' . $tmpUri);
 
 			$crawler = (new Crawler($response->getBody()->getContents()))->filter('.container .col-lg-9.px-2')
 				->children();
@@ -126,6 +156,8 @@
 				'name' => $name,
 			]);
 
+			$mainSection = $crawler->filter('.card')->eq(1);
+
 			/**
 			 * 0 = Defense
 			 * 1 = Slots
@@ -133,7 +165,7 @@
 			 * 3 = Gender
 			 * 4 = Rarity
 			 */
-			$infoNodes = $crawler->filter('.card')->eq(1)->filter('.card-footer .p-3');
+			$infoNodes = $mainSection->filter('.card-footer .p-3');
 
 			$rarity = (int)StringUtil::clean($infoNodes->eq(4)->filter('.lead')->text());
 
@@ -147,6 +179,85 @@
 					->setAttributes([]);
 
 				$armor->getSkills()->clear();
+			}
+
+			$assetNodes = $mainSection->filter('.card-body .media .img-thumbnail');
+			$assets = [];
+
+			foreach ([Gender::MALE, Gender::FEMALE] as $i => $gender) {
+				$tmp = tmpfile();
+				$tmpUri = stream_get_meta_data($tmp)['uri'];
+
+				preg_match('/background: .* (-?\d+)px (-?\d+)px/', $assetNodes->eq($i)->attr('style'),
+					$matches);
+
+				if (sizeof($matches) < 3)
+					continue;
+
+				$sprite = $spriteMaps[$gender]->get((int)$matches[1], (int)$matches[2], 96, 96);
+
+				if ($sprite === null)
+					continue;
+
+				imagepng($sprite, $tmp);
+				imagedestroy($sprite);
+
+				$primary = hash_file('md5', $tmpUri);
+				$secondary = hash_file('sha1', $tmpUri);
+
+				$asset = $this->getAsset($primary, $secondary);
+
+				if ($asset === null) {
+					$fileKey = sprintf('%s.%s', $primary, $secondary);
+
+					$result = $this->s3Client->putObject([
+						'Bucket' => 'assets.mhw-db.com',
+						'Key' => 'armor/' . $fileKey . '.png',
+						'ContentType' => 'image/png',
+						'Body' => $tmp,
+					]);
+
+					fclose($tmp);
+
+					// ObjectURL is in the format: 'https://<s3-domain>/<bucket-domain>/path'
+					// So, parsing out the path portion of the URL actually yields <bucket-domain>/path, which
+					// is what we want.
+					$objectPath = ltrim(parse_url($result->get('ObjectURL'), PHP_URL_PATH), '/');
+
+					$asset = new Asset('https://' . $objectPath, $primary, $secondary);
+
+					$this->assetCache[$fileKey] = $asset;
+				}
+
+				$assets[$gender] = $asset;
+			}
+
+			if ($group = $armor->getAssets()) {
+				if (isset($assets[Gender::MALE])) {
+					if ($group->getImageMale() !== $assets[Gender::MALE])
+						$this->deleteAsset($group->getImageMale());
+
+					$group->setImageMale($assets[Gender::MALE]);
+				} else if ($asset = $group->getImageMale()) {
+					$this->deleteAsset($asset);
+
+					$group->setImageMale(null);
+				}
+
+				if (isset($assets[Gender::FEMALE])) {
+					if ($group->getImageFemale() !== $assets[Gender::FEMALE])
+						$this->deleteAsset($group->getImageFemale());
+
+					$group->setImageFemale($assets[Gender::FEMALE]);
+				} else if ($asset = $group->getImageFemale()) {
+					$this->deleteAsset($asset);
+
+					$group->setImageFemale(null);
+				}
+			} else {
+				$group = new ArmorAssets($assets[Gender::MALE] ?? null, $assets[Gender::FEMALE] ?? null);
+
+				$armor->setAssets($group);
 			}
 
 			$armor->setArmorSet($armorSet);
@@ -228,5 +339,47 @@
 			]);
 
 			return $this->setCache[$name] = $set;
+		}
+
+		/**
+		 * @param string $primaryHash
+		 * @param string $secondaryHash
+		 *
+		 * @return Asset|null
+		 */
+		protected function getAsset(string $primaryHash, string $secondaryHash): ?Asset {
+			$key = sprintf('%s.%s', $primaryHash, $secondaryHash);
+
+			if (isset($this->assetCache[$key]))
+				return $this->assetCache[$key];
+
+			$asset = $this->manager->getRepository('App:Asset')->findOneBy([
+				'primaryHash' => $primaryHash,
+				'secondaryHash' => $secondaryHash,
+			]);
+
+			return $this->assetCache[$key] = $asset;
+		}
+
+		/**
+		 * @param Asset $asset
+		 *
+		 * @return bool
+		 */
+		protected function deleteAsset(Asset $asset): bool {
+			$key = sprintf('armor/%s.%s.png', $asset->getPrimaryHash(), $asset->getSecondaryHash());
+
+			$result = $this->s3Client->deleteObject([
+				'Bucket' => 'assets.mhw-db.com',
+				'Key' => $key,
+			]);
+
+			if (!$result->get('DeleteMarker')) {
+				echo PHP_EOL . PHP_EOL . '!! Could not delete file: ' . $key . PHP_EOL . PHP_EOL;
+
+				return false;
+			}
+
+			return true;
 		}
 	}
