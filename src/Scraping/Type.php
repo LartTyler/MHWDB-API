@@ -8,6 +8,7 @@
 		const ITEMS = 'items';
 		const SKILLS = 'skills';
 		const WEAPONS = 'weapons';
+		const ELDERSEAL = 'elderseal';
 
 		/**
 		 * Type constructor.

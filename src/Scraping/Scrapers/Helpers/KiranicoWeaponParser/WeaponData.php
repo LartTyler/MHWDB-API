@@ -152,9 +152,13 @@
 		 */
 		protected function fixWeaponName(string $name): string {
 			return str_replace([
-				'Berseker'
+				'Berseker',
+				'Gnshing',
+				'Water Golum',
 			], [
-				'Berserker'
+				'Berserker',
+				'Gnashing',
+				'Water Golem',
 			], $name);
 		}
 	}
