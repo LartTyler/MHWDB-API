@@ -78,14 +78,22 @@
 			$currentRank = ArmorRank::LOW;
 			$spriteMaps = [
 				Gender::MALE => new SpriteMap('https://mhworld.kiranico.com/images/armor_m.png'),
-				Gender::FEMALE => new SpriteMap('https://mhworld.kiranico.com/images/armor_m.png'),
+				Gender::FEMALE => new SpriteMap('https://mhworld.kiranico.com/images/armor_f.png'),
 			];
+
+			$setsContext = $context['sets'] ?? [];
 
 			for ($i = 0; $i < $count; $i++) {
 				$setNode = $crawler->eq($i);
 
 				$setName = StringUtil::clean($setNode->filter('.card-header')->text());
 				$setName = trim(str_replace('Set', '', $setName));
+
+				if ($setsContext && !in_array($setName, $setsContext)) {
+					$this->progressBar->advance();
+
+					continue;
+				}
 
 				$set = $this->getArmorSet($setName);
 
@@ -180,7 +188,7 @@
 				$tmp = tmpfile();
 				$tmpUri = stream_get_meta_data($tmp)['uri'];
 
-				preg_match('/background: .* (\d+)px (-?\d+)px/', $assetNodes->eq($i)->attr('style'),
+				preg_match('/background: .* (-?\d+)px (-?\d+)px/', $assetNodes->eq($i)->attr('style'),
 					$matches);
 
 				if (sizeof($matches) < 3)
@@ -192,6 +200,7 @@
 					continue;
 
 				imagepng($sprite, $tmp);
+				imagedestroy($sprite);
 
 				$primary = hash_file('md5', $tmpUri);
 				$secondary = hash_file('sha1', $tmpUri);
@@ -207,6 +216,8 @@
 						'ContentType' => 'image/png',
 						'Body' => $tmp,
 					]);
+
+					fclose($tmp);
 
 					// ObjectURL is in the format: 'https://<s3-domain>/<bucket-domain>/path'
 					// So, parsing out the path portion of the URL actually yields <bucket-domain>/path, which
