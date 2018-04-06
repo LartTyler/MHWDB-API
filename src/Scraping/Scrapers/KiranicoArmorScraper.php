@@ -213,11 +213,17 @@
 				$assets[$gender] = $asset;
 			}
 
-			if ($group = $armor->getAssets())
+			if ($group = $armor->getAssets()) {
+				if ($group->getImageMale() !== $assets[Gender::MALE])
+					$this->deleteAsset($group->getImageMale());
+
+				if ($group->getImageFemale() !== $assets[Gender::FEMALE])
+					$this->deleteAsset($group->getImageFemale());
+
 				$group
 					->setImageMale($assets[Gender::MALE])
 					->setImageFemale($assets[Gender::FEMALE]);
-			else {
+			} else {
 				$group = new ArmorAssets($assets[Gender::MALE], $assets[Gender::FEMALE]);
 
 				$armor->setAssets($group);
@@ -322,5 +328,27 @@
 			]);
 
 			return $this->assetCache[$key] = $asset;
+		}
+
+		/**
+		 * @param Asset $asset
+		 *
+		 * @return bool
+		 */
+		protected function deleteAsset(Asset $asset): bool {
+			$key = sprintf('armor/%s.%s.png', $asset->getPrimaryHash(), $asset->getSecondaryHash());
+
+			$result = $this->s3Client->deleteObject([
+				'Bucket' => 'assets.mhw-db.com',
+				'Key' => $key,
+			]);
+
+			if (!$result->get('DeleteMarker')) {
+				echo PHP_EOL . PHP_EOL . '!! Could not delete file: ' . $key . PHP_EOL . PHP_EOL;
+
+				return false;
+			}
+
+			return true;
 		}
 	}
