@@ -159,9 +159,7 @@
 			else if ($data === null)
 				return $this->responder->createNotFoundResponse();
 
-			return $this->responder->createResponse($data, null, [
-				'Cache-Control' => 'public, max-age=14400',
-			]);
+			return $this->responder->createResponse($data);
 		}
 
 		/**
