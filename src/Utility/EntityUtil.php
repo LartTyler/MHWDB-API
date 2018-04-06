@@ -21,7 +21,10 @@
 		 *
 		 * @return array
 		 */
-		public static function normalize($subject, array $fields = [], $isNested = false): array {
+		public static function normalize($subject, array $fields = [], $isNested = false): ?array {
+			if ($subject === null)
+				return null;
+
 			$normalized = [];
 
 			if (!$isNested && is_iterable($subject)) {
