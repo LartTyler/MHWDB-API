@@ -188,6 +188,9 @@
 
 				$sprite = $spriteMaps[$gender]->get((int)$matches[1], (int)$matches[2], 96, 96);
 
+				if ($sprite === null)
+					continue;
+
 				imagepng($sprite, $tmp);
 
 				$primary = hash_file('md5', $tmpUri);
@@ -205,9 +208,12 @@
 						'Body' => $tmp,
 					]);
 
-					$objectPath = parse_url($result->get('ObjectURL'), PHP_URL_PATH);
+					// ObjectURL is in the format: 'https://<s3-domain>/<bucket-domain>/path'
+					// So, parsing out the path portion of the URL actually yields <bucket-domain>/path, which
+					// is what we want.
+					$objectPath = ltrim(parse_url($result->get('ObjectURL'), PHP_URL_PATH), '/');
 
-					$asset = new Asset('https://assets.mhw-db.com' . $objectPath, $primary, $secondary);
+					$asset = new Asset('https://' . $objectPath, $primary, $secondary);
 
 					$this->assetCache[$fileKey] = $asset;
 				}
@@ -221,6 +227,10 @@
 						$this->deleteAsset($group->getImageMale());
 
 					$group->setImageMale($assets[Gender::MALE]);
+				} else if ($asset = $group->getImageMale()) {
+					$this->deleteAsset($asset);
+
+					$group->setImageMale(null);
 				}
 
 				if (isset($assets[Gender::FEMALE])) {
@@ -228,6 +238,10 @@
 						$this->deleteAsset($group->getImageFemale());
 
 					$group->setImageFemale($assets[Gender::FEMALE]);
+				} else if ($asset = $group->getImageFemale()) {
+					$this->deleteAsset($asset);
+
+					$group->setImageFemale(null);
 				}
 			} else {
 				$group = new ArmorAssets($assets[Gender::MALE] ?? null, $assets[Gender::FEMALE] ?? null);

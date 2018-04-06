@@ -35,9 +35,15 @@
 		 * @param int $width
 		 * @param int $height
 		 *
-		 * @return resource
+		 * @return resource|null
 		 */
 		public function get(int $x, int $y, int $width, int $height) {
+			$x = abs($x);
+			$y = abs($y);
+
+			if ($x + $width > $this->imageWidth || $y + $height > $this->imageHeight)
+				return null;
+
 			return imagecrop($this->image, [
 				'x' => abs($x),
 				'y' => abs($y),
