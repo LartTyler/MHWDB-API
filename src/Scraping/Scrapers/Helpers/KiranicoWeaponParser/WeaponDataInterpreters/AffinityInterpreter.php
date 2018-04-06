@@ -19,8 +19,8 @@
 		 * {@inheritdoc}
 		 */
 		public function parse(Crawler $node, WeaponData $target): void {
-			$value = str_replace('+', '', StringUtil::clean($node->filter('.lead')->text()));
+			$value = str_replace(['+', '%'], '', StringUtil::clean($node->filter('.lead')->text()));
 
-			$target->setAttribute(Attribute::AFFINITY, $value);
+			$target->setAttribute(Attribute::AFFINITY, (int)$value);
 		}
 	}
