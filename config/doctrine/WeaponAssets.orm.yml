@@ -15,7 +15,7 @@ App\Entity\WeaponAssets:
             cascade:
                 - persist
             joinColumn:
-                nullable: false
+                nullable: true
                 options:
                     unsigned: true
         image:
@@ -23,6 +23,6 @@ App\Entity\WeaponAssets:
             cascade:
                 - persist
             joinColumn:
-                nullable: false
+                nullable: true
                 options:
                     unsigned: true

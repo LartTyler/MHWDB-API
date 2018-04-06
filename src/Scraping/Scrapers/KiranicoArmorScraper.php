@@ -205,7 +205,9 @@
 						'Body' => $tmp,
 					]);
 
-					$asset = new Asset($result->get('ObjectURL'), $primary, $secondary);
+					$objectPath = parse_url($result->get('ObjectURL'), PHP_URL_PATH);
+
+					$asset = new Asset('https://assets.mhw-db.com' . $objectPath, $primary, $secondary);
 
 					$this->assetCache[$fileKey] = $asset;
 				}
@@ -214,17 +216,21 @@
 			}
 
 			if ($group = $armor->getAssets()) {
-				if ($group->getImageMale() !== $assets[Gender::MALE])
-					$this->deleteAsset($group->getImageMale());
+				if (isset($assets[Gender::MALE])) {
+					if ($group->getImageMale() !== $assets[Gender::MALE])
+						$this->deleteAsset($group->getImageMale());
 
-				if ($group->getImageFemale() !== $assets[Gender::FEMALE])
-					$this->deleteAsset($group->getImageFemale());
+					$group->setImageMale($assets[Gender::MALE]);
+				}
 
-				$group
-					->setImageMale($assets[Gender::MALE])
-					->setImageFemale($assets[Gender::FEMALE]);
+				if (isset($assets[Gender::FEMALE])) {
+					if ($group->getImageFemale() !== $assets[Gender::FEMALE])
+						$this->deleteAsset($group->getImageFemale());
+
+					$group->setImageFemale($assets[Gender::FEMALE]);
+				}
 			} else {
-				$group = new ArmorAssets($assets[Gender::MALE], $assets[Gender::FEMALE]);
+				$group = new ArmorAssets($assets[Gender::MALE] ?? null, $assets[Gender::FEMALE] ?? null);
 
 				$armor->setAssets($group);
 			}

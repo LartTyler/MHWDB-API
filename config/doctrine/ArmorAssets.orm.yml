@@ -9,13 +9,13 @@ App\Entity\ArmorAssets:
                 unsigned: true
             generator:
                 strategy: IDENTITY
-    oneToOne:
+    manyToOne:
         imageMale:
             targetEntity: App\Entity\Asset
             cascade:
                 - persist
             joinColumn:
-                nullable: false
+                nullable: true
                 options:
                     unsigned: true
         imageFemale:
@@ -23,6 +23,6 @@ App\Entity\ArmorAssets:
             cascade:
                 - persist
             joinColumn:
-                nullable: false
+                nullable: true
                 options:
                     unsigned: true

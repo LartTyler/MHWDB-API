@@ -38,15 +38,9 @@
 		 * @return resource
 		 */
 		public function get(int $x, int $y, int $width, int $height) {
-			if ($x < 0)
-				$x = $this->imageWidth - $x;
-
-			if ($y < 0)
-				$y = $this->imageHeight - $y;
-
 			return imagecrop($this->image, [
-				'x' => $x,
-				'y' => $y,
+				'x' => abs($x),
+				'y' => abs($y),
 				'width' => $width,
 				'height' => $height,
 			]);

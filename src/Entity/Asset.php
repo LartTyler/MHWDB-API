@@ -43,6 +43,16 @@
 		}
 
 		/**
+		 * @param string $uri
+		 *
+		 * @return $this
+		 */
+		public function setUri($uri) {
+			$this->uri = $uri;
+			return $this;
+		}
+
+		/**
 		 * @return string
 		 */
 		public function getPrimaryHash(): string {

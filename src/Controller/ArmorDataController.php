@@ -2,6 +2,7 @@
 	namespace App\Controller;
 
 	use App\Entity\Armor;
+	use App\Entity\Asset;
 	use App\Entity\Skill;
 	use App\Utility\EntityUtil;
 	use DaybreakStudios\Doze\Errors\ApiErrorInterface;
@@ -70,6 +71,10 @@
 			if (!$armor)
 				return null;
 
+			$assetTransformer = function(?Asset $asset): ?string {
+				return $asset ? $asset->getUri() : null;
+			};
+
 			return EntityUtil::normalize($armor, [
 				'id',
 				'slug',
@@ -95,6 +100,10 @@
 					'pieces' => function(Armor $armor): int {
 						return $armor->getId();
 					},
+				],
+				'assets' => [
+					'imageMale' => $assetTransformer,
+					'imageFemale' => $assetTransformer,
 				],
 			]);
 		}

@@ -8,57 +8,57 @@
 		use EntityTrait;
 
 		/**
-		 * @var Asset
+		 * @var Asset|null
 		 */
 		private $icon;
 
 		/**
-		 * @var Asset
+		 * @var Asset|null
 		 */
 		private $image;
 
 		/**
 		 * WeaponAssets constructor.
 		 *
-		 * @param Asset $icon
-		 * @param Asset $image
+		 * @param Asset|null $icon
+		 * @param Asset|null $image
 		 */
-		public function __construct(Asset $icon, Asset $image) {
+		public function __construct(?Asset $icon, ?Asset $image) {
 			$this->icon = $icon;
 			$this->image = $image;
 		}
 
 		/**
-		 * @return Asset
+		 * @return Asset|null
 		 */
-		public function getIcon(): Asset {
+		public function getIcon(): ?Asset {
 			return $this->icon;
 		}
 
 		/**
-		 * @param Asset $icon
+		 * @param Asset|null $icon
 		 *
 		 * @return $this
 		 */
-		public function setIcon(Asset $icon) {
+		public function setIcon(?Asset $icon) {
 			$this->icon = $icon;
 
 			return $this;
 		}
 
 		/**
-		 * @return Asset
+		 * @return Asset|null
 		 */
-		public function getImage(): Asset {
+		public function getImage(): ?Asset {
 			return $this->image;
 		}
 
 		/**
-		 * @param Asset $image
+		 * @param Asset|null $image
 		 *
 		 * @return $this
 		 */
-		public function setImage(Asset $image) {
+		public function setImage(?Asset $image) {
 			$this->image = $image;
 
 			return $this;
