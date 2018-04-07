@@ -103,26 +103,43 @@
 			 */
 			$cells = $row->filter('td');
 
-			$nameAnchors = $cells->eq(0)->filter('a');
-			$weaponName = StringUtil::clean($nameAnchors->last()->text());
+			if ($cells->count() < 7)
+				return;
 
-			if ($weaponName === '→')
-				$weaponName = StringUtil::clean($nameAnchors->eq($nameAnchors->count() - 2)->text());
+			if (in_array($weaponType, [WeaponType::GREAT_SWORD, WeaponType::LIGHT_BOWGUN, WeaponType::HEAVY_BOWGUN]))
+				$weaponName = $cells->eq(0)->filter('a')->last()->text();
+			else
+				$weaponName = $cells->eq(0)->text();
 
-			$weaponName = StringUtil::replaceNumeralRank($weaponName);
+			$weaponName = str_replace([
+				'→'
+			], [
+				'',
+			], $weaponName);
+
+			$weaponName = StringUtil::replaceNumeralRank(StringUtil::clean($weaponName));
 
 			// General typo correction
 			$weaponName = str_replace([
 				'’',
 				'Exterminator\'s',
 				'Eraadication',
+				'Bazel Myriad',
+				'Thunderspike',
+				'Chroma',
+				'Snowfeltcher',
+				'Mentora',
 			], [
 				'\'',
 				'Extermination\'s',
 				'Eradication',
+				'Bazel Myniad',
+				'Thunderpike',
+				'Chrome',
+				'Snowfletcher',
+				'Metora',
 			], $weaponName);
 
-			// Targeted type correction
 			if ($weaponType === WeaponType::DUAL_BLADES)
 				$weaponName = str_replace([
 					'Dragonbone Cleaver',
@@ -143,10 +160,22 @@
 				return;
 			}
 
+			$eldersealColIndex = 6;
+
+			if ($weaponType === WeaponType::CHARGE_BLADE)
+				$eldersealColIndex = 8;
+
 			$elderseal = str_replace([
 				'-',
 				'n/a',
-			], '', strtolower(StringUtil::clean($cells->eq(6)->text())));
+			], '', strtolower(StringUtil::clean($cells->eq($eldersealColIndex)->text())));
+
+			if ($weaponType === WeaponType::BOW) {
+				preg_match('/Elderseal: (low|average|high)/i', $elderseal, $matches);
+
+				if (sizeof($matches) >= 2)
+					$elderseal = strtolower($matches[1]);
+			}
 
 			if (!Elderseal::isValid($elderseal))
 				$weapon->removeAttribute(Attribute::ELDERSEAL);
