@@ -60,6 +60,12 @@
 				$parser->parse($sections->eq($layout[$key]), $data);
 			}
 
+			if ($name = $data->getName())
+				$data->setName(KiranicoHelper::fixWeaponName($name, $weaponType));
+
+			if ($previous = $data->getCraftingPrevious())
+				$data->setCraftingPrevious(KiranicoHelper::fixWeaponName($previous, $weaponType));
+
 			return $data;
 		}
 

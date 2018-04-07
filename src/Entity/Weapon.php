@@ -31,6 +31,11 @@
 		private $crafting = null;
 
 		/**
+		 * @var WeaponAssets|null
+		 */
+		private $assets = null;
+
+		/**
 		 * Weapon constructor.
 		 *
 		 * @param string $name
@@ -50,6 +55,19 @@
 		 */
 		public function getName(): string {
 			return $this->name;
+		}
+
+		/**
+		 * @param string $name
+		 *
+		 * @return $this
+		 */
+		public function setName($name) {
+			$this->name = $name;
+
+			$this->setSlug($name);
+
+			return $this;
 		}
 
 		/**
@@ -91,6 +109,24 @@
 		 */
 		public function setCrafting(WeaponCraftingInfo $crafting) {
 			$this->crafting = $crafting;
+
+			return $this;
+		}
+
+		/**
+		 * @return WeaponAssets|null
+		 */
+		public function getAssets(): ?WeaponAssets {
+			return $this->assets;
+		}
+
+		/**
+		 * @param WeaponAssets|null $assets
+		 *
+		 * @return $this
+		 */
+		public function setAssets(?WeaponAssets $assets) {
+			$this->assets = $assets;
 
 			return $this;
 		}

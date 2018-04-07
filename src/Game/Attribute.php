@@ -26,6 +26,9 @@
 		const ELEM_TYPE = 'elementType';
 		const ELEM_DAMAGE = 'elementDamage';
 		const ELEM_HIDDEN = 'elementHidden';
+		const ELDERSEAL = 'elderseal';
+
+		// -- Melee Weapon Attributes --
 		const SHARP_RED = 'sharpnessRed';
 		const SHARP_ORANAGE = 'sharpnessOrange';
 		const SHARP_YELLOW = 'sharpnessYellow';

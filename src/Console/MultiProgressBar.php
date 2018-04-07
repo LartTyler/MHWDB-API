@@ -35,6 +35,13 @@
 		}
 
 		/**
+		 * @return null|ProgressBar
+		 */
+		public function getCurrent() {
+			return $this->current;
+		}
+
+		/**
 		 * @param int $max
 		 *
 		 * @return $this

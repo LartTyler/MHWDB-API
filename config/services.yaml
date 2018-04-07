@@ -36,7 +36,19 @@ services:
                 name: console.command
                 command: app:scrape
 
+    App\Command\KiranicoFixWeaponNamesCommand:
+        tags:
+            -
+                name: console.command
+                command: app:kiranico:fix-weapon-names
+
     DaybreakStudios\DoctrineQueryDocument\QueryManager:
         public: true
         arguments:
             - '@doctrine.orm.entity_manager'
+
+    Aws\Sdk:
+        arguments:
+            -
+                region: 'us-east-2'
+                version: 'latest'

@@ -50,7 +50,7 @@
 		 * @return $this
 		 */
 		public function setName(string $name) {
-			$this->name = $this->fixWeaponName($name);
+			$this->name = $name;
 
 			return $this;
 		}
@@ -86,7 +86,7 @@
 		 * @return $this
 		 */
 		public function setCraftingPrevious(string $craftingPrevious) {
-			$this->craftingPrevious = $this->fixWeaponName($craftingPrevious);
+			$this->craftingPrevious = $craftingPrevious;
 
 			return $this;
 		}
@@ -143,18 +143,5 @@
 			$this->craftable = $craftable;
 
 			return $this;
-		}
-
-		/**
-		 * @param string $name
-		 *
-		 * @return string
-		 */
-		protected function fixWeaponName(string $name): string {
-			return str_replace([
-				'Berseker'
-			], [
-				'Berserker'
-			], $name);
 		}
 	}
