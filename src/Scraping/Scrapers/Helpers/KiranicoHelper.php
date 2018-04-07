@@ -1,6 +1,7 @@
 <?php
 	namespace App\Scraping\Scrapers\Helpers;
 
+	use App\Game\WeaponType;
 	use Symfony\Component\DomCrawler\Crawler;
 
 	final class KiranicoHelper {
@@ -34,7 +35,7 @@
 		 * @return string
 		 */
 		public static function fixWeaponName(string $name, string $type): string {
-			return str_replace([
+			$name = str_replace([
 				'Berseker',
 				'Gnshing',
 				'Water Golum',
@@ -53,6 +54,13 @@
 				'Raider',
 				'Commission',
 			], $name);
+
+			if ($type === WeaponType::BOW) {
+				if ($name === 'Villainous Bow')
+					$name = 'Villainous Brace';
+			}
+
+			return $name;
 		}
 
 		/**
