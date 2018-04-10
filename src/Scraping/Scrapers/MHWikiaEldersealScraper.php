@@ -9,6 +9,7 @@
 	use App\Scraping\ProgressAwareInterface;
 	use App\Scraping\ProgressAwareTrait;
 	use App\Scraping\ScraperInterface;
+	use App\Scraping\Scrapers\Helpers\EldersealData;
 	use App\Scraping\Scrapers\Helpers\MHWikiaHelper;
 	use App\Scraping\Type;
 	use App\Utility\StringUtil;
@@ -25,15 +26,26 @@
 		protected $manager;
 
 		/**
+		 * @var EldersealData
+		 */
+		protected $missingValues;
+
+		/**
 		 * MHWikiaEldersealScraper constructor.
 		 *
 		 * @param MHWikiaConfiguration $configuration
 		 * @param ObjectManager        $manager
+		 * @param EldersealData        $missingValues
 		 */
-		public function __construct(MHWikiaConfiguration $configuration, ObjectManager $manager) {
+		public function __construct(
+			MHWikiaConfiguration $configuration,
+			ObjectManager $manager,
+			EldersealData $missingValues
+		) {
 			parent::__construct($configuration, Type::ELDERSEAL);
 
 			$this->manager = $manager;
+			$this->missingValues = $missingValues;
 		}
 
 		/**
@@ -50,6 +62,8 @@
 				if ($subtypes && !in_array($weaponType, $subtypes))
 					continue;
 
+				$extra = $this->missingValues->get($weaponType);
+
 				$uri = $this->configuration->getBaseUri()->withPath($path);
 				$response = $this->getWithRetry($uri);
 
@@ -61,7 +75,7 @@
 
 				$count = $crawler->count();
 
-				$this->progressBar->append($count);
+				$this->progressBar->append($count + sizeof($extra));
 
 				for ($i = 0; $i < $count; $i++) {
 					$row = $crawler->eq($i);
@@ -73,6 +87,23 @@
 					}
 
 					$this->process($row, $weaponType);
+
+					$this->progressBar->advance();
+				}
+
+				foreach ($extra as $weaponName => $eldersealValue) {
+					$weapon = $this->manager->getRepository('App:Weapon')->findOneBy([
+						'name' => $weaponName,
+						'type' => $weaponType,
+					]);
+
+					if (!$weapon)
+						throw new \RuntimeException('Could not find weapon named ' . $weaponName);
+
+					if ($eldersealValue !== null)
+						$weapon->setAttribute(Attribute::ELDERSEAL, $eldersealValue);
+					else
+						$weapon->removeAttribute(Attribute::ELDERSEAL);
 
 					$this->progressBar->advance();
 				}
