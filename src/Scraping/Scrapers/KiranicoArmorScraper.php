@@ -20,6 +20,7 @@
 	use Aws\S3\S3Client;
 	use Aws\Sdk;
 	use Doctrine\Common\Persistence\ObjectManager;
+	use Doctrine\ORM\EntityManager;
 	use Symfony\Component\DomCrawler\Crawler;
 	use Symfony\Component\HttpFoundation\Response;
 
@@ -27,7 +28,7 @@
 		use ProgressAwareTrait;
 
 		/**
-		 * @var ObjectManager
+		 * @var ObjectManager|EntityManager
 		 */
 		protected $manager;
 
@@ -182,6 +183,8 @@
 			}
 
 			$assetNodes = $mainSection->filter('.card-body .media .img-thumbnail');
+
+			/** @var Asset[] $assets */
 			$assets = [];
 
 			foreach ([Gender::MALE, Gender::FEMALE] as $i => $gender) {
@@ -209,22 +212,19 @@
 
 				if ($asset === null) {
 					$fileKey = sprintf('%s.%s', $primary, $secondary);
+					$bucketKey = 'armor/' . $fileKey . '.png';
 
-					$result = $this->s3Client->putObject([
-						'Bucket' => 'assets.mhw-db.com',
-						'Key' => 'armor/' . $fileKey . '.png',
-						'ContentType' => 'image/png',
-						'Body' => $tmp,
-					]);
+					if (!$this->s3Client->doesObjectExist('assets.mhw-db.com', $bucketKey))
+						$this->s3Client->putObject([
+							'Bucket' => 'assets.mhw-db.com',
+							'Key' => $bucketKey,
+							'ContentType' => 'image/png',
+							'Body' => $tmp,
+						]);
 
 					fclose($tmp);
 
-					// ObjectURL is in the format: 'https://<s3-domain>/<bucket-domain>/path'
-					// So, parsing out the path portion of the URL actually yields <bucket-domain>/path, which
-					// is what we want.
-					$objectPath = ltrim(parse_url($result->get('ObjectURL'), PHP_URL_PATH), '/');
-
-					$asset = new Asset('https://' . $objectPath, $primary, $secondary);
+					$asset = new Asset('https://assets.mhw-db.com/' . $bucketKey, $primary, $secondary);
 
 					$this->assetCache[$fileKey] = $asset;
 				}
@@ -234,10 +234,12 @@
 
 			if ($group = $armor->getAssets()) {
 				if (isset($assets[Gender::MALE])) {
-					if ($group->getImageMale() !== $assets[Gender::MALE])
-						$this->deleteAsset($group->getImageMale());
+					if ($group->getImageMale() !== $assets[Gender::MALE]) {
+						if ($existing = $group->getImageMale())
+							$this->deleteAsset($existing);
 
-					$group->setImageMale($assets[Gender::MALE]);
+						$group->setImageMale($assets[Gender::MALE]);
+					}
 				} else if ($asset = $group->getImageMale()) {
 					$this->deleteAsset($asset);
 
@@ -245,10 +247,12 @@
 				}
 
 				if (isset($assets[Gender::FEMALE])) {
-					if ($group->getImageFemale() !== $assets[Gender::FEMALE])
-						$this->deleteAsset($group->getImageFemale());
+					if ($group->getImageFemale() !== $assets[Gender::FEMALE]) {
+						if ($existing = $group->getImageFemale())
+							$this->deleteAsset($existing);
 
-					$group->setImageFemale($assets[Gender::FEMALE]);
+						$group->setImageFemale($assets[Gender::FEMALE]);
+					}
 				} else if ($asset = $group->getImageFemale()) {
 					$this->deleteAsset($asset);
 
@@ -367,18 +371,10 @@
 		 * @return bool
 		 */
 		protected function deleteAsset(Asset $asset): bool {
-			$key = sprintf('armor/%s.%s.png', $asset->getPrimaryHash(), $asset->getSecondaryHash());
-
-			$result = $this->s3Client->deleteObject([
+			$this->s3Client->deleteObject([
 				'Bucket' => 'assets.mhw-db.com',
-				'Key' => $key,
+				'Key' => sprintf('armor/%s.%s.png', $asset->getPrimaryHash(), $asset->getSecondaryHash()),
 			]);
-
-			if (!$result->get('DeleteMarker')) {
-				echo PHP_EOL . PHP_EOL . '!! Could not delete file: ' . $key . PHP_EOL . PHP_EOL;
-
-				return false;
-			}
 
 			return true;
 		}
