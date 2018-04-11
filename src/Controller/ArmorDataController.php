@@ -7,7 +7,6 @@
 	use App\Utility\EntityUtil;
 	use DaybreakStudios\Doze\Errors\ApiErrorInterface;
 	use DaybreakStudios\DozeBundle\ResponderService;
-	use Doctrine\Common\Collections\Collection;
 	use Symfony\Bridge\Doctrine\RegistryInterface;
 	use Symfony\Component\HttpFoundation\Request;
 	use Symfony\Component\HttpFoundation\Response;

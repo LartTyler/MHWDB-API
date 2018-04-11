@@ -16,8 +16,10 @@ services:
                 - '@App\Scraping\Scrapers\KiranicoWeaponsScraper'
                 - '@App\Scraping\Scrapers\KiranicoArmorScraper'
                 - '@App\Scraping\Scrapers\KiranicoDecorationsScraper'
+                - '@App\Scraping\Scrapers\MHWikiaEldersealScraper'
 
     App\Scraping\Configurations\KiranicoConfiguration: ~
+    App\Scraping\Configurations\MHWikiaConfiguration: ~
 
     App\Scraping\Scrapers\KiranicoItemScraper: ~
     App\Scraping\Scrapers\KiranicoSkillsScraper: ~
@@ -25,3 +27,8 @@ services:
     App\Scraping\Scrapers\KiranicoWeaponsScraper: ~
     App\Scraping\Scrapers\KiranicoArmorScraper: ~
     App\Scraping\Scrapers\KiranicoDecorationsScraper: ~
+    App\Scraping\Scrapers\MHWikiaEldersealScraper: ~
+
+    App\Scraping\Scrapers\Helpers\EldersealData:
+        arguments:
+            - '%kernel.root_dir%/Resources/data/missing-elderseal-values.json'

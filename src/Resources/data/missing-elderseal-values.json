@@ -1,0 +1,51 @@
+{
+	"hunting-horn": {
+		"Nergal Groove": "high",
+		"Desolation's Overture": "high",
+		"Devil's Maestro": "high",
+		"Deep Vero": "high",
+		"Dragonbone Auldhorn 1": "low",
+		"Dragonbone Auldhorn 2": "low",
+		"Dragonbone Auldhorn 3": "low",
+		"Blacksteel Dragonhorn 1": "low",
+		"Blacksteel Dragonhorn 2": "low",
+		"Xeno Manasheena": "low"
+	},
+	"gunlance": {
+		"Nergal Ram": "high",
+		"Eradication Flame": "high",
+		"Hazak Spysa 1": "average",
+		"Hazak Spysa 2": "average",
+		"Dragonbone Gunlance 1": "low",
+		"Dragonbone Gunlance 2": "low",
+		"Dragonbone Gunlance 3": "low",
+		"Blacksteel Gunlance 1": "low",
+		"Blacksteel Gunlance 2": "low",
+		"Xeno Hemta": "low",
+		"Ravenous Gunlance": "high",
+		"Insatiable Gunlance": "high"
+	},
+	"switch-axe": {
+		"Nergal Gash": "high",
+		"Dying Light": "high",
+		"Hazak Demios 1": "average",
+		"Hazak Demios 2": "average",
+		"Dragonbone Slicer 1": "average",
+		"Dragonbone Slicer 2": "average",
+		"Dragonbone Slicer 3": "average",
+		"Blacksteel Switch Axe 1": "low",
+		"Blacksteel Switch Axe 2": "low",
+		"Xeno Martshu": "low",
+		"Tyrannos": "high",
+		"Terror Tyrannos": "high"
+	},
+	"insect-glaive": {
+		"_comment": "These values are not yet on the Wikia, and will need to be copied from in-game"
+	},
+	"light-bowgun": {
+		"_comment": "These values are not yet on the Wikia, and will need to be copied from in-game"
+	},
+	"heavy-bowgun": {
+		"_comment": "These values are not yet on the Wikia, and will need to be copied from in-game"
+	}
+}

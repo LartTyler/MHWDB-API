@@ -36,6 +36,12 @@ services:
                 name: console.command
                 command: app:scrape
 
+    App\Command\KiranicoFixWeaponNamesCommand:
+        tags:
+            -
+                name: console.command
+                command: app:kiranico:fix-weapon-names
+
     DaybreakStudios\DoctrineQueryDocument\QueryManager:
         public: true
         arguments:

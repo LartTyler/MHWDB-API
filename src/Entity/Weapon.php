@@ -58,6 +58,19 @@
 		}
 
 		/**
+		 * @param string $name
+		 *
+		 * @return $this
+		 */
+		public function setName($name) {
+			$this->name = $name;
+
+			$this->setSlug($name);
+
+			return $this;
+		}
+
+		/**
 		 * @return string
 		 */
 		public function getType(): string {
