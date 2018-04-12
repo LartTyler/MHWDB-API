@@ -21,14 +21,40 @@
 		public function parse(Crawler $node, WeaponData $target): void {
 			$raw = StringUtil::clean($node->filter('.lead')->text());
 
-			if (strpos($raw, '(') === 0) {
-				$target->setAttribute(Attribute::ELEM_HIDDEN, true);
+			// Handles some weapons (such as Fire and Ice) having more than one element
+			if (strpos($raw, '/') !== false)
+				$rawElements = array_map(function(string $part): string {
+					return trim($part);
+				}, explode('/', $raw));
+			else
+				$rawElements = [$raw];
 
-				$raw = substr($raw, 1, -1);
+			foreach ($rawElements as $i => $rawElement) {
+				if (strpos($rawElement, '(') === 0) {
+					if ($i === 0)
+						$hiddenKey = Attribute::ELEM_HIDDEN;
+					else if ($i === 1)
+						$hiddenKey = Attribute::ELEM_HIDDEN_2;
+					else
+						throw new \RuntimeException($target->getName() . ' has more than two elements!');
+
+					$target->setAttribute($hiddenKey, true);
+
+					$rawElement = substr($rawElement, 1, -1);
+				}
+
+				if ($i === 0) {
+					$typeKey = Attribute::ELEM_TYPE;
+					$damageKey = Attribute::ELEM_DAMAGE;
+				} else if ($i === 1) {
+					$typeKey = Attribute::ELEM_TYPE_2;
+					$damageKey = Attribute::ELEM_DAMAGE_2;
+				} else
+					throw new \RuntimeException($target->getName() . ' has more than two elements!');
+
+				$target
+					->setAttribute($damageKey, (int)strtok($rawElement, ' '))
+					->setAttribute($typeKey, strtok(''));
 			}
-
-			$target
-				->setAttribute(Attribute::ELEM_DAMAGE, (int)strtok($raw, ' '))
-				->setAttribute(Attribute::ELEM_TYPE, strtok(''));
 		}
 	}

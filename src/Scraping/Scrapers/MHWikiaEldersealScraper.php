@@ -92,6 +92,12 @@
 				}
 
 				foreach ($extra as $weaponName => $eldersealValue) {
+					if ($weaponName === '_comment') {
+						$this->progressBar->advance();
+
+						continue;
+					}
+
 					$weapon = $this->manager->getRepository('App:Weapon')->findOneBy([
 						'name' => $weaponName,
 						'type' => $weaponType,

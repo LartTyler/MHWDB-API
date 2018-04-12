@@ -26,6 +26,9 @@
 		const ELEM_TYPE = 'elementType';
 		const ELEM_DAMAGE = 'elementDamage';
 		const ELEM_HIDDEN = 'elementHidden';
+		const ELEM_TYPE_2 = 'elementType2';
+		const ELEM_DAMAGE_2 = 'elementDamage2';
+		const ELEM_HIDDEN_2 = 'elementHidden2';
 		const ELDERSEAL = 'elderseal';
 
 		// -- Melee Weapon Attributes --
