@@ -25,6 +25,7 @@
 			'Eyepatch' => ArmorType::HEAD,
 			'Shades' => ArmorType::HEAD,
 			'Faux Felyne' => ArmorType::HEAD,
+			'Head' => ArmorType::HEAD,
 
 			// -- Chest --
 			'Mail' => ArmorType::CHEST,
@@ -46,6 +47,7 @@
 			'Grip' => ArmorType::GLOVES,
 			'Longarms' => ArmorType::GLOVES,
 			'Claws' => ArmorType::GLOVES,
+			'Cuffs' => ArmorType::GLOVES,
 
 			// -- Waist --
 			'Belt' => ArmorType::WAIST,
@@ -55,6 +57,7 @@
 			'Hoop' => ArmorType::WAIST,
 			'Spine' => ArmorType::WAIST,
 			'Cocoon' => ArmorType::WAIST,
+			'Coat' => ArmorType::WAIST,
 
 			// -- Legs --
 			'Trousers' => ArmorType::LEGS,
