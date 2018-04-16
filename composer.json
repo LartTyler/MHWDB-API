@@ -22,7 +22,7 @@
         "symfony/orm-pack": "^1.0",
         "symfony/yaml": "^4.0",
         "syslogic/doctrine-json-functions": "^2.1",
-        "dbstudios/doctrine-query-document": "^0.1",
+        "dbstudios/doctrine-query-document": "^0.2",
         "symfony/dotenv": "^4.0"
     },
     "require-dev": {

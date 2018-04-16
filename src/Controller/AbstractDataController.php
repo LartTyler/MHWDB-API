@@ -2,6 +2,7 @@
 	namespace App\Controller;
 
 	use App\Entity\SluggableInterface;
+	use App\QueryDocument\ApiQueryManager;
 	use App\Response\BadQueryObjectError;
 	use App\Response\EmptySearchParametersError;
 	use App\Response\SearchError;
@@ -138,7 +139,7 @@
 				return $this->responder->createErrorResponse(new EmptySearchParametersError());
 
 			try {
-				$this->get(QueryManager::class)->apply($queryBuilder, $queryObject);
+				$this->get(ApiQueryManager::class)->apply($queryBuilder, $queryObject);
 			} catch (\Exception $e) {
 				return $this->responder->createErrorResponse(new SearchError($e->getMessage()));
 			}
