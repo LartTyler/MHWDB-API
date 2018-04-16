@@ -42,7 +42,7 @@ services:
                 name: console.command
                 command: app:kiranico:fix-weapon-names
 
-    DaybreakStudios\DoctrineQueryDocument\QueryManager:
+    App\QueryDocument\ApiQueryManager:
         public: true
         arguments:
             - '@doctrine.orm.entity_manager'
