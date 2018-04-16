@@ -4,6 +4,7 @@
 	use App\Entity\Armor;
 	use App\Entity\Asset;
 	use App\Entity\Skill;
+	use App\Entity\SkillRank;
 	use App\Utility\EntityUtil;
 	use DaybreakStudios\Doze\Errors\ApiErrorInterface;
 	use DaybreakStudios\DozeBundle\ResponderService;
@@ -70,40 +71,44 @@
 			if (!$armor)
 				return null;
 
+			$armorSet = $armor->getArmorSet();
+			$assets = $armor->getAssets();
+
 			$assetTransformer = function(?Asset $asset): ?string {
 				return $asset ? $asset->getUri() : null;
 			};
 
-			return EntityUtil::normalize($armor, [
-				'id',
-				'slug',
-				'name',
-				'type',
-				'rank',
-				'rarity',
-				'attributes',
-				'skills' => [
-					'id',
-					'slug',
-					'skill' => function(Skill $skill): int {
-						return $skill->getId();
-					},
-					'level',
-					'description',
-					'modifiers',
-				],
-				'armorSet' => [
-					'id',
-					'name',
-					'rank',
-					'pieces' => function(Armor $armor): int {
+			return [
+				'id' => $armor->getId(),
+				'slug' => $armor->getSlug(),
+				'name' => $armor->getName(),
+				'type' => $armor->getType(),
+				'rank' => $armor->getRank(),
+				'rarity' => $armor->getRarity(),
+				'attributes' => $armor->getAttributes(),
+				'skills' => array_map(function(SkillRank $rank): array {
+					return [
+						'id' => $rank->getId(),
+						'slug' => $rank->getSlug(),
+						'level' => $rank->getLevel(),
+						'description' => $rank->getDescription(),
+						'modifiers' => $rank->getModifiers(),
+						'skill' => $rank->getSkill()->getId(),
+						'skillName' => $rank->getSkill()->getName(),
+					];
+				}, $armor->getSkills()->toArray()),
+				'armorSet' => $armorSet ? [
+					'id' => $armorSet->getId(),
+					'name' => $armorSet->getName(),
+					'rank' => $armorSet->getRank(),
+					'pieces' => array_map(function(Armor $armor): int {
 						return $armor->getId();
-					},
-				],
+					}, $armorSet->getPieces()->toArray()),
+				] : $armorSet,
 				'assets' => [
-					'imageMale' => $assetTransformer,
-					'imageFemale' => $assetTransformer,
+					'imageMale' => $assets ? call_user_func($assetTransformer, $assets->getImageMale()) : null,
+					'imageFemale' => $assets ? call_user_func($assetTransformer, $assets->getImageFemale()) : null,
 				],
-			]);
+			];
 		}
 	}
