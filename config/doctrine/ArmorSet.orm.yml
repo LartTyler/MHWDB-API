@@ -23,3 +23,10 @@ App\Entity\ArmorSet:
         pieces:
             targetEntity: App\Entity\Armor
             mappedBy: armorSet
+    manyToOne:
+        bonus:
+            targetEntity: App\Entity\ArmorSetBonus
+            joinColumn:
+                nullable: true
+                options:
+                    unsigned: true

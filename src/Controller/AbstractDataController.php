@@ -8,7 +8,6 @@
 	use App\Response\SearchError;
 	use App\Response\SlugNotSupportedError;
 	use App\Search\SearchManager;
-	use DaybreakStudios\DoctrineQueryDocument\QueryManager;
 	use DaybreakStudios\Doze\Errors\ApiErrorInterface;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -160,6 +159,11 @@
 			else if ($data === null)
 				return $this->responder->createNotFoundResponse();
 
+			if (is_array($data))
+				$data = $this->normalizeMany($data);
+			else if ($data instanceof EntityInterface)
+				$data = $this->normalizeOne($data);
+
 			return $this->responder->createResponse($data, null, [
 				'Cache-Control' => 'public, max-age=14400',
 			]);
@@ -184,4 +188,25 @@
 
 			return $item;
 		}
+
+		/**
+		 * @param EntityInterface[] $entities
+		 *
+		 * @return array
+		 */
+		protected function normalizeMany(array $entities): array {
+			$normalized = [];
+
+			foreach ($entities as $entity)
+				$normalized[] = $this->normalizeOne($entity);
+
+			return $normalized;
+		}
+
+		/**
+		 * @param EntityInterface|null $entity
+		 *
+		 * @return array|null
+		 */
+		protected abstract function normalizeOne(?EntityInterface $entity): ?array;
 	}

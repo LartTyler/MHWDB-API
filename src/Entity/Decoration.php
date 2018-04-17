@@ -88,7 +88,7 @@
 		}
 
 		/**
-		 * @return SkillRank|null
+		 * @return Skill|null
 		 */
 		public function getSkill(): ?Skill {
 			return $this->skill;
