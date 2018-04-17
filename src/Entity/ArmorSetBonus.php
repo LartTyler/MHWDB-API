@@ -5,6 +5,7 @@
 	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
+	use Doctrine\Common\Collections\Criteria;
 	use Doctrine\Common\Collections\Selectable;
 
 	class ArmorSetBonus implements EntityInterface {
@@ -43,5 +44,23 @@
 		 */
 		public function getRanks() {
 			return $this->ranks;
+		}
+
+		/**
+		 * @param int $pieces
+		 *
+		 * @return ArmorSetBonusRank|null
+		 */
+		public function getRank(int $pieces): ?ArmorSetBonusRank {
+			$criteria = Criteria::create()
+				->where(Criteria::expr()->eq('pieces', $pieces))
+				->setMaxResults(1);
+
+			$matching = $this->getRanks()->matching($criteria);
+
+			if (!$matching->count())
+				return null;
+
+			return $matching->first();
 		}
 	}
