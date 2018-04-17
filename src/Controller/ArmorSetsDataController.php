@@ -3,12 +3,12 @@
 
 	use App\Entity\Armor;
 	use App\Entity\ArmorSet;
-	use App\Utility\EntityUtil;
-	use DaybreakStudios\Doze\Errors\ApiErrorInterface;
+	use App\Entity\ArmorSetBonusRank;
+	use App\Entity\Asset;
+	use App\Entity\SkillRank;
 	use DaybreakStudios\DozeBundle\ResponderService;
+	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Symfony\Bridge\Doctrine\RegistryInterface;
-	use Symfony\Component\HttpFoundation\Request;
-	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\Routing\RouterInterface;
 
 	class ArmorSetsDataController extends AbstractDataController {
@@ -24,55 +24,73 @@
 		}
 
 		/**
-		 * @param Request $request
-		 *
-		 * @return Response
-		 */
-		public function listAction(Request $request): Response {
-			/** @var ArmorSet[]|Response $items */
-			$items = $this->doListAction($request);
-
-			if ($items instanceof Response)
-				return $items;
-
-			return $this->respond($this->normalizeManyArmorSets($items));
-		}
-
-		/**
-		 * @param string $idOrSlug
-		 *
-		 * @return Response
-		 */
-		public function readAction(string $idOrSlug): Response {
-			/** @var ArmorSet|null $armorSet */
-			$armorSet = $this->doReadAction($idOrSlug);
-
-			if ($armorSet instanceof ApiErrorInterface)
-				return $this->respond($armorSet);
-
-			return $this->respond($this->normalizeOneArmorSet($armorSet));
-		}
-
-		/**
-		 * @param array $items
-		 *
-		 * @return array
-		 */
-		protected function normalizeManyArmorSets(array $items): array {
-			return array_map((function(ArmorSet $armorSet): array {
-				return $this->normalizeOneArmorSet($armorSet);
-			})->bindTo($this), $items);
-		}
-
-		/**
-		 * @param ArmorSet|null $armorSet
+		 * @param EntityInterface|ArmorSet|null $armorSet
 		 *
 		 * @return array|null
 		 */
-		protected function normalizeOneArmorSet(?ArmorSet $armorSet): ?array {
+		protected function normalizeOne(?EntityInterface $armorSet): ?array {
 			if (!$armorSet)
 				return null;
 
-			return EntityUtil::normalize($armorSet);
+			$bonus = $armorSet->getBonus();
+
+			$transformer = function(?Asset $asset): ?string {
+				return $asset ? $asset->getUri() : null;
+			};
+
+			return [
+				'id' => $armorSet->getId(),
+				'name' => $armorSet->getName(),
+				'rank' => $armorSet->getRank(),
+				'pieces' => array_map(function(Armor $armor) use ($transformer): array {
+					$assets = $armor->getAssets();
+
+					return [
+						'id' => $armor->getId(),
+						'slug' => $armor->getSlug(),
+						'name' => $armor->getName(),
+						'type' => $armor->getType(),
+						'rank' => $armor->getRank(),
+						'rarity' => $armor->getRarity(),
+						'armorSet' => $armor->getArmorSet()->getId(),
+						'attributes' => $armor->getAttributes(),
+						'skills' => array_map(function(SkillRank $rank): array {
+							return [
+								'id' => $rank->getId(),
+								'slug' => $rank->getSlug(),
+								'level' => $rank->getLevel(),
+								'description' => $rank->getDescription(),
+								'modifiers' => $rank->getModifiers(),
+								'skill' => $rank->getSkill()->getId(),
+								'skillName' => $rank->getSkill()->getName(),
+							];
+						}, $armor->getSkills()->toArray()),
+						'assets' => [
+							'imageMale' => $assets ? call_user_func($transformer, $assets->getImageMale()) : null,
+							'imageFemale' => $assets ? call_user_func($transformer, $assets->getImageFemale()) : null,
+						],
+					];
+				}, $armorSet->getPieces()->toArray()),
+				'bonus' => $bonus ? [
+					'id' => $bonus->getId(),
+					'name' => $bonus->getName(),
+					'ranks' => array_map(function(ArmorSetBonusRank $rank): array {
+						$skillRank = $rank->getSkill();
+
+						return [
+							'pieces' => $rank->getPieces(),
+							'skill' => [
+								'id' => $skillRank->getId(),
+								'slug' => $skillRank->getSlug(),
+								'level' => $skillRank->getLevel(),
+								'description' => $skillRank->getDescription(),
+								'modifiers' => $skillRank->getModifiers(),
+								'skill' => $skillRank->getSkill()->getId(),
+								'skillName' => $skillRank->getSkill()->getName(),
+							],
+						];
+					}, $bonus->getRanks()->toArray()),
+				] : null,
+			];
 		}
 	}

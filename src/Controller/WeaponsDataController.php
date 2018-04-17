@@ -1,14 +1,12 @@
 <?php
 	namespace App\Controller;
 
+	use App\Entity\CraftingMaterialCost;
 	use App\Entity\Weapon;
-	use App\Utility\EntityUtil;
-	use DaybreakStudios\Doze\Errors\ApiErrorInterface;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
+	use Doctrine\Common\Collections\Collection;
 	use Symfony\Bridge\Doctrine\RegistryInterface;
-	use Symfony\Component\HttpFoundation\Request;
-	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\Routing\RouterInterface;
 
 	class WeaponsDataController extends AbstractDataController {
@@ -24,86 +22,56 @@
 		}
 
 		/**
-		 * @param Request $request
-		 *
-		 * @return Response
-		 */
-		public function listAction(Request $request): Response {
-			/** @var Weapon[]|Response $items */
-			$items = $this->doListAction($request);
-
-			if ($items instanceof Response)
-				return $items;
-
-			return $this->respond($this->normalizeManyWeapons($items));
-		}
-
-		/**
-		 * @param string $idOrSlug
-		 *
-		 * @return Response
-		 */
-		public function readAction(string $idOrSlug): Response {
-			/** @var Weapon|ApiErrorInterface|null $weapon */
-			$weapon = $this->doReadAction($idOrSlug);
-
-			if ($weapon instanceof ApiErrorInterface)
-				return $this->respond($weapon);
-
-			return $this->respond($this->normalizeOneWeapon($weapon));
-		}
-
-		/**
-		 * @param Weapon[] $weapons
-		 *
-		 * @return array
-		 */
-		protected function normalizeManyWeapons(array $weapons): array {
-			return array_map((function(Weapon $weapon): array {
-				return $this->normalizeOneWeapon($weapon);
-			})->bindTo($this), $weapons);
-		}
-
-		/**
-		 * @param Weapon|null $weapon
+		 * @param EntityInterface|Weapon|null $weapon
 		 *
 		 * @return array|null
 		 */
-		protected function normalizeOneWeapon(?Weapon $weapon): ?array {
+		protected function normalizeOne(?EntityInterface $weapon): ?array {
 			if (!$weapon)
 				return null;
 
-			$toIdTransformer = function(?EntityInterface $entity): ?int {
-				return $entity ? $entity->getId() : null;
+			/**
+			 * @param Collection|CraftingMaterialCost[] $costs
+			 *
+			 * @return array
+			 */
+			$materialTransformer = function(Collection $costs): array {
+				return array_map(function(CraftingMaterialCost $cost): array {
+					$item = $cost->getItem();
+
+					return [
+						'quantity' => $cost->getQuantity(),
+						'item' => [
+							'id' => $item->getId(),
+							'name' => $item->getName(),
+							'description' => $item->getDescription(),
+							'rarity' => $item->getRarity(),
+							'carryLimit' => $item->getCarryLimit(),
+							'sellPrice' => $item->getSellPrice(),
+							'buyPrice' => $item->getBuyPrice(),
+						],
+					];
+				}, $costs->toArray());
 			};
 
-			$materialCostKeys = [
-				'quantity',
-				'item' => [
-					'id',
-					'name',
-					'description',
-					'rarity',
-					'sellPrice',
-					'buyPrice',
-					'carryLimit',
-				],
-			];
+			$crafting = $weapon->getCrafting();
 
-			return EntityUtil::normalize($weapon, [
-				'id',
-				'slug',
-				'name',
-				'type',
-				'rarity',
-				'attributes',
-				'crafting' => [
-					'craftable',
-					'previous' => $toIdTransformer,
-					'branches' => $toIdTransformer,
-					'craftingMaterials' => $materialCostKeys,
-					'upgradeMaterials' => $materialCostKeys,
-				],
-			]);
+			return [
+				'id' => $weapon->getId(),
+				'slug' => $weapon->getSlug(),
+				'name' => $weapon->getName(),
+				'type' => $weapon->getType(),
+				'rarity' => $weapon->getRarity(),
+				'attributes' => $weapon->getAttributes(),
+				'crafting' => $crafting ? [
+					'craftable' => $crafting->isCraftable(),
+					'previous' => $crafting->getPrevious() ? $crafting->getPrevious()->getId() : null,
+					'branches' => array_map(function(Weapon $branch): int {
+						return $branch->getId();
+					}, $crafting->getBranches()->toArray()),
+					'craftingMaterials' => call_user_func($materialTransformer, $crafting->getCraftingMaterials()),
+					'upgradeMaterials' => call_user_func($materialTransformer, $crafting->getUpgradeMaterials()),
+				] : null,
+			];
 		}
 	}
