@@ -27,6 +27,11 @@
 		private $pieces;
 
 		/**
+		 * @var ArmorSetBonus
+		 */
+		private $bonus = null;
+
+		/**
 		 * ArmorSet constructor.
 		 *
 		 * @param string $name
@@ -59,5 +64,23 @@
 		 */
 		public function getPieces() {
 			return $this->pieces;
+		}
+
+		/**
+		 * @return ArmorSetBonus|null
+		 */
+		public function getBonus(): ?ArmorSetBonus {
+			return $this->bonus;
+		}
+
+		/**
+		 * @param ArmorSetBonus|null $bonus
+		 *
+		 * @return $this
+		 */
+		public function setBonus(?ArmorSetBonus $bonus) {
+			$this->bonus = $bonus;
+
+			return $this;
 		}
 	}
