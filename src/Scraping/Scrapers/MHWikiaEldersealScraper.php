@@ -148,11 +148,15 @@
 			else
 				$weaponName = $cells->eq(0)->text();
 
-			$weaponName = str_replace([
-				'→'
+			$weaponName = trim(str_replace([
+				'→',
 			], [
 				'',
-			], $weaponName);
+			], $weaponName));
+
+			// Fix for weird multibyte characters hiding out in some rows
+			if (preg_match('/^\w/', $weaponName) === 0)
+				$weaponName = substr($weaponName, 2);
 
 			$weaponName = StringUtil::replaceNumeralRank(StringUtil::clean($weaponName));
 
@@ -192,7 +196,8 @@
 			if (!$weapon) {
 				$newLines = str_repeat(PHP_EOL, 4);
 
-				echo $newLines . '>> Could not find ' . $weaponType . ' named ' . $weaponName . $newLines . PHP_EOL;
+				echo $newLines . '>> [Elderseal] Could not find ' . $weaponType . ' named ' . $weaponName .
+					$newLines . PHP_EOL;
 
 				return;
 			}
