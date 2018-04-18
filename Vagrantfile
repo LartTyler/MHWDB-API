@@ -17,12 +17,10 @@ Vagrant.configure(2) do |config|
     yum install -y centos-release-scl.noarch vim wget telnet
 
     yum install -y rh-mariadb102-mariadb rh-mariadb102-mariadb-server
-    sh -c 'echo "source scl_source enable rh-mariadb102" > /etc/profile.d/scl.sh'
+    echo "source scl_source enable rh-mariadb102" > /etc/profile.d/scl.sh'
 
     systemctl start rh-mariadb102-mariadb
     systemctl enable rh-mariadb102-mariadb
-
-    scl enable rh-mariadb102 'mysql -u root -e "CREATE SCHEMA IF NOT EXISTS application;"'
 
     echo "[client]" > /etc/.my.cnf
     echo "user=root" >> /etc/.my.cnf
@@ -33,7 +31,7 @@ Vagrant.configure(2) do |config|
 
     source "${HOME}/.bashrc"
 
-    wget https://gist.githubusercontent.com/LartTyler/56966b744b9f60ab050e64091d6296dd/raw/e9192ed8149eeb8698b5c1fc862bb9872fc6faf3/install-composer.sh -O "${HOME}/install-composer.sh"
+    wget -q https://gist.githubusercontent.com/LartTyler/56966b744b9f60ab050e64091d6296dd/raw/e9192ed8149eeb8698b5c1fc862bb9872fc6faf3/install-composer.sh -O "${HOME}/install-composer.sh"
 
     chmod +x "${HOME}/install-composer.sh"
 
@@ -43,9 +41,11 @@ Vagrant.configure(2) do |config|
   SHELL
 
   config.vm.provision "shell", name: 'user-init', privileged: false, inline: <<-SHELL
+    mysql -e "CREATE SCHEMA IF NOT EXISTS application;"
+
     cp /vagrant/.env.dist /vagrant/.env
 
-    composer install -d /vagrant
+    composer install -qd /vagrant
     /vagrant/db-reset.sh latest
 
     echo
