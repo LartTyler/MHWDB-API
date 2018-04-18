@@ -28,7 +28,7 @@ Vagrant.configure(2) do |config|
     echo "user=root" >> /etc/.my.cnf
     echo "database=application" >> /etc/.my.cnf
 
-    yum install -y memcached rh-php71 rh-php71-php rh-php71-php-mysqlnd rh-php71-php-xml rh-php71-php-process
+    yum install -y memcached rh-php71 rh-php71-php rh-php71-php-mysqlnd rh-php71-php-xml rh-php71-php-process sclo-php71-php-pecl-memcached
     echo "source scl_source enable rh-php71" >> /etc/profile.d/scl.sh
 
     source "${HOME}/.bashrc"
