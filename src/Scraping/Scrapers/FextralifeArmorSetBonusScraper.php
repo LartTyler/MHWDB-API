@@ -79,7 +79,7 @@
 				if ($result->getStatusCode() !== Response::HTTP_OK) {
 					$newLines = str_repeat(PHP_EOL, 4);
 
-					echo $newLines . '>> Could not find page for ' . $set->getName() . $newLines . PHP_EOL;
+					echo $newLines . '>> [Set Bonus] Could not find page for ' . $set->getName() . $newLines . PHP_EOL;
 				}
 
 				$nodes = (new Crawler($result->getBody()->getContents()))->filter('#wiki-content-block ul li');
