@@ -17,7 +17,7 @@ Vagrant.configure(2) do |config|
     yum install -y centos-release-scl.noarch vim wget telnet
 
     yum install -y rh-mariadb102-mariadb rh-mariadb102-mariadb-server
-    echo "source scl_source enable rh-mariadb102" > /etc/profile.d/scl.sh'
+    echo "source scl_source enable rh-mariadb102" > /etc/profile.d/scl.sh
 
     systemctl start rh-mariadb102-mariadb
     systemctl enable rh-mariadb102-mariadb
