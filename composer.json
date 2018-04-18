@@ -5,6 +5,7 @@
 	"require": {
 		"php": "^7.1.3",
 		"ext-iconv": "*",
+		"ext-memcached": "*",
 		"dbstudios/doctrine-entities": "^1.0",
 		"dbstudios/doze-bundle": "^1.4",
 		"php-http/client-common": "^1.0",
