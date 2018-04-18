@@ -10,7 +10,7 @@ function usage() {
     exit
 }
 
-
+cwd=`dirname "${0}"`
 
 if [[ $# < 1  || "${1}" == '--help' || "${1}" == '-h' ]]; then
     usage
@@ -19,8 +19,8 @@ fi
 snapshot="${1}"
 
 if [[ "${snapshot}" == "latest" ]]; then
-    snapshot=`ls -t snapshots | cut -f1 | head -n1`
-    snapshot="snapshots/${snapshot}"
+    snapshot=`ls -t "${cwd}/snapshots" | cut -f1 | head -n1`
+    snapshot="${cwd}/snapshots/${snapshot}"
 fi
 
 db="application"
