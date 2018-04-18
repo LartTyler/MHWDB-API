@@ -2,6 +2,9 @@
 
 echo "[client]" > "${HOME}/.my.cnf"
 echo "user=root" >> "${HOME}/.my.cnf"
+
+mysql -e "CREATE SCHEMA IF NOT EXISTS application;"
+
 echo "[mysql]" >> "${HOME}/.my.cnf"
 echo "database=application" >> "${HOME}/.my.cnf"
 
@@ -12,8 +15,6 @@ mkdir -p "${HOME}/bin"
 
 "${HOME}/install-composer.sh" --install-dir="${HOME}/bin" --filename=composer
 rm "${HOME}/install-composer.sh"
-
-mysql -e "CREATE SCHEMA IF NOT EXISTS application;"
 
 cp /vagrant/.env.dist /vagrant/.env
 
