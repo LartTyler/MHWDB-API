@@ -43,10 +43,14 @@ Vagrant.configure(2) do |config|
   SHELL
 
   config.vm.provision "shell", name: 'user-init', privileged: false, inline: <<-SHELL
+    cp /vagrant/.env.dist /vagrant/.env
+
     composer install -d /vagrant
     /vagrant/db-reset.sh latest
 
     echo
     echo "Your box has been provisioned. In order to start the webserver, please run 'php /vagrant/bin/console server:start 0.0.0.0'."
+    echo
+    echo "Please keep in mind that this configuration is NOT suitable for production, and is not secure."
   SHELL
 end
