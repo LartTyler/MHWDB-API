@@ -30,5 +30,5 @@ Vagrant.configure(2) do |config|
     echo "source scl_source enable rh-php71" >> /etc/profile.d/scl.sh
   SHELL
 
-  config.vm.provision "shell", name: 'user-init', privileged: false, file: './provision.sh'
+  config.vm.provision "shell", name: 'user-init', privileged: false, path: './provision.sh'
 end
