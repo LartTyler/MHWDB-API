@@ -22,13 +22,9 @@ Vagrant.configure(2) do |config|
     systemctl start rh-mariadb102-mariadb
     systemctl enable rh-mariadb102-mariadb
 
-    echo "[client]" > /etc/.my.cnf
-    echo "user=root" >> /etc/.my.cnf
-    echo "database=application" >> /etc/.my.cnf
-
     yum install -y memcached rh-php71 rh-php71-php rh-php71-php-mysqlnd rh-php71-php-xml rh-php71-php-process sclo-php71-php-pecl-memcached
     echo "source scl_source enable rh-php71" >> /etc/profile.d/scl.sh
   SHELL
 
-  config.vm.provision "shell", name: 'user-init', privileged: false, path: './provision.sh'
+  config.vm.provision "shell", name: 'user-init', privileged: false, path: './vagrant/provision.sh'
 end

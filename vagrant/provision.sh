@@ -1,9 +1,16 @@
 #!/usr/bin/env bash
 
+echo "[client]" > "${HOME}/.my.cnf"
+echo "user=root" >> "${HOME}/.my.cnf"
+echo "[mysql]" >> "${HOME}/.my.cnf"
+echo "database=application" >> "${HOME}/.my.cnf"
+
 wget -qO "${HOME}/install-composer.sh" https://gist.githubusercontent.com/LartTyler/56966b744b9f60ab050e64091d6296dd/raw/e9192ed8149eeb8698b5c1fc862bb9872fc6faf3/install-composer.sh
 chmod +x "${HOME}/install-composer.sh"
 
-"${HOME}/install-composer.sh" --install-dir=/usr/local/bin --filename=composer
+mkdir -p "${HOME}/bin"
+
+"${HOME}/install-composer.sh" --install-dir="${HOME}/bin" --filename=composer
 rm "${HOME}/install-composer.sh"
 
 mysql -e "CREATE SCHEMA IF NOT EXISTS application;"
