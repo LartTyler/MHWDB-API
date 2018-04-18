@@ -23,7 +23,7 @@ The project requires the following software in order to run:
 - Memcached
 - MySQL 5.7 or higher OR MariaDB 10.2 or higher
 
-After ensuring that the above packages are available, copy the `.env.dist` file to `.env` and modify it to your
+After ensuring that the above packages are available, copy the `.env.dist` file to `.env` and modify it to match your
 machine's configuration. Once you've done that, run the following commands to install the project requirements and start
 the web server.
 
@@ -33,4 +33,4 @@ $ composer install
 $ php bin/console server:start
 ```
 
-The `<dbname>` placeholder should be replaced with the name of the database you'll be using for the project.
+Replace `<dbname>`  with the name of the database you'll be using for the project.
