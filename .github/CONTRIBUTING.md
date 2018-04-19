@@ -3,6 +3,9 @@
 - [Reporting Bugs](#reporting-bugs)
 - [Pull Requests](#pull-requests)
     - [Backwards Compatibility](#backwards-compatibility)
+- [Styleguides](#styleguides)
+    - [Git Commit Messages](#git-commit-messages)
+    - [PHP Styleguide](#php-styleguide)
 
 # Reporting Bugs
 Bug reports should be opened as [GitHub issues](https://github.com/LartTyler/MHWDB-Docs/issues) on the docs repository.
@@ -15,8 +18,10 @@ attempting to query the API.
 First off, thanks for your interest in helping to improve the API! At the moment, I'm maintaining this project on my
 own, in my spare time, so any help at all is appreciated. So again, thank you!
 
-In order to submit a code change to the API, please fork the project first. Changes for a single pull request should be
-limited to a single feature or change, and should be done on a "topic branch". Accepted topic prefixes are listed below.
+In order to submit a code change to the API, please
+[fork the project first](https://help.github.com/articles/creating-a-pull-request-from-a-fork/). Changes for a single
+pull request must be limited to a single feature or change, and should be done on a "topic branch". Accepted topic
+prefixes are listed below.
 
 |Topic Prefix|Description|Example|
 |:---|:---|:---|
@@ -26,6 +31,8 @@ limited to a single feature or change, and should be done on a "topic branch". A
 
 \* Before making any changes to the API data structures, please read the section on
 [backwards compatibility](#backwards-compatibility).
+
+When submitting a pull request, please include a detailed changelog describing what changes were made.
 
 ## Backwards Compatibility
 Maintaining backwards compatibility is very important. Any update that changes how response data is structured MUST do
@@ -44,3 +51,24 @@ point they will be removed. The changelog for whatever release this change is pa
 **Deprecations:**
 - The existing `attributes.resist*` fields have been deprecated, and will be removed from the API on May 10, 2018.
 -----
+
+# Styleguides
+### Git Commit Messages
+- Use past tense ("Added feature" not "Add feature")
+- Use imperative mood ("Move fields to" not "Moves fields to")
+- Limit the first line to 72 characters or less
+- Reference relevant issues or pull requests after the first line (if applicable)
+- DO NOT use emoji anywhere in your commit messages
+
+### PHP Styleguide
+- Use spaces around binary operators (such as `+`, `-`, or `&&`)
+- Do not use spaces around unary operators (such as `!`)
+- Do not use spaces inside parenthesis (such as `if (condition)`)
+- Do not use spaces inside short array brackets (such as `[1, 2, 3]`)
+- `If` statements with only one line should not be wrapped in braces.
+- Curly braces must always be placed on the same line as the statement they match (such as `class MyClass { ...` or
+`if (condition) { ...`
+- Limit lines to 120 characters
+- Arrays should be written using short array syntax (such as `[1, 2, 3]`)
+- Equality must be checked using `===` not `==`
+- Classes and class members should include phpDoc comments
