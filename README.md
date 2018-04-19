@@ -1,4 +1,6 @@
 # Getting Started
+See [CONTRIBUTING.md](.github/CONTRIBUTING.md) for information on contributing to the project.
+
 ```sh
 $ git clone https://github.com/LartTyler/MHWDB-API.git
 ```
