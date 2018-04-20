@@ -61,6 +61,7 @@ point they will be removed. The changelog for whatever release this change is pa
 - DO NOT use emoji anywhere in your commit messages
 
 ### PHP Styleguide
+- Only use tabs to indent, not spaces
 - Use spaces around binary operators (such as `+`, `-`, or `&&`)
 - Do not use spaces around unary operators (such as `!`)
 - Do not use spaces inside parenthesis (such as `if (condition)`)
