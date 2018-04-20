@@ -4,6 +4,9 @@
 	use App\Game\Attribute;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
+	use Doctrine\Common\Collections\ArrayCollection;
+	use Doctrine\Common\Collections\Collection;
+	use Doctrine\Common\Collections\Selectable;
 
 	class Weapon implements EntityInterface, SluggableInterface {
 		use EntityTrait;
@@ -26,6 +29,11 @@
 		private $rarity;
 
 		/**
+		 * @var Collection|Selectable|Slot[]
+		 */
+		private $slots;
+
+		/**
 		 * @var WeaponCraftingInfo|null
 		 */
 		private $crafting = null;
@@ -46,6 +54,7 @@
 			$this->name = $name;
 			$this->type = $type;
 			$this->rarity = $rarity;
+			$this->slots = new ArrayCollection();
 
 			$this->setSlug($name);
 		}
@@ -93,6 +102,13 @@
 			$this->rarity = $rarity;
 
 			return $this;
+		}
+
+		/**
+		 * @return Slot[]|Collection|Selectable
+		 */
+		public function getSlots() {
+			return $this->slots;
 		}
 
 		/**

@@ -55,3 +55,21 @@ App\Entity\Weapon:
                 nullable: true
                 options:
                     unsigned: true
+    manyToMany:
+        slots:
+            targetEntity: App\Entity\Slot
+            orphanRemoval: true
+            cascade:
+                - all
+            joinTable:
+                name: weapon_slots
+                joinColumns:
+                    weapon_id:
+                        nullable: false
+                        options:
+                            unsigned: true
+                inverseJoinColumns:
+                    slot_id:
+                        nullable: false
+                        options:
+                            unsigned: true

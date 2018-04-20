@@ -2,6 +2,7 @@
 	namespace App\Controller;
 
 	use App\Entity\CraftingMaterialCost;
+	use App\Entity\Slot;
 	use App\Entity\Weapon;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -62,6 +63,11 @@
 				'name' => $weapon->getName(),
 				'type' => $weapon->getType(),
 				'rarity' => $weapon->getRarity(),
+				'slots' => array_map(function(Slot $slot): array {
+					return [
+						'rank' => $slot->getRank(),
+					];
+				}, $weapon->getSlots()->toArray()),
 				'attributes' => $weapon->getAttributes(),
 				'crafting' => $crafting ? [
 					'craftable' => $crafting->isCraftable(),

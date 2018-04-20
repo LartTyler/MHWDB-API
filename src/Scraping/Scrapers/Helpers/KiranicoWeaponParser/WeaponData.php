@@ -18,6 +18,11 @@
 		protected $rarity = null;
 
 		/**
+		 * @var int[]
+		 */
+		protected $slots = [];
+
+		/**
 		 * @var string|null
 		 */
 		protected $craftingPrevious = null;
@@ -69,6 +74,35 @@
 		 */
 		public function setRarity(int $rarity) {
 			$this->rarity = $rarity;
+
+			return $this;
+		}
+
+		/**
+		 * @return int[]
+		 */
+		public function getSlots(): array {
+			return $this->slots;
+		}
+
+		/**
+		 * @param int[] $slots
+		 *
+		 * @return $this
+		 */
+		public function setSlots(array $slots) {
+			$this->slots = $slots;
+
+			return $this;
+		}
+
+		/**
+		 * @param int $rank
+		 *
+		 * @return $this
+		 */
+		public function addSlot(int $rank) {
+			$this->slots[] = $rank;
 
 			return $this;
 		}
