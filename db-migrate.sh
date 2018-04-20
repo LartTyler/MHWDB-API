@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
 
-php bin/console doctrine:migrations:migrate "$@"
+cwd=`dirname "${0}"`
+
+php "${cwd}/bin/console" doctrine:migrations:migrate "$@"
