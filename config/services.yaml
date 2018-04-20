@@ -48,6 +48,12 @@ services:
                 name: console.command
                 command: app:migrate:slot-attributes
 
+    App\Command\MigrateResistAttributesCommand:
+        tags:
+            -
+                name: console.command
+                command: app:migrate:resist-attributes
+
     App\QueryDocument\ApiQueryManager:
         public: true
         arguments:
