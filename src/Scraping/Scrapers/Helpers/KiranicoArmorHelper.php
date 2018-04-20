@@ -87,9 +87,13 @@
 			$cleanedName = str_replace([
 				'Apha',
 				'Barchia',
+				'Dodogame',
+				'Mossswine',
 			], [
 				'Alpha',
 				'Brachia',
+				'Dodogama',
+				'Mosswine',
 			], preg_replace('/\s+/', ' ', $rawName));
 
 			$parts = array_filter(array_map(function(string $part): string {

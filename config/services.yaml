@@ -42,6 +42,12 @@ services:
                 name: console.command
                 command: app:kiranico:fix-weapon-names
 
+    App\Command\KiranicoFixArmorNamesCommand:
+        tags:
+            -
+                name: console.command
+                command: app:kiranico:fix-armor-names
+
     App\Command\MigrateSlotAttributesCommand:
         tags:
             -
