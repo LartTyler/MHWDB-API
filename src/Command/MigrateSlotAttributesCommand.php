@@ -13,7 +13,7 @@
 	use Symfony\Component\Console\Output\OutputInterface;
 	use Symfony\Component\Console\Style\SymfonyStyle;
 
-	class MigrateSlotDataCommand extends Command {
+	class MigrateSlotAttributesCommand extends Command {
 		private const SLOT_KEYS = [
 			Attribute::SLOT_RANK_1,
 			Attribute::SLOT_RANK_2,

@@ -42,7 +42,7 @@ services:
                 name: console.command
                 command: app:kiranico:fix-weapon-names
 
-    App\Command\MigrateSlotDataCommand:
+    App\Command\MigrateSlotAttributesCommand:
         tags:
             -
                 name: console.command
