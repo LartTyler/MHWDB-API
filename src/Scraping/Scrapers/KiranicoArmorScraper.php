@@ -267,8 +267,17 @@
 
 			$armor->setArmorSet($armorSet);
 
-			$armor
-				->setAttribute(Attribute::DEFENSE, (int)strtok(trim($infoNodes->eq(0)->filter('.lead')->text()), ' '));
+			$defense = (int)strtok(trim($infoNodes->eq(0)->filter('.lead')->text()), ' ');
+
+			$armor->getDefense()
+				->setBase($defense)
+				// Both max and augmented are set by another scraper. Naively assume that all armor breakpoints are
+				// equal so that we at least have something in those fields in case something goes wrong
+				->setMax($defense)
+				->setAugmented($defense);
+
+			// DEPRECATED This preserves BC for < 1.8.0 and will be removed in the future
+			$armor->setAttribute(Attribute::DEFENSE, $defense);
 
 			$armor->getSlots()->clear();
 

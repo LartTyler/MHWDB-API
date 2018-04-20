@@ -46,6 +46,7 @@
 				'type' => $armor->getType(),
 				'rank' => $armor->getRank(),
 				'rarity' => $armor->getRarity(),
+				'defense' => $armor->getDefense(),
 				'resistances' => $armor->getResistances(),
 				'slots' => array_map(function(Slot $slot): array {
 					return [
