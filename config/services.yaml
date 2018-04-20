@@ -42,6 +42,12 @@ services:
                 name: console.command
                 command: app:kiranico:fix-weapon-names
 
+    App\Command\MigrateSlotDataCommand:
+        tags:
+            -
+                name: console.command
+                command: app:migrate:slot-attributes
+
     App\QueryDocument\ApiQueryManager:
         public: true
         arguments:

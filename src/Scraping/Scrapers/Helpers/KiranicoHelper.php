@@ -6,9 +6,11 @@
 
 	final class KiranicoHelper {
 		/**
+		 * Returns an array of available slot ranks.
+		 *
 		 * @param Crawler $slotNodes
 		 *
-		 * @return array
+		 * @return int[]
 		 */
 		public static function getSlots(Crawler $slotNodes): array {
 			$slots = [];
@@ -17,12 +19,7 @@
 				if (!preg_match('/zmdi-n-(\d+)-square/', $slotNodes->eq($i)->attr('class'), $matches))
 					continue;
 
-				$key = 'slotsRank' . $matches[1];
-
-				if (!isset($slots[$key]))
-					$slots[$key] = 0;
-
-				++$slots[$key];
+				$slots[] = (int)$matches[1];
 			}
 
 			return $slots;

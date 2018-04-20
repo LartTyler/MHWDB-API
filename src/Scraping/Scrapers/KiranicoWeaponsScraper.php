@@ -2,8 +2,10 @@
 	namespace App\Scraping\Scrapers;
 
 	use App\Entity\CraftingMaterialCost;
+	use App\Entity\Slot;
 	use App\Entity\Weapon;
 	use App\Entity\WeaponCraftingInfo;
+	use App\Game\Attribute;
 	use App\Game\WeaponType;
 	use App\Scraping\AbstractScraper;
 	use App\Scraping\Configurations\KiranicoConfiguration;
@@ -35,6 +37,12 @@
 			WeaponType::LIGHT_BOWGUN => '/light-bowgun',
 			WeaponType::HEAVY_BOWGUN => '/heavy-bowgun',
 			WeaponType::BOW => '/bow',
+		];
+
+		private const SLOT_KEYS = [
+			Attribute::SLOT_RANK_1,
+			Attribute::SLOT_RANK_2,
+			Attribute::SLOT_RANK_3,
 		];
 
 		/**
@@ -124,7 +132,22 @@
 			} else
 				$weapon->setRarity($data->getRarity());
 
+			// DEPRECATED This preserves BC for < 1.8.0 and will be removed in the future
 			$weapon->setAttributes($data->getAttributes());
+
+			$weapon->getSlots()->clear();
+
+			foreach (self::SLOT_KEYS as $slotKey) {
+				$count = $weapon->getAttribute($slotKey);
+
+				if (!$count)
+					continue;
+
+				$rank = (int)substr($slotKey, -1);
+
+				for ($i = 0; $i < $count; $i++)
+					$weapon->getSlots()->add(new Slot($rank));
+			}
 
 			$info = $weapon->getCrafting();
 

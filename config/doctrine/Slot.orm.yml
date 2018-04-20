@@ -1,0 +1,17 @@
+App\Entity\Slot:
+    type: entity
+    table: slots
+    id:
+        id:
+            type: integer
+            nullable: false
+            options:
+                unsigned: true
+            generator:
+                strategy: IDENTITY
+    fields:
+        rank:
+            type: smallint
+            nullable: false
+            options:
+                unsigned: true

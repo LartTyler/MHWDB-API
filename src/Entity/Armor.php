@@ -43,9 +43,14 @@
 		private $skills;
 
 		/**
+		 * @var Collection|Selectable|Slot[]
+		 */
+		private $slots;
+
+		/**
 		 * @var ArmorSet|null
 		 */
-		private $armorSet;
+		private $armorSet = null;
 
 		/**
 		 * @var ArmorAssets|null
@@ -67,6 +72,7 @@
 			$this->rarity = $rarity;
 			$this->resistances = new Resistances();
 			$this->skills = new ArrayCollection();
+			$this->slots = new ArrayCollection();
 
 			$this->setSlug($name);
 		}
@@ -90,6 +96,13 @@
 		 */
 		public function getSkills() {
 			return $this->skills;
+		}
+
+		/**
+		 * @return Slot[]|Collection|Selectable
+		 */
+		public function getSlots() {
+			return $this->slots;
 		}
 
 		/**

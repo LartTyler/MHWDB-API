@@ -71,3 +71,20 @@ App\Entity\Armor:
                         nullable: false
                         options:
                             unsigned: true
+        slots:
+            targetEntity: App\Entity\Slot
+            orphanRemoval: true
+            cascade:
+                - all
+            joinTable:
+                name: armor_slots
+                joinColumns:
+                    armor_id:
+                        nullable: false
+                        options:
+                            unsigned: true
+                inverseJoinColumns:
+                    slot_id:
+                        nullable: false
+                        options:
+                            unsigned: true
