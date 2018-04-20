@@ -5,6 +5,7 @@
 	use App\Entity\Asset;
 	use App\Entity\SkillRank;
 	use App\Entity\Slot;
+	use App\Game\Element;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Symfony\Bridge\Doctrine\RegistryInterface;
@@ -45,6 +46,7 @@
 				'type' => $armor->getType(),
 				'rank' => $armor->getRank(),
 				'rarity' => $armor->getRarity(),
+				'resistances' => $armor->getResistances(),
 				'slots' => array_map(function(Slot $slot): array {
 					return [
 						'rank' => $slot->getRank(),

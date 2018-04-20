@@ -33,6 +33,11 @@
 		private $rarity;
 
 		/**
+		 * @var Resistances
+		 */
+		private $resistances;
+
+		/**
 		 * @var Collection|Selectable|SkillRank[]
 		 */
 		private $skills;
@@ -65,6 +70,7 @@
 			$this->type = $type;
 			$this->rank = $rank;
 			$this->rarity = $rarity;
+			$this->resistances = new Resistances();
 			$this->skills = new ArrayCollection();
 			$this->slots = new ArrayCollection();
 
@@ -156,6 +162,13 @@
 		public function setRarity(int $rarity) {
 			$this->rarity = $rarity;
 			return $this;
+		}
+
+		/**
+		 * @return Resistances
+		 */
+		public function getResistances(): Resistances {
+			return $this->resistances;
 		}
 
 		/**

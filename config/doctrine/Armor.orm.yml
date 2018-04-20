@@ -38,6 +38,10 @@ App\Entity\Armor:
         attributes:
             type: json
             nullable: false
+    embedded:
+        resistances:
+            class: App\Entity\Resistances
+            columnPrefix: resist_
     oneToOne:
         assets:
             targetEntity: App\Entity\ArmorAssets
