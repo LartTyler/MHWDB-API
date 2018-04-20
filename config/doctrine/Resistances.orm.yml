@@ -1,0 +1,18 @@
+App\Entity\Resistances:
+    type: embeddable
+    fields:
+        fire:
+            type: integer
+            nullable: false
+        water:
+            type: integer
+            nullable: false
+        ice:
+            type: integer
+            nullable: false
+        thunder:
+            type: integer
+            nullable: false
+        dragon:
+            type: integer
+            nullable: false

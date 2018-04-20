@@ -4,6 +4,7 @@
 	use App\Entity\Armor;
 	use App\Entity\Asset;
 	use App\Entity\SkillRank;
+	use App\Game\Element;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Symfony\Bridge\Doctrine\RegistryInterface;
@@ -44,6 +45,7 @@
 				'type' => $armor->getType(),
 				'rank' => $armor->getRank(),
 				'rarity' => $armor->getRarity(),
+				'resistances' => $armor->getResistances(),
 				'attributes' => $armor->getAttributes(),
 				'skills' => array_map(function(SkillRank $rank): array {
 					return [
