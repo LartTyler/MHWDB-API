@@ -38,6 +38,11 @@
 		private $resistances;
 
 		/**
+		 * @var ArmorDefenseValues
+		 */
+		private $defense;
+
+		/**
 		 * @var Collection|Selectable|SkillRank[]
 		 */
 		private $skills;
@@ -71,6 +76,7 @@
 			$this->rank = $rank;
 			$this->rarity = $rarity;
 			$this->resistances = new Resistances();
+			$this->defense = new ArmorDefenseValues();
 			$this->skills = new ArrayCollection();
 			$this->slots = new ArrayCollection();
 
@@ -82,6 +88,17 @@
 		 */
 		public function getName(): string {
 			return $this->name;
+		}
+
+		/**
+		 * @param string $name
+		 *
+		 * @return $this
+		 */
+		public function setName(string $name) {
+			$this->name = $name;
+
+			return $this;
 		}
 
 		/**
@@ -169,6 +186,13 @@
 		 */
 		public function getResistances(): Resistances {
 			return $this->resistances;
+		}
+
+		/**
+		 * @return ArmorDefenseValues
+		 */
+		public function getDefense(): ArmorDefenseValues {
+			return $this->defense;
 		}
 
 		/**

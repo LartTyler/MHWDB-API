@@ -42,6 +42,9 @@ App\Entity\Armor:
         resistances:
             class: App\Entity\Resistances
             columnPrefix: resist_
+        defense:
+            class: App\Entity\ArmorDefenseValues
+            columnPrefix: defense_
     oneToOne:
         assets:
             targetEntity: App\Entity\ArmorAssets
