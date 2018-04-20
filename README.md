@@ -9,9 +9,25 @@ $ git clone https://github.com/LartTyler/MHWDB-API.git
 You can use the included Vagrant configuration to run your own development environment. If you're not familiar with
 Vagrant, check out their [getting started](https://www.vagrantup.com/intro/index.html) guide.
 
-Simply navigate to the project root and run `vagrant up`. Once the virtual machine has been created and has booted,
-you can use `vagrant ssh` to SSH into the box and run `/vagrant/server-start.sh` to start the web server (which will
-listen on `0.0.0.0:8000` by default).
+In the project root, run:
+
+```sh
+$ vagrant up
+```
+
+Once the box is done provisioning, use `vagrant ssh` to access the box and run:
+
+```sh
+$ cd /vagrant
+$ composer install
+$ ./db-reset.sh latest
+$ ./server-start.sh
+```
+
+The commands, in order, will perform the following tasks:
+- 1 and 2: Navigate to the project root and install dependencies
+- 3: Sync the boxes database with the most recent SQL file in the `snapshots/` directory
+- 4: Start the webserver, which will make the API available on `127.0.0.1:8000`
 
 ## Manual Setup
 Support is not provided for any development environments that are set up manually. If you open an issue, I'll try to
