@@ -270,18 +270,18 @@
 			$armor
 				->setAttribute(Attribute::DEFENSE, (int)strtok(trim($infoNodes->eq(0)->filter('.lead')->text()), ' '));
 
-			$slots = KiranicoHelper::getSlots($infoNodes->eq(1)->filter('.zmdi'));
-
-			// DEPRECATED Slot data is now a first-class field on Armor
-			$armor->setAttributes($slots);
-
 			$armor->getSlots()->clear();
 
-			foreach ($slots as $key => $count) {
-				$rank = (int)substr($key, -1);
+			foreach (KiranicoHelper::getSlots($infoNodes->eq(1)->filter('.zmdi')) as $rank) {
+				$armor->getSlots()->add(new Slot($rank));
 
-				for ($i = 0; $i < $count; $i++)
-					$armor->getSlots()->add(new Slot($rank));
+				// DEPRECATED The code below preserves BC for < 1.8.0 and will be removed in the future
+				$slotKey = 'slotsRank' . $rank;
+
+				if ($count = $armor->getAttribute($slotKey))
+					$armor->setAttribute($slotKey, $count + 1);
+				else
+					$armor->setAttribute($slotKey, 1);
 			}
 
 			$genderNodes = $infoNodes->eq(3)->filter('.zmdi:not(.text-dark)');
