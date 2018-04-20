@@ -54,7 +54,7 @@ point they will be removed. The changelog for whatever release this change is pa
 
 # Styleguides
 ### Git Commit Messages
-- Use past tense ("Added feature" not "Add feature")
+- Use present tense ("Add feature" not "Added feature")
 - Use imperative mood ("Move fields to" not "Moves fields to")
 - Limit the first line to 72 characters or less
 - Reference relevant issues or pull requests after the first line (if applicable)
