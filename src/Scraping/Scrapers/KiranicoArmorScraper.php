@@ -5,6 +5,7 @@
 	use App\Entity\ArmorAssets;
 	use App\Entity\ArmorSet;
 	use App\Entity\Asset;
+	use App\Entity\Slot;
 	use App\Game\ArmorRank;
 	use App\Game\Attribute;
 	use App\Game\Gender;
@@ -267,8 +268,21 @@
 			$armor->setArmorSet($armorSet);
 
 			$armor
-				->setAttribute(Attribute::DEFENSE, (int)strtok(trim($infoNodes->eq(0)->filter('.lead')->text()), ' '))
-				->addAttributes(KiranicoHelper::getSlots($infoNodes->eq(1)->filter('.zmdi')));
+				->setAttribute(Attribute::DEFENSE, (int)strtok(trim($infoNodes->eq(0)->filter('.lead')->text()), ' '));
+
+			$slots = KiranicoHelper::getSlots($infoNodes->eq(1)->filter('.zmdi'));
+
+			// DEPRECATED Slot data is now a first-class field on Armor
+			$armor->setAttributes($slots);
+
+			$armor->getSlots()->clear();
+
+			foreach ($slots as $key => $count) {
+				$rank = (int)substr($key, -1);
+
+				for ($i = 0; $i < $count; $i++)
+					$armor->getSlots()->add(new Slot($rank));
+			}
 
 			$genderNodes = $infoNodes->eq(3)->filter('.zmdi:not(.text-dark)');
 
