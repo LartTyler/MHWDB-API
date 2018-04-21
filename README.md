@@ -52,3 +52,6 @@ $ php bin/console server:start
 ```
 
 Replace `<dbname>`  with the name of the database you'll be using for the project.
+
+# Feature Tracking
+I'm currently using a Trello board to track features and changes, which can be found [here](https://trello.com/b/KRXsLUCs/mhw-api).
