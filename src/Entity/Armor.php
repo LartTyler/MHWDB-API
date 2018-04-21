@@ -33,14 +33,29 @@
 		private $rarity;
 
 		/**
+		 * @var Resistances
+		 */
+		private $resistances;
+
+		/**
+		 * @var ArmorDefenseValues
+		 */
+		private $defense;
+
+		/**
 		 * @var Collection|Selectable|SkillRank[]
 		 */
 		private $skills;
 
 		/**
+		 * @var Collection|Selectable|Slot[]
+		 */
+		private $slots;
+
+		/**
 		 * @var ArmorSet|null
 		 */
-		private $armorSet;
+		private $armorSet = null;
 
 		/**
 		 * @var ArmorAssets|null
@@ -60,7 +75,10 @@
 			$this->type = $type;
 			$this->rank = $rank;
 			$this->rarity = $rarity;
+			$this->resistances = new Resistances();
+			$this->defense = new ArmorDefenseValues();
 			$this->skills = new ArrayCollection();
+			$this->slots = new ArrayCollection();
 
 			$this->setSlug($name);
 		}
@@ -70,6 +88,17 @@
 		 */
 		public function getName(): string {
 			return $this->name;
+		}
+
+		/**
+		 * @param string $name
+		 *
+		 * @return $this
+		 */
+		public function setName(string $name) {
+			$this->name = $name;
+
+			return $this;
 		}
 
 		/**
@@ -84,6 +113,13 @@
 		 */
 		public function getSkills() {
 			return $this->skills;
+		}
+
+		/**
+		 * @return Slot[]|Collection|Selectable
+		 */
+		public function getSlots() {
+			return $this->slots;
 		}
 
 		/**
@@ -143,6 +179,20 @@
 		public function setRarity(int $rarity) {
 			$this->rarity = $rarity;
 			return $this;
+		}
+
+		/**
+		 * @return Resistances
+		 */
+		public function getResistances(): Resistances {
+			return $this->resistances;
+		}
+
+		/**
+		 * @return ArmorDefenseValues
+		 */
+		public function getDefense(): ArmorDefenseValues {
+			return $this->defense;
 		}
 
 		/**

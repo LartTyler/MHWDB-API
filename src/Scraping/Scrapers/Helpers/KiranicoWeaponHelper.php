@@ -61,12 +61,47 @@
 			}
 
 			if ($name = $data->getName())
-				$data->setName(KiranicoHelper::fixWeaponName($name, $weaponType));
+				$data->setName(self::fixWeaponName($name, $weaponType));
 
 			if ($previous = $data->getCraftingPrevious())
-				$data->setCraftingPrevious(KiranicoHelper::fixWeaponName($previous, $weaponType));
+				$data->setCraftingPrevious(self::fixWeaponName($previous, $weaponType));
 
 			return $data;
+		}
+
+		/**
+		 * @param string $name
+		 * @param string $type
+		 *
+		 * @return string
+		 */
+		public static function fixWeaponName(string $name, string $type): string {
+			$name = str_replace([
+				'Berseker',
+				'Gnshing',
+				'Water Golum',
+				'Supermacy',
+				'Hachets',
+				'Jyura Blaster',
+				'Rider',
+				'Commision',
+			], [
+				'Berserker',
+				'Gnashing',
+				'Water Golem',
+				'Supremacy',
+				'Hatchets',
+				'Jyura Buster',
+				'Raider',
+				'Commission',
+			], $name);
+
+			if ($type === WeaponType::BOW) {
+				if ($name === 'Villainous Bow')
+					$name = 'Villainous Brace';
+			}
+
+			return $name;
 		}
 
 		/**

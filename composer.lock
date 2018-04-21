@@ -95,16 +95,16 @@
         },
         {
             "name": "dbstudios/doctrine-query-document",
-            "version": "0.2.0",
+            "version": "0.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/LartTyler/doctrine-query-document.git",
-                "reference": "fa1285dea977a9c49e1a470c3dbc6ca83a208dff"
+                "reference": "8312f6a94c0e553083a2f520cfbe7040f35db536"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/LartTyler/doctrine-query-document/zipball/fa1285dea977a9c49e1a470c3dbc6ca83a208dff",
-                "reference": "fa1285dea977a9c49e1a470c3dbc6ca83a208dff",
+                "url": "https://api.github.com/repos/LartTyler/doctrine-query-document/zipball/8312f6a94c0e553083a2f520cfbe7040f35db536",
+                "reference": "8312f6a94c0e553083a2f520cfbe7040f35db536",
                 "shasum": ""
             },
             "require": {
@@ -132,7 +132,7 @@
                 }
             ],
             "description": "Allows building Doctrine queries using MongoDB-style query documents",
-            "time": "2018-04-16T17:37:00+00:00"
+            "time": "2018-04-20T19:16:27+00:00"
         },
         {
             "name": "dbstudios/doze",
@@ -4002,16 +4002,16 @@
     "packages-dev": [
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.54.5",
+            "version": "3.54.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "0216bc091f0cb7aea72e9e6abfdeac0730809217"
+                "reference": "ea86c808c9c8a1cd39dab2baa1b9dd38e03323ec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/0216bc091f0cb7aea72e9e6abfdeac0730809217",
-                "reference": "0216bc091f0cb7aea72e9e6abfdeac0730809217",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/ea86c808c9c8a1cd39dab2baa1b9dd38e03323ec",
+                "reference": "ea86c808c9c8a1cd39dab2baa1b9dd38e03323ec",
                 "shasum": ""
             },
             "require": {
@@ -4078,7 +4078,7 @@
                 "s3",
                 "sdk"
             ],
-            "time": "2018-04-19T22:54:55+00:00"
+            "time": "2018-04-20T18:14:14+00:00"
         },
         {
             "name": "mtdowling/jmespath.php",

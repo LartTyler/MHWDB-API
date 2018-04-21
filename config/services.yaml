@@ -42,6 +42,30 @@ services:
                 name: console.command
                 command: app:kiranico:fix-weapon-names
 
+    App\Command\KiranicoFixArmorNamesCommand:
+        tags:
+            -
+                name: console.command
+                command: app:kiranico:fix-armor-names
+
+    App\Command\MigrateSlotAttributesCommand:
+        tags:
+            -
+                name: console.command
+                command: app:migrate:slot-attributes
+
+    App\Command\MigrateResistAttributesCommand:
+        tags:
+            -
+                name: console.command
+                command: app:migrate:resist-attributes
+
+    App\Command\MigrateArmorDefenseAttributeCommand:
+        tags:
+            -
+                name: console.command
+                command: app:migrate:armor-defense-attribute
+
     App\QueryDocument\ApiQueryManager:
         public: true
         arguments:

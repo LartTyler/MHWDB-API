@@ -3,6 +3,7 @@
 
 	use App\Entity\Weapon;
 	use App\Scraping\Scrapers\Helpers\KiranicoHelper;
+	use App\Scraping\Scrapers\Helpers\KiranicoWeaponHelper;
 	use Doctrine\Common\Persistence\ObjectManager;
 	use Doctrine\ORM\EntityManagerInterface;
 	use Symfony\Component\Console\Command\Command;
@@ -59,7 +60,7 @@
 			$progress = new ProgressBar($output, sizeof($weapons));
 
 			foreach ($weapons as $weapon) {
-				$weapon->setName(KiranicoHelper::fixWeaponName($weapon->getName(), $weapon->getType()));
+				$weapon->setName(KiranicoWeaponHelper::fixWeaponName($weapon->getName(), $weapon->getType()));
 
 				$progress->advance();
 			}

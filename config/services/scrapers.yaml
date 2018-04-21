@@ -18,10 +18,12 @@ services:
                 - '@App\Scraping\Scrapers\KiranicoDecorationsScraper'
                 - '@App\Scraping\Scrapers\MHWikiaEldersealScraper'
                 - '@App\Scraping\Scrapers\FextralifeArmorSetBonusScraper'
+                - '@App\Scraping\Scrapers\CarlosFdezMHWorldDataDefenseValuesScraper'
 
     App\Scraping\Configurations\KiranicoConfiguration: ~
     App\Scraping\Configurations\MHWikiaConfiguration: ~
     App\Scraping\Configurations\FextralifeConfiguration: ~
+    App\Scraping\Configurations\GithubConfiguration: ~
 
     App\Scraping\Scrapers\KiranicoItemScraper: ~
     App\Scraping\Scrapers\KiranicoSkillsScraper: ~
@@ -31,6 +33,7 @@ services:
     App\Scraping\Scrapers\KiranicoDecorationsScraper: ~
     App\Scraping\Scrapers\MHWikiaEldersealScraper: ~
     App\Scraping\Scrapers\FextralifeArmorSetBonusScraper: ~
+    App\Scraping\Scrapers\CarlosFdezMHWorldDataDefenseValuesScraper: ~
 
     App\Scraping\Scrapers\Helpers\EldersealData:
         arguments:

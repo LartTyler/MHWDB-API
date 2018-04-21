@@ -18,10 +18,7 @@ rm "${HOME}/install-composer.sh"
 
 cp /vagrant/.env.dist /vagrant/.env
 
-composer install -qd /vagrant
-/vagrant/db-reset.sh latest
-
 echo
-echo "Your box has been provisioned. In order to start the webserver, please run 'php /vagrant/bin/console server:start 0.0.0.0'."
+echo "Your box has been provisioned. Please refer to the README for any remaining setup instructions."
 echo
-echo "Please keep in mind that this configuration is NOT suitable for production, and is not secure."
+echo "Please keep in mind that this configuration is NOT suitable for production."

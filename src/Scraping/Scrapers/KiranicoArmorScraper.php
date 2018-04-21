@@ -5,6 +5,7 @@
 	use App\Entity\ArmorAssets;
 	use App\Entity\ArmorSet;
 	use App\Entity\Asset;
+	use App\Entity\Slot;
 	use App\Game\ArmorRank;
 	use App\Game\Attribute;
 	use App\Game\Gender;
@@ -266,9 +267,31 @@
 
 			$armor->setArmorSet($armorSet);
 
-			$armor
-				->setAttribute(Attribute::DEFENSE, (int)strtok(trim($infoNodes->eq(0)->filter('.lead')->text()), ' '))
-				->addAttributes(KiranicoHelper::getSlots($infoNodes->eq(1)->filter('.zmdi')));
+			$defense = (int)strtok(trim($infoNodes->eq(0)->filter('.lead')->text()), ' ');
+
+			$armor->getDefense()
+				->setBase($defense)
+				// Both max and augmented are set by another scraper. Naively assume that all armor breakpoints are
+				// equal so that we at least have something in those fields in case something goes wrong
+				->setMax($defense)
+				->setAugmented($defense);
+
+			// DEPRECATED This preserves BC for < 1.8.0 and will be removed in the future
+			$armor->setAttribute(Attribute::DEFENSE, $defense);
+
+			$armor->getSlots()->clear();
+
+			foreach (KiranicoHelper::getSlots($infoNodes->eq(1)->filter('.zmdi')) as $rank) {
+				$armor->getSlots()->add(new Slot($rank));
+
+				// DEPRECATED The code below preserves BC for < 1.8.0 and will be removed in the future
+				$slotKey = 'slotsRank' . $rank;
+
+				if ($count = $armor->getAttribute($slotKey))
+					$armor->setAttribute($slotKey, $count + 1);
+				else
+					$armor->setAttribute($slotKey, 1);
+			}
 
 			$genderNodes = $infoNodes->eq(3)->filter('.zmdi:not(.text-dark)');
 
@@ -295,6 +318,14 @@
 
 				$value = (int)$value;
 
+				$method = 'set' . ucfirst($elem);
+
+				if (!method_exists($armor->getResistances(), $method))
+					throw new \RuntimeException($elem . ' is not a recognized element');
+
+				call_user_func([$armor->getResistances(), $method], $value);
+
+				// DEPRECATED The code below preserves BC for < 1.8.0 and will be removed in the future
 				if ($value === 0)
 					continue;
 
