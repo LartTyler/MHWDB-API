@@ -34,6 +34,11 @@
 		private $slots;
 
 		/**
+		 * @var WeaponSharpness
+		 */
+		private $sharpness;
+
+		/**
 		 * @var WeaponCraftingInfo|null
 		 */
 		private $crafting = null;
@@ -55,6 +60,7 @@
 			$this->type = $type;
 			$this->rarity = $rarity;
 			$this->slots = new ArrayCollection();
+			$this->sharpness = new WeaponSharpness();
 
 			$this->setSlug($name);
 		}
@@ -145,5 +151,12 @@
 			$this->assets = $assets;
 
 			return $this;
+		}
+
+		/**
+		 * @return WeaponSharpness
+		 */
+		public function getSharpness(): WeaponSharpness {
+			return $this->sharpness;
 		}
 	}
