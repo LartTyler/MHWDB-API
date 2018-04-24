@@ -68,6 +68,7 @@
 						'rank' => $slot->getRank(),
 					];
 				}, $weapon->getSlots()->toArray()),
+				'sharpness' => $weapon->getSharpness()->jsonSerialize(),
 				'attributes' => $weapon->getAttributes(),
 				'crafting' => $crafting ? [
 					'craftable' => $crafting->isCraftable(),
