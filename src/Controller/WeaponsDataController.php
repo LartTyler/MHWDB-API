@@ -4,6 +4,7 @@
 	use App\Entity\CraftingMaterialCost;
 	use App\Entity\Slot;
 	use App\Entity\Weapon;
+	use App\Game\WeaponType;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\Collection;
@@ -57,7 +58,7 @@
 
 			$crafting = $weapon->getCrafting();
 
-			return [
+			$data = [
 				'id' => $weapon->getId(),
 				'slug' => $weapon->getSlug(),
 				'name' => $weapon->getName(),
@@ -68,7 +69,6 @@
 						'rank' => $slot->getRank(),
 					];
 				}, $weapon->getSlots()->toArray()),
-				'sharpness' => $weapon->getSharpness()->jsonSerialize(),
 				'attributes' => $weapon->getAttributes(),
 				'crafting' => $crafting ? [
 					'craftable' => $crafting->isCraftable(),
@@ -80,5 +80,12 @@
 					'upgradeMaterials' => call_user_func($materialTransformer, $crafting->getUpgradeMaterials()),
 				] : null,
 			];
+
+			if (WeaponType::isMelee($weapon->getType()))
+				$data += [
+					'sharpness' => $weapon->getSharpness()->jsonSerialize(),
+				];
+
+			return $data;
 		}
 	}
