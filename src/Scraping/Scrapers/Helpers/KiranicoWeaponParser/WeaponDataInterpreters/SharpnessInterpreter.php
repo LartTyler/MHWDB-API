@@ -2,20 +2,12 @@
 	namespace App\Scraping\Scrapers\Helpers\KiranicoWeaponParser\WeaponDataInterpreters;
 
 	use App\Game\Attribute;
+	use App\Game\Sharpness;
 	use App\Scraping\Scrapers\Helpers\KiranicoWeaponParser\WeaponData;
 	use App\Scraping\Scrapers\Helpers\KiranicoWeaponParser\WeaponDataInterpreterInterface;
 	use Symfony\Component\DomCrawler\Crawler;
 
 	class SharpnessInterpreter implements WeaponDataInterpreterInterface {
-		private const SHARPNESS_NODES = [
-			Attribute::SHARP_RED,
-			Attribute::SHARP_ORANAGE,
-			Attribute::SHARP_YELLOW,
-			Attribute::SHARP_GREEN,
-			Attribute::SHARP_BLUE,
-			Attribute::SHARP_WHITE,
-		];
-
 		/**
 		 * {@inheritdoc}
 		 */
@@ -33,9 +25,10 @@
 			if ($sharpnessNodes->count() === 0)
 				return;
 
+			$sharpObject = $target->getSharpness();
 			$sharpnessNodes = $sharpnessNodes->children();
 
-			foreach (self::SHARPNESS_NODES as $i => $sharpness) {
+			foreach (Sharpness::ALL as $i => $sharpness) {
 				$styles = $sharpnessNodes->eq($i)->attr('style');
 
 				if (!$styles || !preg_match('/width: ?(\d+)px/', $styles, $matches))
@@ -46,7 +39,15 @@
 				if ($value === 0)
 					break;
 
-				$target->setAttribute($sharpness, $value);
+				$method = 'set' . ucfirst($sharpness);
+
+				if (!method_exists($sharpObject, $method))
+					throw new \RuntimeException('Could not find method named ' . $method);
+
+				call_user_func([$sharpObject, $method], $value);
+
+				// DEPRECATED The code below preserves BC for < 1.9.0 and will be removed in the future
+				$target->setAttribute('sharpness' . ucfirst($sharpness), $value);
 			}
 		}
 	}

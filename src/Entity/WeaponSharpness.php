@@ -123,6 +123,22 @@
 		}
 
 		/**
+		 * @param WeaponSharpness $other
+		 *
+		 * @return $this
+		 */
+		public function import(WeaponSharpness $other) {
+			$this
+				->setRed($other->getRed())
+				->setOrange($other->getOrange())
+				->setYellow($other->getYellow())
+				->setGreen($other->getGreen())
+				->setBlue($other->getBlue());
+
+			return $this;
+		}
+
+		/**
 		 * {@inheritdoc}
 		 */
 		public function jsonSerialize(): array {

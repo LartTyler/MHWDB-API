@@ -110,7 +110,6 @@
 		 * @param string $weaponType
 		 *
 		 * @return void
-		 * @throws \Http\Client\Exception
 		 */
 		protected function process(string $path, string $weaponType): void {
 			$uri = $this->configuration->getBaseUri()->withPath($path);
@@ -132,8 +131,9 @@
 			} else
 				$weapon->setRarity($data->getRarity());
 
-			// DEPRECATED This preserves BC for < 1.8.0 and will be removed in the future
 			$weapon->setAttributes($data->getAttributes());
+
+			$weapon->getSharpness()->import($data->getSharpness());
 
 			$weapon->getSlots()->clear();
 
