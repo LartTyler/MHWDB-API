@@ -61,7 +61,7 @@ App\Entity\Weapon:
             cascade:
                 - all
             joinColumn:
-                nullable: true
+                nullable: false
                 options:
                     unsigned: true
     manyToMany:
