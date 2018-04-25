@@ -18,6 +18,28 @@
 		const BOW = 'bow';
 
 		/**
+		 * @param string $type
+		 *
+		 * @return bool
+		 */
+		public static function isMelee(string $type): bool {
+			return !self::isRanged($type);
+		}
+
+		/**
+		 * @param string $type
+		 *
+		 * @return bool
+		 */
+		public static function isRanged(string $type): bool {
+			return in_array($type, [
+				self::LIGHT_BOWGUN,
+				self::HEAVY_BOWGUN,
+				self::BOW,
+			]);
+		}
+
+		/**
 		 * WeaponType constructor.
 		 */
 		private function __construct() {

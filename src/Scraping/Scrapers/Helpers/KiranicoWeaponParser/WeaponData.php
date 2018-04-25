@@ -2,10 +2,16 @@
 	namespace App\Scraping\Scrapers\Helpers\KiranicoWeaponParser;
 
 	use App\Entity\AttributableTrait;
+	use App\Entity\WeaponSharpness;
 	use App\Game\WeaponType;
 
 	class WeaponData {
 		use AttributableTrait;
+
+		/**
+		 * @var WeaponSharpness
+		 */
+		protected $sharpness;
 
 		/**
 		 * @var string|null
@@ -41,6 +47,13 @@
 		 * @var bool
 		 */
 		protected $craftable = false;
+
+		/**
+		 * WeaponData constructor.
+		 */
+		public function __construct() {
+			$this->sharpness = new WeaponSharpness();
+		}
 
 		/**
 		 * @return string|null
@@ -177,5 +190,12 @@
 			$this->craftable = $craftable;
 
 			return $this;
+		}
+
+		/**
+		 * @return WeaponSharpness
+		 */
+		public function getSharpness(): WeaponSharpness {
+			return $this->sharpness;
 		}
 	}

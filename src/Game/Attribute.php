@@ -5,10 +5,22 @@
 		// -- General Attributes --
 		const HEALTH = 'health';
 		const STAMINA = 'stamina';
-		const SLOT_RANK_1 = 'slotsRank1';
-		const SLOT_RANK_2 = 'slotsRank2';
-		const SLOT_RANK_3 = 'slotsRank3';
 		const REQUIRED_GENDER = 'requiredGender';
+
+		/**
+		 * @deprecated Use {@see WeaponSharpness} instead. Will be removed 2018-05-05.
+		 */
+		const SLOT_RANK_1 = 'slotsRank1';
+
+		/**
+		 * @deprecated Use {@see WeaponSharpness} instead. Will be removed 2018-05-05.
+		 */
+		const SLOT_RANK_2 = 'slotsRank2';
+
+		/**
+		 * @deprecated Use {@see WeaponSharpness} instead. Will be removed 2018-05-05.
+		 */
+		const SLOT_RANK_3 = 'slotsRank3';
 
 		// -- Skill Attribute Modifiers --
 		const SHARP_BONUS = 'sharpnessBonus';
@@ -57,11 +69,35 @@
 		const SPECIAL_AMMO = 'specialAmmo';
 
 		// -- Armor Attributes --
+
+		/**
+		 * @deprecated Use {@see ArmorDefenseValues} instead. Will be removed 2018-05-05.
+		 */
 		const DEFENSE = 'defense';
+
+		/**
+		 * @deprecated Use {@see Resistances} instead. Will be removed 2018-05-05.
+		 */
 		const RES_FIRE = 'resistFire';
+
+		/**
+		 * @deprecated Use {@see Resistances} instead. Will be removed 2018-05-05.
+		 */
 		const RES_WATER = 'resistWater';
+
+		/**
+		 * @deprecated Use {@see Resistances} instead. Will be removed 2018-05-05.
+		 */
 		const RES_THUNDER = 'resistThunder';
+
+		/**
+		 * @deprecated Use {@see Resistances} instead. Will be removed 2018-05-05.
+		 */
 		const RES_ICE = 'resistIce';
+
+		/**
+		 * @deprecated Use {@see Resistances} instead. Will be removed 2018-05-05.
+		 */
 		const RES_DRAGON = 'resistDragon';
 
 		/**
