@@ -4,6 +4,7 @@
 	use App\Entity\CraftingMaterialCost;
 	use App\Entity\Slot;
 	use App\Entity\Weapon;
+	use App\Entity\WeaponElement;
 	use App\Game\WeaponType;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -69,6 +70,9 @@
 						'rank' => $slot->getRank(),
 					];
 				}, $weapon->getSlots()->toArray()),
+				'elements' => array_map(function(WeaponElement $element): array {
+					return $element->jsonSerialize();
+				}, $weapon->getElements()->toArray()),
 				'attributes' => $weapon->getAttributes(),
 				'crafting' => $crafting ? [
 					'craftable' => $crafting->isCraftable(),

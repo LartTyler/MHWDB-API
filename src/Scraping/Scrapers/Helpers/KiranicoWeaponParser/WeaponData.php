@@ -49,6 +49,11 @@
 		protected $craftable = false;
 
 		/**
+		 * @var Element[]
+		 */
+		protected $elements = [];
+
+		/**
 		 * WeaponData constructor.
 		 */
 		public function __construct() {
@@ -197,5 +202,26 @@
 		 */
 		public function getSharpness(): WeaponSharpness {
 			return $this->sharpness;
+		}
+
+		/**
+		 * @return Element[]
+		 */
+		public function getElements(): array {
+			return $this->elements;
+		}
+
+		/**
+		 * @param Element $element
+		 *
+		 * @return $this
+		 */
+		public function setElement(Element $element) {
+			if (!$element->getType() || $element->getDamage() === null)
+				throw new \InvalidArgumentException('The provied element is incomplete');
+
+			$this->elements[$element->getType()] = $element;
+
+			return $this;
 		}
 	}

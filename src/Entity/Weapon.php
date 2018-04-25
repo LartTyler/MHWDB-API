@@ -6,6 +6,7 @@
 	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
+	use Doctrine\Common\Collections\Criteria;
 	use Doctrine\Common\Collections\Selectable;
 
 	class Weapon implements EntityInterface, SluggableInterface {
@@ -39,6 +40,11 @@
 		private $sharpness;
 
 		/**
+		 * @var Collection|Selectable|WeaponElement[]
+		 */
+		private $elements;
+
+		/**
 		 * @var WeaponCraftingInfo|null
 		 */
 		private $crafting = null;
@@ -61,6 +67,7 @@
 			$this->rarity = $rarity;
 			$this->slots = new ArrayCollection();
 			$this->sharpness = new WeaponSharpness();
+			$this->elements = new ArrayCollection();
 
 			$this->setSlug($name);
 		}
@@ -158,5 +165,49 @@
 		 */
 		public function getSharpness(): WeaponSharpness {
 			return $this->sharpness;
+		}
+
+		/**
+		 * @return WeaponElement[]|Collection|Selectable
+		 */
+		public function getElements() {
+			return $this->elements;
+		}
+
+		/**
+		 * @param string $element
+		 *
+		 * @return WeaponElement|null
+		 */
+		public function getElement(string $element): ?WeaponElement {
+			$matches = $this->getElements()->matching(
+				Criteria::create()->
+					where(Criteria::expr()->eq('type', strtolower($element)))
+			);
+
+			if ($matches->count())
+				return $matches->first();
+
+			return null;
+		}
+
+		/**
+		 * @param string $element
+		 * @param int    $damage
+		 * @param bool   $hidden
+		 *
+		 * @return $this
+		 */
+		public function setElement(string $element, int $damage, bool $hidden = false) {
+			$element = strtolower($element);
+
+			if ($object = $this->getElement($element)) {
+				$object
+					->setDamage($damage)
+					->setHidden($hidden);
+			} else
+				$this->getElements()->add(new WeaponElement($this, $element, $damage, $hidden));
+
+			return $this;
 		}
 	}
