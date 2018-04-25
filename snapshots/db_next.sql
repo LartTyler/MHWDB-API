@@ -371,6 +371,34 @@ INSERT INTO `decorations` VALUES (1,1,'Antidote Jewel 1','antidote-jewel-1',5,1)
 UNLOCK TABLES;
 
 --
+-- Table structure for table `decorations_skill_ranks`
+--
+
+DROP TABLE IF EXISTS `decorations_skill_ranks`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `decorations_skill_ranks` (
+  `decoration_id` int(10) unsigned NOT NULL,
+  `skill_rank_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`decoration_id`,`skill_rank_id`),
+  KEY `IDX_5D2A04FA3446DFC4` (`decoration_id`),
+  KEY `IDX_5D2A04FA6CE3F9A6` (`skill_rank_id`),
+  CONSTRAINT `FK_5D2A04FA3446DFC4` FOREIGN KEY (`decoration_id`) REFERENCES `decorations` (`id`),
+  CONSTRAINT `FK_5D2A04FA6CE3F9A6` FOREIGN KEY (`skill_rank_id`) REFERENCES `skill_ranks` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `decorations_skill_ranks`
+--
+
+LOCK TABLES `decorations_skill_ranks` WRITE;
+/*!40000 ALTER TABLE `decorations_skill_ranks` DISABLE KEYS */;
+INSERT INTO `decorations_skill_ranks` VALUES (1,1),(2,264),(3,193),(4,207),(5,234),(6,252),(7,255),(8,260),(9,273),(10,160),(11,282),(12,285),(13,291),(14,294),(15,297),(16,305),(17,185),(18,4),(19,179),(20,65),(21,17),(22,74),(23,62),(24,68),(25,20),(26,71),(27,7),(28,14),(29,235),(30,198),(31,80),(32,210),(33,215),(34,223),(35,226),(36,231),(37,56),(38,238),(39,10),(40,241),(41,59),(42,304),(43,46),(44,270),(45,33),(46,276),(47,28),(48,23),(49,53),(50,77),(51,186),(52,153),(53,85),(54,90),(55,95),(56,100),(57,105),(58,328),(59,123),(60,133),(61,150),(62,316),(63,156),(64,329),(65,327),(66,318),(67,332),(68,188),(69,139),(70,117),(71,180),(72,174),(73,108),(74,111),(75,218),(76,204),(77,114),(78,330),(79,331),(80,161),(81,166),(82,39),(83,171),(84,187),(85,267),(86,195),(87,130),(88,190),(89,244),(90,120),(91,119),(92,136),(93,142),(94,325),(95,314),(96,147),(97,118);
+/*!40000 ALTER TABLE `decorations_skill_ranks` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `items`
 --
 
@@ -419,7 +447,7 @@ CREATE TABLE `migration_versions` (
 
 LOCK TABLES `migration_versions` WRITE;
 /*!40000 ALTER TABLE `migration_versions` DISABLE KEYS */;
-INSERT INTO `migration_versions` VALUES ('20180305182815'),('20180305213108'),('20180311004633'),('20180314175357'),('20180319155834'),('20180320200544'),('20180323034352'),('20180324193558'),('20180325041554'),('20180330194208'),('20180401034729'),('20180406032338'),('20180417030407'),('20180420125649'),('20180420144556'),('20180420154806'),('20180420180120'),('20180423145852'),('20180424142246');
+INSERT INTO `migration_versions` VALUES ('20180305182815'),('20180305213108'),('20180311004633'),('20180314175357'),('20180319155834'),('20180320200544'),('20180323034352'),('20180324193558'),('20180325041554'),('20180330194208'),('20180401034729'),('20180406032338'),('20180417030407'),('20180420125649'),('20180420144556'),('20180420154806'),('20180420180120'),('20180423145852'),('20180424142246'),('20180424202745');
 /*!40000 ALTER TABLE `migration_versions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -781,4 +809,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-04-24 16:16:44
+-- Dump completed on 2018-04-24 20:41:43
