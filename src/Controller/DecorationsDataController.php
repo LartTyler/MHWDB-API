@@ -2,6 +2,7 @@
 	namespace App\Controller;
 
 	use App\Entity\Decoration;
+	use App\Entity\SkillRank;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Symfony\Bridge\Doctrine\RegistryInterface;
@@ -33,8 +34,21 @@
 				'slug' => $decoration->getSlug(),
 				'name' => $decoration->getName(),
 				'rarity' => $decoration->getRarity(),
-				'skill' => $decoration->getSkill()->getId(),
+				'skills' => array_map(function(SkillRank $rank): array {
+					return [
+						'id' => $rank->getId(),
+						'slug' => $rank->getSlug(),
+						'description' => $rank->getDescription(),
+						'level' => $rank->getLevel(),
+						'skill' => $rank->getSkill()->getId(),
+						'skillName' => $rank->getSkill()->getName(),
+						'modifiers' => $rank->getModifiers(),
+					];
+				}, $decoration->getSkills()->toArray()),
 				'slot' => $decoration->getSlot(),
+
+				// DEPRECATED This field preserves BC for < 1.9.0 and will be removed in the future
+				'skill' => $decoration->getSkill()->getId(),
 			];
 		}
 	}
