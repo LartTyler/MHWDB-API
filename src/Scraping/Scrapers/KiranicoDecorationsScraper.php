@@ -113,6 +113,10 @@
 				throw new \RuntimeException('No skill found named ' . trim($matches[1]) . '(for ' . $name .
 					' decoration)');
 
+			$deco->getSkills()->clear();
+			$deco->getSkills()->add($skill->getRank(1));
+
+			// DEPRECATED This line preserves BC for < 1.9.0 and will be removed in the future
 			$deco->setSkill($skill);
 		}
 	}
