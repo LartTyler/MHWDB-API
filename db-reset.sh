@@ -10,6 +10,9 @@ function usage() {
     exit
 }
 
+fmtRst="\e[0m"
+fmtEm="\e[1m\e[36m"
+
 cwd=`dirname "${0}"`
 
 if [[ $# < 1  || "${1}" == '--help' || "${1}" == '-h' ]]; then
@@ -28,6 +31,8 @@ db="application"
 if [[ $# > 1 ]]; then
     db="${2}"
 fi
+
+echo -e "Restoring snapshot from ${fmtEm}${snapshot}${fmtRst} into ${fmtEm}${db}${fmtRst}"
 
 mysql -e "DROP SCHEMA ${db}; CREATE SCHEMA ${db};"
 mysql "${db}" < "${snapshot}"
