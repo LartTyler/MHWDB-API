@@ -94,35 +94,11 @@
 		const SPECIAL_AMMO = 'specialAmmo';
 
 		// -- Armor Attributes --
-
-		/**
-		 * @deprecated Use {@see ArmorDefenseValues} instead. Will be removed 2018-05-05.
-		 */
 		const DEFENSE = 'defense';
-
-		/**
-		 * @deprecated Use {@see Resistances} instead. Will be removed 2018-05-05.
-		 */
 		const RES_FIRE = 'resistFire';
-
-		/**
-		 * @deprecated Use {@see Resistances} instead. Will be removed 2018-05-05.
-		 */
 		const RES_WATER = 'resistWater';
-
-		/**
-		 * @deprecated Use {@see Resistances} instead. Will be removed 2018-05-05.
-		 */
 		const RES_THUNDER = 'resistThunder';
-
-		/**
-		 * @deprecated Use {@see Resistances} instead. Will be removed 2018-05-05.
-		 */
 		const RES_ICE = 'resistIce';
-
-		/**
-		 * @deprecated Use {@see Resistances} instead. Will be removed 2018-05-05.
-		 */
 		const RES_DRAGON = 'resistDragon';
 
 		/**
