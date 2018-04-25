@@ -64,6 +64,13 @@ App\Entity\Weapon:
                 nullable: false
                 options:
                     unsigned: true
+    oneToMany:
+        elements:
+            targetEntity: App\Entity\WeaponElement
+            mappedBy: weapon
+            orphanRemoval: true
+            cascade:
+                - all
     manyToMany:
         slots:
             targetEntity: App\Entity\Slot

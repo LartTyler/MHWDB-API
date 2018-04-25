@@ -7,6 +7,10 @@
 		const ICE = 'ice';
 		const THUNDER = 'thunder';
 		const DRAGON = 'dragon';
+		const BLAST = 'blast';
+		const POISON = 'poison';
+		const SLEEP = 'sleep';
+		const PARALYSIS = 'paralysis';
 
 		const ALL = [
 			self::FIRE,
@@ -14,6 +18,10 @@
 			self::ICE,
 			self::THUNDER,
 			self::DRAGON,
+			self::BLAST,
+			self::POISON,
+			self::SLEEP,
+			self::PARALYSIS,
 		];
 
 		/**
