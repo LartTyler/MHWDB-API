@@ -2,6 +2,7 @@
 	namespace App\Scraping\Scrapers\Helpers\KiranicoWeaponParser\WeaponDataInterpreters;
 
 	use App\Game\Attribute;
+	use App\Scraping\Scrapers\Helpers\KiranicoWeaponParser\Element;
 	use App\Scraping\Scrapers\Helpers\KiranicoWeaponParser\WeaponData;
 	use App\Scraping\Scrapers\Helpers\KiranicoWeaponParser\WeaponDataInterpreterInterface;
 	use App\Utility\StringUtil;
@@ -30,7 +31,19 @@
 				$rawElements = [$raw];
 
 			foreach ($rawElements as $i => $rawElement) {
+				$element = new Element();
+
 				if (strpos($rawElement, '(') === 0) {
+					$element->setHidden(true);
+
+					$rawElement = substr($rawElement, 1);
+				}
+
+				$element
+					->setDamage((int)strtok($rawElement, ' '))
+					->setType(strtok(''));
+
+				if ($element->isHidden()) {
 					if ($i === 0)
 						$hiddenKey = Attribute::ELEM_HIDDEN;
 					else if ($i === 1)
@@ -39,8 +52,6 @@
 						throw new \RuntimeException($target->getName() . ' has more than two elements!');
 
 					$target->setAttribute($hiddenKey, true);
-
-					$rawElement = substr($rawElement, 1, -1);
 				}
 
 				if ($i === 0) {
@@ -53,8 +64,8 @@
 					throw new \RuntimeException($target->getName() . ' has more than two elements!');
 
 				$target
-					->setAttribute($damageKey, (int)strtok($rawElement, ' '))
-					->setAttribute($typeKey, strtok(''));
+					->setAttribute($damageKey, $element->getDamage())
+					->setAttribute($typeKey, $element->getType());
 			}
 		}
 	}
