@@ -36,7 +36,7 @@
 				if (strpos($rawElement, '(') === 0) {
 					$element->setHidden(true);
 
-					$rawElement = substr($rawElement, 1);
+					$rawElement = substr($rawElement, 1, -1);
 				}
 
 				$element
