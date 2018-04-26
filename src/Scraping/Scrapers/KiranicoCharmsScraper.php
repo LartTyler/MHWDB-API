@@ -3,6 +3,8 @@
 
 	use App\Entity\Charm;
 	use App\Entity\CharmRank;
+	use App\Entity\CharmRankCraftingInfo;
+	use App\Entity\CraftingMaterialCost;
 	use App\Scraping\AbstractScraper;
 	use App\Scraping\Configurations\KiranicoConfiguration;
 	use App\Scraping\ProgressAwareInterface;
@@ -70,6 +72,11 @@
 		 * @return void
 		 */
 		protected function process(Crawler $node): void {
+			/**
+			 * 0 = Name and level
+			 * 1 = Skills
+			 * 2 = Material Cost
+			 */
 			$cells = $node->children();
 
 			$fullName = StringUtil::replaceNumeralRank(StringUtil::clean($cells->first()->text()));
@@ -124,8 +131,38 @@
 
 				$charmRank->getSkills()->add($skillRank);
 			}
+
+			$materialNodes = $cells->eq(2)->filter('div');
+
+			if ($crafting = $charmRank->getCrafting())
+				$crafting->getMaterials()->clear();
+			else
+				$charmRank->setCrafting($crafting = new CharmRankCraftingInfo($charmRank->getLevel() === 1));
+
+			for ($i = 0, $ii = $materialNodes->count(); $i < $ii; $i++) {
+				$text = StringUtil::clean($materialNodes->eq($i)->text());
+
+				preg_match('/^(.+) x(\d+)$/', $text, $matches);
+
+				if (sizeof($matches) < 3)
+					throw new \RuntimeException('[Charms] Could not parse material cost: ' . $text);
+
+				$item = $this->manager->getRepository('App:Item')->findOneBy([
+					'name' => $matches[1],
+				]);
+
+				if (!$item)
+					throw new \RuntimeException('[Charms] Could not find item named ' . $matches[1]);
+
+				$crafting->getMaterials()->add(new CraftingMaterialCost($item, (int)$matches[2]));
+			}
 		}
 
+		/**
+		 * @param string $name
+		 *
+		 * @return Charm|null
+		 */
 		protected function findCharm(string $name): ?Charm {
 			if (isset($this->charmCache[$name]))
 				return $this->charmCache[$name];
