@@ -20,18 +20,10 @@ App\Entity\Charm:
             length: 64
             nullable: false
             unique: true
-    manyToMany:
-        skills:
-            targetEntity: App\Entity\SkillRank
-            joinTable:
-                name: charms_skill_ranks
-                joinColumns:
-                    charm_id:
-                        nullable: false
-                        options:
-                            unsigned: true
-                inverseJoinColumns:
-                    skill_rank_id:
-                        nullable: false
-                        options:
-                            unsigned: true
+    oneToMany:
+        ranks:
+            targetEntity: App\Entity\CharmRank
+            mappedBy: charm
+            orphanRemoval: true
+            cascade:
+                - all
