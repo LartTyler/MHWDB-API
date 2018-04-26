@@ -4,7 +4,7 @@
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
 
-	class WeaponSharpness implements EntityInterface, \JsonSerializable {
+	class WeaponSharpness implements EntityInterface {
 		use EntityTrait;
 
 		/**
@@ -136,18 +136,5 @@
 				->setBlue($other->getBlue());
 
 			return $this;
-		}
-
-		/**
-		 * {@inheritdoc}
-		 */
-		public function jsonSerialize(): array {
-			return [
-				'red' => $this->getRed(),
-				'orange' => $this->getOrange(),
-				'yellow' => $this->getYellow(),
-				'green' => $this->getGreen(),
-				'blue' => $this->getBlue(),
-			];
 		}
 	}

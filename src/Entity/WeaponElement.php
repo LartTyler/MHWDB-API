@@ -4,7 +4,7 @@
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
 
-	class WeaponElement implements EntityInterface, \JsonSerializable {
+	class WeaponElement implements EntityInterface {
 		use EntityTrait;
 
 		/**
@@ -90,16 +90,5 @@
 			$this->hidden = $hidden;
 
 			return $this;
-		}
-
-		/**
-		 * @return array
-		 */
-		public function jsonSerialize(): array {
-			return [
-				'type' => $this->getType(),
-				'damage' => $this->getDamage(),
-				'hidden' => $this->isHidden(),
-			];
 		}
 	}
