@@ -10,7 +10,6 @@
 	use App\Scraping\ProgressAwareInterface;
 	use App\Scraping\ProgressAwareTrait;
 	use App\Scraping\Scrapers\Helpers\KiranicoHelper;
-	use App\Scraping\Scrapers\Helpers\KiranicoWeaponParser\KiranicoCharmHelper;
 	use App\Scraping\Type;
 	use App\Utility\StringUtil;
 	use Doctrine\Common\Persistence\ObjectManager;
