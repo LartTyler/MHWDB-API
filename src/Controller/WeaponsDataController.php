@@ -4,6 +4,8 @@
 	use App\Entity\CraftingMaterialCost;
 	use App\Entity\Slot;
 	use App\Entity\Weapon;
+	use App\Entity\WeaponElement;
+	use App\Game\WeaponType;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\Collection;
@@ -57,7 +59,7 @@
 
 			$crafting = $weapon->getCrafting();
 
-			return [
+			$data = [
 				'id' => $weapon->getId(),
 				'slug' => $weapon->getSlug(),
 				'name' => $weapon->getName(),
@@ -68,6 +70,13 @@
 						'rank' => $slot->getRank(),
 					];
 				}, $weapon->getSlots()->toArray()),
+				'elements' => array_map(function(WeaponElement $element): array {
+					return [
+						'type' => $element->getType(),
+						'damage' => $element->getDamage(),
+						'hidden' => $element->isHidden(),
+					];
+				}, $weapon->getElements()->toArray()),
 				'attributes' => $weapon->getAttributes(),
 				'crafting' => $crafting ? [
 					'craftable' => $crafting->isCraftable(),
@@ -79,5 +88,21 @@
 					'upgradeMaterials' => call_user_func($materialTransformer, $crafting->getUpgradeMaterials()),
 				] : null,
 			];
+
+			if (WeaponType::isMelee($weapon->getType())) {
+				$sharpness = $weapon->getSharpness();
+
+				$data += [
+					'sharpness' => [
+						'red' => $sharpness->getRed(),
+						'orange' => $sharpness->getOrange(),
+						'yellow' => $sharpness->getYellow(),
+						'green' => $sharpness->getGreen(),
+						'blue' => $sharpness->getBlue(),
+					],
+				];
+			}
+
+			return $data;
 		}
 	}

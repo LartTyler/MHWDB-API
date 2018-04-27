@@ -66,14 +66,23 @@
 		 * @param string $name
 		 *
 		 * @return void
-		 * @throws \Http\Client\Exception
 		 */
 		protected function process(string $path, string $name): void {
+			$item = $this->manager->getRepository('App:Item')->findOneBy([
+				'name' => $name,
+			]);
+
+			if (!$item) {
+				$item = new Item($name, '', 0);
+
+				$this->manager->persist($item);
+			}
+
 			$uri = $this->configuration->getBaseUri()->withPath($path);
 			$response = $this->getWithRetry($uri);
 
 			if ($response->getStatusCode() !== Response::HTTP_OK)
-				throw new \RuntimeException('Could not retrieve ' . $uri);
+				return;
 
 			/**
 			 * 0 = Top Navigation
@@ -97,16 +106,9 @@
 
 			$rarity = StringUtil::toNumber(StringUtil::clean($metadataNodes->eq(3)->filter('div.lead')->text()));
 
-			$item = $this->manager->getRepository('App:Item')->findOneBy([
-				'name' => $name,
-			]);
-
-			if (!$item) {
-				$item = new Item($name, $description, $rarity);
-
-				$this->manager->persist($item);
-			} else
-				$item->setDescription($description);
+			$item
+				->setDescription($description)
+				->setRarity($rarity);
 
 			$sellPrice = StringUtil::toNumber(StringUtil::clean($metadataNodes->eq(0)->filter('div.lead')->text()));
 			$item->setSellPrice($sellPrice);

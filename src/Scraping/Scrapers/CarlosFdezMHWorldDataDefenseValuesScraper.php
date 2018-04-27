@@ -71,7 +71,7 @@
 		 * @return UriInterface
 		 */
 		protected function getUriWithPath(string $path): UriInterface {
-			return $this->configuration->getBaseUri()->withPath('/CarlosFdez/MHWorldData/master/data/' .
+			return $this->configuration->getBaseUri()->withPath('/CarlosFdez/MHWorldData/master/source_data/' .
 				ltrim($path, '/'));
 		}
 	}

@@ -4,6 +4,9 @@
 	use App\Utility\StringUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
+	use Doctrine\Common\Collections\ArrayCollection;
+	use Doctrine\Common\Collections\Collection;
+	use Doctrine\Common\Collections\Selectable;
 
 	class Decoration implements EntityInterface, SluggableInterface {
 		use EntityTrait;
@@ -25,9 +28,15 @@
 		private $rarity;
 
 		/**
-		 * @var Skill|null
+		 * @var Collection|Selectable|SkillRank[]
 		 */
-		private $skill = null;
+		private $skills;
+
+		/**
+		 * @var Skill
+		 * @deprecated Preserves BC for < 1.9.0 and will be removed in the future
+		 */
+		private $skill;
 
 		/**
 		 * Decoration constructor.
@@ -40,6 +49,7 @@
 			$this->name = $name;
 			$this->slot = $slot;
 			$this->rarity = $rarity;
+			$this->skills = new ArrayCollection();
 
 			$this->setSlug(StringUtil::toSlug($name));
 		}
@@ -88,9 +98,18 @@
 		}
 
 		/**
-		 * @return Skill|null
+		 * @return SkillRank[]|Collection|Selectable
 		 */
-		public function getSkill(): ?Skill {
+		public function getSkills() {
+			return $this->skills;
+		}
+
+		/**
+		 * @return Skill
+		 * @deprecated Preserves BC for < 1.9.0 and will be removed in the future
+		 * @see Decoration::getSkills()
+		 */
+		public function getSkill(): Skill {
 			return $this->skill;
 		}
 
@@ -98,6 +117,8 @@
 		 * @param Skill $skill
 		 *
 		 * @return $this
+		 * @deprecated Preserves BC for < 1.9.0 and will be removed in the future
+		 * @see Decoration::getSkills()
 		 */
 		public function setSkill(Skill $skill) {
 			$this->skill = $skill;

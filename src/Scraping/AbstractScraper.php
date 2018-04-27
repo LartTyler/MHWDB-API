@@ -49,7 +49,7 @@
 		 *
 		 * @return ResponseInterface
 		 */
-		public function getWithRetry(UriInterface $uri): ResponseInterface {
+		protected function getWithRetry(UriInterface $uri): ResponseInterface {
 			try {
 				return $this->configuration->getHttpClient()->get($uri);
 			} catch (\Exception $e) {
@@ -57,5 +57,18 @@
 
 				return $this->configuration->getHttpClient()->get($uri);
 			}
+		}
+
+		/**
+		 * @param string $message
+		 *
+		 * @return void
+		 */
+		protected function write(string $message): void {
+			$padding = str_repeat(PHP_EOL, 2);
+
+			echo $padding;
+			printf('>> [%s] %s', $this->getType(), $message);
+			echo $padding;
 		}
 	}
