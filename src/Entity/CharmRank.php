@@ -31,6 +31,11 @@
 		private $skills;
 
 		/**
+		 * @var int
+		 */
+		private $rarity = 0;
+
+		/**
 		 * @var CharmRankCraftingInfo|null
 		 */
 		private $crafting = null;
@@ -88,6 +93,24 @@
 		 */
 		public function setLevel(int $level) {
 			$this->level = $level;
+
+			return $this;
+		}
+
+		/**
+		 * @return int
+		 */
+		public function getRarity(): int {
+			return $this->rarity;
+		}
+
+		/**
+		 * @param int $rarity
+		 *
+		 * @return $this
+		 */
+		public function setRarity(int $rarity) {
+			$this->rarity = $rarity;
 
 			return $this;
 		}

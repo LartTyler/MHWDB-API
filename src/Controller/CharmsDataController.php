@@ -41,6 +41,7 @@
 					return [
 						'name' => $rank->getName(),
 						'level' => $rank->getLevel(),
+						'rarity' => $rank->getRarity(),
 						'skills' => array_map(function(SkillRank $skillRank): array {
 							return [
 								'id' => $skillRank->getId(),

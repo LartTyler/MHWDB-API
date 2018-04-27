@@ -4,6 +4,7 @@
 	final class Type {
 		const ARMOR = 'armor';
 		const CHARMS = 'charms';
+		const CHARM_RARITY = 'charm-rarity';
 		const DECORATIONS = 'decorations';
 		const ITEMS = 'items';
 		const SKILLS = 'skills';
