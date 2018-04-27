@@ -17,6 +17,11 @@ App\Entity\CharmRank:
         level:
             type: smallint
             nullable: false
+        rarity:
+            type: smallint
+            nullable: false
+            options:
+                unsigned: true
     oneToOne:
         crafting:
             targetEntity: App\Entity\CharmRankCraftingInfo
