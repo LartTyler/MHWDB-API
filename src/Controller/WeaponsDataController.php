@@ -71,7 +71,11 @@
 					];
 				}, $weapon->getSlots()->toArray()),
 				'elements' => array_map(function(WeaponElement $element): array {
-					return $element->jsonSerialize();
+					return [
+						'type' => $element->getType(),
+						'damage' => $element->getDamage(),
+						'hidden' => $element->isHidden(),
+					];
 				}, $weapon->getElements()->toArray()),
 				'attributes' => $weapon->getAttributes(),
 				'crafting' => $crafting ? [
@@ -85,10 +89,19 @@
 				] : null,
 			];
 
-			if (WeaponType::isMelee($weapon->getType()))
+			if (WeaponType::isMelee($weapon->getType())) {
+				$sharpness = $weapon->getSharpness();
+
 				$data += [
-					'sharpness' => $weapon->getSharpness()->jsonSerialize(),
+					'sharpness' => [
+						'red' => $sharpness->getRed(),
+						'orange' => $sharpness->getOrange(),
+						'yellow' => $sharpness->getYellow(),
+						'green' => $sharpness->getGreen(),
+						'blue' => $sharpness->getBlue(),
+					],
 				];
+			}
 
 			return $data;
 		}

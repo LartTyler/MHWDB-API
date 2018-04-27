@@ -31,6 +31,11 @@
 		private $skills;
 
 		/**
+		 * @var CharmRankCraftingInfo|null
+		 */
+		private $crafting = null;
+
+		/**
 		 * CharmRank constructor.
 		 *
 		 * @param Charm  $charm
@@ -92,5 +97,23 @@
 		 */
 		public function getSkills() {
 			return $this->skills;
+		}
+
+		/**
+		 * @return CharmRankCraftingInfo|null
+		 */
+		public function getCrafting(): ?CharmRankCraftingInfo {
+			return $this->crafting;
+		}
+
+		/**
+		 * @param CharmRankCraftingInfo $crafting
+		 *
+		 * @return $this
+		 */
+		public function setCrafting(CharmRankCraftingInfo $crafting) {
+			$this->crafting = $crafting;
+
+			return $this;
 		}
 	}
