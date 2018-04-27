@@ -23,7 +23,6 @@ App\Entity\CharmRankCraftingInfo:
                 name: charm_rank_crafting_info_crafting_material_costs
                 joinColumns:
                     charm_rank_id:
-                        unique: true
                         nullable: false
                         options:
                             unsigned: true

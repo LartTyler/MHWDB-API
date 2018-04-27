@@ -15,7 +15,7 @@
 				'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
 			$this->addSql('CREATE TABLE charm_rank_crafting_info (id INT UNSIGNED AUTO_INCREMENT NOT NULL, craftable TINYINT(1) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = InnoDB');
-			$this->addSql('CREATE TABLE charm_rank_crafting_info_crafting_material_costs (charm_rank_id INT UNSIGNED NOT NULL, crafting_material_cost_id INT UNSIGNED NOT NULL, UNIQUE INDEX UNIQ_8EEF42523BA5C9D1 (charm_rank_id), INDEX IDX_8EEF4252DD94392C (crafting_material_cost_id), PRIMARY KEY(charm_rank_id, crafting_material_cost_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = InnoDB');
+			$this->addSql('CREATE TABLE charm_rank_crafting_info_crafting_material_costs (charm_rank_id INT UNSIGNED NOT NULL, crafting_material_cost_id INT UNSIGNED NOT NULL, INDEX IDX_8EEF4252DD94392C (crafting_material_cost_id), PRIMARY KEY(charm_rank_id, crafting_material_cost_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = InnoDB');
 			$this->addSql('ALTER TABLE charm_rank_crafting_info_crafting_material_costs ADD CONSTRAINT FK_8EEF42523BA5C9D1 FOREIGN KEY (charm_rank_id) REFERENCES charm_rank_crafting_info (id)');
 			$this->addSql('ALTER TABLE charm_rank_crafting_info_crafting_material_costs ADD CONSTRAINT FK_8EEF4252DD94392C FOREIGN KEY (crafting_material_cost_id) REFERENCES crafting_material_costs (id)');
 			$this->addSql('ALTER TABLE charm_ranks ADD crafting_id INT UNSIGNED DEFAULT NULL');
