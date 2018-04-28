@@ -55,6 +55,22 @@ App\Entity\Weapon:
                 nullable: true
                 options:
                     unsigned: true
+        sharpness:
+            targetEntity: App\Entity\WeaponSharpness
+            orphanRemoval: true
+            cascade:
+                - all
+            joinColumn:
+                nullable: false
+                options:
+                    unsigned: true
+    oneToMany:
+        elements:
+            targetEntity: App\Entity\WeaponElement
+            mappedBy: weapon
+            orphanRemoval: true
+            cascade:
+                - all
     manyToMany:
         slots:
             targetEntity: App\Entity\Slot

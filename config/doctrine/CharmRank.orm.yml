@@ -1,6 +1,6 @@
-App\Entity\Decoration:
+App\Entity\CharmRank:
     type: entity
-    table: decorations
+    table: charm_ranks
     id:
         id:
             type: integer
@@ -14,26 +14,28 @@ App\Entity\Decoration:
             type: string
             length: 64
             nullable: false
-            unique: true
-        slug:
-            type: string
-            length: 64
+        level:
+            type: smallint
             nullable: false
-            unique: true
         rarity:
             type: smallint
             nullable: false
             options:
                 unsigned: true
-        slot:
-            type: smallint
-            nullable: false
-            options:
-                unsigned: true
     oneToOne:
-        # DEPRECATED This field preserves BC for < 1.9.0 and will be removed in the future
-        skill:
-            targetEntity: App\Entity\Skill
+        crafting:
+            targetEntity: App\Entity\CharmRankCraftingInfo
+            orphanRemoval: true
+            cascade:
+                - all
+            joinColumn:
+                nullable: true
+                options:
+                    unsigned: true
+    manyToOne:
+        charm:
+            targetEntity: App\Entity\Charm
+            inversedBy: ranks
             joinColumn:
                 nullable: false
                 options:
@@ -42,9 +44,9 @@ App\Entity\Decoration:
         skills:
             targetEntity: App\Entity\SkillRank
             joinTable:
-                name: decorations_skill_ranks
+                name: charm_ranks_skill_ranks
                 joinColumns:
-                    decoration_id:
+                    charm_rank_id:
                         nullable: false
                         options:
                             unsigned: true

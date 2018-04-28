@@ -5,6 +5,7 @@
 	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
+	use Doctrine\Common\Collections\Criteria;
 	use Doctrine\Common\Collections\Selectable;
 
 	class Charm implements EntityInterface, SluggableInterface {
@@ -17,9 +18,9 @@
 		private $name;
 
 		/**
-		 * @var Collection|Selectable|SkillRank[]
+		 * @var Collection|Selectable|CharmRank[]
 		 */
-		private $skills;
+		private $ranks;
 
 		/**
 		 * Charm constructor.
@@ -28,7 +29,7 @@
 		 */
 		public function __construct(string $name) {
 			$this->name = $name;
-			$this->skills = new ArrayCollection();
+			$this->ranks = new ArrayCollection();
 
 			$this->setSlug($name);
 		}
@@ -41,9 +42,27 @@
 		}
 
 		/**
-		 * @return SkillRank[]|Collection|Selectable
+		 * @return CharmRank[]|Collection|Selectable
 		 */
-		public function getSkills() {
-			return $this->skills;
+		public function getRanks() {
+			return $this->ranks;
+		}
+
+		/**
+		 * @param int $level
+		 *
+		 * @return CharmRank|null
+		 */
+		public function getRank(int $level): ?CharmRank {
+			$matches = $this->getRanks()->matching(
+				Criteria::create()
+					->where(Criteria::expr()->eq('level', $level))
+					->setMaxResults(1)
+			);
+
+			if ($matches->count())
+				return $matches->first();
+
+			return null;
 		}
 	}

@@ -5,10 +5,22 @@
 		// -- General Attributes --
 		const HEALTH = 'health';
 		const STAMINA = 'stamina';
-		const SLOT_RANK_1 = 'slotsRank1';
-		const SLOT_RANK_2 = 'slotsRank2';
-		const SLOT_RANK_3 = 'slotsRank3';
 		const REQUIRED_GENDER = 'requiredGender';
+
+		/**
+		 * @deprecated Use {@see WeaponSharpness} instead. Will be removed 2018-05-05.
+		 */
+		const SLOT_RANK_1 = 'slotsRank1';
+
+		/**
+		 * @deprecated Use {@see WeaponSharpness} instead. Will be removed 2018-05-05.
+		 */
+		const SLOT_RANK_2 = 'slotsRank2';
+
+		/**
+		 * @deprecated Use {@see WeaponSharpness} instead. Will be removed 2018-05-05.
+		 */
+		const SLOT_RANK_3 = 'slotsRank3';
 
 		// -- Skill Attribute Modifiers --
 		const SHARP_BONUS = 'sharpnessBonus';
@@ -23,12 +35,37 @@
 		const ATTACK = 'attack';
 		const AFFINITY = 'affinity';
 		const DAMAGE_TYPE = 'damageType';
+
+		/**
+		 * @deprecated Use {@see WeaponElement} instead. Will be removed on 2018-05-12.
+		 */
 		const ELEM_TYPE = 'elementType';
+
+		/**
+		 * @deprecated Use {@see WeaponElement} instead. Will be removed on 2018-05-12.
+		 */
 		const ELEM_DAMAGE = 'elementDamage';
+
+		/**
+		 * @deprecated Use {@see WeaponElement} instead. Will be removed on 2018-05-12.
+		 */
 		const ELEM_HIDDEN = 'elementHidden';
+
+		/**
+		 * @deprecated Use {@see WeaponElement} instead. Will be removed on 2018-05-12.
+		 */
 		const ELEM_TYPE_2 = 'elementType2';
+
+		/**
+		 * @deprecated Use {@see WeaponElement} instead. Will be removed on 2018-05-12.
+		 */
 		const ELEM_DAMAGE_2 = 'elementDamage2';
+
+		/**
+		 * @deprecated Use {@see WeaponElement} instead. Will be removed on 2018-05-12.
+		 */
 		const ELEM_HIDDEN_2 = 'elementHidden2';
+
 		const ELDERSEAL = 'elderseal';
 
 		// -- Melee Weapon Attributes --

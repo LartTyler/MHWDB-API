@@ -42,41 +42,7 @@
 			$rank = trim(substr($string, $pos + 1));
 			$title = trim(substr($string, 0, $pos));
 
-			return $title . ' ' . StringUtil::convertNumeralToDecimal($rank);
-		}
-
-		/**
-		 * @param string $numeral
-		 *
-		 * @return int
-		 */
-		public static function convertNumeralToDecimal(string $numeral): int {
-			$numeral = strtoupper($numeral);
-
-			$decimal = 0;
-			$previous = 0;
-
-			for ($i = strlen($numeral) - 1; $i >= 0; $i--) {
-				$char = $numeral[$i];
-
-				if ($char === 'I')
-					$value = 1;
-				else if ($char === 'V')
-					$value = 5;
-				else if ($char === 'X')
-					$value = 10;
-				else if ($char === 'L')
-					$value = 50;
-				else
-					throw new \InvalidArgumentException($char . ' is not a supported numeral');
-
-				if ($value < $previous)
-					$decimal -= $value;
-				else
-					$decimal += $value;
-			}
-
-			return $decimal;
+			return $title . ' ' . RomanNumeral::toDecimal($rank);
 		}
 
 		/**

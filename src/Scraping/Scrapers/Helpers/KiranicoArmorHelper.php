@@ -26,6 +26,7 @@
 			'Shades' => ArmorType::HEAD,
 			'Faux Felyne' => ArmorType::HEAD,
 			'Head' => ArmorType::HEAD,
+			'Taroth\'s Fury' => ArmorType::HEAD,
 
 			// -- Chest --
 			'Mail' => ArmorType::CHEST,
@@ -37,6 +38,7 @@
 			'Hide' => ArmorType::CHEST,
 			'Cista' => ArmorType::CHEST,
 			'Armor' => ArmorType::CHEST,
+			'Taroth\'s Ire' => ArmorType::CHEST,
 
 			// -- Gloves --
 			'Gloves' => ArmorType::GLOVES,
@@ -48,6 +50,7 @@
 			'Longarms' => ArmorType::GLOVES,
 			'Claws' => ArmorType::GLOVES,
 			'Cuffs' => ArmorType::GLOVES,
+			'Taroth\'s Rage' => ArmorType::GLOVES,
 
 			// -- Waist --
 			'Belt' => ArmorType::WAIST,
@@ -58,6 +61,7 @@
 			'Spine' => ArmorType::WAIST,
 			'Cocoon' => ArmorType::WAIST,
 			'Coat' => ArmorType::WAIST,
+			'Taroth\'s Malice' => ArmorType::WAIST,
 
 			// -- Legs --
 			'Trousers' => ArmorType::LEGS,
@@ -70,6 +74,7 @@
 			'Spurs' => ArmorType::LEGS,
 			'Crus' => ArmorType::LEGS,
 			'Pants' => ArmorType::LEGS,
+			'Taroth\'s Wrath' => ArmorType::LEGS,
 		];
 
 		/**
