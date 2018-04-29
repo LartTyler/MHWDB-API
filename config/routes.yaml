@@ -6,4 +6,4 @@ index:
     path: /
     controller: 'FrameworkBundle:Redirect:urlRedirect'
     defaults:
-        path: https://github.com/LartTyler/MHWDB-Docs/wiki
+        path: 'https://larttyler.github.io/MHWDB-Docs/'
