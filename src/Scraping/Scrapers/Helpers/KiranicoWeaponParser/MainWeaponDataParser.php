@@ -12,6 +12,7 @@
 			Interpreter\RarityInterpreter::class,
 			Interpreter\SlotsInterpreter::class,
 			Interpreter\ElementInterpreter::class,
+			Interpreter\DefenseBoostInterpreter::class,
 
 			// -- Melee Only --
 			Interpreter\SharpnessInterpreter::class,
