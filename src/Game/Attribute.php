@@ -3,9 +3,10 @@
 
 	final class Attribute {
 		// -- General Attributes --
+		const DEFENSE = 'defense';
 		const HEALTH = 'health';
-		const STAMINA = 'stamina';
 		const REQUIRED_GENDER = 'requiredGender';
+		const STAMINA = 'stamina';
 
 		/**
 		 * @deprecated Use {@see WeaponSharpness} instead. Will be removed 2018-05-05.
@@ -94,7 +95,6 @@
 		const SPECIAL_AMMO = 'specialAmmo';
 
 		// -- Armor Attributes --
-		const DEFENSE = 'defense';
 		const RES_FIRE = 'resistFire';
 		const RES_WATER = 'resistWater';
 		const RES_THUNDER = 'resistThunder';
