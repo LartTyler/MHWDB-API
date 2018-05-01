@@ -33,6 +33,11 @@
 		private $blue = 0;
 
 		/**
+		 * @var int
+		 */
+		private $white = 0;
+
+		/**
 		 * @return int
 		 */
 		public function getRed(): int {
@@ -123,6 +128,24 @@
 		}
 
 		/**
+		 * @return int
+		 */
+		public function getWhite(): int {
+			return $this->white;
+		}
+
+		/**
+		 * @param int $white
+		 *
+		 * @return $this
+		 */
+		public function setWhite(int $white) {
+			$this->white = $white;
+
+			return $this;
+		}
+
+		/**
 		 * @param WeaponSharpness $other
 		 *
 		 * @return $this
@@ -133,7 +156,8 @@
 				->setOrange($other->getOrange())
 				->setYellow($other->getYellow())
 				->setGreen($other->getGreen())
-				->setBlue($other->getBlue());
+				->setBlue($other->getBlue())
+				->setWhite($other->getWhite());
 
 			return $this;
 		}

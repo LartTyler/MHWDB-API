@@ -99,6 +99,7 @@
 						'yellow' => $sharpness->getYellow(),
 						'green' => $sharpness->getGreen(),
 						'blue' => $sharpness->getBlue(),
+						'white' => $sharpness->getWhite(),
 					],
 				];
 			}

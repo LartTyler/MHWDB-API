@@ -35,3 +35,8 @@ App\Entity\WeaponSharpness:
             nullable: false
             options:
                 unsigned: true
+        white:
+            type: integer
+            nullable: false
+            options:
+                unsigned: true
