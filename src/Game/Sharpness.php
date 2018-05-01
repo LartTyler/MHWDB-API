@@ -7,6 +7,7 @@
 		const YELLOW = 'yellow';
 		const GREEN = 'green';
 		const BLUE = 'blue';
+		const WHITE = 'white';
 
 		const ALL = [
 			self::RED,
@@ -14,6 +15,7 @@
 			self::YELLOW,
 			self::GREEN,
 			self::BLUE,
+			self::WHITE,
 		];
 
 		/**
