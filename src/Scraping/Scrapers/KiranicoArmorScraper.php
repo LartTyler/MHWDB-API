@@ -142,10 +142,20 @@
 			if ($response->getStatusCode() !== Response::HTTP_OK)
 				throw new \RuntimeException('Could not retrieve ' . $uri);
 
-			$crawler = (new Crawler($response->getBody()->getContents()))->filter('.container .col-lg-9.px-2')
-				->children();
+			/**
+			 * 0 = Top navbar
+			 * 1 = Main section (name, description, attributes, etc.)
+			 * 2 = Resistances
+			 * 3 = Skills
+			 * 4 = Crafting info
+			 * 5 = Bottom navbar
+			 */
+			$sections = (new Crawler($response->getBody()->getContents()))->filter('.container .col-lg-9.px-2')
+				->filter('.card');
 
-			$rawName = $crawler->filter('.card .media h1[itemprop=name]')->text();
+			$mainSection = $sections->filter('.card')->eq(1);
+
+			$rawName = $mainSection->filter('.media h1[itemprop=name]')->text();
 
 			/**
 			 * @var string $name
@@ -157,8 +167,6 @@
 			$armor = $this->manager->getRepository('App:Armor')->findOneBy([
 				'name' => $name,
 			]);
-
-			$mainSection = $crawler->filter('.card')->eq(1);
 
 			/**
 			 * 0 = Defense
@@ -302,9 +310,7 @@
 					$armor->setAttribute(Attribute::REQUIRED_GENDER, $matches[1]);
 			}
 
-			$attributeNodes = $crawler->filter('.row.no-gutters')->children();
-
-			$elemResists = $attributeNodes->eq(0)->filter('.card-body table tr');
+			$elemResists = $sections->eq(2)->filter('.card-body table tr');
 
 			for ($i = 0, $ii = $elemResists->count(); $i < $ii; $i++) {
 				$children = $elemResists->eq($i)->children();
@@ -332,7 +338,7 @@
 				$armor->setAttribute('resist' . $elem, $value);
 			}
 
-			$skills = $attributeNodes->eq(1)->filter('.card-body table tr');
+			$skills = $sections->eq(3)->filter('.card-body table tr');
 
 			for ($i = 0, $ii = $skills->count(); $i < $ii; $i++) {
 				$children = $skills->eq($i)->children();
