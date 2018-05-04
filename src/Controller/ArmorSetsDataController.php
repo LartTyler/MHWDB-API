@@ -6,6 +6,7 @@
 	use App\Entity\ArmorSetBonusRank;
 	use App\Entity\Asset;
 	use App\Entity\SkillRank;
+	use App\Entity\Slot;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Symfony\Bridge\Doctrine\RegistryInterface;
@@ -52,7 +53,13 @@
 						'type' => $armor->getType(),
 						'rank' => $armor->getRank(),
 						'rarity' => $armor->getRarity(),
-						'armorSet' => $armor->getArmorSet()->getId(),
+						'defense' => $armor->getDefense(),
+						'resistances' => $armor->getResistances(),
+						'slots' => array_map(function(Slot $slot): array {
+							return [
+								'rank' => $slot->getRank(),
+							];
+						}, $armor->getSlots()->toArray()),
 						'attributes' => $armor->getAttributes(),
 						'skills' => array_map(function(SkillRank $rank): array {
 							return [
@@ -65,6 +72,7 @@
 								'skillName' => $rank->getSkill()->getName(),
 							];
 						}, $armor->getSkills()->toArray()),
+						'armorSet' => $armor->getArmorSet()->getId(),
 						'assets' => [
 							'imageMale' => $assets ? call_user_func($transformer, $assets->getImageMale()) : null,
 							'imageFemale' => $assets ? call_user_func($transformer, $assets->getImageFemale()) : null,
