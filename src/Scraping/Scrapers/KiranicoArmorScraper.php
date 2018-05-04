@@ -284,12 +284,16 @@
 			// region Defense
 			$defense = (int)strtok(trim($infoNodes->eq(0)->filter('.lead')->text()), ' ');
 
-			$armor->getDefense()
-				->setBase($defense)
-				// Both max and augmented are set by another scraper. Naively assume that all armor breakpoints are
-				// equal so that we at least have something in those fields in case something goes wrong
-				->setMax($defense)
-				->setAugmented($defense);
+			$armor->getDefense()->setBase($defense);
+
+			// Both max and augmented are set by another scraper. If the fields are empty (in the case of new armor
+			// objects), default them to the same value as the base defense.
+
+			if (!$armor->getDefense()->getMax())
+				$armor->getDefense()->setMax($defense);
+
+			if (!$armor->getDefense()->getAugmented())
+				$armor->getDefense()->setAugmented($defense);
 			// endregion
 
 			// region Slots
