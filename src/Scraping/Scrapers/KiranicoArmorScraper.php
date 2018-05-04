@@ -290,9 +290,6 @@
 				// equal so that we at least have something in those fields in case something goes wrong
 				->setMax($defense)
 				->setAugmented($defense);
-
-			// DEPRECATED This preserves BC for < 1.8.0 and will be removed in the future
-			$armor->setAttribute(Attribute::DEFENSE, $defense);
 			// endregion
 
 			// region Slots
