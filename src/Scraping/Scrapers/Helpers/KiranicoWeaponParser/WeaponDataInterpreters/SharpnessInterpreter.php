@@ -45,9 +45,6 @@
 					throw new \RuntimeException('Could not find method named ' . $method);
 
 				call_user_func([$sharpObject, $method], $value);
-
-				// DEPRECATED The code below preserves BC for < 1.9.0 and will be removed in the future
-				$target->setAttribute('sharpness' . ucfirst($sharpness), $value);
 			}
 		}
 	}
