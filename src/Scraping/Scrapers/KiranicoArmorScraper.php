@@ -3,8 +3,10 @@
 
 	use App\Entity\Armor;
 	use App\Entity\ArmorAssets;
+	use App\Entity\ArmorCraftingInfo;
 	use App\Entity\ArmorSet;
 	use App\Entity\Asset;
+	use App\Entity\CraftingMaterialCost;
 	use App\Entity\Slot;
 	use App\Game\ArmorRank;
 	use App\Game\Attribute;
@@ -376,6 +378,42 @@
 					throw new \RuntimeException($skillName . ' has no rank labelled "' . $skillRank . '"');
 
 				$armor->getSkills()->add($rank);
+			}
+			// endregion
+
+			// region Crafting
+			if ($crafting = $armor->getCrafting())
+				$crafting->getMaterials()->clear();
+			else
+				$armor->setCrafting($crafting = new ArmorCraftingInfo());
+
+			$materials = $sections->eq(4)->filter('.card-body tr');
+
+			for ($i = 0, $ii = $materials->count(); $i < $ii; $i++) {
+				/**
+				 * 0 = Item Name
+				 * 1 = Quantity
+				 */
+				$cells = $materials->eq($i)->children();
+
+				$itemName = StringUtil::clean($cells->eq(0)->text());
+				$item = $this->manager->getRepository('App:Item')->findOneBy([
+					'name' => $itemName,
+				]);
+
+				if (!$item) {
+					throw new \RuntimeException(sprintf('[Armor] Could not find item named %s (for %s)', $itemName,
+						$armor->getName()));
+				}
+
+				$quantity = (int)substr(StringUtil::clean($cells->eq(1)->text()), 1);
+
+				if ($quantity <= 0) {
+					throw new \RuntimeException(sprintf('[Armor] Got quantity = %d, expected > 0 (for %s)', $quantity,
+						$armor->getName()));
+				}
+
+				$crafting->getMaterials()->add(new CraftingMaterialCost($item, $quantity));
 			}
 			// endregion
 		}
