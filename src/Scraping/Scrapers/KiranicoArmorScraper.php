@@ -298,17 +298,8 @@
 			// region Slots
 			$armor->getSlots()->clear();
 
-			foreach (KiranicoHelper::getSlots($infoNodes->eq(1)->filter('.zmdi')) as $rank) {
+			foreach (KiranicoHelper::getSlots($infoNodes->eq(1)->filter('.zmdi')) as $rank)
 				$armor->getSlots()->add(new Slot($rank));
-
-				// DEPRECATED The code below preserves BC for < 1.8.0 and will be removed in the future
-				$slotKey = 'slotsRank' . $rank;
-
-				if ($count = $armor->getAttribute($slotKey))
-					$armor->setAttribute($slotKey, $count + 1);
-				else
-					$armor->setAttribute($slotKey, 1);
-			}
 			// endregion
 
 			// region Gender Requirements
