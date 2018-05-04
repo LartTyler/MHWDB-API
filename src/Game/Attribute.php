@@ -8,21 +8,6 @@
 		const REQUIRED_GENDER = 'requiredGender';
 		const STAMINA = 'stamina';
 
-		/**
-		 * @deprecated Use {@see WeaponSharpness} instead. Will be removed 2018-05-05.
-		 */
-		const SLOT_RANK_1 = 'slotsRank1';
-
-		/**
-		 * @deprecated Use {@see WeaponSharpness} instead. Will be removed 2018-05-05.
-		 */
-		const SLOT_RANK_2 = 'slotsRank2';
-
-		/**
-		 * @deprecated Use {@see WeaponSharpness} instead. Will be removed 2018-05-05.
-		 */
-		const SLOT_RANK_3 = 'slotsRank3';
-
 		// -- Skill Attribute Modifiers --
 		const SHARP_BONUS = 'sharpnessBonus';
 		const RES_ALL = 'resistAll';
