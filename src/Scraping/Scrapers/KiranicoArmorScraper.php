@@ -284,31 +284,23 @@
 			// region Defense
 			$defense = (int)strtok(trim($infoNodes->eq(0)->filter('.lead')->text()), ' ');
 
-			$armor->getDefense()
-				->setBase($defense)
-				// Both max and augmented are set by another scraper. Naively assume that all armor breakpoints are
-				// equal so that we at least have something in those fields in case something goes wrong
-				->setMax($defense)
-				->setAugmented($defense);
+			$armor->getDefense()->setBase($defense);
 
-			// DEPRECATED This preserves BC for < 1.8.0 and will be removed in the future
-			$armor->setAttribute(Attribute::DEFENSE, $defense);
+			// Both max and augmented are set by another scraper. If the fields are empty (in the case of new armor
+			// objects), default them to the same value as the base defense.
+
+			if (!$armor->getDefense()->getMax())
+				$armor->getDefense()->setMax($defense);
+
+			if (!$armor->getDefense()->getAugmented())
+				$armor->getDefense()->setAugmented($defense);
 			// endregion
 
 			// region Slots
 			$armor->getSlots()->clear();
 
-			foreach (KiranicoHelper::getSlots($infoNodes->eq(1)->filter('.zmdi')) as $rank) {
+			foreach (KiranicoHelper::getSlots($infoNodes->eq(1)->filter('.zmdi')) as $rank)
 				$armor->getSlots()->add(new Slot($rank));
-
-				// DEPRECATED The code below preserves BC for < 1.8.0 and will be removed in the future
-				$slotKey = 'slotsRank' . $rank;
-
-				if ($count = $armor->getAttribute($slotKey))
-					$armor->setAttribute($slotKey, $count + 1);
-				else
-					$armor->setAttribute($slotKey, 1);
-			}
 			// endregion
 
 			// region Gender Requirements
@@ -343,12 +335,6 @@
 					throw new \RuntimeException($elem . ' is not a recognized element');
 
 				call_user_func([$armor->getResistances(), $method], $value);
-
-				// DEPRECATED The code below preserves BC for < 1.8.0 and will be removed in the future
-				if ($value === 0)
-					continue;
-
-				$armor->setAttribute('resist' . $elem, $value);
 			}
 			// endregion
 

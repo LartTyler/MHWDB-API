@@ -14,6 +14,7 @@
 	use Doctrine\ORM\EntityManager;
 	use Symfony\Bridge\Doctrine\RegistryInterface;
 	use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+	use Symfony\Component\HttpFoundation\JsonResponse;
 	use Symfony\Component\HttpFoundation\Request;
 	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\Routing\RouterInterface;
@@ -164,8 +165,14 @@
 			else if ($data instanceof EntityInterface)
 				$data = $this->normalizeOne($data);
 
-			return $this->responder->createResponse($data, null, [
+			if ($data === null)
+				$status = Response::HTTP_NO_CONTENT;
+			else
+				$status = Response::HTTP_OK;
+
+			return new JsonResponse($data, $status, [
 				'Cache-Control' => 'public, max-age=14400',
+				'Content-Type' => 'application/json',
 			]);
 		}
 

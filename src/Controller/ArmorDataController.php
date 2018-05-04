@@ -55,7 +55,8 @@
 						'rank' => $slot->getRank(),
 					];
 				}, $armor->getSlots()->toArray()),
-				'attributes' => $armor->getAttributes(),
+				// default to \stdClass to fix an empty array being returned instead of an empty object
+				'attributes' => $armor->getAttributes() ?: new \stdClass(),
 				'skills' => array_map(function(SkillRank $rank): array {
 					return [
 						'id' => $rank->getId(),
