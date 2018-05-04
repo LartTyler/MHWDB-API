@@ -3,8 +3,10 @@
 
 	use App\Entity\Armor;
 	use App\Entity\ArmorAssets;
+	use App\Entity\ArmorCraftingInfo;
 	use App\Entity\ArmorSet;
 	use App\Entity\Asset;
+	use App\Entity\CraftingMaterialCost;
 	use App\Entity\Slot;
 	use App\Game\ArmorRank;
 	use App\Game\Attribute;
@@ -136,16 +138,27 @@
 		 * @return void
 		 */
 		protected function process(string $path, string $rank, ArmorSet $armorSet, array $spriteMaps): void {
-			$tmpUri = $this->configuration->getBaseUri()->withPath($path);
-			$response = $this->getWithRetry($tmpUri);
+			$uri = $this->configuration->getBaseUri()->withPath($path);
+			$response = $this->getWithRetry($uri);
 
 			if ($response->getStatusCode() !== Response::HTTP_OK)
-				throw new \RuntimeException('Could not retrieve ' . $tmpUri);
+				throw new \RuntimeException('Could not retrieve ' . $uri);
 
-			$crawler = (new Crawler($response->getBody()->getContents()))->filter('.container .col-lg-9.px-2')
-				->children();
+			/**
+			 * 0 = Top navbar
+			 * 1 = Main section (name, description, attributes, etc.)
+			 * 2 = Resistances
+			 * 3 = Skills
+			 * 4 = Crafting info
+			 * 5 = Bottom navbar
+			 */
+			$sections = (new Crawler($response->getBody()->getContents()))->filter('.container .col-lg-9.px-2')
+				->filter('.card');
 
-			$rawName = $crawler->filter('.card .media h1[itemprop=name]')->text();
+			$mainSection = $sections->filter('.card')->eq(1);
+
+			// region Armor Lookup / Init
+			$rawName = $mainSection->filter('.media h1[itemprop=name]')->text();
 
 			/**
 			 * @var string $name
@@ -157,8 +170,6 @@
 			$armor = $this->manager->getRepository('App:Armor')->findOneBy([
 				'name' => $name,
 			]);
-
-			$mainSection = $crawler->filter('.card')->eq(1);
 
 			/**
 			 * 0 = Defense
@@ -182,7 +193,9 @@
 
 				$armor->getSkills()->clear();
 			}
+			// endregion
 
+			// region Assets
 			$assetNodes = $mainSection->filter('.card-body .media .img-thumbnail');
 
 			/** @var Asset[] $assets */
@@ -264,9 +277,11 @@
 
 				$armor->setAssets($group);
 			}
+			// endregion
 
 			$armor->setArmorSet($armorSet);
 
+			// region Defense
 			$defense = (int)strtok(trim($infoNodes->eq(0)->filter('.lead')->text()), ' ');
 
 			$armor->getDefense()
@@ -278,7 +293,9 @@
 
 			// DEPRECATED This preserves BC for < 1.8.0 and will be removed in the future
 			$armor->setAttribute(Attribute::DEFENSE, $defense);
+			// endregion
 
+			// region Slots
 			$armor->getSlots()->clear();
 
 			foreach (KiranicoHelper::getSlots($infoNodes->eq(1)->filter('.zmdi')) as $rank) {
@@ -292,7 +309,9 @@
 				else
 					$armor->setAttribute($slotKey, 1);
 			}
+			// endregion
 
+			// region Gender Requirements
 			$genderNodes = $infoNodes->eq(3)->filter('.zmdi:not(.text-dark)');
 
 			if ($genderNodes->count() < 2) {
@@ -301,10 +320,10 @@
 				if (sizeof($matches) >= 2)
 					$armor->setAttribute(Attribute::REQUIRED_GENDER, $matches[1]);
 			}
+			// endregion
 
-			$attributeNodes = $crawler->filter('.row.no-gutters')->children();
-
-			$elemResists = $attributeNodes->eq(0)->filter('.card-body table tr');
+			// region Elemental Resistances
+			$elemResists = $sections->eq(2)->filter('.card-body table tr');
 
 			for ($i = 0, $ii = $elemResists->count(); $i < $ii; $i++) {
 				$children = $elemResists->eq($i)->children();
@@ -331,8 +350,10 @@
 
 				$armor->setAttribute('resist' . $elem, $value);
 			}
+			// endregion
 
-			$skills = $attributeNodes->eq(1)->filter('.card-body table tr');
+			// region Skills
+			$skills = $sections->eq(3)->filter('.card-body table tr');
 
 			for ($i = 0, $ii = $skills->count(); $i < $ii; $i++) {
 				$children = $skills->eq($i)->children();
@@ -358,6 +379,43 @@
 
 				$armor->getSkills()->add($rank);
 			}
+			// endregion
+
+			// region Crafting
+			if ($crafting = $armor->getCrafting())
+				$crafting->getMaterials()->clear();
+			else
+				$armor->setCrafting($crafting = new ArmorCraftingInfo());
+
+			$materials = $sections->eq(4)->filter('.card-body tr');
+
+			for ($i = 0, $ii = $materials->count(); $i < $ii; $i++) {
+				/**
+				 * 0 = Item Name
+				 * 1 = Quantity
+				 */
+				$cells = $materials->eq($i)->children();
+
+				$itemName = StringUtil::clean($cells->eq(0)->text());
+				$item = $this->manager->getRepository('App:Item')->findOneBy([
+					'name' => $itemName,
+				]);
+
+				if (!$item) {
+					throw new \RuntimeException(sprintf('[Armor] Could not find item named %s (for %s)', $itemName,
+						$armor->getName()));
+				}
+
+				$quantity = (int)substr(StringUtil::clean($cells->eq(1)->text()), 1);
+
+				if ($quantity <= 0) {
+					throw new \RuntimeException(sprintf('[Armor] Got quantity = %d, expected > 0 (for %s)', $quantity,
+						$armor->getName()));
+				}
+
+				$crafting->getMaterials()->add(new CraftingMaterialCost($item, $quantity));
+			}
+			// endregion
 		}
 
 		/**

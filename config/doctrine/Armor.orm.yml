@@ -55,6 +55,15 @@ App\Entity\Armor:
                 nullable: true
                 options:
                     unsigned: true
+        crafting:
+            targetEntity: App\Entity\ArmorCraftingInfo
+            orphanRemoval: true
+            cascade:
+                - all
+            joinColumn:
+                nullable: true
+                options:
+                    unsigned: true
     manyToOne:
         armorSet:
             targetEntity: App\Entity\ArmorSet
