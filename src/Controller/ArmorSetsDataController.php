@@ -5,6 +5,7 @@
 	use App\Entity\ArmorSet;
 	use App\Entity\ArmorSetBonusRank;
 	use App\Entity\Asset;
+	use App\Entity\CraftingMaterialCost;
 	use App\Entity\SkillRank;
 	use App\Entity\Slot;
 	use DaybreakStudios\DozeBundle\ResponderService;
@@ -45,6 +46,7 @@
 				'rank' => $armorSet->getRank(),
 				'pieces' => array_map(function(Armor $armor) use ($transformer): array {
 					$assets = $armor->getAssets();
+					$crafting = $armor->getCrafting();
 
 					return [
 						'id' => $armor->getId(),
@@ -78,6 +80,24 @@
 							'imageMale' => $assets ? call_user_func($transformer, $assets->getImageMale()) : null,
 							'imageFemale' => $assets ? call_user_func($transformer, $assets->getImageFemale()) : null,
 						],
+						'crafting' => $crafting ? [
+							'materials' => array_map(function(CraftingMaterialCost $cost): array {
+								$item = $cost->getItem();
+
+								return [
+									'quantity' => $cost->getQuantity(),
+									'item' => [
+										'id' => $item->getId(),
+										'name' => $item->getName(),
+										'description' => $item->getDescription(),
+										'rarity' => $item->getRarity(),
+										'carryLimit' => $item->getCarryLimit(),
+										'sellPrice' => $item->getSellPrice(),
+										'buyPrice' => $item->getBuyPrice(),
+									],
+								];
+							}, $crafting->getMaterials()->toArray()),
+						] : null,
 					];
 				}, $armorSet->getPieces()->toArray()),
 				'bonus' => $bonus ? [
