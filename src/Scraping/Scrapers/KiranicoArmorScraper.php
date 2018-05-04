@@ -136,11 +136,11 @@
 		 * @return void
 		 */
 		protected function process(string $path, string $rank, ArmorSet $armorSet, array $spriteMaps): void {
-			$tmpUri = $this->configuration->getBaseUri()->withPath($path);
-			$response = $this->getWithRetry($tmpUri);
+			$uri = $this->configuration->getBaseUri()->withPath($path);
+			$response = $this->getWithRetry($uri);
 
 			if ($response->getStatusCode() !== Response::HTTP_OK)
-				throw new \RuntimeException('Could not retrieve ' . $tmpUri);
+				throw new \RuntimeException('Could not retrieve ' . $uri);
 
 			$crawler = (new Crawler($response->getBody()->getContents()))->filter('.container .col-lg-9.px-2')
 				->children();
