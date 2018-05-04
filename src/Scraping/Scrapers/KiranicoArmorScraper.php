@@ -331,12 +331,6 @@
 					throw new \RuntimeException($elem . ' is not a recognized element');
 
 				call_user_func([$armor->getResistances(), $method], $value);
-
-				// DEPRECATED The code below preserves BC for < 1.8.0 and will be removed in the future
-				if ($value === 0)
-					continue;
-
-				$armor->setAttribute('resist' . $elem, $value);
 			}
 			// endregion
 
