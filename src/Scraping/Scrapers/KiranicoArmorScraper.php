@@ -155,6 +155,7 @@
 
 			$mainSection = $sections->filter('.card')->eq(1);
 
+			// region Armor Lookup / Init
 			$rawName = $mainSection->filter('.media h1[itemprop=name]')->text();
 
 			/**
@@ -190,7 +191,9 @@
 
 				$armor->getSkills()->clear();
 			}
+			// endregion
 
+			// region Assets
 			$assetNodes = $mainSection->filter('.card-body .media .img-thumbnail');
 
 			/** @var Asset[] $assets */
@@ -272,9 +275,11 @@
 
 				$armor->setAssets($group);
 			}
+			// endregion
 
 			$armor->setArmorSet($armorSet);
 
+			// region Defense
 			$defense = (int)strtok(trim($infoNodes->eq(0)->filter('.lead')->text()), ' ');
 
 			$armor->getDefense()
@@ -286,7 +291,9 @@
 
 			// DEPRECATED This preserves BC for < 1.8.0 and will be removed in the future
 			$armor->setAttribute(Attribute::DEFENSE, $defense);
+			// endregion
 
+			// region Slots
 			$armor->getSlots()->clear();
 
 			foreach (KiranicoHelper::getSlots($infoNodes->eq(1)->filter('.zmdi')) as $rank) {
@@ -300,7 +307,9 @@
 				else
 					$armor->setAttribute($slotKey, 1);
 			}
+			// endregion
 
+			// region Gender Requirements
 			$genderNodes = $infoNodes->eq(3)->filter('.zmdi:not(.text-dark)');
 
 			if ($genderNodes->count() < 2) {
@@ -309,7 +318,9 @@
 				if (sizeof($matches) >= 2)
 					$armor->setAttribute(Attribute::REQUIRED_GENDER, $matches[1]);
 			}
+			// endregion
 
+			// region Elemental Resistances
 			$elemResists = $sections->eq(2)->filter('.card-body table tr');
 
 			for ($i = 0, $ii = $elemResists->count(); $i < $ii; $i++) {
@@ -337,7 +348,9 @@
 
 				$armor->setAttribute('resist' . $elem, $value);
 			}
+			// endregion
 
+			// region Skills
 			$skills = $sections->eq(3)->filter('.card-body table tr');
 
 			for ($i = 0, $ii = $skills->count(); $i < $ii; $i++) {
@@ -364,6 +377,7 @@
 
 				$armor->getSkills()->add($rank);
 			}
+			// endregion
 		}
 
 		/**
