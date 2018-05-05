@@ -63,6 +63,11 @@
 		private $assets = null;
 
 		/**
+		 * @var ArmorCraftingInfo|null
+		 */
+		private $crafting = null;
+
+		/**
 		 * Armor constructor.
 		 *
 		 * @param string $name
@@ -209,6 +214,24 @@
 		 */
 		public function setAssets(?ArmorAssets $assets) {
 			$this->assets = $assets;
+
+			return $this;
+		}
+
+		/**
+		 * @return ArmorCraftingInfo|null
+		 */
+		public function getCrafting(): ?ArmorCraftingInfo {
+			return $this->crafting;
+		}
+
+		/**
+		 * @param ArmorCraftingInfo $crafting
+		 *
+		 * @return $this
+		 */
+		public function setCrafting(ArmorCraftingInfo $crafting) {
+			$this->crafting = $crafting;
 
 			return $this;
 		}

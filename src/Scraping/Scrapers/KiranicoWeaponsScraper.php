@@ -39,12 +39,6 @@
 			WeaponType::BOW => '/bow',
 		];
 
-		private const SLOT_KEYS = [
-			Attribute::SLOT_RANK_1,
-			Attribute::SLOT_RANK_2,
-			Attribute::SLOT_RANK_3,
-		];
-
 		/**
 		 * @var ObjectManager
 		 */
@@ -137,17 +131,8 @@
 
 			$weapon->getSlots()->clear();
 
-			foreach (self::SLOT_KEYS as $slotKey) {
-				$count = $weapon->getAttribute($slotKey);
-
-				if (!$count)
-					continue;
-
-				$rank = (int)substr($slotKey, -1);
-
-				for ($i = 0; $i < $count; $i++)
-					$weapon->getSlots()->add(new Slot($rank));
-			}
+			foreach ($data->getSlots() as $rank)
+				$weapon->getSlots()->add(new Slot($rank));
 
 			$info = $weapon->getCrafting();
 

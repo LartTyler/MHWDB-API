@@ -5,6 +5,7 @@
 	use App\Entity\ArmorSet;
 	use App\Entity\ArmorSetBonusRank;
 	use App\Entity\Asset;
+	use App\Entity\CraftingMaterialCost;
 	use App\Entity\SkillRank;
 	use App\Entity\Slot;
 	use DaybreakStudios\DozeBundle\ResponderService;
@@ -45,6 +46,7 @@
 				'rank' => $armorSet->getRank(),
 				'pieces' => array_map(function(Armor $armor) use ($transformer): array {
 					$assets = $armor->getAssets();
+					$crafting = $armor->getCrafting();
 
 					return [
 						'id' => $armor->getId(),
@@ -53,6 +55,8 @@
 						'type' => $armor->getType(),
 						'rank' => $armor->getRank(),
 						'rarity' => $armor->getRarity(),
+						// default to \stdClass to fix an empty array being returned instead of an empty object
+						'attributes' => $armor->getAttributes() ?: new \stdClass(),
 						'defense' => $armor->getDefense(),
 						'resistances' => $armor->getResistances(),
 						'slots' => array_map(function(Slot $slot): array {
@@ -60,7 +64,6 @@
 								'rank' => $slot->getRank(),
 							];
 						}, $armor->getSlots()->toArray()),
-						'attributes' => $armor->getAttributes(),
 						'skills' => array_map(function(SkillRank $rank): array {
 							return [
 								'id' => $rank->getId(),
@@ -77,6 +80,24 @@
 							'imageMale' => $assets ? call_user_func($transformer, $assets->getImageMale()) : null,
 							'imageFemale' => $assets ? call_user_func($transformer, $assets->getImageFemale()) : null,
 						],
+						'crafting' => $crafting ? [
+							'materials' => array_map(function(CraftingMaterialCost $cost): array {
+								$item = $cost->getItem();
+
+								return [
+									'quantity' => $cost->getQuantity(),
+									'item' => [
+										'id' => $item->getId(),
+										'name' => $item->getName(),
+										'description' => $item->getDescription(),
+										'rarity' => $item->getRarity(),
+										'carryLimit' => $item->getCarryLimit(),
+										'sellPrice' => $item->getSellPrice(),
+										'buyPrice' => $item->getBuyPrice(),
+									],
+								];
+							}, $crafting->getMaterials()->toArray()),
+						] : null,
 					];
 				}, $armorSet->getPieces()->toArray()),
 				'bonus' => $bonus ? [

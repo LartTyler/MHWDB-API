@@ -77,7 +77,8 @@
 						'hidden' => $element->isHidden(),
 					];
 				}, $weapon->getElements()->toArray()),
-				'attributes' => $weapon->getAttributes(),
+				// default to \stdClass to fix an empty array being returned instead of an empty object
+				'attributes' => $weapon->getAttributes() ?: new \stdClass(),
 				'crafting' => $crafting ? [
 					'craftable' => $crafting->isCraftable(),
 					'previous' => $crafting->getPrevious() ? $crafting->getPrevious()->getId() : null,
