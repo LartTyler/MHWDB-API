@@ -34,11 +34,12 @@
 				'slug' => $skill->getSlug(),
 				'name' => $skill->getName(),
 				'description' => $skill->getDescription(),
-				'ranks' => array_map(function(SkillRank $rank): array {
+				'ranks' => array_map(function(SkillRank $rank) use ($skill): array {
 					return [
 						'id' => $rank->getId(),
 						'slug' => $rank->getSlug(),
-						'skill' => $rank->getSkill()->getId(),
+						'skill' => $skill->getId(),
+						'skillName' => $skill->getId(),
 						'level' => $rank->getLevel(),
 						'description' => $rank->getDescription(),
 						'modifiers' => $rank->getModifiers(),
