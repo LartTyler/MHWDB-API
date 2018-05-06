@@ -39,7 +39,7 @@
 						'id' => $rank->getId(),
 						'slug' => $rank->getSlug(),
 						'skill' => $skill->getId(),
-						'skillName' => $skill->getId(),
+						'skillName' => $skill->getName(),
 						'level' => $rank->getLevel(),
 						'description' => $rank->getDescription(),
 						'modifiers' => $rank->getModifiers(),
