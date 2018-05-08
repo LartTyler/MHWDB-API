@@ -12,6 +12,7 @@
 		const ELDERSEAL = 'elderseal';
 		const ARMOR_SET_BONUS = 'armor-set-bonus';
 		const ARMOR_DEFENSE = 'armor-defense';
+		const WEAPON_ICONS = 'weapon-icons';
 
 		/**
 		 * Type constructor.
