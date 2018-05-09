@@ -12,7 +12,7 @@ git fetch
 git checkout -- .
 git pull
 
-./db-reset.sh latest
+sudo ./db-reset.sh latest
 ./cache-clear.sh
 
 composer install -o --no-dev
