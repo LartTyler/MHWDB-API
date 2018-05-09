@@ -19,8 +19,18 @@
 		 * {@inheritdoc}
 		 */
 		public function parse(Crawler $node, WeaponData $target): void {
-			$value = explode(' ', StringUtil::clean($node->filter('.lead')->text()))[0];
+			$values = array_map(function(string $item): string {
+				return (int)trim($item);
+			}, explode('|', $text = StringUtil::clean($node->filter('.lead')->text())));
 
-			$target->setAttribute(Attribute::ATTACK, (int)$value);
+			if (sizeof($values) !== 2)
+				throw new \RuntimeException(sprintf('Invalid attack values for %s: %s', $target->getName(), $text));
+
+			$target->getAttack()
+				->setDisplay($values[0])
+				->setRaw($values[1]);
+
+			// DEPRECATED The line below preserves BC for < 1.11.0 and will be removed in the future
+			$target->setAttribute(Attribute::ATTACK, $values[0]);
 		}
 	}
