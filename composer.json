@@ -29,6 +29,7 @@
 	"require-dev": {
 		"aws/aws-sdk-php": "^3.54",
 		"roave/security-advisories": "dev-master",
+		"symfony/profiler-pack": "^1.0",
 		"symfony/web-server-bundle": "^4.0"
 	},
 	"config": {
