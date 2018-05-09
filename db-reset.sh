@@ -22,7 +22,7 @@ fi
 snapshot="${1}"
 
 if [[ "${snapshot}" == "latest" ]]; then
-    snapshot=`ls -t "${cwd}/snapshots" | cut -f1 | head -n1`
+    snapshot=`ls -vr "${cwd}/snapshots" | cut -f1 | head -n1`
     snapshot="${cwd}/snapshots/${snapshot}"
 fi
 

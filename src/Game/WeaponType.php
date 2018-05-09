@@ -18,6 +18,11 @@
 		const BOW = 'bow';
 
 		/**
+		 * @var string[]|null
+		 */
+		private static $allTypes = null;
+
+		/**
 		 * @param string $type
 		 *
 		 * @return bool
@@ -37,6 +42,16 @@
 				self::HEAVY_BOWGUN,
 				self::BOW,
 			]);
+		}
+
+		/**
+		 * @return string[]
+		 */
+		public static function all(): array {
+			if (self::$allTypes === null)
+				self::$allTypes = array_values((new \ReflectionClass(self::class))->getConstants());
+
+			return self::$allTypes;
 		}
 
 		/**

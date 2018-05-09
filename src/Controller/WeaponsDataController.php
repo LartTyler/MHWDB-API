@@ -58,6 +58,7 @@
 			};
 
 			$crafting = $weapon->getCrafting();
+			$assets = $weapon->getAssets();
 
 			$data = [
 				'id' => $weapon->getId(),
@@ -87,6 +88,10 @@
 					}, $crafting->getBranches()->toArray()),
 					'craftingMaterials' => call_user_func($materialTransformer, $crafting->getCraftingMaterials()),
 					'upgradeMaterials' => call_user_func($materialTransformer, $crafting->getUpgradeMaterials()),
+				] : null,
+				'assets' => $assets ? [
+					'icon' => $assets->getIcon() ? $assets->getIcon()->getUri() : null,
+					'image' => $assets->getImage() ? $assets->getImage()->getUri() : null,
 				] : null,
 			];
 
