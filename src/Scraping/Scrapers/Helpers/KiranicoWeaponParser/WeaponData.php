@@ -2,8 +2,8 @@
 	namespace App\Scraping\Scrapers\Helpers\KiranicoWeaponParser;
 
 	use App\Entity\AttributableTrait;
+	use App\Entity\WeaponAttackValues;
 	use App\Entity\WeaponSharpness;
-	use App\Game\WeaponType;
 
 	class WeaponData {
 		use AttributableTrait;
@@ -12,6 +12,11 @@
 		 * @var WeaponSharpness
 		 */
 		protected $sharpness;
+
+		/**
+		 * @var WeaponAttackValues
+		 */
+		protected $attack;
 
 		/**
 		 * @var string|null
@@ -58,6 +63,7 @@
 		 */
 		public function __construct() {
 			$this->sharpness = new WeaponSharpness();
+			$this->attack = new WeaponAttackValues();
 		}
 
 		/**
@@ -223,5 +229,12 @@
 			$this->elements[$element->getType()] = $element;
 
 			return $this;
+		}
+
+		/**
+		 * @return WeaponAttackValues
+		 */
+		public function getAttack(): WeaponAttackValues {
+			return $this->attack;
 		}
 	}

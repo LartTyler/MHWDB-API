@@ -127,6 +127,7 @@
 
 			$weapon->setAttributes($data->getAttributes());
 
+			$weapon->getAttack()->import($data->getAttack());
 			$weapon->getSharpness()->import($data->getSharpness());
 
 			$weapon->getSlots()->clear();

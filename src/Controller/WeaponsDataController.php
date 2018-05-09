@@ -66,6 +66,10 @@
 				'name' => $weapon->getName(),
 				'type' => $weapon->getType(),
 				'rarity' => $weapon->getRarity(),
+				'attack' => [
+					'display' => $weapon->getAttack()->getDisplay(),
+					'raw' => $weapon->getAttack()->getRaw(),
+				],
 				'slots' => array_map(function(Slot $slot): array {
 					return [
 						'rank' => $slot->getRank(),
