@@ -1,0 +1,29 @@
+App\Entity\MotionValue:
+    type: entity
+    table: motion_values
+    id:
+        id:
+            type: integer
+            nullable: false
+            options:
+                unsigned: true
+            generator:
+                strategy: IDENTITY
+    fields:
+        name:
+            type: string
+            length: 64
+            nullable: false
+        weaponType:
+            type: string
+            length: 32
+            nullable: false
+            column: weapon_type
+        damageType:
+            type: string
+            length: 32
+            nullable: true
+            column: damage_type
+        values:
+            type: json
+            nullable: false
