@@ -13,6 +13,7 @@
 		const ARMOR_SET_BONUS = 'armor-set-bonus';
 		const ARMOR_DEFENSE = 'armor-defense';
 		const WEAPON_ICONS = 'weapon-icons';
+		const WEAPON_IMAGES = 'weapon-images';
 
 		/**
 		 * Type constructor.
