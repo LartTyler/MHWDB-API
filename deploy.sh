@@ -12,9 +12,10 @@ git fetch
 git checkout -- .
 git pull
 
-sudo ./db-reset.sh latest
 ./cache-clear.sh
 
 composer install -o --no-dev
 
 php bin/console cache:warmup --env=prod --no-debug
+
+echo "Deploy complete. If necessary, be sure to run './db-reset.sh latest' to bring the database up to date."
