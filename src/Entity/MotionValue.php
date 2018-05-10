@@ -35,7 +35,7 @@
 		/**
 		 * @var int[]
 		 */
-		private $values = [];
+		private $hits = [];
 
 		/**
 		 * MotionValue constructor.
@@ -92,11 +92,11 @@
 		}
 
 		/**
-		 * @param string $damageType
+		 * @param string|null $damageType
 		 *
 		 * @return $this
 		 */
-		public function setDamageType(string $damageType) {
+		public function setDamageType(?string $damageType) {
 			$this->damageType = $damageType;
 
 			return $this;
@@ -141,17 +141,17 @@
 		/**
 		 * @return int[]
 		 */
-		public function getValues(): array {
-			return $this->values;
+		public function getHits(): array {
+			return $this->hits;
 		}
 
 		/**
-		 * @param int[] $values
+		 * @param int[] $hits
 		 *
 		 * @return $this
 		 */
-		public function setValues(array $values) {
-			$this->values = $values;
+		public function setHits(array $hits) {
+			$this->hits = $hits;
 
 			return $this;
 		}

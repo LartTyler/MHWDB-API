@@ -1,6 +1,11 @@
 App\Entity\MotionValue:
     type: entity
     table: motion_values
+    uniqueConstraints:
+        name_weapon_type_idx:
+            columns:
+                - weapon_type
+                - name
     id:
         id:
             type: integer
@@ -24,7 +29,6 @@ App\Entity\MotionValue:
             length: 32
             nullable: true
             column: damage_type
-        values:
         stun:
             type: smallint
             nullable: true
@@ -37,5 +41,6 @@ App\Entity\MotionValue:
             options:
                 unsigned: true
             column: exhaust_potency
+        hits:
             type: json
             nullable: false
