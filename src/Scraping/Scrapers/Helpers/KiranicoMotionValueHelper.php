@@ -12,7 +12,7 @@
 		public static function cleanDamageType(string $type): ?string {
 			$type = strtolower($type);
 
-			if (!$type)
+			if (!$type || $type === '-')
 				return null;
 
 			if ($type === 'shot')
