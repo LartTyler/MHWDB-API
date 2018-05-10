@@ -41,8 +41,6 @@ services:
             -
                 name: doctrine.event_listener
                 event: prePersist
-                method: handle
             -
                 name: doctrine.event_listener
                 event: preUpdate
-                method: handle

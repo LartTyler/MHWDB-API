@@ -10,6 +10,24 @@
 		 *
 		 * @return void
 		 */
+		public function prePersist(LifecycleEventArgs $event): void {
+			$this->handle($event);
+		}
+
+		/**
+		 * @param LifecycleEventArgs $event
+		 *
+		 * @return void
+		 */
+		public function preUpdate(LifecycleEventArgs $event): void {
+			$this->handle($event);
+		}
+
+		/**
+		 * @param LifecycleEventArgs $event
+		 *
+		 * @return void
+		 */
 		public function handle(LifecycleEventArgs $event): void {
 			$entity = $event->getEntity();
 
