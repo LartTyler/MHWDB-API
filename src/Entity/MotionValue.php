@@ -23,6 +23,16 @@
 		private $damageType = null;
 
 		/**
+		 * @var int|null
+		 */
+		private $stun = null;
+
+		/**
+		 * @var int|null
+		 */
+		private $exhaust = null;
+
+		/**
 		 * @var int[]
 		 */
 		private $values = [];
@@ -88,6 +98,42 @@
 		 */
 		public function setDamageType(string $damageType) {
 			$this->damageType = $damageType;
+
+			return $this;
+		}
+
+		/**
+		 * @return int|null
+		 */
+		public function getStun(): ?int {
+			return $this->stun;
+		}
+
+		/**
+		 * @param int|null $stun
+		 *
+		 * @return $this
+		 */
+		public function setStun(?int $stun) {
+			$this->stun = $stun;
+
+			return $this;
+		}
+
+		/**
+		 * @return int|null
+		 */
+		public function getExhaust(): ?int {
+			return $this->exhaust;
+		}
+
+		/**
+		 * @param int|null $exhaust
+		 *
+		 * @return $this
+		 */
+		public function setExhaust(?int $exhaust) {
+			$this->exhaust = $exhaust;
 
 			return $this;
 		}

@@ -25,5 +25,17 @@ App\Entity\MotionValue:
             nullable: true
             column: damage_type
         values:
+        stun:
+            type: smallint
+            nullable: true
+            options:
+                unsigned: true
+            column: stun_potency
+        exhaust:
+            type: smallint
+            nullable: true
+            options:
+                unsigned: true
+            column: exhaust_potency
             type: json
             nullable: false
