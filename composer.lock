@@ -95,16 +95,16 @@
         },
         {
             "name": "dbstudios/doctrine-query-document",
-            "version": "0.2.2",
+            "version": "0.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/LartTyler/doctrine-query-document.git",
-                "reference": "2632388655b62e10ae0483f6cc639f6768a3900e"
+                "reference": "8beed2036d085dd5a4f81c15b03f6de38068fb15"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/LartTyler/doctrine-query-document/zipball/2632388655b62e10ae0483f6cc639f6768a3900e",
-                "reference": "2632388655b62e10ae0483f6cc639f6768a3900e",
+                "url": "https://api.github.com/repos/LartTyler/doctrine-query-document/zipball/8beed2036d085dd5a4f81c15b03f6de38068fb15",
+                "reference": "8beed2036d085dd5a4f81c15b03f6de38068fb15",
                 "shasum": ""
             },
             "require": {
@@ -132,7 +132,7 @@
                 }
             ],
             "description": "Allows building Doctrine queries using MongoDB-style query documents",
-            "time": "2018-05-09T14:09:59+00:00"
+            "time": "2018-05-10T23:30:01+00:00"
         },
         {
             "name": "dbstudios/doze",
@@ -987,16 +987,16 @@
         },
         {
             "name": "doctrine/migrations",
-            "version": "v1.7.1",
+            "version": "v1.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/migrations.git",
-                "reference": "d3e8b903233d5fb7f00193c95eec501f27c0b908"
+                "reference": "3e7656c5adfd9b7d0d8757aa1e9e8daf43a6f200"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/migrations/zipball/d3e8b903233d5fb7f00193c95eec501f27c0b908",
-                "reference": "d3e8b903233d5fb7f00193c95eec501f27c0b908",
+                "url": "https://api.github.com/repos/doctrine/migrations/zipball/3e7656c5adfd9b7d0d8757aa1e9e8daf43a6f200",
+                "reference": "3e7656c5adfd9b7d0d8757aa1e9e8daf43a6f200",
                 "shasum": ""
             },
             "require": {
@@ -1056,7 +1056,7 @@
                 "database",
                 "migrations"
             ],
-            "time": "2018-05-07T12:37:11+00:00"
+            "time": "2018-05-09T21:04:56+00:00"
         },
         {
             "name": "doctrine/orm",
@@ -4003,16 +4003,16 @@
     "packages-dev": [
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.55.9",
+            "version": "3.55.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "ec7b972330ce65fa33875025ffec8e09e0476a8f"
+                "reference": "237f2acff17238ac723845e0f302d5672d0bf0a1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/ec7b972330ce65fa33875025ffec8e09e0476a8f",
-                "reference": "ec7b972330ce65fa33875025ffec8e09e0476a8f",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/237f2acff17238ac723845e0f302d5672d0bf0a1",
+                "reference": "237f2acff17238ac723845e0f302d5672d0bf0a1",
                 "shasum": ""
             },
             "require": {
@@ -4079,7 +4079,7 @@
                 "s3",
                 "sdk"
             ],
-            "time": "2018-05-08T16:37:41+00:00"
+            "time": "2018-05-10T19:27:13+00:00"
         },
         {
             "name": "mtdowling/jmespath.php",

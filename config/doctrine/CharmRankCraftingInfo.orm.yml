@@ -13,6 +13,13 @@ App\Entity\CharmRankCraftingInfo:
         craftable:
             type: boolean
             nullable: false
+        materialsLength:
+            type: integer
+            nullable: false
+            options:
+                unsigned: true
+                default: 0
+            column: materials_length
     manyToMany:
         materials:
             targetEntity: App\Entity\CraftingMaterialCost

@@ -13,6 +13,27 @@ App\Entity\WeaponCraftingInfo:
         craftable:
             type: boolean
             nullable: false
+        branchesLength:
+            type: integer
+            nullable: false
+            options:
+                unsigned: true
+                default: 0
+            column: branches_length
+        craftingMaterialsLength:
+            type: integer
+            nullable: false
+            options:
+                unsigned: true
+                default: 0
+            column: crafting_materials_length
+        upgradeMaterialsLength:
+            type: integer
+            nullable: false
+            options:
+                unsigned: true
+                default: 0
+            column: upgrade_materials_length
     manyToOne:
         previous:
             targetEntity: App\Entity\Weapon

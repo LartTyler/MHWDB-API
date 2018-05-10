@@ -7,7 +7,7 @@
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\Common\Collections\Selectable;
 
-	class WeaponCraftingInfo implements EntityInterface {
+	class WeaponCraftingInfo implements EntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
 
 		/**
@@ -34,6 +34,24 @@
 		 * @var Collection|Selectable|CraftingMaterialCost[]
 		 */
 		private $upgradeMaterials;
+
+		/**
+		 * @var int
+		 * @internal Used to allow API queries against "branches.length"
+		 */
+		private $branchesLength = 0;
+
+		/**
+		 * @var int
+		 * @internal Used to allow API queries against "craftingMaterials.length"
+		 */
+		private $craftingMaterialsLength = 0;
+
+		/**
+		 * @var int
+		 * @internal Used to allow API queries against "upgradeMaterials.length"
+		 */
+		private $upgradeMaterialsLength = 0;
 
 		/**
 		 * WeaponCraftingInfo constructor.
@@ -103,5 +121,14 @@
 		 */
 		public function getUpgradeMaterials() {
 			return $this->upgradeMaterials;
+		}
+
+		/**
+		 * {@inheritdoc}
+		 */
+		public function syncLengthFields(): void {
+			$this->branchesLength = $this->branches->count();
+			$this->craftingMaterialsLength = $this->craftingMaterials->count();
+			$this->upgradeMaterialsLength = $this->upgradeMaterials->count();
 		}
 	}

@@ -7,7 +7,7 @@
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\Common\Collections\Selectable;
 
-	class CharmRank implements EntityInterface {
+	class CharmRank implements EntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
 
 		/**
@@ -39,6 +39,12 @@
 		 * @var CharmRankCraftingInfo|null
 		 */
 		private $crafting = null;
+
+		/**
+		 * @var int
+		 * @internal Used to allow API queries against "skills.length"
+		 */
+		private $skillsLength = 0;
 
 		/**
 		 * CharmRank constructor.
@@ -138,5 +144,12 @@
 			$this->crafting = $crafting;
 
 			return $this;
+		}
+
+		/**
+		 * {@inheritdoc}
+		 */
+		public function syncLengthFields(): void {
+			$this->skillsLength = $this->skills->count();
 		}
 	}
