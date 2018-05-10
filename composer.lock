@@ -95,16 +95,16 @@
         },
         {
             "name": "dbstudios/doctrine-query-document",
-            "version": "0.2.3",
+            "version": "0.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/LartTyler/doctrine-query-document.git",
-                "reference": "617ab4b611d529109918e671028e6453cd4a64ea"
+                "reference": "8beed2036d085dd5a4f81c15b03f6de38068fb15"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/LartTyler/doctrine-query-document/zipball/617ab4b611d529109918e671028e6453cd4a64ea",
-                "reference": "617ab4b611d529109918e671028e6453cd4a64ea",
+                "url": "https://api.github.com/repos/LartTyler/doctrine-query-document/zipball/8beed2036d085dd5a4f81c15b03f6de38068fb15",
+                "reference": "8beed2036d085dd5a4f81c15b03f6de38068fb15",
                 "shasum": ""
             },
             "require": {
@@ -132,7 +132,7 @@
                 }
             ],
             "description": "Allows building Doctrine queries using MongoDB-style query documents",
-            "time": "2018-05-10T20:46:27+00:00"
+            "time": "2018-05-10T23:30:01+00:00"
         },
         {
             "name": "dbstudios/doze",
