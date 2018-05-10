@@ -8,7 +8,7 @@
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\Common\Collections\Selectable;
 
-	class Decoration implements EntityInterface, SluggableInterface {
+	class Decoration implements EntityInterface, SluggableInterface, LengthCachingEntityInterface {
 		use EntityTrait;
 		use SluggableTrait;
 
@@ -37,6 +37,12 @@
 		 * @deprecated Preserves BC for < 1.9.0 and will be removed in the future
 		 */
 		private $skill;
+
+		/**
+		 * @var int
+		 * @internal Used to allow API queries against "skills.length"
+		 */
+		private $skillsLength = 0;
 
 		/**
 		 * Decoration constructor.
@@ -124,5 +130,12 @@
 			$this->skill = $skill;
 
 			return $this;
+		}
+
+		/**
+		 * {@inheritdoc}
+		 */
+		public function syncLengthFields(): void {
+			$this->skillsLength = $this->skills->count();
 		}
 	}

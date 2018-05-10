@@ -8,7 +8,7 @@
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\Common\Collections\Selectable;
 
-	class ArmorSet implements EntityInterface {
+	class ArmorSet implements EntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
 
 		/**
@@ -30,6 +30,12 @@
 		 * @var ArmorSetBonus
 		 */
 		private $bonus = null;
+
+		/**
+		 * @var int
+		 * @internal Used to allow API queries against "pieces.length"
+		 */
+		private $piecesLength = 0;
 
 		/**
 		 * ArmorSet constructor.
@@ -82,5 +88,12 @@
 			$this->bonus = $bonus;
 
 			return $this;
+		}
+
+		/**
+		 * {@inheritdoc}
+		 */
+		public function syncLengthFields(): void {
+			$this->piecesLength = $this->pieces->count();
 		}
 	}

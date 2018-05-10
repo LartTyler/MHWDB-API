@@ -9,7 +9,7 @@
 	use Doctrine\Common\Collections\Criteria;
 	use Doctrine\Common\Collections\Selectable;
 
-	class Weapon implements EntityInterface, SluggableInterface {
+	class Weapon implements EntityInterface, SluggableInterface, LengthCachingEntityInterface {
 		use EntityTrait;
 		use SluggableTrait;
 		use AttributableTrait;
@@ -53,6 +53,18 @@
 		 * @var WeaponAssets|null
 		 */
 		private $assets = null;
+
+		/**
+		 * @var int
+		 * @internal Used to allow API queries against "elements.length"
+		 */
+		private $elementsLength = 0;
+
+		/**
+		 * @var int
+		 * @internal Used to allow API queries against "slots.length"
+		 */
+		private $slotsLength = 0;
 
 		/**
 		 * Weapon constructor.
@@ -209,5 +221,13 @@
 				$this->getElements()->add(new WeaponElement($this, $element, $damage, $hidden));
 
 			return $this;
+		}
+
+		/**
+		 * {@inheritdoc}
+		 */
+		public function syncLengthFields(): void {
+			$this->elementsLength = $this->elements->count();
+			$this->slotsLength = $this->slots->count();
 		}
 	}

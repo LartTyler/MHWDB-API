@@ -7,7 +7,7 @@
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\Common\Collections\Selectable;
 
-	class Armor implements EntityInterface {
+	class Armor implements EntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
 		use SluggableTrait;
 		use AttributableTrait;
@@ -66,6 +66,18 @@
 		 * @var ArmorCraftingInfo|null
 		 */
 		private $crafting = null;
+
+		/**
+		 * @var int
+		 * @internal Used to allow API queries against "skills.length"
+		 */
+		private $skillsLength = 0;
+
+		/**
+		 * @var int
+		 * @internal Used to allow API queries against "slots.length"
+		 */
+		private $slotsLength = 0;
 
 		/**
 		 * Armor constructor.
@@ -234,5 +246,13 @@
 			$this->crafting = $crafting;
 
 			return $this;
+		}
+
+		/**
+		 * @return void
+		 */
+		public function syncLengthFields(): void {
+			$this->skillsLength = $this->skills->count();
+			$this->slotsLength = $this->slots->count();
 		}
 	}

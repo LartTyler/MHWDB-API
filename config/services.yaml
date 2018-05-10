@@ -35,3 +35,14 @@ services:
             -
                 region: 'us-east-2'
                 version: 'latest'
+
+    App\Doctrine\LengthCachingListener:
+        tags:
+            -
+                name: doctrine.event_listener
+                event: prePersist
+                method: handle
+            -
+                name: doctrine.event_listener
+                event: preUpdate
+                method: handle

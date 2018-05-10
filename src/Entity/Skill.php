@@ -8,7 +8,7 @@
 	use Doctrine\Common\Collections\Criteria;
 	use Doctrine\Common\Collections\Selectable;
 
-	class Skill implements EntityInterface, SluggableInterface {
+	class Skill implements EntityInterface, SluggableInterface, LengthCachingEntityInterface {
 		use EntityTrait;
 		use SluggableTrait;
 
@@ -26,6 +26,12 @@
 		 * @var string|null
 		 */
 		private $description = null;
+
+		/**
+		 * @var int
+		 * @internal Used to allow API queries against "ranks.length"
+		 */
+		private $ranksLength = 0;
 
 		/**
 		 * Skill constructor.
@@ -106,5 +112,12 @@
 		public function setDescription(?string $description) {
 			$this->description = $description;
 			return $this;
+		}
+
+		/**
+		 * {@inheritdoc}
+		 */
+		public function syncLengthFields(): void {
+			$this->ranksLength = $this->ranks->count();
 		}
 	}

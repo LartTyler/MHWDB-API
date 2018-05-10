@@ -22,6 +22,13 @@ App\Entity\CharmRank:
             nullable: false
             options:
                 unsigned: true
+        skillsLength:
+            type: integer
+            nullable: false
+            options:
+                unsigned: true
+                default: 0
+            column: skills_length
     oneToOne:
         crafting:
             targetEntity: App\Entity\CharmRankCraftingInfo

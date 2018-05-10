@@ -20,6 +20,13 @@ App\Entity\Charm:
             length: 64
             nullable: false
             unique: true
+        ranksLength:
+            type: integer
+            nullable: false
+            options:
+                unsigned: true
+                default: 0
+            column: ranks_length
     oneToMany:
         ranks:
             targetEntity: App\Entity\CharmRank

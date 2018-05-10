@@ -38,6 +38,20 @@ App\Entity\Armor:
         attributes:
             type: json
             nullable: false
+        skillsLength:
+            type: integer
+            nullable: false
+            options:
+                unsigned: true
+                default: 0
+            column: skills_length
+        slotsLength:
+            type: integer
+            nullable: false
+            options:
+                unsigned: true
+                default: 0
+            column: slots_length
     embedded:
         resistances:
             class: App\Entity\Resistances
