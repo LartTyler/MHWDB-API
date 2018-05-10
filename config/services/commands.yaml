@@ -50,3 +50,9 @@ services:
             -
                 name: console.command
                 command: app:migrate:weapon-element-attributes
+
+    App\Command\SyncEntityLengthCachesCommand:
+        tags:
+            -
+                name: console.command
+                command: app:util:sync-entity-length-caches
