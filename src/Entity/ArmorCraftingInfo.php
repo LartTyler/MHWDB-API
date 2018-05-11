@@ -7,13 +7,19 @@
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\Common\Collections\Selectable;
 
-	class ArmorCraftingInfo implements EntityInterface {
+	class ArmorCraftingInfo implements EntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
 
 		/**
 		 * @var Collection|Selectable|CraftingMaterialCost[]
 		 */
 		private $materials;
+
+		/**
+		 * @var int
+		 * @internal Used to allow API queries against "materials.length"
+		 */
+		private $materialsLength = 0;
 
 		/**
 		 * ArmorCraftingInfo constructor.
@@ -27,5 +33,12 @@
 		 */
 		public function getMaterials() {
 			return $this->materials;
+		}
+
+		/**
+		 * {@inheritdoc}
+		 */
+		public function syncLengthFields(): void {
+			$this->materialsLength = $this->materials->count();
 		}
 	}

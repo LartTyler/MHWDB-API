@@ -8,7 +8,7 @@
 	use Doctrine\Common\Collections\Criteria;
 	use Doctrine\Common\Collections\Selectable;
 
-	class Charm implements EntityInterface, SluggableInterface {
+	class Charm implements EntityInterface, SluggableInterface, LengthCachingEntityInterface {
 		use EntityTrait;
 		use SluggableTrait;
 
@@ -21,6 +21,12 @@
 		 * @var Collection|Selectable|CharmRank[]
 		 */
 		private $ranks;
+
+		/**
+		 * @var int
+		 * @internal Used to allow API queries against "ranks.length"
+		 */
+		private $ranksLength = 0;
 
 		/**
 		 * Charm constructor.
@@ -64,5 +70,12 @@
 				return $matches->first();
 
 			return null;
+		}
+
+		/**
+		 * {@inheritdoc}
+		 */
+		public function syncLengthFields(): void {
+			$this->ranksLength = $this->ranks->count();
 		}
 	}

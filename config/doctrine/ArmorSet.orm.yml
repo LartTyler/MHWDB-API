@@ -19,6 +19,13 @@ App\Entity\ArmorSet:
             type: string
             length: 32
             nullable: false
+        piecesLength:
+            type: integer
+            nullable: false
+            options:
+                unsigned: true
+                default: 0
+            column: pieces_length
     oneToMany:
         pieces:
             targetEntity: App\Entity\Armor

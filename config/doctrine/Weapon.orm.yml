@@ -36,6 +36,20 @@ App\Entity\Weapon:
         attributes:
             type: json
             nullable: false
+        elementsLength:
+            type: integer
+            nullable: false
+            options:
+                unsigned: true
+                default: 0
+            column: elements_length
+        slotsLength:
+            type: integer
+            nullable: false
+            options:
+                unsigned: true
+                default: 0
+            column: slots_length
     embedded:
         attack:
             class: App\Entity\WeaponAttackValues
