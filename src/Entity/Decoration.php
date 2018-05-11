@@ -33,12 +33,6 @@
 		private $skills;
 
 		/**
-		 * @var Skill
-		 * @deprecated Preserves BC for < 1.9.0 and will be removed in the future
-		 */
-		private $skill;
-
-		/**
 		 * @var int
 		 * @internal Used to allow API queries against "skills.length"
 		 */
@@ -108,28 +102,6 @@
 		 */
 		public function getSkills() {
 			return $this->skills;
-		}
-
-		/**
-		 * @return Skill
-		 * @deprecated Preserves BC for < 1.9.0 and will be removed in the future
-		 * @see Decoration::getSkills()
-		 */
-		public function getSkill(): Skill {
-			return $this->skill;
-		}
-
-		/**
-		 * @param Skill $skill
-		 *
-		 * @return $this
-		 * @deprecated Preserves BC for < 1.9.0 and will be removed in the future
-		 * @see Decoration::getSkills()
-		 */
-		public function setSkill(Skill $skill) {
-			$this->skill = $skill;
-
-			return $this;
 		}
 
 		/**
