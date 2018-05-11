@@ -22,45 +22,7 @@
 		const AFFINITY = 'affinity';
 		const DAMAGE_TYPE = 'damageType';
 
-		/**
-		 * @deprecated Use {@see WeaponElement} instead. Will be removed on 2018-05-12.
-		 */
-		const ELEM_TYPE = 'elementType';
-
-		/**
-		 * @deprecated Use {@see WeaponElement} instead. Will be removed on 2018-05-12.
-		 */
-		const ELEM_DAMAGE = 'elementDamage';
-
-		/**
-		 * @deprecated Use {@see WeaponElement} instead. Will be removed on 2018-05-12.
-		 */
-		const ELEM_HIDDEN = 'elementHidden';
-
-		/**
-		 * @deprecated Use {@see WeaponElement} instead. Will be removed on 2018-05-12.
-		 */
-		const ELEM_TYPE_2 = 'elementType2';
-
-		/**
-		 * @deprecated Use {@see WeaponElement} instead. Will be removed on 2018-05-12.
-		 */
-		const ELEM_DAMAGE_2 = 'elementDamage2';
-
-		/**
-		 * @deprecated Use {@see WeaponElement} instead. Will be removed on 2018-05-12.
-		 */
-		const ELEM_HIDDEN_2 = 'elementHidden2';
-
 		const ELDERSEAL = 'elderseal';
-
-		// -- Melee Weapon Attributes --
-		const SHARP_RED = 'sharpnessRed';
-		const SHARP_ORANAGE = 'sharpnessOrange';
-		const SHARP_YELLOW = 'sharpnessYellow';
-		const SHARP_GREEN = 'sharpnessGreen';
-		const SHARP_BLUE = 'sharpnessBlue';
-		const SHARP_WHITE = 'sharpnessWhite';
 
 		// -- Insect Glaive Attributes --
 		const IG_BOOST_TYPE = 'boostType';

@@ -43,32 +43,7 @@
 					->setDamage((int)strtok($rawElement, ' '))
 					->setType(strtok(''));
 
-				// DEPRECATED The region below preserves BC for < 1.9.0 and will be removed in the future
-				// region Old Element Storage
-				if ($element->isHidden()) {
-					if ($i === 0)
-						$hiddenKey = Attribute::ELEM_HIDDEN;
-					else if ($i === 1)
-						$hiddenKey = Attribute::ELEM_HIDDEN_2;
-					else
-						throw new \RuntimeException($target->getName() . ' has more than two elements!');
-
-					$target->setAttribute($hiddenKey, true);
-				}
-
-				if ($i === 0) {
-					$typeKey = Attribute::ELEM_TYPE;
-					$damageKey = Attribute::ELEM_DAMAGE;
-				} else if ($i === 1) {
-					$typeKey = Attribute::ELEM_TYPE_2;
-					$damageKey = Attribute::ELEM_DAMAGE_2;
-				} else
-					throw new \RuntimeException($target->getName() . ' has more than two elements!');
-
-				$target
-					->setAttribute($damageKey, $element->getDamage())
-					->setAttribute($typeKey, $element->getType());
-				// endregion
+				$target->setElement($element);
 			}
 		}
 	}
