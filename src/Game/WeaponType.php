@@ -55,6 +55,15 @@
 		}
 
 		/**
+		 * @param string $type
+		 *
+		 * @return bool
+		 */
+		public static function isValid(string $type): bool {
+			return in_array($type, self::all());
+		}
+
+		/**
 		 * WeaponType constructor.
 		 */
 		private function __construct() {

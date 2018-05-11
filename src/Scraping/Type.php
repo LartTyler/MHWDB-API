@@ -14,6 +14,7 @@
 		const ARMOR_DEFENSE = 'armor-defense';
 		const WEAPON_ICONS = 'weapon-icons';
 		const WEAPON_IMAGES = 'weapon-images';
+		const MOTION_VALUES = 'motion-values';
 
 		/**
 		 * Type constructor.
