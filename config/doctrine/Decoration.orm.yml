@@ -37,14 +37,6 @@ App\Entity\Decoration:
                 unsigned: true
                 default: 0
             column: skills_length
-    oneToOne:
-        # DEPRECATED This field preserves BC for < 1.9.0 and will be removed in the future
-        skill:
-            targetEntity: App\Entity\Skill
-            joinColumn:
-                nullable: false
-                options:
-                    unsigned: true
     manyToMany:
         skills:
             targetEntity: App\Entity\SkillRank

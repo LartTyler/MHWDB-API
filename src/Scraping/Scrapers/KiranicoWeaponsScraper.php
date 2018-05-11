@@ -135,6 +135,11 @@
 			foreach ($data->getSlots() as $rank)
 				$weapon->getSlots()->add(new Slot($rank));
 
+			$weapon->getElements()->clear();
+
+			foreach ($data->getElements() as $element)
+				$weapon->setElement($element->getType(), $element->getDamage(), $element->isHidden());
+
 			$info = $weapon->getCrafting();
 
 			if (!$info) {
