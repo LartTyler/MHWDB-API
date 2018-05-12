@@ -150,22 +150,9 @@
 				$this->manager->persist($asset);
 			}
 
-			if ($group = $weapon->getAssets()) {
-				$existing = $group->getImage();
-
-				if (!$existing)
-					$group->setImage($asset);
-				else if ($existing !== $asset) {
-					$this->s3Client->deleteObject([
-						'Bucket' => 'assets.mhw-db.com',
-						'Key' => substr(parse_url($existing->getUri(), PHP_URL_PATH), 1),
-					]);
-
-					$this->manager->remove($existing);
-
-					$group->setImage($asset);
-				}
-			} else
+			if ($group = $weapon->getAssets())
+				$group->setImage($asset);
+			else
 				$weapon->setAssets(new WeaponAssets(null, $asset));
 		}
 
