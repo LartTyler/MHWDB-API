@@ -4,7 +4,7 @@
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
 
-	class MotionValue implements EntityInterface {
+	class MotionValue implements EntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
 
 		/**
@@ -36,6 +36,12 @@
 		 * @var int[]
 		 */
 		private $hits = [];
+
+		/**
+		 * @var int
+		 * @internal Used to allow API queries against "hits.length"
+		 */
+		private $hitsLength = 0;
 
 		/**
 		 * MotionValue constructor.
@@ -154,5 +160,12 @@
 			$this->hits = $hits;
 
 			return $this;
+		}
+
+		/**
+		 * {@inheritdoc}
+		 */
+		public function syncLengthFields(): void {
+			$this->hitsLength = sizeof($this->hits);
 		}
 	}

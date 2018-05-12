@@ -8,15 +8,13 @@
 	/**
 	 * Auto-generated Migration: Please modify to your needs!
 	 */
-	final class Version20180509191153 extends AbstractMigration {
+	final class Version20180512214206 extends AbstractMigration {
 		public function up(Schema $schema): void {
 			// this up() migration is auto-generated, please modify it to your needs
 			$this->abortIf($this->connection->getDatabasePlatform()->getName() !==
 				'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-			$this->addSql('ALTER TABLE weapons ADD attack_display SMALLINT UNSIGNED NOT NULL DEFAULT 0, ADD attack_raw SMALLINT UNSIGNED NOT NULL DEFAULT 0');
-			$this->addSql('UPDATE weapons SET attack_raw = 0');
-			$this->addSql('UPDATE weapons SET attack_display = JSON_UNQUOTE(JSON_EXTRACT(attributes, "$.attack"))');
+			$this->addSql('ALTER TABLE motion_values ADD hits_length INT UNSIGNED DEFAULT 0 NOT NULL');
 		}
 
 		public function down(Schema $schema): void {
@@ -24,6 +22,6 @@
 			$this->abortIf($this->connection->getDatabasePlatform()->getName() !==
 				'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-			$this->addSql('ALTER TABLE weapons DROP attack_display, DROP attack_raw');
+			$this->addSql('ALTER TABLE motion_values DROP hits_length');
 		}
 	}

@@ -10,6 +10,7 @@
 	use App\Entity\CharmRank;
 	use App\Entity\CharmRankCraftingInfo;
 	use App\Entity\Decoration;
+	use App\Entity\MotionValue;
 	use App\Entity\Skill;
 	use App\Entity\SkillRank;
 	use App\Entity\Weapon;
@@ -53,6 +54,9 @@
 				],
 				Decoration::class => [
 					'skills.length' => 'skillsLength',
+				],
+				MotionValue::class => [
+					'hits.length' => 'hitsLength',
 				],
 				Skill::class => [
 					'ranks.length' => 'ranksLength',

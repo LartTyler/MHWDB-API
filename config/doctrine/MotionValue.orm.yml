@@ -44,3 +44,10 @@ App\Entity\MotionValue:
         hits:
             type: json
             nullable: false
+        hitsLength:
+            type: integer
+            nullable: false
+            options:
+                unsigned: true
+                default: 0
+            column: hits_length
