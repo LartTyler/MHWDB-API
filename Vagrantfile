@@ -14,7 +14,10 @@ Vagrant.configure(2) do |config|
 
   config.vm.provision "shell", privileged: true, name: 'system-init', inline: <<-SHELL
     yum update -y
-    yum install -y centos-release-scl.noarch vim wget telnet
+    yum install -y centos-release-scl.noarch vim wget telnet ntpd
+
+    systemctl enable ntpd
+    ntpdate pool.ntp.org
 
     yum install -y rh-mariadb102-mariadb rh-mariadb102-mariadb-server
     echo "source scl_source enable rh-mariadb102" > /etc/profile.d/scl.sh

@@ -9,7 +9,7 @@ App\Entity\WeaponAssets:
                 unsigned: true
             generator:
                 strategy: IDENTITY
-    oneToOne:
+    manyToOne:
         icon:
             targetEntity: App\Entity\Asset
             cascade:

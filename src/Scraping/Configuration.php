@@ -2,6 +2,8 @@
 	namespace App\Scraping;
 
 	use Http\Client\Common\HttpMethodsClient;
+	use Http\Client\Common\Plugin\RedirectPlugin;
+	use Http\Client\Common\PluginClient;
 	use Http\Discovery\HttpClientDiscovery;
 	use Http\Discovery\MessageFactoryDiscovery;
 	use Http\Discovery\UriFactoryDiscovery;
@@ -32,7 +34,9 @@
 			UriFactory $uriFactory = null
 		) {
 			if (!$httpClient)
-				$httpClient = new HttpMethodsClient(HttpClientDiscovery::find(), MessageFactoryDiscovery::find());
+				$httpClient = new HttpMethodsClient(new PluginClient(HttpClientDiscovery::find(), [
+					new RedirectPlugin(),
+				]), MessageFactoryDiscovery::find());
 
 			$this->httpClient = $httpClient;
 			$this->baseUri = ($uriFactory ?? UriFactoryDiscovery::find())->createUri($baseUri);

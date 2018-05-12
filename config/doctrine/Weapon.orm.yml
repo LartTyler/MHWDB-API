@@ -50,6 +50,10 @@ App\Entity\Weapon:
                 unsigned: true
                 default: 0
             column: slots_length
+    embedded:
+        attack:
+            class: App\Entity\WeaponAttackValues
+            prefix: attack_
     oneToOne:
         crafting:
             targetEntity: App\Entity\WeaponCraftingInfo

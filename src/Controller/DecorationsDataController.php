@@ -46,9 +46,6 @@
 					];
 				}, $decoration->getSkills()->toArray()),
 				'slot' => $decoration->getSlot(),
-
-				// DEPRECATED This field preserves BC for < 1.9.0 and will be removed in the future
-				'skill' => $decoration->getSkill()->getId(),
 			];
 		}
 	}

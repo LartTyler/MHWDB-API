@@ -11,6 +11,7 @@
 	use App\Entity\CharmRankCraftingInfo;
 	use App\Entity\Decoration;
 	use App\Entity\LengthCachingEntityInterface;
+	use App\Entity\MotionValue;
 	use App\Entity\Skill;
 	use App\Entity\Weapon;
 	use App\Entity\WeaponCraftingInfo;
@@ -30,6 +31,7 @@
 			CharmRank::class,
 			CharmRankCraftingInfo::class,
 			Decoration::class,
+			MotionValue::class,
 			Skill::class,
 			Weapon::class,
 			WeaponCraftingInfo::class,

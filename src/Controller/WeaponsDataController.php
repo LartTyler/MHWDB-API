@@ -58,6 +58,7 @@
 			};
 
 			$crafting = $weapon->getCrafting();
+			$assets = $weapon->getAssets();
 
 			$data = [
 				'id' => $weapon->getId(),
@@ -65,6 +66,10 @@
 				'name' => $weapon->getName(),
 				'type' => $weapon->getType(),
 				'rarity' => $weapon->getRarity(),
+				'attack' => [
+					'display' => $weapon->getAttack()->getDisplay(),
+					'raw' => $weapon->getAttack()->getRaw(),
+				],
 				'slots' => array_map(function(Slot $slot): array {
 					return [
 						'rank' => $slot->getRank(),
@@ -87,6 +92,10 @@
 					}, $crafting->getBranches()->toArray()),
 					'craftingMaterials' => call_user_func($materialTransformer, $crafting->getCraftingMaterials()),
 					'upgradeMaterials' => call_user_func($materialTransformer, $crafting->getUpgradeMaterials()),
+				] : null,
+				'assets' => $assets ? [
+					'icon' => $assets->getIcon() ? $assets->getIcon()->getUri() : null,
+					'image' => $assets->getImage() ? $assets->getImage()->getUri() : null,
 				] : null,
 			];
 

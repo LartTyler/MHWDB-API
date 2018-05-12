@@ -45,6 +45,11 @@
 		private $elements;
 
 		/**
+		 * @var WeaponAttackValues
+		 */
+		private $attack;
+
+		/**
 		 * @var WeaponCraftingInfo|null
 		 */
 		private $crafting = null;
@@ -79,6 +84,7 @@
 			$this->rarity = $rarity;
 			$this->slots = new ArrayCollection();
 			$this->sharpness = new WeaponSharpness();
+			$this->attack = new WeaponAttackValues();
 			$this->elements = new ArrayCollection();
 
 			$this->setSlug($name);
@@ -221,6 +227,13 @@
 				$this->getElements()->add(new WeaponElement($this, $element, $damage, $hidden));
 
 			return $this;
+		}
+
+		/**
+		 * @return WeaponAttackValues
+		 */
+		public function getAttack(): WeaponAttackValues {
+			return $this->attack;
 		}
 
 		/**
