@@ -53,7 +53,7 @@
 				'damageType' => $motion->getDamageType(),
 				'stun' => $motion->getStun(),
 				'exhaust' => $motion->getExhaust(),
-				'values' => $motion->getHits(),
+				'hits' => $motion->getHits(),
 			];
 		}
 	}
