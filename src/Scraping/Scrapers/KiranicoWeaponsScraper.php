@@ -13,8 +13,10 @@
 	use App\Scraping\ProgressAwareTrait;
 	use App\Scraping\ScraperInterface;
 	use App\Scraping\Scrapers\Helpers\KiranicoWeaponHelper;
+	use App\Scraping\Scrapers\Helpers\KiranicoWeaponParser\Element;
 	use App\Scraping\Type;
 	use App\Utility\StringUtil;
+	use Doctrine\Common\Collections\Criteria;
 	use Doctrine\Common\Persistence\ObjectManager;
 	use Symfony\Component\DomCrawler\Crawler;
 	use Symfony\Component\HttpFoundation\Response;
@@ -135,10 +137,21 @@
 			foreach ($data->getSlots() as $rank)
 				$weapon->getSlots()->add(new Slot($rank));
 
-			$weapon->getElements()->clear();
+			$elementTypes = [];
 
-			foreach ($data->getElements() as $element)
+			foreach ($data->getElements() as $element) {
 				$weapon->setElement($element->getType(), $element->getDamage(), $element->isHidden());
+
+				$elementTypes[] = $element->getType();
+			}
+
+			$removed = $weapon->getElements()->matching(
+				Criteria::create()
+					->where(Criteria::expr()->notIn('type', $elementTypes))
+			);
+
+			foreach ($removed as $item)
+				$weapon->getElements()->removeElement($item);
 
 			$info = $weapon->getCrafting();
 
