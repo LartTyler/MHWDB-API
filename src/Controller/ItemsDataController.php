@@ -2,6 +2,7 @@
 	namespace App\Controller;
 
 	use App\Entity\Item;
+	use App\Response\Projection;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Symfony\Bridge\Doctrine\RegistryInterface;
@@ -21,7 +22,6 @@
 
 		/**
 		 * @param EntityInterface|Item|null $entity
-		 *
 		 * @param Projection                $projection
 		 *
 		 * @return array|null

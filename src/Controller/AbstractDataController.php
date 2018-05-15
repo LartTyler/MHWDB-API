@@ -175,15 +175,18 @@
 
 			if (is_array($data))
 				$data = $this->normalizeMany($data, $projection);
-			else if ($data instanceof EntityInterface)
+			else if ($data instanceof EntityInterface) {
 				$data = $this->normalizeOne($data, $projection);
+
+				$projection->filter($data);
+			}
 
 			if ($data === null)
 				$status = Response::HTTP_NO_CONTENT;
 			else
 				$status = Response::HTTP_OK;
 
-			return new JsonResponse($projection->filter($data), $status, [
+			return new JsonResponse($data, $status, [
 				'Cache-Control' => 'public, max-age=14400',
 				'Content-Type' => 'application/json',
 			]);
@@ -218,8 +221,11 @@
 		protected function normalizeMany(array $entities, Projection $projection): array {
 			$normalized = [];
 
-			foreach ($entities as $entity)
-				$normalized[] = $this->normalizeOne($entity, $projection);
+			foreach ($entities as $entity) {
+				$normal = $this->normalizeOne($entity, $projection);
+
+				$normalized[] = $projection->filter($normal);
+			}
 
 			return $normalized;
 		}

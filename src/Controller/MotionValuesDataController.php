@@ -3,6 +3,7 @@
 
 	use App\Entity\MotionValue;
 	use App\Game\WeaponType;
+	use App\Response\Projection;
 	use App\Response\UnknownWeaponTypeError;
 	use DaybreakStudios\Doze\Errors\ApiError;
 	use DaybreakStudios\DozeBundle\ResponderService;
@@ -39,7 +40,6 @@
 
 		/**
 		 * @param EntityInterface|MotionValue|null $entity
-		 *
 		 * @param Projection                       $projection
 		 *
 		 * @return array|null

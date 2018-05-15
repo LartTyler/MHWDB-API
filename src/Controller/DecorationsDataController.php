@@ -3,6 +3,7 @@
 
 	use App\Entity\Decoration;
 	use App\Entity\SkillRank;
+	use App\Response\Projection;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Symfony\Bridge\Doctrine\RegistryInterface;
@@ -22,7 +23,6 @@
 
 		/**
 		 * @param EntityInterface|Decoration|null $entity
-		 *
 		 * @param Projection                      $projection
 		 *
 		 * @return array|null

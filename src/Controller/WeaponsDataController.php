@@ -6,6 +6,7 @@
 	use App\Entity\Weapon;
 	use App\Entity\WeaponElement;
 	use App\Game\WeaponType;
+	use App\Response\Projection;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\Collection;
@@ -26,7 +27,6 @@
 
 		/**
 		 * @param EntityInterface|Weapon|null $entity
-		 *
 		 * @param Projection                  $projection
 		 *
 		 * @return array|null

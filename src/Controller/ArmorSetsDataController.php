@@ -8,6 +8,7 @@
 	use App\Entity\CraftingMaterialCost;
 	use App\Entity\SkillRank;
 	use App\Entity\Slot;
+	use App\Response\Projection;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Symfony\Bridge\Doctrine\RegistryInterface;
@@ -27,7 +28,6 @@
 
 		/**
 		 * @param EntityInterface|ArmorSet|null $entity
-		 *
 		 * @param Projection                    $projection
 		 *
 		 * @return array|null
