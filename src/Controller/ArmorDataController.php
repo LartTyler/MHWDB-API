@@ -34,8 +34,6 @@
 			if (!$entity)
 				return null;
 
-			$armorSet = $entity->getArmorSet();
-			$assets = $entity->getAssets();
 			$crafting = $entity->getCrafting();
 			$defense = $entity->getDefense();
 			$resists = $entity->getResistances();
@@ -44,7 +42,7 @@
 				return $asset ? $asset->getUri() : null;
 			};
 
-			return [
+			$output = [
 				'id' => $entity->getId(),
 				'slug' => $entity->getSlug(),
 				'name' => $entity->getName(),
@@ -63,36 +61,8 @@
 					'thunder' => $resists->getThunder(),
 					'dragon' => $resists->getDragon(),
 				],
-				'slots' => array_map(function(Slot $slot): array {
-					return [
-						'rank' => $slot->getRank(),
-					];
-				}, $entity->getSlots()->toArray()),
 				// default to \stdClass to fix an empty array being returned instead of an empty object
 				'attributes' => $entity->getAttributes() ?: new \stdClass(),
-				'skills' => array_map(function(SkillRank $rank): array {
-					return [
-						'id' => $rank->getId(),
-						'slug' => $rank->getSlug(),
-						'level' => $rank->getLevel(),
-						'description' => $rank->getDescription(),
-						'modifiers' => $rank->getModifiers(),
-						'skill' => $rank->getSkill()->getId(),
-						'skillName' => $rank->getSkill()->getName(),
-					];
-				}, $entity->getSkills()->toArray()),
-				'armorSet' => $armorSet ? [
-					'id' => $armorSet->getId(),
-					'name' => $armorSet->getName(),
-					'rank' => $armorSet->getRank(),
-					'pieces' => array_map(function(Armor $armor): int {
-						return $armor->getId();
-					}, $armorSet->getPieces()->toArray()),
-				] : $armorSet,
-				'assets' => [
-					'imageMale' => $assets ? call_user_func($assetTransformer, $assets->getImageMale()) : null,
-					'imageFemale' => $assets ? call_user_func($assetTransformer, $assets->getImageFemale()) : null,
-				],
 				'crafting' => $crafting ? [
 					'materials' => array_map(function(CraftingMaterialCost $cost): array {
 						$item = $cost->getItem();
@@ -112,5 +82,105 @@
 					}, $crafting->getMaterials()->toArray()),
 				] : null,
 			];
+
+			if ($projection->isAllowed('slots')) {
+				$output['slots'] = array_map(function(Slot $slot): array {
+					return [
+						'rank' => $slot->getRank(),
+					];
+				}, $entity->getSlots()->toArray());
+			}
+
+			if ($projection->isAllowed('skills')) {
+				$output['skills'] = array_map(function(SkillRank $rank) use ($projection): array {
+					$output = [
+						'id' => $rank->getId(),
+						'slug' => $rank->getSlug(),
+						'level' => $rank->getLevel(),
+						'description' => $rank->getDescription(),
+						'modifiers' => $rank->getModifiers(),
+						'skill' => $rank->getSkill()->getId(),
+						'skillName' => $rank->getSkill()->getName(),
+					];
+
+					if ($projection->isAllowed('skills.skill'))
+						$output['skill'] = $rank->getSkill()->getId();
+
+					if ($projection->isAllowed('skills.skillName'))
+						$output['skillName'] = $rank->getSkill()->getName();
+
+					return $output;
+				}, $entity->getSkills()->toArray());
+			}
+
+			if ($projection->isAllowed('armorSet')) {
+				$armorSet = $entity->getArmorSet();
+
+				if ($armorSet) {
+					$output['armorSet'] = [
+						'id' => $armorSet->getId(),
+						'name' => $armorSet->getName(),
+						'rank' => $armorSet->getRank(),
+					];
+
+					if ($projection->isAllowed('armorSet.pieces'))
+						$output['armorSet']['pieces'] = array_map(function(Armor $armor): int {
+							return $armor->getId();
+						}, $armorSet->getPieces()->toArray());
+				} else
+					$output['armorSet'] = null;
+			}
+
+			if ($projection->isAllowed('assets')) {
+				$assets = $entity->getAssets();
+
+				if ($assets) {
+					$output['assets'] = [];
+
+					if ($projection->isAllowed('assets.imageMale'))
+						$output['assets']['imageMale'] = call_user_func($assetTransformer, $assets->getImageMale());
+
+					if ($projection->isAllowed('assets.imageFemale'))
+						$output['assets']['imageFemale'] = call_user_func($assetTransformer, $assets->getImageFemale());
+				} else
+					$output['assets'] = null;
+			}
+
+			// TODO Finish conditional crafting output
+			if ($projection->isAllowed('crafting')) {
+				$crafting = $entity->getCrafting();
+
+				if ($crafting) {
+					$output['crafting'] = [];
+
+					if ($projection->isAllowed('crafting.materials'))
+						$output['crafting']['materials'] = array_map(
+							function(CraftingMaterialCost $cost) use ($projection): array {
+								$output = [
+									'quantity' => $cost->getQuantity(),
+								];
+
+								if ($projection->isAllowed('crafting.materials.item')) {
+									$item = $cost->getItem();
+
+									$output['item'] = [
+										'id' => $item->getId(),
+										'name' => $item->getName(),
+										'description' => $item->getDescription(),
+										'rarity' => $item->getRarity(),
+										'carryLimit' => $item->getCarryLimit(),
+										'sellPrice' => $item->getSellPrice(),
+										'buyPrice' => $item->getBuyPrice(),
+									];
+								}
+
+								return $output;
+							}, $crafting->getMaterials()->toArray()
+						);
+				} else
+					$output['crafting'] = null;
+			}
+
+			return $output;
 		}
 	}
