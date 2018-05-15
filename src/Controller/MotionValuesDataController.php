@@ -3,9 +3,8 @@
 
 	use App\Entity\MotionValue;
 	use App\Game\WeaponType;
-	use App\Response\Projection;
+	use App\QueryDocument\Projection;
 	use App\Response\UnknownWeaponTypeError;
-	use DaybreakStudios\Doze\Errors\ApiError;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Symfony\Bridge\Doctrine\RegistryInterface;

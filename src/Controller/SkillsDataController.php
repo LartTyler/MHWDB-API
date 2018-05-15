@@ -3,7 +3,7 @@
 
 	use App\Entity\Skill;
 	use App\Entity\SkillRank;
-	use App\Response\Projection;
+	use App\QueryDocument\Projection;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Symfony\Bridge\Doctrine\RegistryInterface;

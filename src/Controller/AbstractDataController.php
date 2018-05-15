@@ -3,13 +3,12 @@
 
 	use App\Entity\SluggableInterface;
 	use App\QueryDocument\ApiQueryManager;
+	use App\QueryDocument\Projection;
 	use App\Response\BadProjectionObjectError;
 	use App\Response\BadQueryObjectError;
 	use App\Response\EmptySearchParametersError;
-	use App\Response\Projection;
 	use App\Response\SearchError;
 	use App\Response\SlugNotSupportedError;
-	use App\Search\SearchManager;
 	use DaybreakStudios\Doze\Errors\ApiErrorInterface;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -19,7 +18,6 @@
 	use Symfony\Component\HttpFoundation\JsonResponse;
 	use Symfony\Component\HttpFoundation\Request;
 	use Symfony\Component\HttpFoundation\Response;
-	use Symfony\Component\PropertyAccess\PropertyAccessor;
 	use Symfony\Component\Routing\RouterInterface;
 
 	abstract class AbstractDataController extends Controller {
@@ -170,7 +168,7 @@
 			}
 
 			try {
-				$projection = new Projection($fields ?: []);
+				$projection = Projection::fromFields($fields ?: []);
 			} catch (\InvalidArgumentException $e) {
 				return $this->responder->createErrorResponse(new SearchError($e->getMessage()));
 			}
@@ -184,11 +182,8 @@
 
 			if (is_array($data))
 				$data = $this->normalizeMany($data, $projection);
-			else if ($data instanceof EntityInterface) {
-				$data = $this->normalizeOne($data, $projection);
-
-				$projection->filter($data);
-			}
+			else if ($data instanceof EntityInterface)
+				$data = $projection->filter($this->normalizeOne($data, $projection));
 
 			if ($data === null)
 				$status = Response::HTTP_NO_CONTENT;
@@ -230,11 +225,8 @@
 		protected function normalizeMany(array $entities, Projection $projection): array {
 			$normalized = [];
 
-			foreach ($entities as $entity) {
-				$normal = $this->normalizeOne($entity, $projection);
-
-				$normalized[] = $projection->filter($normal);
-			}
+			foreach ($entities as $entity)
+				$normalized[] = $projection->filter($this->normalizeOne($entity, $projection));
 
 			return $normalized;
 		}

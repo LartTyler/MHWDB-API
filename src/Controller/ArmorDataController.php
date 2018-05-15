@@ -6,8 +6,7 @@
 	use App\Entity\CraftingMaterialCost;
 	use App\Entity\SkillRank;
 	use App\Entity\Slot;
-	use App\Game\Element;
-	use App\Response\Projection;
+	use App\QueryDocument\Projection;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Symfony\Bridge\Doctrine\RegistryInterface;
@@ -38,6 +37,8 @@
 			$armorSet = $entity->getArmorSet();
 			$assets = $entity->getAssets();
 			$crafting = $entity->getCrafting();
+			$defense = $entity->getDefense();
+			$resists = $entity->getResistances();
 
 			$assetTransformer = function(?Asset $asset): ?string {
 				return $asset ? $asset->getUri() : null;
@@ -50,8 +51,18 @@
 				'type' => $entity->getType(),
 				'rank' => $entity->getRank(),
 				'rarity' => $entity->getRarity(),
-				'defense' => $entity->getDefense(),
-				'resistances' => $entity->getResistances(),
+				'defense' => [
+					'base' => $defense->getBase(),
+					'max' => $defense->getMax(),
+					'augmented' => $defense->getAugmented(),
+				],
+				'resistances' => [
+					'fire' => $resists->getFire(),
+					'water' => $resists->getWater(),
+					'ice' => $resists->getIce(),
+					'thunder' => $resists->getThunder(),
+					'dragon' => $resists->getDragon(),
+				],
 				'slots' => array_map(function(Slot $slot): array {
 					return [
 						'rank' => $slot->getRank(),

@@ -6,7 +6,7 @@
 	use App\Entity\Weapon;
 	use App\Entity\WeaponElement;
 	use App\Game\WeaponType;
-	use App\Response\Projection;
+	use App\QueryDocument\Projection;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\Collection;
