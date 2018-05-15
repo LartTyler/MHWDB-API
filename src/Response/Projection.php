@@ -26,15 +26,11 @@
 			$this->fields = $fields;
 			$this->include = reset($fields);
 
+			if (!$this->isValid($fields, $this->include))
+				throw new \InvalidArgumentException('You cannot mix includes and excludes in a projection');
+
 			// Also append the parent node of any child fields
-			foreach (array_keys($fields) as $field) {
-				$pos = strrpos($field, '.');
-
-				if ($pos === false)
-					continue;
-
-				$this->parents[substr($field, 0, $pos)] = true;
-			}
+			$this->setParentsFromFields($fields);
 		}
 
 		/**
@@ -53,9 +49,7 @@
 			if (!$this->fields)
 				return true;
 
-			$found = $this->fields[$path] ?? false;
-
-			return $this->isInclude() ? $found : !$found;
+			return $this->fields[$path] ?? !$this->isInclude();
 		}
 
 		/**
@@ -65,6 +59,15 @@
 		 */
 		public function isParent(string $path): bool {
 			return isset($this->parents[$path]);
+		}
+
+		/**
+		 * @param string $path
+		 *
+		 * @return bool
+		 */
+		public function isAllowedOrParent(string $path): bool {
+			return $this->isAllowed($path) || $this->isParent($path);
 		}
 
 		/**
@@ -107,5 +110,38 @@
 			}
 
 			return $output;
+		}
+
+		/**
+		 * @param array $fields
+		 * @param bool  $isInclude
+		 *
+		 * @return bool
+		 */
+		protected function isValid(array $fields, bool $isInclude): bool {
+			foreach ($fields as $value) {
+				if ($value !== $isInclude)
+					return false;
+			}
+
+			return true;
+		}
+
+		/**
+		 * @param bool[] $fields
+		 *
+		 * @return $this
+		 */
+		protected function setParentsFromFields(array $fields) {
+			foreach (array_keys($fields) as $field) {
+				$pos = strrpos($field, '.');
+
+				if ($pos === false)
+					continue;
+
+				$this->parents[substr($field, 0, $pos)] = true;
+			}
+
+			return $this;
 		}
 	}

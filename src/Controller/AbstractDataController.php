@@ -3,6 +3,7 @@
 
 	use App\Entity\SluggableInterface;
 	use App\QueryDocument\ApiQueryManager;
+	use App\Response\BadProjectionObjectError;
 	use App\Response\BadQueryObjectError;
 	use App\Response\EmptySearchParametersError;
 	use App\Response\Projection;
@@ -161,10 +162,18 @@
 
 			$fields = $request->query->get('p');
 
-			if ($fields)
-				$fields = json_decode($fields, true);
+			if ($fields) {
+				$fields = @json_decode($fields, true);
+				
+				if (json_last_error() !== JSON_ERROR_NONE)
+					return $this->responder->createErrorResponse(new BadProjectionObjectError());
+			}
 
-			$projection = new Projection($fields ?: []);
+			try {
+				$projection = new Projection($fields ?: []);
+			} catch (\InvalidArgumentException $e) {
+				return $this->responder->createErrorResponse(new SearchError($e->getMessage()));
+			}
 
 			if ($data instanceof ApiErrorInterface)
 				return $this->responder->createErrorResponse($data);
