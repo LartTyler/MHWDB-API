@@ -26,24 +26,26 @@
 		}
 
 		/**
-		 * @param EntityInterface|ArmorSet|null $armorSet
+		 * @param EntityInterface|ArmorSet|null $entity
+		 *
+		 * @param Projection                    $projection
 		 *
 		 * @return array|null
 		 */
-		protected function normalizeOne(?EntityInterface $armorSet): ?array {
-			if (!$armorSet)
+		protected function normalizeOne(?EntityInterface $entity, Projection $projection): ?array {
+			if (!$entity)
 				return null;
 
-			$bonus = $armorSet->getBonus();
+			$bonus = $entity->getBonus();
 
 			$transformer = function(?Asset $asset): ?string {
 				return $asset ? $asset->getUri() : null;
 			};
 
 			return [
-				'id' => $armorSet->getId(),
-				'name' => $armorSet->getName(),
-				'rank' => $armorSet->getRank(),
+				'id' => $entity->getId(),
+				'name' => $entity->getName(),
+				'rank' => $entity->getRank(),
 				'pieces' => array_map(function(Armor $armor) use ($transformer): array {
 					$assets = $armor->getAssets();
 					$crafting = $armor->getCrafting();
@@ -99,7 +101,7 @@
 							}, $crafting->getMaterials()->toArray()),
 						] : null,
 					];
-				}, $armorSet->getPieces()->toArray()),
+				}, $entity->getPieces()->toArray()),
 				'bonus' => $bonus ? [
 					'id' => $bonus->getId(),
 					'name' => $bonus->getName(),

@@ -23,18 +23,20 @@
 		}
 
 		/**
-		 * @param EntityInterface|Charm|null $charm
+		 * @param EntityInterface|Charm|null $entity
+		 *
+		 * @param Projection                 $projection
 		 *
 		 * @return array|null
 		 */
-		protected function normalizeOne(?EntityInterface $charm): ?array {
-			if (!$charm)
+		protected function normalizeOne(?EntityInterface $entity, Projection $projection): ?array {
+			if (!$entity)
 				return null;
 
 			return [
-				'id' => $charm->getId(),
-				'slug' => $charm->getSlug(),
-				'name' => $charm->getName(),
+				'id' => $entity->getId(),
+				'slug' => $entity->getSlug(),
+				'name' => $entity->getName(),
 				'ranks' => array_map(function(CharmRank $rank): array {
 					$crafting = $rank->getCrafting();
 
@@ -73,7 +75,7 @@
 							}, $crafting->getMaterials()->toArray()),
 						] : null,
 					];
-				}, $charm->getRanks()->toArray()),
+				}, $entity->getRanks()->toArray()),
 			];
 		}
 	}

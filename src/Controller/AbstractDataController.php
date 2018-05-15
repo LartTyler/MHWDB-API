@@ -5,6 +5,7 @@
 	use App\QueryDocument\ApiQueryManager;
 	use App\Response\BadQueryObjectError;
 	use App\Response\EmptySearchParametersError;
+	use App\Response\Projection;
 	use App\Response\SearchError;
 	use App\Response\SlugNotSupportedError;
 	use App\Search\SearchManager;
@@ -17,6 +18,7 @@
 	use Symfony\Component\HttpFoundation\JsonResponse;
 	use Symfony\Component\HttpFoundation\Request;
 	use Symfony\Component\HttpFoundation\Response;
+	use Symfony\Component\PropertyAccess\PropertyAccessor;
 	use Symfony\Component\Routing\RouterInterface;
 
 	abstract class AbstractDataController extends Controller {
@@ -149,10 +151,21 @@
 
 		/**
 		 * @param ApiErrorInterface|array|object|null $data
+		 * @param Request|null                        $request
 		 *
 		 * @return Response
 		 */
-		protected function respond($data): Response {
+		protected function respond($data, Request $request = null): Response {
+			if (!$request)
+				$request = $this->get('request_stack')->getCurrentRequest();
+
+			$fields = $request->query->get('p');
+
+			if ($fields)
+				$fields = json_decode($fields, true);
+
+			$projection = new Projection($fields ?: []);
+
 			if ($data instanceof ApiErrorInterface)
 				return $this->responder->createErrorResponse($data);
 			else if ($data instanceof Response)
@@ -161,16 +174,16 @@
 				return $this->responder->createNotFoundResponse();
 
 			if (is_array($data))
-				$data = $this->normalizeMany($data);
+				$data = $this->normalizeMany($data, $projection);
 			else if ($data instanceof EntityInterface)
-				$data = $this->normalizeOne($data);
+				$data = $this->normalizeOne($data, $projection);
 
 			if ($data === null)
 				$status = Response::HTTP_NO_CONTENT;
 			else
 				$status = Response::HTTP_OK;
 
-			return new JsonResponse($data, $status, [
+			return new JsonResponse($projection->filter($data), $status, [
 				'Cache-Control' => 'public, max-age=14400',
 				'Content-Type' => 'application/json',
 			]);
@@ -198,22 +211,24 @@
 
 		/**
 		 * @param EntityInterface[] $entities
+		 * @param Projection        $projection
 		 *
 		 * @return array
 		 */
-		protected function normalizeMany(array $entities): array {
+		protected function normalizeMany(array $entities, Projection $projection): array {
 			$normalized = [];
 
 			foreach ($entities as $entity)
-				$normalized[] = $this->normalizeOne($entity);
+				$normalized[] = $this->normalizeOne($entity, $projection);
 
 			return $normalized;
 		}
 
 		/**
 		 * @param EntityInterface|null $entity
+		 * @param Projection           $projection
 		 *
 		 * @return array|null
 		 */
-		protected abstract function normalizeOne(?EntityInterface $entity): ?array;
+		protected abstract function normalizeOne(?EntityInterface $entity, Projection $projection): ?array;
 	}

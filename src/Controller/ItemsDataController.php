@@ -20,22 +20,24 @@
 		}
 
 		/**
-		 * @param EntityInterface|Item|null $item
+		 * @param EntityInterface|Item|null $entity
+		 *
+		 * @param Projection                $projection
 		 *
 		 * @return array|null
 		 */
-		protected function normalizeOne(?EntityInterface $item): ?array {
-			if (!$item)
+		protected function normalizeOne(?EntityInterface $entity, Projection $projection): ?array {
+			if (!$entity)
 				return null;
 
 			return [
-				'id' => $item->getId(),
-				'name' => $item->getName(),
-				'description' => $item->getName(),
-				'rarity' => $item->getRarity(),
-				'carryLimit' => $item->getCarryLimit(),
-				'sellPrice' => $item->getSellPrice(),
-				'buyPrice' => $item->getBuyPrice(),
+				'id' => $entity->getId(),
+				'name' => $entity->getName(),
+				'description' => $entity->getName(),
+				'rarity' => $entity->getRarity(),
+				'carryLimit' => $entity->getCarryLimit(),
+				'sellPrice' => $entity->getSellPrice(),
+				'buyPrice' => $entity->getBuyPrice(),
 			];
 		}
 	}

@@ -21,19 +21,21 @@
 		}
 
 		/**
-		 * @param EntityInterface|Decoration|null $decoration
+		 * @param EntityInterface|Decoration|null $entity
+		 *
+		 * @param Projection                      $projection
 		 *
 		 * @return array|null
 		 */
-		protected function normalizeOne(?EntityInterface $decoration): ?array {
-			if (!$decoration)
+		protected function normalizeOne(?EntityInterface $entity, Projection $projection): ?array {
+			if (!$entity)
 				return null;
 
 			return [
-				'id' => $decoration->getId(),
-				'slug' => $decoration->getSlug(),
-				'name' => $decoration->getName(),
-				'rarity' => $decoration->getRarity(),
+				'id' => $entity->getId(),
+				'slug' => $entity->getSlug(),
+				'name' => $entity->getName(),
+				'rarity' => $entity->getRarity(),
 				'skills' => array_map(function(SkillRank $rank): array {
 					return [
 						'id' => $rank->getId(),
@@ -44,8 +46,8 @@
 						'skillName' => $rank->getSkill()->getName(),
 						'modifiers' => $rank->getModifiers(),
 					];
-				}, $decoration->getSkills()->toArray()),
-				'slot' => $decoration->getSlot(),
+				}, $entity->getSkills()->toArray()),
+				'slot' => $entity->getSlot(),
 			];
 		}
 	}

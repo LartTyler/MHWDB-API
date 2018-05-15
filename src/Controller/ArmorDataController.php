@@ -25,38 +25,40 @@
 		}
 
 		/**
-		 * @param EntityInterface|Armor|null $armor
+		 * @param EntityInterface|Armor|null $entity
+		 *
+		 * @param Projection                 $projection
 		 *
 		 * @return array|null
 		 */
-		protected function normalizeOne(?EntityInterface $armor): ?array {
-			if (!$armor)
+		protected function normalizeOne(?EntityInterface $entity, Projection $projection): ?array {
+			if (!$entity)
 				return null;
 
-			$armorSet = $armor->getArmorSet();
-			$assets = $armor->getAssets();
-			$crafting = $armor->getCrafting();
+			$armorSet = $entity->getArmorSet();
+			$assets = $entity->getAssets();
+			$crafting = $entity->getCrafting();
 
 			$assetTransformer = function(?Asset $asset): ?string {
 				return $asset ? $asset->getUri() : null;
 			};
 
 			return [
-				'id' => $armor->getId(),
-				'slug' => $armor->getSlug(),
-				'name' => $armor->getName(),
-				'type' => $armor->getType(),
-				'rank' => $armor->getRank(),
-				'rarity' => $armor->getRarity(),
-				'defense' => $armor->getDefense(),
-				'resistances' => $armor->getResistances(),
+				'id' => $entity->getId(),
+				'slug' => $entity->getSlug(),
+				'name' => $entity->getName(),
+				'type' => $entity->getType(),
+				'rank' => $entity->getRank(),
+				'rarity' => $entity->getRarity(),
+				'defense' => $entity->getDefense(),
+				'resistances' => $entity->getResistances(),
 				'slots' => array_map(function(Slot $slot): array {
 					return [
 						'rank' => $slot->getRank(),
 					];
-				}, $armor->getSlots()->toArray()),
+				}, $entity->getSlots()->toArray()),
 				// default to \stdClass to fix an empty array being returned instead of an empty object
-				'attributes' => $armor->getAttributes() ?: new \stdClass(),
+				'attributes' => $entity->getAttributes() ?: new \stdClass(),
 				'skills' => array_map(function(SkillRank $rank): array {
 					return [
 						'id' => $rank->getId(),
@@ -67,7 +69,7 @@
 						'skill' => $rank->getSkill()->getId(),
 						'skillName' => $rank->getSkill()->getName(),
 					];
-				}, $armor->getSkills()->toArray()),
+				}, $entity->getSkills()->toArray()),
 				'armorSet' => $armorSet ? [
 					'id' => $armorSet->getId(),
 					'name' => $armorSet->getName(),

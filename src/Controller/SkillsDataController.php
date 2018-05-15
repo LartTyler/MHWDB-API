@@ -21,30 +21,32 @@
 		}
 
 		/**
-		 * @param EntityInterface|Skill|null $skill
+		 * @param EntityInterface|Skill|null $entity
+		 *
+		 * @param Projection                 $projection
 		 *
 		 * @return array|null
 		 */
-		protected function normalizeOne(?EntityInterface $skill): ?array {
-			if (!$skill)
+		protected function normalizeOne(?EntityInterface $entity, Projection $projection): ?array {
+			if (!$entity)
 				return null;
 
 			return [
-				'id' => $skill->getId(),
-				'slug' => $skill->getSlug(),
-				'name' => $skill->getName(),
-				'description' => $skill->getDescription(),
-				'ranks' => array_map(function(SkillRank $rank) use ($skill): array {
+				'id' => $entity->getId(),
+				'slug' => $entity->getSlug(),
+				'name' => $entity->getName(),
+				'description' => $entity->getDescription(),
+				'ranks' => array_map(function(SkillRank $rank) use ($entity): array {
 					return [
 						'id' => $rank->getId(),
 						'slug' => $rank->getSlug(),
-						'skill' => $skill->getId(),
-						'skillName' => $skill->getName(),
+						'skill' => $entity->getId(),
+						'skillName' => $entity->getName(),
 						'level' => $rank->getLevel(),
 						'description' => $rank->getDescription(),
 						'modifiers' => $rank->getModifiers(),
 					];
-				}, $skill->getRanks()->toArray()),
+				}, $entity->getRanks()->toArray()),
 			];
 		}
 	}

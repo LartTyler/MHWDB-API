@@ -25,12 +25,14 @@
 		}
 
 		/**
-		 * @param EntityInterface|Weapon|null $weapon
+		 * @param EntityInterface|Weapon|null $entity
+		 *
+		 * @param Projection                  $projection
 		 *
 		 * @return array|null
 		 */
-		protected function normalizeOne(?EntityInterface $weapon): ?array {
-			if (!$weapon)
+		protected function normalizeOne(?EntityInterface $entity, Projection $projection): ?array {
+			if (!$entity)
 				return null;
 
 			/**
@@ -57,33 +59,33 @@
 				}, $costs->toArray());
 			};
 
-			$crafting = $weapon->getCrafting();
-			$assets = $weapon->getAssets();
+			$crafting = $entity->getCrafting();
+			$assets = $entity->getAssets();
 
 			$data = [
-				'id' => $weapon->getId(),
-				'slug' => $weapon->getSlug(),
-				'name' => $weapon->getName(),
-				'type' => $weapon->getType(),
-				'rarity' => $weapon->getRarity(),
+				'id' => $entity->getId(),
+				'slug' => $entity->getSlug(),
+				'name' => $entity->getName(),
+				'type' => $entity->getType(),
+				'rarity' => $entity->getRarity(),
 				'attack' => [
-					'display' => $weapon->getAttack()->getDisplay(),
-					'raw' => $weapon->getAttack()->getRaw(),
+					'display' => $entity->getAttack()->getDisplay(),
+					'raw' => $entity->getAttack()->getRaw(),
 				],
 				'slots' => array_map(function(Slot $slot): array {
 					return [
 						'rank' => $slot->getRank(),
 					];
-				}, $weapon->getSlots()->toArray()),
+				}, $entity->getSlots()->toArray()),
 				'elements' => array_map(function(WeaponElement $element): array {
 					return [
 						'type' => $element->getType(),
 						'damage' => $element->getDamage(),
 						'hidden' => $element->isHidden(),
 					];
-				}, $weapon->getElements()->toArray()),
+				}, $entity->getElements()->toArray()),
 				// default to \stdClass to fix an empty array being returned instead of an empty object
-				'attributes' => $weapon->getAttributes() ?: new \stdClass(),
+				'attributes' => $entity->getAttributes() ?: new \stdClass(),
 				'crafting' => $crafting ? [
 					'craftable' => $crafting->isCraftable(),
 					'previous' => $crafting->getPrevious() ? $crafting->getPrevious()->getId() : null,
@@ -99,8 +101,8 @@
 				] : null,
 			];
 
-			if (WeaponType::isMelee($weapon->getType())) {
-				$sharpness = $weapon->getSharpness();
+			if (WeaponType::isMelee($entity->getType())) {
+				$sharpness = $entity->getSharpness();
 
 				$data += [
 					'sharpness' => [
