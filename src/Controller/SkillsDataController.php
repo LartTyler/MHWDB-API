@@ -31,22 +31,29 @@
 			if (!$entity)
 				return null;
 
-			return [
+			$output = [
 				'id' => $entity->getId(),
 				'slug' => $entity->getSlug(),
 				'name' => $entity->getName(),
 				'description' => $entity->getDescription(),
-				'ranks' => array_map(function(SkillRank $rank) use ($entity): array {
+			];
+
+			if ($projection->isAllowed('ranks')) {
+				$output['ranks'] = array_map(function(SkillRank $rank): array {
+					// No related field optimizations needed for each SkillRank, as the parent skill is already loaded
+
 					return [
 						'id' => $rank->getId(),
 						'slug' => $rank->getSlug(),
-						'skill' => $entity->getId(),
-						'skillName' => $entity->getName(),
+						'skill' => $rank->getSkill()->getId(),
+						'skillName' => $rank->getSkill()->getName(),
 						'level' => $rank->getLevel(),
 						'description' => $rank->getDescription(),
 						'modifiers' => $rank->getModifiers(),
 					];
-				}, $entity->getRanks()->toArray()),
-			];
+				}, $entity->getRanks()->toArray());
+			}
+
+			return $output;
 		}
 	}
