@@ -13,12 +13,18 @@
 		protected $default;
 
 		/**
+		 * @var ProjectionPathCache
+		 */
+		protected $cache;
+
+		/**
 		 * Projection constructor.
 		 *
 		 * @param bool[] $nodes
 		 */
 		protected function __construct(array $nodes) {
 			$this->nodes = $nodes;
+			$this->cache = new ProjectionPathCache();
 
 			if (sizeof($nodes) === 0)
 				$this->default = true;
@@ -56,6 +62,9 @@
 		 * @return bool
 		 */
 		public function isAllowed(string $path): bool {
+			if ($this->cache->has($path))
+				return $this->cache->get($path);
+
 			$current = $this->getNodes();
 
 			// For projections with no nodes, all paths are allowed
@@ -63,15 +72,22 @@
 				return true;
 
 			$parts = explode('.', $path);
+			$result = null;
 
 			foreach ($parts as $part) {
-				if (!isset($current[$part]))
-					return $this->isAllowedByDefault();
+				if (!isset($current[$part])) {
+					$result = $this->isAllowedByDefault();
+
+					break;
+				}
 
 				$value = $current[$part];
 
-				if (!is_array($value))
-					return $value;
+				if (!is_array($value)) {
+					$result = $value;
+
+					break;
+				}
 
 				$current = $value;
 			}
@@ -79,9 +95,9 @@
 			// If $current is an array after processing all path parts, the path has child nodes and needs to be
 			// allowed so that it can be processed later.
 			if (is_array($current))
-				return true;
+				$result = true;
 
-			return $this->isAllowedByDefault();
+			return $this->cache->set($path, $result);
 		}
 
 		/**
