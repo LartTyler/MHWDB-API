@@ -94,7 +94,7 @@
 
 			// If $current is an array after processing all path parts, the path has child nodes and needs to be
 			// allowed so that it can be processed later.
-			if (is_array($current))
+			if ($result === null && is_array($current))
 				$result = true;
 
 			return $this->cache->set($path, $result);
