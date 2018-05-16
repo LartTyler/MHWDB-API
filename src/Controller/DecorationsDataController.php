@@ -31,23 +31,34 @@
 			if (!$entity)
 				return null;
 
-			return [
+			$output = [
 				'id' => $entity->getId(),
 				'slug' => $entity->getSlug(),
 				'name' => $entity->getName(),
 				'rarity' => $entity->getRarity(),
-				'skills' => array_map(function(SkillRank $rank): array {
-					return [
+				'slot' => $entity->getSlot(),
+			];
+
+			if ($projection->isAllowed('skills')) {
+				$output['skills'] = array_map(function(SkillRank $rank) use ($projection): array {
+					$output = [
 						'id' => $rank->getId(),
 						'slug' => $rank->getSlug(),
 						'description' => $rank->getDescription(),
 						'level' => $rank->getLevel(),
-						'skill' => $rank->getSkill()->getId(),
-						'skillName' => $rank->getSkill()->getName(),
 						'modifiers' => $rank->getModifiers(),
 					];
-				}, $entity->getSkills()->toArray()),
-				'slot' => $entity->getSlot(),
-			];
+
+					if ($projection->isAllowed('skills.skill'))
+						$output['skill'] = $rank->getSkill()->getId();
+
+					if ($projection->isAllowed('skills.skillName'))
+						$output['skillName'] = $rank->getSkill()->getName();
+
+					return $output;
+				}, $entity->getSkills()->toArray());
+			}
+
+			return $output;
 		}
 	}
