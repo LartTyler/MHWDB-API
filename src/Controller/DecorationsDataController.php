@@ -39,6 +39,7 @@
 				'slot' => $entity->getSlot(),
 			];
 
+			// region SkillRank Fields
 			if ($projection->isAllowed('skills')) {
 				$output['skills'] = array_map(function(SkillRank $rank) use ($projection): array {
 					$output = [
@@ -58,6 +59,7 @@
 					return $output;
 				}, $entity->getSkills()->toArray());
 			}
+			// endregion
 
 			return $output;
 		}

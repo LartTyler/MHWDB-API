@@ -39,6 +39,7 @@
 				'name' => $entity->getName(),
 			];
 
+			// region CharmRank Fields
 			if ($projection->isAllowed('ranks')) {
 				$output['ranks'] = array_map(function(CharmRank $rank) use ($projection): array {
 					$output = [
@@ -47,6 +48,7 @@
 						'rarity' => $rank->getRarity(),
 					];
 
+					// region SkillRank Fields
 					if ($projection->isAllowed('ranks.skills')) {
 						$output['skills'] = array_map(function(SkillRank $skillRank) use ($projection): array {
 							$output = [
@@ -66,7 +68,9 @@
 							return $output;
 						}, $rank->getSkills()->toArray());
 					}
+					// endregion
 
+					// region Crafting Fields
 					if ($projection->isAllowed('ranks.crafting')) {
 						$crafting = $rank->getCrafting();
 
@@ -75,6 +79,7 @@
 								'craftable' => $crafting->isCraftable(),
 							];
 
+							// region CraftingMaterialCost Fields
 							if ($projection->isAllowed('ranks.crafting.materials')) {
 								$output['crafting']['materials'] = array_map(
 									function(CraftingMaterialCost $cost) use ($projection): array {
@@ -82,6 +87,7 @@
 											'quantity' => $cost->getQuantity(),
 										];
 
+										// region Item Fields
 										if ($projection->isAllowed('ranks.crafting.materials.item')) {
 											$item = $cost->getItem();
 
@@ -95,18 +101,22 @@
 												'buyPrice' => $item->getBuyPrice(),
 											];
 										}
+										// endregion
 
 										return $output;
 									}, $crafting->getMaterials()->toArray()
 								);
 							}
+							// endregion
 						} else
 							$output['crafting'] = null;
 					}
+					// endregion
 
 					return $output;
 				}, $entity->getRanks()->toArray());
 			}
+			// endregion
 
 			return $output;
 		}

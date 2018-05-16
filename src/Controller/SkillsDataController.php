@@ -38,6 +38,7 @@
 				'description' => $entity->getDescription(),
 			];
 
+			// region SkillRank Fields
 			if ($projection->isAllowed('ranks')) {
 				$output['ranks'] = array_map(function(SkillRank $rank): array {
 					// No related field optimizations needed for each SkillRank, as the parent skill is already loaded
@@ -53,6 +54,7 @@
 					];
 				}, $entity->getRanks()->toArray());
 			}
+			// endregion
 
 			return $output;
 		}

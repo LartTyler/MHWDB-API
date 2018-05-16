@@ -49,6 +49,7 @@
 				'attributes' => $entity->getAttributes() ?: new \stdClass(),
 			];
 
+			// region Sharpness Fields
 			if (WeaponType::isMelee($entity->getType()) && $projection->isAllowed('sharpness')) {
 				$sharpness = $entity->getSharpness();
 
@@ -61,7 +62,9 @@
 					'white' => $sharpness->getWhite(),
 				];
 			}
+			// endregion
 
+			// region Slots Fields
 			if ($projection->isAllowed('slots')) {
 				$output['slots'] = array_map(function(Slot $slot): array {
 					return [
@@ -69,7 +72,9 @@
 					];
 				}, $entity->getSlots()->toArray());
 			}
+			// endregion
 
+			// region Elements Fields
 			if ($projection->isAllowed('elements')) {
 				$output['elements'] = array_map(function(WeaponElement $element): array {
 					return [
@@ -79,7 +84,9 @@
 					];
 				}, $entity->getElements()->toArray());
 			}
+			// endregion
 
+			// region Crafting Fields
 			if ($projection->isAllowed('crafting')) {
 				$crafting = $entity->getCrafting();
 
@@ -96,6 +103,7 @@
 								'quantity' => $cost->getQuantity(),
 							];
 
+							// region Item Fields
 							if ($projection->isAllowed(sprintf('crafting.%s.item', $type))) {
 								$item = $cost->getItem();
 
@@ -109,6 +117,7 @@
 									'buyPrice' => $item->getBuyPrice(),
 								];
 							}
+							// endregion
 
 							return $output;
 						}, $costs->toArray());
@@ -118,50 +127,66 @@
 						'craftable' => $crafting->isCraftable(),
 					];
 
+					// region Previous Weapon Fields
 					if ($projection->isAllowed('crafting.previous')) {
 						$previous = $crafting->getPrevious();
 
 						$output['crafting']['previous'] = $previous ? $previous->getId() : null;
 					}
+					// endregion
 
-					if ($projection->isAllowed('crafting.branches')) {						$output['crafting']['branches'] = array_map(function(Weapon $branch): int {
+					// region Branches Fields
+					if ($projection->isAllowed('crafting.branches')) {
+						$output['crafting']['branches'] = array_map(function(Weapon $branch): int {
 							return $branch->getId();
 						}, $crafting->getBranches()->toArray());
 					}
+					// endregion
 
+					// region Crafting Materials Fields
 					if ($projection->isAllowed('crafting.craftingMaterials')) {
 						$output['crafting']['craftingMaterials'] = call_user_func($transformer, 'craftingMaterials',
 							$crafting->getCraftingMaterials());
 					}
+					// endregion
 
+					// region Upgrade Materials Fields
 					if ($projection->isAllowed('crafting.upgradeMaterials')) {
 						$output['crafting']['upgradeMaterials'] = call_user_func($transformer, 'upgradeMaterials',
 							$crafting->getUpgradeMaterials());
 					}
+					// endregion
 				} else
 					$output['crafting'] = null;
 			}
+			// endregion
 
+			// region Assets Fields
 			if ($projection->isAllowed('assets')) {
 				$assets = $entity->getAssets();
 
 				if ($assets) {
 					$output['assets'] = [];
 
+					// region Icon Fields
 					if ($projection->isAllowed('assets.icon')) {
 						$icon = $assets->getIcon();
 
 						$output['assets']['icon'] = $icon ? $icon->getUri() : null;
 					}
+					// endregion
 
+					// region Image Fields
 					if ($projection->isAllowed('assets.image')) {
 						$image = $assets->getImage();
 
 						$output['assets']['image'] = $image ? $image->getUri() : null;
 					}
+					// endregion
 				} else
 					$output['assets'] = null;
 			}
+			// endregion
 
 			return $output;
 		}

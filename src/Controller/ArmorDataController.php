@@ -37,10 +37,6 @@
 			$defense = $entity->getDefense();
 			$resists = $entity->getResistances();
 
-			$assetTransformer = function(?Asset $asset): ?string {
-				return $asset ? $asset->getUri() : null;
-			};
-
 			$output = [
 				'id' => $entity->getId(),
 				'slug' => $entity->getSlug(),
@@ -64,6 +60,7 @@
 				'attributes' => $entity->getAttributes() ?: new \stdClass(),
 			];
 
+			// region Slots Fields
 			if ($projection->isAllowed('slots')) {
 				$output['slots'] = array_map(function(Slot $slot): array {
 					return [
@@ -71,7 +68,9 @@
 					];
 				}, $entity->getSlots()->toArray());
 			}
+			// endregion
 
+			// region Skills Fields
 			if ($projection->isAllowed('skills')) {
 				$output['skills'] = array_map(function(SkillRank $rank) use ($projection): array {
 					$output = [
@@ -93,7 +92,9 @@
 					return $output;
 				}, $entity->getSkills()->toArray());
 			}
+			// endregion
 
+			// region ArmorSet Fields
 			if ($projection->isAllowed('armorSet')) {
 				$armorSet = $entity->getArmorSet();
 
@@ -111,35 +112,45 @@
 				} else
 					$output['armorSet'] = null;
 			}
+			// endregion
 
+			// region Assets Fields
 			if ($projection->isAllowed('assets')) {
 				$assets = $entity->getAssets();
 
 				if ($assets) {
 					$output['assets'] = [];
 
+					$transformer = function(?Asset $asset): ?string {
+						return $asset ? $asset->getUri() : null;
+					};
+
 					if ($projection->isAllowed('assets.imageMale'))
-						$output['assets']['imageMale'] = call_user_func($assetTransformer, $assets->getImageMale());
+						$output['assets']['imageMale'] = call_user_func($transformer, $assets->getImageMale());
 
 					if ($projection->isAllowed('assets.imageFemale'))
-						$output['assets']['imageFemale'] = call_user_func($assetTransformer, $assets->getImageFemale());
+						$output['assets']['imageFemale'] = call_user_func($transformer, $assets->getImageFemale());
 				} else
 					$output['assets'] = null;
 			}
+			// endregion
 
+			// region Crafting Fields
 			if ($projection->isAllowed('crafting')) {
 				$crafting = $entity->getCrafting();
 
 				if ($crafting) {
 					$output['crafting'] = [];
 
-					if ($projection->isAllowed('crafting.materials'))
+					// region CraftingMaterialCost Fields
+					if ($projection->isAllowed('crafting.materials')) {
 						$output['crafting']['materials'] = array_map(
 							function(CraftingMaterialCost $cost) use ($projection): array {
 								$output = [
 									'quantity' => $cost->getQuantity(),
 								];
 
+								// region Item Fields
 								if ($projection->isAllowed('crafting.materials.item')) {
 									$item = $cost->getItem();
 
@@ -154,12 +165,17 @@
 									];
 								}
 
+								// endregion
+
 								return $output;
 							}, $crafting->getMaterials()->toArray()
 						);
+					}
+					// endregion
 				} else
 					$output['crafting'] = null;
 			}
+			// endregion
 
 			return $output;
 		}

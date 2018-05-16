@@ -37,20 +37,15 @@
 			if (!$entity)
 				return null;
 
-			$bonus = $entity->getBonus();
-
-			$transformer = function(?Asset $asset): ?string {
-				return $asset ? $asset->getUri() : null;
-			};
-
 			$output = [
 				'id' => $entity->getId(),
 				'name' => $entity->getName(),
 				'rank' => $entity->getRank(),
 			];
 
+			// region Armor Fields
 			if ($projection->isAllowed('pieces')) {
-				$output['pieces'] = array_map(function(Armor $armor) use ($projection, $transformer): array {
+				$output['pieces'] = array_map(function(Armor $armor) use ($projection): array {
 					$defense = $armor->getDefense();
 					$resists = $armor->getResistances();
 
@@ -77,6 +72,7 @@
 						],
 					];
 
+					// region Slot Fields
 					if ($projection->isAllowed('pieces.slots')) {
 						$output['slots'] = array_map(function(Slot $slot): array {
 							return [
@@ -84,7 +80,9 @@
 							];
 						}, $armor->getSlots()->toArray());
 					}
+					// endregion
 
+					// region Skill Fields
 					if ($projection->isAllowed('pieces.skills')) {
 						$output['skills'] = array_map(function(SkillRank $rank) use ($projection): array {
 							$output = [
@@ -106,15 +104,23 @@
 							return $output;
 						}, $armor->getSkills()->toArray());
 					}
+					// endregion
 
+					// region ArmorSet Fields
 					if ($projection->isAllowed('pieces.armorSet'))
 						$output['armorSet'] = $armor->getArmorSet()->getId();
+					// endregion
 
+					// region Assets Fields
 					if ($projection->isAllowed('pieces.assets')) {
 						$assets = $armor->getAssets();
 
 						if ($assets) {
 							$output['assets'] = [];
+
+							$transformer = function(?Asset $asset): ?string {
+								return $asset ? $asset->getUri() : null;
+							};
 
 							if ($projection->isAllowed('pieces.assets.imageMale'))
 								$output['assets']['imageMale'] = call_user_func($transformer, $assets->getImageMale());
@@ -124,13 +130,16 @@
  						} else
  							$output['assets'] = null;
 					}
+					// endregion
 
+					// region Crafting Fields
 					if ($projection->isAllowed('pieces.crafting')) {
 						$crafting = $armor->getCrafting();
 
 						if ($crafting) {
 							$output['crafting'] = [];
 
+							// region CraftingMaterialCost Fields
 							if ($projection->isAllowed('pieces.crafting.materials')) {
 								$output['crafting']['materials'] = array_map(
 									function(CraftingMaterialCost $cost) use ($projection): array {
@@ -138,6 +147,7 @@
 											'quantity' => $cost->getQuantity(),
 										];
 
+										// region Item Fields
 										if ($projection->isAllowed('pieces.crafting.materials.item')) {
 											$item = $cost->getItem();
 
@@ -151,19 +161,24 @@
 												'buyPrice' => $item->getBuyPrice(),
 											];
 										}
+										// endregion
 
 										return $output;
 									}, $crafting->getMaterials()->toArray()
 								);
 							}
+							// endregion
 						} else
 							$output['crafting'] = null;
 					}
+					// endregion
 
 					return $output;
 				}, $entity->getPieces()->toArray());
 			}
+			// endregion
 
+			// region ArmorSetBonus Fields
 			if ($projection->isAllowed('bonus')) {
 				$bonus = $entity->getBonus();
 
@@ -173,6 +188,7 @@
 						'name' => $bonus->getName(),
 					];
 
+					// region ArmorSetBonusRank Fields
 					if ($projection->isAllowed('bonus.ranks')) {
 						$output['bonus']['ranks'] = array_map(
 							function(ArmorSetBonusRank $rank) use ($projection): array {
@@ -180,6 +196,7 @@
 									'pieces' => $rank->getPieces(),
 								];
 
+								// region SkillRank Fields
 								if ($projection->isAllowed('bonus.ranks.skill')) {
 									$skillRank = $rank->getSkill();
 
@@ -197,14 +214,17 @@
 									if ($projection->isAllowed('bonus.ranks.skill.skillName'))
 										$output['skill']['skillName'] = $skillRank->getSkill()->getName();
 								}
+								// endregion
 
 								return $output;
 							}, $bonus->getRanks()->toArray()
 						);
 					}
+					// endregion
 				} else
 					$output['bonus'] = null;
 			}
+			// endregion
 
 			return $output;
 		}
