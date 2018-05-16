@@ -3,11 +3,12 @@
 
 	use App\Entity\SluggableInterface;
 	use App\QueryDocument\ApiQueryManager;
+	use App\QueryDocument\Projection;
+	use App\Response\BadProjectionObjectError;
 	use App\Response\BadQueryObjectError;
 	use App\Response\EmptySearchParametersError;
 	use App\Response\SearchError;
 	use App\Response\SlugNotSupportedError;
-	use App\Search\SearchManager;
 	use DaybreakStudios\Doze\Errors\ApiErrorInterface;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -149,10 +150,29 @@
 
 		/**
 		 * @param ApiErrorInterface|array|object|null $data
+		 * @param Request|null                        $request
 		 *
 		 * @return Response
 		 */
-		protected function respond($data): Response {
+		protected function respond($data, Request $request = null): Response {
+			if (!$request)
+				$request = $this->get('request_stack')->getCurrentRequest();
+
+			$fields = $request->query->get('p');
+
+			if ($fields) {
+				$fields = @json_decode($fields, true);
+				
+				if (json_last_error() !== JSON_ERROR_NONE)
+					return $this->responder->createErrorResponse(new BadProjectionObjectError());
+			}
+
+			try {
+				$projection = Projection::fromFields($fields ?: []);
+			} catch (\InvalidArgumentException $e) {
+				return $this->responder->createErrorResponse(new SearchError($e->getMessage()));
+			}
+
 			if ($data instanceof ApiErrorInterface)
 				return $this->responder->createErrorResponse($data);
 			else if ($data instanceof Response)
@@ -161,9 +181,9 @@
 				return $this->responder->createNotFoundResponse();
 
 			if (is_array($data))
-				$data = $this->normalizeMany($data);
+				$data = $this->normalizeMany($data, $projection);
 			else if ($data instanceof EntityInterface)
-				$data = $this->normalizeOne($data);
+				$data = $projection->filter($this->normalizeOne($data, $projection));
 
 			if ($data === null)
 				$status = Response::HTTP_NO_CONTENT;
@@ -198,22 +218,24 @@
 
 		/**
 		 * @param EntityInterface[] $entities
+		 * @param Projection        $projection
 		 *
 		 * @return array
 		 */
-		protected function normalizeMany(array $entities): array {
+		protected function normalizeMany(array $entities, Projection $projection): array {
 			$normalized = [];
 
 			foreach ($entities as $entity)
-				$normalized[] = $this->normalizeOne($entity);
+				$normalized[] = $projection->filter($this->normalizeOne($entity, $projection));
 
 			return $normalized;
 		}
 
 		/**
 		 * @param EntityInterface|null $entity
+		 * @param Projection           $projection
 		 *
 		 * @return array|null
 		 */
-		protected abstract function normalizeOne(?EntityInterface $entity): ?array;
+		protected abstract function normalizeOne(?EntityInterface $entity, Projection $projection): ?array;
 	}

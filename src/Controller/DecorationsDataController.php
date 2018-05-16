@@ -3,6 +3,7 @@
 
 	use App\Entity\Decoration;
 	use App\Entity\SkillRank;
+	use App\QueryDocument\Projection;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Symfony\Bridge\Doctrine\RegistryInterface;
@@ -21,31 +22,45 @@
 		}
 
 		/**
-		 * @param EntityInterface|Decoration|null $decoration
+		 * @param EntityInterface|Decoration|null $entity
+		 * @param Projection                      $projection
 		 *
 		 * @return array|null
 		 */
-		protected function normalizeOne(?EntityInterface $decoration): ?array {
-			if (!$decoration)
+		protected function normalizeOne(?EntityInterface $entity, Projection $projection): ?array {
+			if (!$entity)
 				return null;
 
-			return [
-				'id' => $decoration->getId(),
-				'slug' => $decoration->getSlug(),
-				'name' => $decoration->getName(),
-				'rarity' => $decoration->getRarity(),
-				'skills' => array_map(function(SkillRank $rank): array {
-					return [
+			$output = [
+				'id' => $entity->getId(),
+				'slug' => $entity->getSlug(),
+				'name' => $entity->getName(),
+				'rarity' => $entity->getRarity(),
+				'slot' => $entity->getSlot(),
+			];
+
+			// region SkillRank Fields
+			if ($projection->isAllowed('skills')) {
+				$output['skills'] = array_map(function(SkillRank $rank) use ($projection): array {
+					$output = [
 						'id' => $rank->getId(),
 						'slug' => $rank->getSlug(),
 						'description' => $rank->getDescription(),
 						'level' => $rank->getLevel(),
-						'skill' => $rank->getSkill()->getId(),
-						'skillName' => $rank->getSkill()->getName(),
 						'modifiers' => $rank->getModifiers(),
 					];
-				}, $decoration->getSkills()->toArray()),
-				'slot' => $decoration->getSlot(),
-			];
+
+					if ($projection->isAllowed('skills.skill'))
+						$output['skill'] = $rank->getSkill()->getId();
+
+					if ($projection->isAllowed('skills.skillName'))
+						$output['skillName'] = $rank->getSkill()->getName();
+
+					return $output;
+				}, $entity->getSkills()->toArray());
+			}
+			// endregion
+
+			return $output;
 		}
 	}

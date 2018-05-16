@@ -3,8 +3,8 @@
 
 	use App\Entity\MotionValue;
 	use App\Game\WeaponType;
+	use App\QueryDocument\Projection;
 	use App\Response\UnknownWeaponTypeError;
-	use DaybreakStudios\Doze\Errors\ApiError;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Symfony\Bridge\Doctrine\RegistryInterface;
@@ -38,22 +38,23 @@
 		}
 
 		/**
-		 * @param EntityInterface|MotionValue|null $motion
+		 * @param EntityInterface|MotionValue|null $entity
+		 * @param Projection                       $projection
 		 *
 		 * @return array|null
 		 */
-		protected function normalizeOne(?EntityInterface $motion): ?array {
-			if (!$motion)
+		protected function normalizeOne(?EntityInterface $entity, Projection $projection): ?array {
+			if (!$entity)
 				return null;
 
 			return [
-				'id' => $motion->getId(),
-				'name' => $motion->getName(),
-				'weaponType' => $motion->getWeaponType(),
-				'damageType' => $motion->getDamageType(),
-				'stun' => $motion->getStun(),
-				'exhaust' => $motion->getExhaust(),
-				'hits' => $motion->getHits(),
+				'id' => $entity->getId(),
+				'name' => $entity->getName(),
+				'weaponType' => $entity->getWeaponType(),
+				'damageType' => $entity->getDamageType(),
+				'stun' => $entity->getStun(),
+				'exhaust' => $entity->getExhaust(),
+				'hits' => $entity->getHits(),
 			];
 		}
 	}

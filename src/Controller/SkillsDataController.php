@@ -3,6 +3,7 @@
 
 	use App\Entity\Skill;
 	use App\Entity\SkillRank;
+	use App\QueryDocument\Projection;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Symfony\Bridge\Doctrine\RegistryInterface;
@@ -21,30 +22,40 @@
 		}
 
 		/**
-		 * @param EntityInterface|Skill|null $skill
+		 * @param EntityInterface|Skill|null $entity
+		 * @param Projection                 $projection
 		 *
 		 * @return array|null
 		 */
-		protected function normalizeOne(?EntityInterface $skill): ?array {
-			if (!$skill)
+		protected function normalizeOne(?EntityInterface $entity, Projection $projection): ?array {
+			if (!$entity)
 				return null;
 
-			return [
-				'id' => $skill->getId(),
-				'slug' => $skill->getSlug(),
-				'name' => $skill->getName(),
-				'description' => $skill->getDescription(),
-				'ranks' => array_map(function(SkillRank $rank) use ($skill): array {
+			$output = [
+				'id' => $entity->getId(),
+				'slug' => $entity->getSlug(),
+				'name' => $entity->getName(),
+				'description' => $entity->getDescription(),
+			];
+
+			// region SkillRank Fields
+			if ($projection->isAllowed('ranks')) {
+				$output['ranks'] = array_map(function(SkillRank $rank): array {
+					// No related field optimizations needed for each SkillRank, as the parent skill is already loaded
+
 					return [
 						'id' => $rank->getId(),
 						'slug' => $rank->getSlug(),
-						'skill' => $skill->getId(),
-						'skillName' => $skill->getName(),
+						'skill' => $rank->getSkill()->getId(),
+						'skillName' => $rank->getSkill()->getName(),
 						'level' => $rank->getLevel(),
 						'description' => $rank->getDescription(),
 						'modifiers' => $rank->getModifiers(),
 					];
-				}, $skill->getRanks()->toArray()),
-			];
+				}, $entity->getRanks()->toArray());
+			}
+			// endregion
+
+			return $output;
 		}
 	}
