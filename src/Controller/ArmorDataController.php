@@ -34,7 +34,6 @@
 			if (!$entity)
 				return null;
 
-			$crafting = $entity->getCrafting();
 			$defense = $entity->getDefense();
 			$resists = $entity->getResistances();
 
@@ -63,24 +62,6 @@
 				],
 				// default to \stdClass to fix an empty array being returned instead of an empty object
 				'attributes' => $entity->getAttributes() ?: new \stdClass(),
-				'crafting' => $crafting ? [
-					'materials' => array_map(function(CraftingMaterialCost $cost): array {
-						$item = $cost->getItem();
-
-						return [
-							'quantity' => $cost->getQuantity(),
-							'item' => [
-								'id' => $item->getId(),
-								'name' => $item->getName(),
-								'description' => $item->getDescription(),
-								'rarity' => $item->getRarity(),
-								'carryLimit' => $item->getCarryLimit(),
-								'sellPrice' => $item->getSellPrice(),
-								'buyPrice' => $item->getBuyPrice(),
-							],
-						];
-					}, $crafting->getMaterials()->toArray()),
-				] : null,
 			];
 
 			if ($projection->isAllowed('slots')) {
@@ -146,7 +127,6 @@
 					$output['assets'] = null;
 			}
 
-			// TODO Finish conditional crafting output
 			if ($projection->isAllowed('crafting')) {
 				$crafting = $entity->getCrafting();
 
