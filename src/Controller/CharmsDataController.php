@@ -33,49 +33,81 @@
 			if (!$entity)
 				return null;
 
-			return [
+			$output = [
 				'id' => $entity->getId(),
 				'slug' => $entity->getSlug(),
 				'name' => $entity->getName(),
-				'ranks' => array_map(function(CharmRank $rank): array {
-					$crafting = $rank->getCrafting();
+			];
 
-					return [
+			if ($projection->isAllowed('ranks')) {
+				$output['ranks'] = array_map(function(CharmRank $rank) use ($projection): array {
+					$output = [
 						'name' => $rank->getName(),
 						'level' => $rank->getLevel(),
 						'rarity' => $rank->getRarity(),
-						'skills' => array_map(function(SkillRank $skillRank): array {
-							return [
+					];
+
+					if ($projection->isAllowed('ranks.skills')) {
+						$output['skills'] = array_map(function(SkillRank $skillRank) use ($projection): array {
+							$output = [
 								'id' => $skillRank->getId(),
 								'slug' => $skillRank->getSlug(),
 								'level' => $skillRank->getLevel(),
 								'description' => $skillRank->getDescription(),
-								'skill' => $skillRank->getSkill()->getId(),
-								'skillName' => $skillRank->getSkill()->getName(),
 								'modifiers' => $skillRank->getModifiers(),
 							];
-						}, $rank->getSkills()->toArray()),
-						'crafting' => $crafting ? [
-							'craftable' => $crafting->isCraftable(),
-							'materials' => array_map(function(CraftingMaterialCost $cost): array {
-								$item = $cost->getItem();
 
-								return [
-									'quantity' => $cost->getQuantity(),
-									'item' => [
-										'id' => $item->getId(),
-										'name' => $item->getName(),
-										'description' => $item->getDescription(),
-										'rarity' => $item->getRarity(),
-										'carryLimit' => $item->getCarryLimit(),
-										'sellPrice' => $item->getSellPrice(),
-										'buyPrice' => $item->getBuyPrice(),
-									],
-								];
-							}, $crafting->getMaterials()->toArray()),
-						] : null,
-					];
-				}, $entity->getRanks()->toArray()),
-			];
+							if ($projection->isAllowed('ranks.skills.skill'))
+								$output['skill'] = $skillRank->getSkill()->getId();
+
+							if ($projection->isAllowed('ranks.skills.skillName'))
+								$output['skillName'] = $skillRank->getSkill()->getName();
+
+							return $output;
+						}, $rank->getSkills()->toArray());
+					}
+
+					if ($projection->isAllowed('ranks.crafting')) {
+						$crafting = $rank->getCrafting();
+
+						if ($crafting) {
+							$output['crafting'] = [
+								'craftable' => $crafting->isCraftable(),
+							];
+
+							if ($projection->isAllowed('ranks.crafting.materials')) {
+								$output['crafting']['materials'] = array_map(
+									function(CraftingMaterialCost $cost) use ($projection): array {
+										$output = [
+											'quantity' => $cost->getQuantity(),
+										];
+
+										if ($projection->isAllowed('ranks.crafting.materials.item')) {
+											$item = $cost->getItem();
+
+											$output['item'] = [
+												'id' => $item->getId(),
+												'name' => $item->getName(),
+												'description' => $item->getDescription(),
+												'rarity' => $item->getRarity(),
+												'carryLimit' => $item->getCarryLimit(),
+												'sellPrice' => $item->getSellPrice(),
+												'buyPrice' => $item->getBuyPrice(),
+											];
+										}
+
+										return $output;
+									}, $crafting->getMaterials()->toArray()
+								);
+							}
+						} else
+							$output['crafting'] = null;
+					}
+
+					return $output;
+				}, $entity->getRanks()->toArray());
+			}
+
+			return $output;
 		}
 	}
