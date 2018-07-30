@@ -205,7 +205,7 @@
 										'slug' => $skillRank->getSlug(),
 										'level' => $skillRank->getLevel(),
 										'description' => $skillRank->getDescription(),
-										'modifiers' => $skillRank->getModifiers(),
+										'modifiers' => $skillRank->getModifiers() ?: new \stdClass(),
 									];
 
 									if ($projection->isAllowed('bonus.ranks.skill.skill'))

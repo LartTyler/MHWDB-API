@@ -50,7 +50,7 @@
 						'skillName' => $rank->getSkill()->getName(),
 						'level' => $rank->getLevel(),
 						'description' => $rank->getDescription(),
-						'modifiers' => $rank->getModifiers(),
+						'modifiers' => $rank->getModifiers() ?: new \stdClass(),
 					];
 				}, $entity->getRanks()->toArray());
 			}
