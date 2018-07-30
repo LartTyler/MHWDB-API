@@ -27,6 +27,7 @@
 			'Faux Felyne' => ArmorType::HEAD,
 			'Head' => ArmorType::HEAD,
 			'Taroth\'s Fury' => ArmorType::HEAD,
+			'Hair' => ArmorType::HEAD,
 
 			// -- Chest --
 			'Mail' => ArmorType::CHEST,
@@ -39,6 +40,7 @@
 			'Cista' => ArmorType::CHEST,
 			'Armor' => ArmorType::CHEST,
 			'Taroth\'s Ire' => ArmorType::CHEST,
+			'Dante\'s Coat' => ArmorType::CHEST,
 
 			// -- Gloves --
 			'Gloves' => ArmorType::GLOVES,
