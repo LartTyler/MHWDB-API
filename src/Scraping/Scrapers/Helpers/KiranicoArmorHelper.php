@@ -80,11 +80,19 @@
 		];
 
 		/**
+		 * @var array[]
+		 */
+		private static $armorNameCache = [];
+
+		/**
 		 * @param string $rawName
 		 *
 		 * @return array
 		 */
 		public static function parseArmorName(string $rawName): array {
+			if (isset(self::$armorNameCache[$rawName]))
+				return self::$armorNameCache[$rawName];
+
 			/**
 			 * Does a few things:
 			 *
@@ -138,7 +146,7 @@
 			if ($armorType === null)
 				throw new \RuntimeException('Could not determine armor type from name: ' . $rawName);
 
-			return [
+			return self::$armorNameCache[$rawName] = [
 				trim(implode(' ', $parts) . ' ' . $rank),
 				$armorType,
 			];
