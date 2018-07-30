@@ -78,7 +78,7 @@
 						'slug' => $rank->getSlug(),
 						'level' => $rank->getLevel(),
 						'description' => $rank->getDescription(),
-						'modifiers' => $rank->getModifiers(),
+						'modifiers' => $rank->getModifiers() ?: new \stdClass(),
 						'skill' => $rank->getSkill()->getId(),
 						'skillName' => $rank->getSkill()->getName(),
 					];
