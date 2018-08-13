@@ -5,6 +5,7 @@
 	use App\Scraping\ProgressAwareInterface;
 	use App\Scraping\ScraperCollection;
 	use App\Scraping\ScraperInterface;
+	use App\Scraping\Type;
 	use Symfony\Component\Console\Command\Command;
 	use Symfony\Component\Console\Input\InputInterface;
 	use Symfony\Component\Console\Input\InputOption;
@@ -36,7 +37,8 @@
 				->setName('app:scrape')
 				->addOption('type', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY)
 				->addOption('context', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY)
-				->addOption('type-begin-at', null, InputOption::VALUE_REQUIRED);
+				->addOption('begin-at-type', null, InputOption::VALUE_REQUIRED)
+				->addOption('exclude-type', 'x', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY);
 		}
 
 		/**
@@ -67,7 +69,7 @@
 			/** @var ScraperInterface[] $scrapers */
 			$scrapers = array_values($this->scrapers->getScrapers());
 
-			if ($beginAt = $input->getOption('type-begin-at')) {
+			if ($beginAt = $input->getOption('begin-at-type')) {
 				$index = null;
 
 				foreach ($scrapers as $i => $scraper) {
@@ -85,6 +87,12 @@
 			} else if ($types = $input->getOption('type')) {
 				$scrapers = array_filter($scrapers, function(ScraperInterface $scraper) use ($types): bool {
 					return in_array($scraper->getType(), $types);
+				});
+			}
+
+			if ($exclude = $input->getOption('exclude-type')) {
+				$scrapers = array_filter($scrapers, function(ScraperInterface $scraper) use ($exclude): bool {
+					return !in_array($scraper->getType(), $exclude);
 				});
 			}
 
