@@ -17,8 +17,20 @@
 		const MOTION_VALUES = 'motion-values';
 
 		/**
+		 * @var string[]|null
+		 */
+		private static $types = null;
+
+		/**
 		 * Type constructor.
 		 */
 		private function __construct() {
+		}
+
+		public static function getTypes(): array {
+			if (self::$types === null)
+				self::$types = (new \ReflectionClass(self::class))->getConstants();
+
+			return self::$types;
 		}
 	}
