@@ -29,8 +29,16 @@ Vagrant.configure(2) do |config|
     systemctl start rh-mariadb102-mariadb
     systemctl enable rh-mariadb102-mariadb
 
-    yum install -y memcached rh-php71 rh-php71-php rh-php71-php-mysqlnd rh-php71-php-xml rh-php71-php-process sclo-php71-php-pecl-memcached
+    yum install -y memcached rh-php71 rh-php71-php rh-php71-php-mysqlnd rh-php71-php-xml rh-php71-php-process sclo-php71-php-pecl-memcached sclo-php71-php-pecl-xdebug
     echo "source scl_source enable rh-php71" >> /etc/profile.d/scl.sh
+
+    if if grep -Fqvx "xdebug.remote_enable" /etc/opt/rh/rh-php71/php.d/15-xdebug.ini; then
+      echo "xdebug.remote_enable = on" >> /etc/opt/rh/rh-php71/php.d/15-xdebug.ini
+      echo "xdebug.remote_connect_back = on" >> /etc/opt/rh/rh-php71/php.d/15-xdebug.ini
+      echo "xdebug.idekey = application" >> /etc/opt/rh/rh-php71/php.d/15-xdebug.ini
+      echo "xdebug.remote_autostart = on" >> /etc/opt/rh/rh-php71/php.d/15-xdebug.ini
+      echo "xdebug.remote_host = 10.0.2.2" >> /etc/opt/rh/rh-php71/php.d/15-xdebug.ini
+    fi
   SHELL
 
   config.vm.provision "shell", name: 'user-init', privileged: false, path: './vagrant/provision.sh'
