@@ -6,12 +6,13 @@
 	use App\Scraping\Configurations\GithubConfiguration;
 	use App\Scraping\ProgressAwareInterface;
 	use App\Scraping\ProgressAwareTrait;
+	use App\Scraping\Scrapers\Helpers\Csv\CsvReader;
 	use App\Scraping\Type;
 	use Doctrine\Common\Persistence\ObjectManager;
 	use Psr\Http\Message\UriInterface;
 	use Symfony\Component\HttpFoundation\Response;
 
-	class CarlosFdezMHWorldDataDefenseValuesScraper extends AbstractScraper implements ProgressAwareInterface {
+	class CarlosFdezMHWorldDataDefenseValuesScraper extends AbstractCarlosFdezMHWorldDataScraper {
 		use ProgressAwareTrait;
 
 		/**
@@ -35,24 +36,36 @@
 		 * {@inheritdoc}
 		 */
 		public function scrape(array $context = []): void {
-			$uri = $this->getUriWithPath('/armors/armor_data.json');
+			$uri = $this->getUriWithPath('/armors/armor_base.csv');
 			$result = $this->getWithRetry($uri);
 
 			if ($result->getStatusCode() !== Response::HTTP_OK)
 				throw new \RuntimeException('Could not retrieve ' . $uri);
 
-			$armorData = json_decode($result->getBody()->getContents(), true);
+			$reader = new CsvReader($result->getBody()->getContents(), [
+				'defense_base' => 'intval',
+				'defense_max' => 'intval',
+				'defense_augment_max' => 'intval',
+			]);
 
-			$this->progressBar->append(sizeof($armorData));
+			while ($data = $reader->read()) {
+				$name = str_replace([
+					'α',
+					'β',
+					'γ',
+				], [
+					'Alpha',
+					'Beta',
+					'Gamma',
+				], $data['name_en']);
 
-			foreach ($armorData as $armorName => $data) {
 				/** @var Armor|null $armor */
 				$armor = $this->manager->getRepository('App:Armor')->findOneBy([
-					'name' => $armorName,
+					'name' => $name,
 				]);
 
 				if (!$armor)
-					throw new \RuntimeException('Could not find armor named ' . $armorName);
+					throw new \RuntimeException('Could not find armor named ' . $name);
 
 				$armor->getDefense()
 					->setBase($data['defense_base'])
@@ -63,15 +76,5 @@
 			}
 
 			$this->manager->flush();
-		}
-
-		/**
-		 * @param string $path
-		 *
-		 * @return UriInterface
-		 */
-		protected function getUriWithPath(string $path): UriInterface {
-			return $this->configuration->getBaseUri()->withPath('/CarlosFdez/MHWorldData/master/source_data/' .
-				ltrim($path, '/'));
 		}
 	}
