@@ -1,6 +1,7 @@
 <?php
 	namespace App\Scraping\Scrapers;
 
+	use App\Entity\Weapon;
 	use App\Scraping\AbstractScraper;
 	use App\Scraping\Configurations\MHWikiaConfiguration;
 	use App\Scraping\ProgressAwareInterface;
@@ -8,6 +9,7 @@
 	use App\Scraping\ScraperInterface;
 	use App\Scraping\Scrapers\Helpers\MHWikiaHelper;
 	use App\Scraping\Type;
+	use App\Utility\StringUtil;
 	use Doctrine\Common\Persistence\ObjectManager;
 	use Symfony\Component\DomCrawler\Crawler;
 	use Symfony\Component\HttpFoundation\Response;
@@ -78,6 +80,32 @@
 		 * @param string $weaponType
 		 */
 		public function process(string $path, string $weaponType): void {
-			// TODO Implement per-page scraping instructions
+			$uri = $this->getConfiguration()->getBaseUri()->withPath($path);
+			$response = $this->getWithRetry($uri);
+
+			if ($response->getStatusCode() !== Response::HTTP_OK)
+				throw new \RuntimeException('Could not retrieve ' . $uri);
+
+			/**
+			 * For melee weapons:
+			 *   0 = Main Data
+			 *   1 = Crafting Progression
+			 *
+			 * For ranged weapons:
+			 *   0 = Main Data
+			 *   1 = Ammo Info
+			 *   2 = Crafting Progression
+			 */
+			$blocks = (new Crawler($response->getBody()->getContents()))->filter('#mw-content-text aside');
+
+			$mainBlock = $blocks->eq(0);
+
+			$name = trim(explode('/', $mainBlock->filter('h2')->text())[0]);
+			$name = StringUtil::replaceNumeralRank($name);
+
+			$weapon = $this->manager->getRepository('App:Weapon')->findOneBy([
+				'name' => $name,
+				'type' => $weaponType,
+			]);
 		}
 	}
