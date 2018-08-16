@@ -22,7 +22,7 @@ Vagrant.configure("2") do |config|
 		add-apt-repository -y ppa:ondrej/php
 
 		apt-get install -y build-essential software-properties-common php7.2 php7.2-mysqlnd php7.2-curl \
-			php7.2-zip php7.2-mbstring php7.2-xml php7.2-xdebug php7.2-memcached
+			php7.2-zip php7.2-mbstring php7.2-xml php7.2-xdebug php7.2-memcached php7.2-gd
 		apt-get install -y composer
 
 		if grep -Fqvx "xdebug.remote_enable" /etc/php/7.2/mods-available/xdebug.ini; then
