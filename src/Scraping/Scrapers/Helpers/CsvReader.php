@@ -1,5 +1,5 @@
 <?php
-	namespace App\Scraping\Scrapers\Helpers\Csv;
+	namespace App\Scraping\Scrapers\Helpers;
 
 	class CsvReader {
 		/**

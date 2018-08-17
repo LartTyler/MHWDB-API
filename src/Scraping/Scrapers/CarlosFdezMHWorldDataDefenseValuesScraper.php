@@ -6,7 +6,7 @@
 	use App\Scraping\Configurations\GithubConfiguration;
 	use App\Scraping\ProgressAwareInterface;
 	use App\Scraping\ProgressAwareTrait;
-	use App\Scraping\Scrapers\Helpers\Csv\CsvReader;
+	use App\Scraping\Scrapers\Helpers\CsvReader;
 	use App\Scraping\Type;
 	use Doctrine\Common\Persistence\ObjectManager;
 	use Psr\Http\Message\UriInterface;
