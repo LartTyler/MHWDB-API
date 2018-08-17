@@ -14,7 +14,6 @@ services:
                 - '@App\Scraping\Scrapers\MHWikiaWeaponScraper'
                 - '@App\Scraping\Scrapers\KiranicoArmorScraper'
                 - '@App\Scraping\Scrapers\KiranicoDecorationsScraper'
-                - '@App\Scraping\Scrapers\MHWikiaEldersealScraper'
                 - '@App\Scraping\Scrapers\FextralifeArmorSetBonusScraper'
                 - '@App\Scraping\Scrapers\CarlosFdezMHWorldDataDefenseValuesScraper'
                 - '@App\Scraping\Scrapers\MHWikiaWeaponIconsScraper'
@@ -33,7 +32,6 @@ services:
     App\Scraping\Scrapers\MHWikiaWeaponScraper: ~
     App\Scraping\Scrapers\KiranicoArmorScraper: ~
     App\Scraping\Scrapers\KiranicoDecorationsScraper: ~
-    App\Scraping\Scrapers\MHWikiaEldersealScraper: ~
     App\Scraping\Scrapers\FextralifeArmorSetBonusScraper: ~
     App\Scraping\Scrapers\CarlosFdezMHWorldDataDefenseValuesScraper: ~
     App\Scraping\Scrapers\MHWikiaWeaponIconsScraper: ~
