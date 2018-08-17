@@ -316,9 +316,6 @@
 			$weapon->removeAttribute(Attribute::IG_BOOST_TYPE);
 
 			if ($weaponType === WeaponType::INSECT_GLAIVE) {
-				if (!isset($generalStats['kinsectBonus']))
-					throw new \RuntimeException('Missing kinsectBonus on ' . $uri);
-
 				$boostType = strtolower(StringUtil::clean($generalStats['kinsectBonus']));
 				$boostType = trim(str_replace('boost', '', $boostType));
 
