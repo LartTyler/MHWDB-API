@@ -67,4 +67,25 @@
 
 			return $values;
 		}
+
+		/**
+		 * @param Crawler $node
+		 *
+		 * @return array|null
+		 */
+		public static function parseItemList(Crawler $node): ?array {
+			$items = [];
+
+			if (!preg_match_all('/[A-Za-z\\s\\+\'-]+ x\\d+/', $node->text(), $matches))
+				return null;
+
+			foreach ($matches[0] as $match) {
+				$name = substr($match, 0, strrpos($match, ' '));
+				$quantity = (int)substr($match, strrpos($match, ' x') + 2);
+
+				$items[$name] = $quantity;
+			}
+
+			return $items;
+		}
 	}
