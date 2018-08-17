@@ -321,7 +321,7 @@
 
 				if (!InsectGlaiveBoostType::isValid($boostType)) {
 					throw new \RuntimeException('Invalid value found for IG boost type: ' .
-						$generalStats['kinsectBonus']);
+						$generalStats['kinsectBonus'] . ' on ' . $uri);
 				}
 
 				$weapon->setAttribute(Attribute::IG_BOOST_TYPE, $boostType);
@@ -370,7 +370,7 @@
 					]);
 
 					if (!$item)
-						throw new \RuntimeException('Could not find item named ' . $itemName);
+						throw new \RuntimeException('Could not find item named ' . $itemName . ' on ' . $uri);
 
 					$crafting->getCraftingMaterials()->add(new CraftingMaterialCost($item, $quantity));
 				}
@@ -387,7 +387,7 @@
 					]);
 
 					if (!$item)
-						throw new \RuntimeException('Could not find item named ' . $itemName);
+						throw new \RuntimeException('Could not find item named ' . $itemName . ' on ' . $uri);
 
 					$crafting->getUpgradeMaterials()->add(new CraftingMaterialCost($item, $quantity));
 				}
@@ -411,15 +411,19 @@
 
 				$previousWeapon = $this->getWeapon($previousName, $weaponType);
 
-				if (!$previousWeapon)
-					throw new \RuntimeException('Could not find weapon (for previous craft) named ' . $previousName);
+				if (!$previousWeapon) {
+					throw new \RuntimeException('Could not find weapon (for previous craft) named ' . $previousName .
+						' on ' . $uri);
+				}
 
 				$crafting->setPrevious($previousWeapon);
 
 				if (!$previousWeapon->getCrafting()->getBranches()->contains($weapon))
 					$previousWeapon->getCrafting()->getBranches()->add($weapon);
-			} else if ($crafting->getUpgradeMaterials()->count())
-				throw new \RuntimeException('No previous weapon (crafting) specified, but upgrade list is populated');
+			} else if ($crafting->getUpgradeMaterials()->count()) {
+				throw new \RuntimeException('No previous weapon (crafting) specified, but upgrade list is populated on ' .
+					$uri);
+			}
 		}
 
 		/**
