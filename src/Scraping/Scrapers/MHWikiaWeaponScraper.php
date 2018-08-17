@@ -1,8 +1,10 @@
 <?php
 	namespace App\Scraping\Scrapers;
 
+	use App\Entity\CraftingMaterialCost;
 	use App\Entity\Slot;
 	use App\Entity\Weapon;
+	use App\Entity\WeaponCraftingInfo;
 	use App\Game\AmmoType;
 	use App\Game\Attribute;
 	use App\Game\BowCoatingType;
@@ -22,6 +24,7 @@
 	use App\Scraping\Scrapers\Helpers\MHWikiaHelper;
 	use App\Scraping\Type;
 	use App\Utility\StringUtil;
+	use Doctrine\Common\Collections\Criteria;
 	use Doctrine\Common\Persistence\ObjectManager;
 	use Symfony\Component\DomCrawler\Crawler;
 	use Symfony\Component\HttpFoundation\Response;
@@ -77,14 +80,23 @@
 
 				$rows = $table->first()->filter('tr');
 
+				$this->progressBar->append($rows->count());
+
 				for ($i = 0, $ii = $rows->count(); $i < $ii; $i++) {
 					$link = $rows->eq($i)->filter('td:first-child a')->last();
 
-					if (!$link->count())
+					if (!$link->count()) {
+						$this->progressBar->advance();
+
 						continue;
+					}
 
 					$this->process(parse_url($link->attr('href'), PHP_URL_PATH), $weaponType);
+
+					$this->progressBar->advance();
 				}
+
+				$this->manager->flush();
 
 				$this->progressBar->advance();
 			}
@@ -130,7 +142,7 @@
 
 			if ($mainBlockSections->count() !== 4) {
 				throw new \RuntimeException('Something is wrong with main block: found ' . $mainBlockSections->count() .
-					' section tag(s)');
+					' section tag(s) on ' . $uri);
 			}
 
 			$generalStats = MHWikiaHelper::parseHtmlToKeyValuePairs($mainBlockSections->eq(0)->children());
@@ -190,29 +202,40 @@
 					$weapon->getSlots()->add(new Slot((int)$slots[$i]));
 			}
 
-			$weapon->getElements()->clear();
+			$elementTypes = [];
 
 			if ($rawElement = $generalStats['special'] ?? null) {
 				preg_match_all('/\\(?[A-Za-z\\s]+ \d+\\)?/', $rawElement, $matches);
 
 				foreach ($matches as $match) {
-					$match = strtolower($match);
+					$value = strtolower($match[0]);
 
-					if (strpos($match, '(') === 0) {
+					if (strpos($value, '(') === 0) {
 						$hidden = true;
-						$match = trim(str_replace(['(', ')'], '', $match));
+						$value = trim(str_replace(['(', ')'], '', $value));
 					} else
 						$hidden = false;
 
-					$value = substr($match, strrpos($match, ' ') + 1);
-					$element = trim(str_replace($value, '', $match));
+					$damage = (int)substr($value, strrpos($value, ' ') + 1);
+					$element = trim(str_replace($damage, '', $value));
+
+					if ($element === 'blastblight')
+						$element = Element::BLAST;
 
 					if (!Element::isValid($element))
-						throw new \RuntimeException('Invalid value found for type in element: ' . $match);
+						throw new \RuntimeException('Invalid value found for type in element: ' . $match[0]);
 
-					$weapon->setElement($element, $value, $hidden);
+					$weapon->setElement($element, $damage, $hidden);
+
+					$elementTypes[] = $element;
 				}
 			}
+
+			$removed = $weapon->getElements()
+				->matching(Criteria::create()->where(Criteria::expr()->notIn('type', $elementTypes)));
+
+			foreach ($removed as $item)
+				$weapon->getElements()->removeElement($item);
 
 			// region Bowgun-specific Properties
 			$weapon->removeAttribute(Attribute::DEVIATION);
@@ -236,7 +259,6 @@
 
 				$weapon->setAttribute(Attribute::SPECIAL_AMMO, $specialAmmo);
 			}
-			// endregion
 
 			$weapon->removeAttribute(Attribute::AMMO_CAPACITIES);
 
@@ -263,7 +285,9 @@
 
 				$weapon->setAttribute(Attribute::AMMO_CAPACITIES, $capacities);
 			}
+			// endregion
 
+			// region Bow-specific Properties
 			$weapon->removeAttribute(Attribute::COATINGS);
 
 			if ($weaponType === WeaponType::BOW) {
@@ -286,10 +310,15 @@
 
 				$weapon->setAttribute(Attribute::COATINGS, $coatings);
 			}
+			// endregion
 
+			// region Insect Glaive-specific Properties
 			$weapon->removeAttribute(Attribute::IG_BOOST_TYPE);
 
 			if ($weaponType === WeaponType::INSECT_GLAIVE) {
+				if (!isset($generalStats['kinsectBonus']))
+					throw new \RuntimeException('Missing kinsectBonus on ' . $uri);
+
 				$boostType = strtolower(StringUtil::clean($generalStats['kinsectBonus']));
 				$boostType = trim(str_replace('boost', '', $boostType));
 
@@ -300,7 +329,9 @@
 
 				$weapon->setAttribute(Attribute::IG_BOOST_TYPE, $boostType);
 			}
+			// endregion
 
+			// region Gunlance-specific Properties
 			$weapon->removeAttribute(Attribute::GL_SHELLING_TYPE);
 
 			if ($weaponType === WeaponType::GUNLANCE) {
@@ -309,6 +340,7 @@
 
 				$weapon->setAttribute(Attribute::GL_SHELLING_TYPE, $shellingType);
 			}
+			// endregion
 
 			$weapon->removeAttribute(Attribute::PHIAL_TYPE);
 
@@ -321,13 +353,76 @@
 			 */
 			$materialCostCells = $mainBlockSections->eq(2)->filter('td');
 
-			$craftingCosts = array_map(function(string $item): string {
-				return StringUtil::clean($item);
-			}, explode("\n", $materialCostCells->eq(0)->text()));
+			$craftingCosts = MHWikiaHelper::parseItemList($materialCostCells->eq(0));
+			$craftable = $craftingCosts !== null;
 
-			if ($craftingCosts && $craftingCosts[0] !== 'N/A') {
-				// TODO Add crafting cost parsing
+			$crafting = $weapon->getCrafting();
+
+			if (!$crafting)
+				$weapon->setCrafting($crafting = new WeaponCraftingInfo($craftable));
+			else
+				$crafting->setCraftable($craftable);
+
+			$crafting->getBranches()->clear();
+			$crafting->getCraftingMaterials()->clear();
+
+			if ($craftingCosts !== null) {
+				foreach ($craftingCosts as $itemName => $quantity) {
+					$item = $this->manager->getRepository('App:Item')->findOneBy([
+						'name' => $itemName,
+					]);
+
+					if (!$item)
+						throw new \RuntimeException('Could not find item named ' . $itemName);
+
+					$crafting->getCraftingMaterials()->add(new CraftingMaterialCost($item, $quantity));
+				}
 			}
+
+			$crafting->getUpgradeMaterials()->clear();
+
+			$upgradeCosts = MHWikiaHelper::parseItemList($materialCostCells->eq(1));
+
+			if ($upgradeCosts !== null) {
+				foreach ($upgradeCosts as $itemName => $quantity) {
+					$item = $this->manager->getRepository('App:Item')->findOneBy([
+						'name' => $itemName,
+					]);
+
+					if (!$item)
+						throw new \RuntimeException('Could not find item named ' . $itemName);
+
+					$crafting->getUpgradeMaterials()->add(new CraftingMaterialCost($item, $quantity));
+				}
+			}
+
+			/**
+			 * 0 = Previous item
+			 * 1 = Current item
+			 * 2 = Next items
+			 */
+			$progressionCells = $blocks->last()->filter('td');
+
+			$previousLink = $progressionCells->eq(0)->filter('a:not(.image)');
+
+			if ($previousLink->count()) {
+				if (!$crafting->getUpgradeMaterials()->count())
+					throw new \RuntimeException('Previous weapon (crafting) found, but no upgrade materials in list');
+
+				$previousName = StringUtil::clean($previousLink->text());
+				$previousName = StringUtil::replaceNumeralRank($previousName);
+
+				$previousWeapon = $this->getWeapon($previousName, $weaponType);
+
+				if (!$previousWeapon)
+					throw new \RuntimeException('Could not find weapon (for previous craft) named ' . $previousName);
+
+				$crafting->setPrevious($previousWeapon);
+
+				if (!$previousWeapon->getCrafting()->getBranches()->contains($weapon))
+					$previousWeapon->getCrafting()->getBranches()->add($weapon);
+			} else if ($crafting->getUpgradeMaterials()->count())
+				throw new \RuntimeException('No previous weapon (crafting) specified, but upgrade list is populated');
 		}
 
 		/**
@@ -336,7 +431,7 @@
 		 *
 		 * @return Weapon|null
 		 */
-		public function getWeapon(string $name, string $type): ?Weapon {
+		protected function getWeapon(string $name, string $type): ?Weapon {
 			$key = $type . ':' . $name;
 
 			if (array_key_exists($key, $this->weaponCache))
