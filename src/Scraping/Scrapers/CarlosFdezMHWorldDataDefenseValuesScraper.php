@@ -2,19 +2,13 @@
 	namespace App\Scraping\Scrapers;
 
 	use App\Entity\Armor;
-	use App\Scraping\AbstractScraper;
 	use App\Scraping\Configurations\GithubConfiguration;
-	use App\Scraping\ProgressAwareInterface;
-	use App\Scraping\ProgressAwareTrait;
 	use App\Scraping\Scrapers\Helpers\CsvReader;
 	use App\Scraping\Type;
 	use Doctrine\Common\Persistence\ObjectManager;
-	use Psr\Http\Message\UriInterface;
 	use Symfony\Component\HttpFoundation\Response;
 
 	class CarlosFdezMHWorldDataDefenseValuesScraper extends AbstractCarlosFdezMHWorldDataScraper {
-		use ProgressAwareTrait;
-
 		/**
 		 * @var ObjectManager
 		 */
@@ -64,15 +58,16 @@
 					'name' => $name,
 				]);
 
-				if (!$armor)
-					throw new \RuntimeException('Could not find armor named ' . $name);
+				if (!$armor) {
+					echo PHP_EOL . PHP_EOL . '>>> [defense] Could not find armor named ' . $name . PHP_EOL . PHP_EOL;
+
+					return;
+				}
 
 				$armor->getDefense()
 					->setBase($data['defense_base'])
 					->setMax($data['defense_max'])
 					->setAugmented($data['defense_augment_max']);
-
-				$this->progressBar->advance();
 			}
 
 			$this->manager->flush();
