@@ -4314,16 +4314,16 @@
     "packages-dev": [
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.64.13",
+            "version": "3.64.14",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "daff999e06bc5334e9bb90286514f1c2db0c4cbb"
+                "reference": "aadc68842a5dd1d3fb7faaee8a8a8eaaf0fd6065"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/daff999e06bc5334e9bb90286514f1c2db0c4cbb",
-                "reference": "daff999e06bc5334e9bb90286514f1c2db0c4cbb",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/aadc68842a5dd1d3fb7faaee8a8a8eaaf0fd6065",
+                "reference": "aadc68842a5dd1d3fb7faaee8a8a8eaaf0fd6065",
                 "shasum": ""
             },
             "require": {
@@ -4390,7 +4390,7 @@
                 "s3",
                 "sdk"
             ],
-            "time": "2018-08-15T23:03:41+00:00"
+            "time": "2018-08-16T22:11:39+00:00"
         },
         {
             "name": "mtdowling/jmespath.php",
