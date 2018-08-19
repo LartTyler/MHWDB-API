@@ -24,7 +24,6 @@ services:
     App\Scraping\Configurations\GithubConfiguration: ~
 
     App\Scraping\Scrapers\MHWikiaItemsScraper: ~
-    App\Scraping\Scrapers\KiranicoSkillsScraper: ~
     App\Scraping\Scrapers\KiranicoCharmsScraper: ~
     App\Scraping\Scrapers\FextralifeCharmRarityScraper: ~
     App\Scraping\Scrapers\MHWikiaWeaponScraper: ~
@@ -33,3 +32,10 @@ services:
     App\Scraping\Scrapers\MHWikiaWeaponIconsScraper: ~
     App\Scraping\Scrapers\FextralifeWeaponImagesScraper: ~
     App\Scraping\Scrapers\KiranicoMotionValuesScraper: ~
+
+    App\Scraping\Scrapers\KiranicoSkillsScraper:
+        class: App\Scraping\Scrapers\KiranicoSkillsScraper
+        arguments:
+        - '@App\Scraping\Configurations\KiranicoConfiguration'
+        - '@doctrine.orm.entity_manager'
+        - '%kernel.root_dir%/Resources/data/missing-skills.json'

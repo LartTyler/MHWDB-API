@@ -23,15 +23,31 @@
 		protected $manager;
 
 		/**
+		 * @var array
+		 */
+		protected $missingSkills;
+
+		/**
+		 * @var Skill[]
+		 */
+		protected $skillCache = [];
+
+		/**
 		 * KiranicoSkillsScraper constructor.
 		 *
 		 * @param KiranicoConfiguration $configuration
 		 * @param ObjectManager         $manager
+		 * @param string                $missingSkillsFile
 		 */
-		public function __construct(KiranicoConfiguration $configuration, ObjectManager $manager) {
+		public function __construct(
+			KiranicoConfiguration $configuration,
+			ObjectManager $manager,
+			string $missingSkillsFile
+		) {
 			parent::__construct($configuration, Type::SKILLS);
 
 			$this->manager = $manager;
+			$this->missingSkills = json_decode(file_get_contents($missingSkillsFile), true);
 		}
 
 		/**
@@ -47,7 +63,7 @@
 			$crawler = (new Crawler($response->getBody()->getContents()))->filter('.container table tr');
 			$count = $crawler->count();
 
-			$this->progressBar->append($count);
+			$this->progressBar->append($count + sizeof($this->missingSkills));
 
 			for ($i = 0; $i < $count; $i++) {
 				$node = $crawler->eq($i);
@@ -55,6 +71,31 @@
 				if ($rowCount = $node->children()->first()->attr('rowspan'))
 					// For some reason, rows on Kiranico are level count + 1 for rowspan
 					$this->process($node, $rowCount - 1);
+
+				$this->progressBar->advance();
+			}
+
+			foreach ($this->missingSkills as $name => $skillData) {
+				if (isset($this->skillCache[$name]))
+					continue;
+
+				$skill = $this->manager->getRepository('App:Skill')->findOneBy([
+					'name' => $name,
+				]);
+
+				if ($skill)
+					continue;
+
+				$skill = new Skill($name);
+				$this->manager->persist($skill);
+
+				$skill->setDescription($skillData['description']);
+
+				foreach ($skillData['ranks'] as $rankData) {
+					$rank = new SkillRank($skill, $rankData['level'], $rankData['description']);
+
+					$skill->getRanks()->add($rank);
+				}
 
 				$this->progressBar->advance();
 			}
@@ -81,6 +122,8 @@
 
 				$this->manager->persist($skill);
 			}
+
+			$this->skillCache[$skillName] = $skill;
 
 			for ($i = 0; $i < $rankCount; $i++) {
 				$description = trim($initialNode->nextAll()->eq($i)->children()->last()->text());

@@ -7,6 +7,7 @@
 		"ext-iconv": "*",
 		"ext-memcached": "*",
 		"ext-gd": "*",
+		"ext-json": "*",
 		"dbstudios/doctrine-entities": "^1.0",
 		"dbstudios/doctrine-query-document": "^0.2",
 		"dbstudios/doze-bundle": "^1.4",

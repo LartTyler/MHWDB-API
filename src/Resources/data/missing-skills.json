@@ -1,0 +1,20 @@
+{
+	"Great Luck": {
+		"description": "High chance of increased quest rewards. (No effect when joining mid-quest.)",
+		"ranks": [
+			{
+				"level": 1,
+				"description": "High chance of increased quest rewards. (No effect when joining mid-quest.)"
+			}
+		]
+	},
+	"Carving Master": {
+		"description": "Lets you carve one additional time. (No effect when joining mid-quest.)",
+		"ranks": [
+			{
+				"level": 1,
+				"description": "Lets you carve one additional time. (No effect when joining mid-quest.)"
+			}
+		]
+	}
+}
