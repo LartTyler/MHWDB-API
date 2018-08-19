@@ -6,7 +6,7 @@
 	use App\Scraping\ProgressAwareTrait;
 	use Psr\Http\Message\UriInterface;
 
-	abstract class AbstractCarlosFdezMHWorldDataScraper extends AbstractScraper implements ProgressAwareInterface {
+	abstract class AbstractMHWorldDataScraper extends AbstractScraper implements ProgressAwareInterface {
 		use ProgressAwareTrait;
 
 		/**

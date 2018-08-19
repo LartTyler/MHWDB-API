@@ -9,9 +9,6 @@
 		const ITEMS = 'items';
 		const SKILLS = 'skills';
 		const WEAPONS = 'weapons';
-		const ELDERSEAL = 'elderseal';
-		const ARMOR_SET_BONUS = 'armor-set-bonus';
-		const ARMOR_DEFENSE = 'armor-defense';
 		const WEAPON_ICONS = 'weapon-icons';
 		const WEAPON_IMAGES = 'weapon-images';
 		const MOTION_VALUES = 'motion-values';

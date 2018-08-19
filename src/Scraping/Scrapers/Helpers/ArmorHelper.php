@@ -1,10 +1,11 @@
 <?php
 	namespace App\Scraping\Scrapers\Helpers;
 
+	use App\Game\ArmorRank;
 	use App\Game\ArmorType;
 
-	final class KiranicoArmorHelper {
-		private const ARMOR_TYPE_PHRASES = [
+	final class ArmorHelper {
+		public const ARMOR_TYPE_PHRASES = [
 			// -- Head --
 			'Headgear' => ArmorType::HEAD,
 			'Headpiece' => ArmorType::HEAD,
@@ -79,10 +80,41 @@
 			'Taroth\'s Wrath' => ArmorType::LEGS,
 		];
 
+		public const ARMOR_SUFFIX_MAP = [
+			'α' => 'Alpha',
+			'β' => 'Beta',
+			'γ' => 'Gamma',
+		];
+
 		/**
 		 * @var array[]
 		 */
 		private static $armorNameCache = [];
+
+		/**
+		 * @param string $name
+		 *
+		 * @return string
+		 */
+		public static function replaceSuffixSymbol(string $name): string {
+			return str_replace(array_keys(self::ARMOR_SUFFIX_MAP), self::ARMOR_SUFFIX_MAP, $name);
+		}
+
+		/**
+		 * @param string $name
+		 *
+		 * @return string
+		 */
+		public static function getRank(string $name): string {
+			$tail = substr($name, strrpos($name, ' ') + 1);
+
+			foreach (self::ARMOR_SUFFIX_MAP as $suffix) {
+				if ($tail === $suffix)
+					return ArmorRank::HIGH;
+			}
+
+			return ArmorRank::LOW;
+		}
 
 		/**
 		 * @param string $rawName
@@ -93,23 +125,7 @@
 			if (isset(self::$armorNameCache[$rawName]))
 				return self::$armorNameCache[$rawName];
 
-			/**
-			 * Does a few things:
-			 *
-			 * 1. Replaces any consecutive whitespace characters with a single space
-			 * 2. Corrects any typos present on the scrape target
-			 */
-			$cleanedName = str_replace([
-				'Apha',
-				'Barchia',
-				'Dodogame',
-				'Mossswine',
-			], [
-				'Alpha',
-				'Brachia',
-				'Dodogama',
-				'Mosswine',
-			], preg_replace('/\s+/', ' ', $rawName));
+			$cleanedName = self::replaceSuffixSymbol($rawName);
 
 			$parts = array_filter(array_map(function(string $part): string {
 				return trim($part);
@@ -117,7 +133,7 @@
 
 			$partCount = sizeof($parts);
 
-			if (in_array($parts[$partCount - 1], ['Alpha', 'Beta'])) {
+			if (in_array($parts[$partCount - 1], self::ARMOR_SUFFIX_MAP)) {
 				$rank = array_pop($parts);
 
 				--$partCount;

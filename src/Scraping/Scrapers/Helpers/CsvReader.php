@@ -18,6 +18,11 @@
 		protected $headers;
 
 		/**
+		 * @var int|null
+		 */
+		protected $rowCount = null;
+
+		/**
 		 * CsvReader constructor.
 		 *
 		 * @param string|resource $contentOrResource
@@ -58,7 +63,12 @@
 			$row = [];
 			$unknown = 0;
 
-			foreach (fgetcsv($this->file) as $index => $cell) {
+			$next = fgetcsv($this->file);
+
+			if (!$next)
+				return null;
+
+			foreach ($next as $index => $cell) {
 				$key = $this->headers[$index] ?? 'uknown_column_' . $unknown++;
 
 				if (isset($this->transformers[$key]))
@@ -82,5 +92,29 @@
 		 */
 		public function close(): void {
 			fclose($this->file);
+		}
+
+		/**
+		 * @return int
+		 */
+		public function getRowCount(): int {
+			if ($this->rowCount !== null)
+				return $this->rowCount;
+
+			if (!stream_get_meta_data($this->file)['seekable'])
+				throw new \RuntimeException('Cannot get row count: file is not seekable');
+
+			$pos = ftell($this->file);
+
+			fseek($this->file, 0);
+
+			$lines = 0;
+
+			while (fgetcsv($this->file))
+				++$lines;
+
+			fseek($this->file, $pos);
+
+			return $this->rowCount = $lines - 1;
 		}
 	}
