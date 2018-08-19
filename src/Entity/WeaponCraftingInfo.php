@@ -99,6 +99,7 @@
 		 */
 		public function setPrevious(?Weapon $previous) {
 			$this->previous = $previous;
+
 			return $this;
 		}
 

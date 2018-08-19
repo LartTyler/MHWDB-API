@@ -33,11 +33,12 @@
 			return [
 				'id' => $entity->getId(),
 				'name' => $entity->getName(),
-				'description' => $entity->getName(),
+				'description' => $entity->getDescription(),
 				'rarity' => $entity->getRarity(),
 				'carryLimit' => $entity->getCarryLimit(),
 				'sellPrice' => $entity->getSellPrice(),
 				'buyPrice' => $entity->getBuyPrice(),
+				'value' => $entity->getValue(),
 			];
 		}
 	}

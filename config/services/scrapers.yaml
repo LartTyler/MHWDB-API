@@ -7,16 +7,13 @@ services:
     App\Scraping\ScraperCollection:
         arguments:
             -
-                - '@App\Scraping\Scrapers\KiranicoItemScraper'
+                - '@App\Scraping\Scrapers\MHWikiaItemsScraper'
                 - '@App\Scraping\Scrapers\KiranicoSkillsScraper'
                 - '@App\Scraping\Scrapers\KiranicoCharmsScraper'
                 - '@App\Scraping\Scrapers\FextralifeCharmRarityScraper'
-                - '@App\Scraping\Scrapers\KiranicoWeaponsScraper'
-                - '@App\Scraping\Scrapers\KiranicoArmorScraper'
+                - '@App\Scraping\Scrapers\MHWikiaWeaponScraper'
+                - '@App\Scraping\Scrapers\MHWorldDataArmorScraper'
                 - '@App\Scraping\Scrapers\KiranicoDecorationsScraper'
-                - '@App\Scraping\Scrapers\MHWikiaEldersealScraper'
-                - '@App\Scraping\Scrapers\FextralifeArmorSetBonusScraper'
-                - '@App\Scraping\Scrapers\CarlosFdezMHWorldDataDefenseValuesScraper'
                 - '@App\Scraping\Scrapers\MHWikiaWeaponIconsScraper'
                 - '@App\Scraping\Scrapers\FextralifeWeaponImagesScraper'
                 - '@App\Scraping\Scrapers\KiranicoMotionValuesScraper'
@@ -26,20 +23,19 @@ services:
     App\Scraping\Configurations\FextralifeConfiguration: ~
     App\Scraping\Configurations\GithubConfiguration: ~
 
-    App\Scraping\Scrapers\KiranicoItemScraper: ~
-    App\Scraping\Scrapers\KiranicoSkillsScraper: ~
+    App\Scraping\Scrapers\MHWikiaItemsScraper: ~
     App\Scraping\Scrapers\KiranicoCharmsScraper: ~
     App\Scraping\Scrapers\FextralifeCharmRarityScraper: ~
-    App\Scraping\Scrapers\KiranicoWeaponsScraper: ~
-    App\Scraping\Scrapers\KiranicoArmorScraper: ~
+    App\Scraping\Scrapers\MHWikiaWeaponScraper: ~
+    App\Scraping\Scrapers\MHWorldDataArmorScraper: ~
     App\Scraping\Scrapers\KiranicoDecorationsScraper: ~
-    App\Scraping\Scrapers\MHWikiaEldersealScraper: ~
-    App\Scraping\Scrapers\FextralifeArmorSetBonusScraper: ~
-    App\Scraping\Scrapers\CarlosFdezMHWorldDataDefenseValuesScraper: ~
     App\Scraping\Scrapers\MHWikiaWeaponIconsScraper: ~
     App\Scraping\Scrapers\FextralifeWeaponImagesScraper: ~
     App\Scraping\Scrapers\KiranicoMotionValuesScraper: ~
 
-    App\Scraping\Scrapers\Helpers\EldersealData:
+    App\Scraping\Scrapers\KiranicoSkillsScraper:
+        class: App\Scraping\Scrapers\KiranicoSkillsScraper
         arguments:
-            - '%kernel.root_dir%/Resources/data/missing-elderseal-values.json'
+        - '@App\Scraping\Configurations\KiranicoConfiguration'
+        - '@doctrine.orm.entity_manager'
+        - '%kernel.root_dir%/Resources/data/missing-skills.json'

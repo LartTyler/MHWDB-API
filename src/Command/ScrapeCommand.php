@@ -5,6 +5,7 @@
 	use App\Scraping\ProgressAwareInterface;
 	use App\Scraping\ScraperCollection;
 	use App\Scraping\ScraperInterface;
+	use App\Scraping\Type;
 	use Symfony\Component\Console\Command\Command;
 	use Symfony\Component\Console\Input\InputInterface;
 	use Symfony\Component\Console\Input\InputOption;
@@ -35,14 +36,16 @@
 			$this
 				->setName('app:scrape')
 				->addOption('type', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY)
-				->addOption('context', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY);
+				->addOption('context', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY)
+				->addOption('begin-at-type', null, InputOption::VALUE_REQUIRED)
+				->addOption('exclude-type', 'x', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY);
 		}
 
 		/**
 		 * {@inheritdoc}
 		 */
 		protected function execute(InputInterface $input, OutputInterface $output): void {
-			$types = $input->getOption('type');
+			$io = new SymfonyStyle($input, $output);
 			$contexts = [];
 
 			foreach ($input->getOption('context') as $value) {
@@ -63,15 +66,52 @@
 				$contexts[$type][$key] = $value;
 			}
 
+			/** @var ScraperInterface[] $scrapers */
+			$scrapers = array_values($this->scrapers->getScrapers());
+
+			if ($beginAt = $input->getOption('begin-at-type')) {
+				$index = null;
+
+				foreach ($scrapers as $i => $scraper) {
+					if ($scraper->getType() === $beginAt) {
+						$index = $i;
+
+						break;
+					}
+				}
+
+				if ($index === null)
+					throw new \InvalidArgumentException('The string "' . $beginAt . '" is not a recognized type');
+
+				$scrapers = array_slice($scrapers, $index);
+			} else if ($types = $input->getOption('type')) {
+				$scrapers = array_filter($scrapers, function(ScraperInterface $scraper) use ($types): bool {
+					return in_array($scraper->getType(), $types);
+				});
+			}
+
+			if ($exclude = $input->getOption('exclude-type')) {
+				$scrapers = array_filter($scrapers, function(ScraperInterface $scraper) use ($exclude): bool {
+					return !in_array($scraper->getType(), $exclude);
+				});
+			}
+
+			if (sizeof($scrapers) === $this->scrapers->count())
+				$io->comment('Running scrapers: all');
+			else {
+				$io->comment(
+					'Running scrapers: ' .implode(', ', array_map(function(ScraperInterface $scraper): string {
+						return $scraper->getType();
+					}, $scrapers))
+				);
+			}
+
 			$progress = new MultiProgressBar($output);
-			$progress->append($types ? sizeof($types) : $this->scrapers->count());
+			$progress->append(sizeof($scrapers));
 
 			$progress->start();
 
-			foreach ($this->scrapers as $scraper) {
-				if ($types && !in_array($scraper->getType(), $types))
-					continue;
-
+			foreach ($scrapers as $scraper) {
 				$context = $contexts[$scraper->getType()] ?? [];
 
 				if ($scraper instanceof ProgressAwareInterface)
@@ -82,6 +122,6 @@
 				$progress->advance();
 			}
 
-			(new SymfonyStyle($input, $output))->success('Done!');
+			$io->success('Done!');
 		}
 	}

@@ -1,5 +1,6 @@
 /.idea
 /.vagrant
+/*-cloudimg-console.log
 
 ###> symfony/framework-bundle ###
 .env

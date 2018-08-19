@@ -85,4 +85,22 @@
 
 			return (int)$numeric;
 		}
+
+		/**
+		 * @param string $string
+		 *
+		 * @return string
+		 */
+		public static function camelize(string $string): string {
+			return lcfirst(self::classify($string));
+		}
+
+		/**
+		 * @param string $string
+		 *
+		 * @return string
+		 */
+		public static function classify(string $string): string {
+			return str_replace(' ', '', ucwords(strtr($string, '_-', '  ')));
+		}
 	}

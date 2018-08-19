@@ -2,7 +2,7 @@
 	namespace App\Command;
 
 	use App\Entity\Armor;
-	use App\Scraping\Scrapers\Helpers\KiranicoArmorHelper;
+	use App\Scraping\Scrapers\Helpers\ArmorHelper;
 	use Doctrine\Common\Persistence\ObjectManager;
 	use Symfony\Component\Console\Command\Command;
 	use Symfony\Component\Console\Helper\ProgressBar;
@@ -45,7 +45,7 @@
 			$progress->start();
 
 			foreach ($armors as $armor) {
-				[$name] = KiranicoArmorHelper::parseArmorName($armor->getName());
+				[$name] = ArmorHelper::parseArmorName($armor->getName());
 
 				$armor->setName($name);
 

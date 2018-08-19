@@ -33,6 +33,12 @@ App\Entity\Item:
             nullable: false
             options:
                 unsigned: true
+        value:
+            type: integer
+            nullable: false
+            options:
+                unsigned: true
+            column: _value
         carryLimit:
             type: integer
             nullable: false

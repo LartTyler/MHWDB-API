@@ -1,23 +1,21 @@
 <?php
 	namespace App\Game;
 
-	final class ArmorType {
-		const HEAD = 'head';
-		const CHEST = 'chest';
-		const GLOVES = 'gloves';
-		const WAIST = 'waist';
-		const LEGS = 'legs';
+	final class BowgunDeviation {
+		const NONE = 'none';
+		const LOW = 'low';
+		const AVERAGE = 'average';
+		const HIGH = 'high';
 
 		const ALL = [
-			self::HEAD,
-			self::CHEST,
-			self::GLOVES,
-			self::WAIST,
-			self::LEGS,
+			self::NONE,
+			self::LOW,
+			self::AVERAGE,
+			self::HIGH,
 		];
 
 		/**
-		 * ArmorType constructor.
+		 * Deviation constructor.
 		 */
 		private function __construct() {
 		}

@@ -45,6 +45,18 @@
 		}
 
 		/**
+		 * @param string $type
+		 *
+		 * @return bool
+		 */
+		public static function isBowgun(string $type): bool {
+			return in_array($type, [
+				self::LIGHT_BOWGUN,
+				self::HEAVY_BOWGUN,
+			]);
+		}
+
+		/**
 		 * @return string[]
 		 */
 		public static function all(): array {

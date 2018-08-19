@@ -15,7 +15,7 @@
 	use App\Scraping\Configurations\KiranicoConfiguration;
 	use App\Scraping\ProgressAwareInterface;
 	use App\Scraping\ProgressAwareTrait;
-	use App\Scraping\Scrapers\Helpers\KiranicoArmorHelper;
+	use App\Scraping\Scrapers\Helpers\ArmorHelper;
 	use App\Scraping\Scrapers\Helpers\KiranicoHelper;
 	use App\Scraping\Scrapers\Helpers\SpriteMap;
 	use App\Scraping\Type;
@@ -164,7 +164,7 @@
 			 * @var string $name
 			 * @var string $armorType
 			 */
-			list($name, $armorType) = KiranicoArmorHelper::parseArmorName($rawName);
+			list($name, $armorType) = ArmorHelper::parseArmorName($rawName);
 
 			/** @var Armor|null $armor */
 			$armor = $this->manager->getRepository('App:Armor')->findOneBy([

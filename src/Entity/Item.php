@@ -35,6 +35,11 @@
 		/**
 		 * @var int
 		 */
+		private $value = 0;
+
+		/**
+		 * @var int
+		 */
 		private $carryLimit = 0;
 
 		/**
@@ -122,6 +127,24 @@
 		 */
 		public function setBuyPrice(int $buyPrice) {
 			$this->buyPrice = $buyPrice;
+			return $this;
+		}
+
+		/**
+		 * @return int
+		 */
+		public function getValue(): int {
+			return $this->value;
+		}
+
+		/**
+		 * @param int $value
+		 *
+		 * @return $this
+		 */
+		public function setValue(int $value) {
+			$this->value = $value;
+
 			return $this;
 		}
 
