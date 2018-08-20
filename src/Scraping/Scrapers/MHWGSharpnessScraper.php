@@ -9,7 +9,7 @@
 	use App\Scraping\ProgressAwareTrait;
 	use App\Scraping\ScraperInterface;
 	use App\Scraping\Scrapers\Helpers\CssHelper;
-	use App\Scraping\Scrapers\Helpers\MHWGHelper;
+	use App\Scraping\Scrapers\Helpers\MHWGWeaponTreeHelper;
 	use App\Scraping\Type;
 	use App\Utility\StringUtil;
 	use Doctrine\Common\Persistence\ObjectManager;
@@ -50,7 +50,7 @@
 			$this->progressBar->append(sizeof($subtypes));
 
 			foreach ($subtypes as $weaponType) {
-				$uri = $this->getUriWithPath(MHWGHelper::WEAPON_TREE_MAP[$weaponType]);
+				$uri = $this->getUriWithPath(MHWGWeaponTreeHelper::WEAPON_TREE_MAP[$weaponType]);
 				$response = $this->getWithRetry($uri);
 
 				if ($response->getStatusCode() !== Response::HTTP_OK)
@@ -59,13 +59,25 @@
 				$links = (new Crawler($response->getBody()->getContents()))
 					->filter('#main_1 table tr[class]:not(.th2) span > a');
 
-				$this->progressBar->append($links->count());
-
-				$ordinal = 0;
+				$paths = [];
 
 				for ($i = 0, $ii = $links->count(); $i < $ii; $i++) {
 					$path = $links->eq($i)->attr('href');
 
+					// We don't store data for the Kulve Taroth weapons
+					if (in_array($path, MHWGWeaponTreeHelper::KULVE_TAROTH_WEAPON_PATHS))
+						continue;
+
+					$paths[$path] = true;
+				}
+
+				$paths = array_keys($paths);
+
+				$this->progressBar->append(sizeof($paths));
+
+				$ordinal = 0;
+
+				foreach ($paths as $path) {
 					$ordinal = $this->process($path, $weaponType, $ordinal);
 
 					$this->progressBar->advance();
@@ -148,12 +160,12 @@
 				$baseSharpness = $weapon->getDurability()->first();
 
 				$weapon->getSharpness()
-					->setRed(MHWGHelper::toOldSharpnessValue($baseSharpness->getRed()))
-					->setOrange(MHWGHelper::toOldSharpnessValue($baseSharpness->getOrange()))
-					->setYellow(MHWGHelper::toOldSharpnessValue($baseSharpness->getYellow()))
-					->setGreen(MHWGHelper::toOldSharpnessValue($baseSharpness->getGreen()))
-					->setBlue(MHWGHelper::toOldSharpnessValue($baseSharpness->getBlue()))
-					->setWhite(MHWGHelper::toOldSharpnessValue($baseSharpness->getWhite()));
+					->setRed(MHWGWeaponTreeHelper::toOldSharpnessValue($baseSharpness->getRed()))
+					->setOrange(MHWGWeaponTreeHelper::toOldSharpnessValue($baseSharpness->getOrange()))
+					->setYellow(MHWGWeaponTreeHelper::toOldSharpnessValue($baseSharpness->getYellow()))
+					->setGreen(MHWGWeaponTreeHelper::toOldSharpnessValue($baseSharpness->getGreen()))
+					->setBlue(MHWGWeaponTreeHelper::toOldSharpnessValue($baseSharpness->getBlue()))
+					->setWhite(MHWGWeaponTreeHelper::toOldSharpnessValue($baseSharpness->getWhite()));
 			}
 
 			return $ordinal;

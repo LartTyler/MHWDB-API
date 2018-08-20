@@ -5,10 +5,11 @@
 	use App\Scraping\AbstractScraper;
 	use App\Scraping\Configurations\MHWGConfiguration;
 	use Doctrine\Common\Persistence\ObjectManager;
+	use Doctrine\ORM\EntityManager;
 
 	abstract class AbstractMHWGScraper extends AbstractScraper {
 		/**
-		 * @var ObjectManager
+		 * @var ObjectManager|EntityManager
 		 */
 		protected $manager;
 
