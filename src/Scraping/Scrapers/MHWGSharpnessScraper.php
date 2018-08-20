@@ -106,7 +106,7 @@
 			$boxes = (new Crawler($response->getBody()->getContents()))->filter('#main_1 .t1.th3')->first()
 				->filter('tr > td:last-child .kcon');
 
-			for ($i = 0, $ii = $boxes->count(); $i < $ii; $i++) {
+			for ($boxIndex = 0, $boxLength = $boxes->count(); $boxIndex < $boxLength; $boxIndex++) {
 				$weapon = $this->matchWeapon($weaponType, $ordinal++);
 
 				if (!$weapon) {
@@ -114,7 +114,7 @@
 						$ordinal);
 				}
 
-				$bars = $boxes->eq($i)->filter('.kbox');
+				$bars = $boxes->eq($boxIndex)->filter('.kbox');
 
 				$weapon->getDurability()->clear();
 
