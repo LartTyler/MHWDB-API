@@ -3,7 +3,7 @@
 
 	use App\Entity\Weapon;
 	use App\Entity\WeaponSharpness;
-	use App\Scraping\Scrapers\Helpers\MHWGHelper;
+	use App\Scraping\Scrapers\Helpers\MHWGWeaponTreeHelper;
 	use Doctrine\Common\Persistence\ObjectManager;
 	use Symfony\Component\Console\Command\Command;
 	use Symfony\Component\Console\Helper\ProgressBar;
@@ -59,12 +59,12 @@
 				$baseSharpness = $weapon->getDurability()->first();
 
 				$weapon->getSharpness()
-					->setRed(MHWGHelper::toOldSharpnessValue($baseSharpness->getRed()))
-					->setOrange(MHWGHelper::toOldSharpnessValue($baseSharpness->getOrange()))
-					->setYellow(MHWGHelper::toOldSharpnessValue($baseSharpness->getYellow()))
-					->setGreen(MHWGHelper::toOldSharpnessValue($baseSharpness->getGreen()))
-					->setBlue(MHWGHelper::toOldSharpnessValue($baseSharpness->getBlue()))
-					->setWhite(MHWGHelper::toOldSharpnessValue($baseSharpness->getWhite()));
+					->setRed(MHWGWeaponTreeHelper::toOldSharpnessValue($baseSharpness->getRed()))
+					->setOrange(MHWGWeaponTreeHelper::toOldSharpnessValue($baseSharpness->getOrange()))
+					->setYellow(MHWGWeaponTreeHelper::toOldSharpnessValue($baseSharpness->getYellow()))
+					->setGreen(MHWGWeaponTreeHelper::toOldSharpnessValue($baseSharpness->getGreen()))
+					->setBlue(MHWGWeaponTreeHelper::toOldSharpnessValue($baseSharpness->getBlue()))
+					->setWhite(MHWGWeaponTreeHelper::toOldSharpnessValue($baseSharpness->getWhite()));
 
 				$progress->advance();
 			}

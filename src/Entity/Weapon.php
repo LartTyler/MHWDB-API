@@ -78,6 +78,11 @@
 		private $slotsLength = 0;
 
 		/**
+		 * @var int
+		 */
+		private $durabilityLength = 0;
+
+		/**
 		 * Weapon constructor.
 		 *
 		 * @param string $name
@@ -244,17 +249,18 @@
 		}
 
 		/**
+		 * @return WeaponSharpness[]|Collection|Selectable
+		 */
+		public function getDurability() {
+			return $this->durability;
+		}
+
+		/**
 		 * {@inheritdoc}
 		 */
 		public function syncLengthFields(): void {
 			$this->elementsLength = $this->elements->count();
 			$this->slotsLength = $this->slots->count();
-		}
-
-		/**
-		 * @return WeaponSharpness[]|Collection|Selectable
-		 */
-		public function getDurability() {
-			return $this->durability;
+			$this->durabilityLength = $this->durability->count();
 		}
 	}

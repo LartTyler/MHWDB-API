@@ -50,6 +50,13 @@ App\Entity\Weapon:
                 unsigned: true
                 default: 0
             column: slots_length
+        durabilityLength:
+            type: integer
+            nullable: false
+            options:
+                unsigned: true
+                default: 0
+            column: durability_length
     embedded:
         attack:
             class: App\Entity\WeaponAttackValues
