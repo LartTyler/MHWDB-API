@@ -67,6 +67,7 @@
 				Weapon::class => [
 					'elements.length' => 'elementsLength',
 					'slots.length' => 'slotsLength',
+					'durability.length' => 'durabilityLength',
 				],
 				WeaponCraftingInfo::class => [
 					'branches.length' => 'branchesLength',
