@@ -36,8 +36,14 @@
 
 		/**
 		 * @var WeaponSharpness
+		 * @deprecated Will be removed on 2018-08-25
 		 */
 		private $sharpness;
+
+		/**
+		 * @var Collection|Selectable|WeaponSharpness[]
+		 */
+		private $durability;
 
 		/**
 		 * @var Collection|Selectable|WeaponElement[]
@@ -86,6 +92,7 @@
 			$this->sharpness = new WeaponSharpness();
 			$this->attack = new WeaponAttackValues();
 			$this->elements = new ArrayCollection();
+			$this->durability = new ArrayCollection();
 
 			$this->setSlug($name);
 		}
@@ -242,5 +249,12 @@
 		public function syncLengthFields(): void {
 			$this->elementsLength = $this->elements->count();
 			$this->slotsLength = $this->slots->count();
+		}
+
+		/**
+		 * @return WeaponSharpness[]|Collection|Selectable
+		 */
+		public function getDurability() {
+			return $this->durability;
 		}
 	}

@@ -107,3 +107,20 @@ App\Entity\Weapon:
                         nullable: false
                         options:
                             unsigned: true
+        durability:
+            targetEntity: App\Entity\WeaponSharpness
+            orphanRemoval: true
+            cascade:
+                - all
+            joinTable:
+                name: weapon_durability
+                joinColumns:
+                    weapon_id:
+                        nullable: false
+                        options:
+                            unsigned: true
+                inverseJoinColumns:
+                    sharpness_id:
+                        nullable: false
+                        options:
+                            unsigned: true
