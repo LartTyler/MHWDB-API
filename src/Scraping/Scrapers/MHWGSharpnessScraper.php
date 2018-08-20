@@ -45,7 +45,7 @@
 		 * @param array $context
 		 */
 		public function scrape(array $context = []): void {
-			$subtypes = $context[ScraperInterface::CONTEXT_SUBTYPES] ?? [WeaponType::all()];
+			$subtypes = $context[ScraperInterface::CONTEXT_SUBTYPES] ?? WeaponType::all();
 
 			$this->progressBar->append(sizeof($subtypes));
 
