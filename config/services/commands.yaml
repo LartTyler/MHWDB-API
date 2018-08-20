@@ -56,3 +56,9 @@ services:
             -
                 name: console.command
                 command: app:util:sync-entity-length-caches
+
+    App\Command\MHWGSyncSharpnessValues:
+        tags:
+            -
+                name: console.command
+                command: app:fix:sync-mhwg-sharpness-values
