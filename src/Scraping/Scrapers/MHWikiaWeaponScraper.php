@@ -341,7 +341,7 @@
 
 			$weapon->removeAttribute(Attribute::PHIAL_TYPE);
 
-			if ($weapon === WeaponType::SWITCH_AXE || $weaponType === WeaponType::CHARGE_BLADE)
+			if ($weaponType === WeaponType::SWITCH_AXE || $weaponType === WeaponType::CHARGE_BLADE)
 				$weapon->setAttribute(Attribute::PHIAL_TYPE, trim(StringUtil::clean($generalStats['phialType'])));
 
 			/**
