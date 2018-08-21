@@ -341,8 +341,11 @@
 
 			$weapon->removeAttribute(Attribute::PHIAL_TYPE);
 
-			if ($weaponType === WeaponType::SWITCH_AXE || $weaponType === WeaponType::CHARGE_BLADE)
-				$weapon->setAttribute(Attribute::PHIAL_TYPE, trim(StringUtil::clean($generalStats['phialType'])));
+			if ($weaponType === WeaponType::SWITCH_AXE || $weaponType === WeaponType::CHARGE_BLADE) {
+				$phialType = strtolower(trim(StringUtil::clean($generalStats['phialType'])));
+
+				$weapon->setAttribute(Attribute::PHIAL_TYPE, $phialType);
+			}
 
 			/**
 			 * 0 = Crafting material costs
