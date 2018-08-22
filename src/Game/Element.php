@@ -24,6 +24,21 @@
 			self::PARALYSIS,
 		];
 
+		const DAMAGE = [
+			self::FIRE,
+			self::WATER,
+			self::ICE,
+			self::THUNDER,
+			self::DRAGON,
+		];
+
+		const STATUS = [
+			self::BLAST,
+			self::POISON,
+			self::SLEEP,
+			self::PARALYSIS,
+		];
+
 		/**
 		 * Element constructor.
 		 */

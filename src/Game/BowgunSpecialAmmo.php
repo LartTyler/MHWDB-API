@@ -1,23 +1,19 @@
 <?php
 	namespace App\Game;
 
-	final class ArmorType {
-		const HEAD = 'head';
-		const CHEST = 'chest';
-		const GLOVES = 'gloves';
-		const WAIST = 'waist';
-		const LEGS = 'legs';
+	final class BowgunSpecialAmmo {
+		const WYVERNBLAST = 'wyvernblast';
+		const WYVERNHEART = 'wyvernheart';
+		const WYVERNSNIPE = 'wyvernsnipe';
 
 		const ALL = [
-			self::HEAD,
-			self::CHEST,
-			self::GLOVES,
-			self::WAIST,
-			self::LEGS,
+			self::WYVERNBLAST,
+			self::WYVERNHEART,
+			self::WYVERNSNIPE,
 		];
 
 		/**
-		 * ArmorType constructor.
+		 * SpecialAmmo constructor.
 		 */
 		private function __construct() {
 		}
