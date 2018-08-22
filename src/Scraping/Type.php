@@ -3,6 +3,7 @@
 
 	final class Type {
 		const ARMOR = 'armor';
+		const ARMOR_IMAGES = 'armor-images';
 		const CHARMS = 'charms';
 		const CHARM_RARITY = 'charm-rarity';
 		const DECORATIONS = 'decorations';

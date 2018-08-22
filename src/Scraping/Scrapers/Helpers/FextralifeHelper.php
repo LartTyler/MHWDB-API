@@ -3,6 +3,12 @@
 
 	final class FextralifeHelper {
 		/**
+		 * FextralifeHelper constructor.
+		 */
+		private function __construct() {
+		}
+
+		/**
 		 * Changes correct weapon names to names that match what's on the Fextralife wiki.
 		 *
 		 * @param string $name
@@ -22,8 +28,11 @@
 		}
 
 		/**
-		 * FextralifeHelper constructor.
+		 * @param string $value
+		 *
+		 * @return string
 		 */
-		private function __construct() {
+		public static function toWikiSlug(string $value): string {
+			return strtr($value, ' ', '+');
 		}
 	}
