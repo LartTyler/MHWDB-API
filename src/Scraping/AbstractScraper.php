@@ -53,7 +53,7 @@
 			try {
 				return $this->configuration->getHttpClient()->get($uri);
 			} catch (\Exception $e) {
-				sleep(3);
+				sleep(5);
 
 				return $this->configuration->getHttpClient()->get($uri);
 			}
