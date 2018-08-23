@@ -23,6 +23,7 @@
 	class FextralifeArmorImageScraper extends AbstractScraper implements ProgressAwareInterface {
 		use ProgressAwareTrait;
 
+		public const CONTEXT_ONLY_MISSING = 'only-missing';
 		public const S3_BUCKET_PREFIX = 'armor/';
 
 		/**
@@ -34,6 +35,11 @@
 		 * @var S3Client
 		 */
 		protected $s3Client;
+
+		/**
+		 * @var Asset[]
+		 */
+		protected $imageCache = [];
 
 		/**
 		 * @var Asset[]
@@ -54,8 +60,20 @@
 			$this->s3Client = $aws->createS3();
 		}
 
+		/**
+		 * @param array $context
+		 *
+		 * @throws \Doctrine\ORM\NonUniqueResultException
+		 */
 		public function scrape(array $context = []): void {
 			$qb = $this->manager->createQueryBuilder()->from('App:Armor', 'a');
+
+			if (isset($context[self::CONTEXT_ONLY_MISSING])) {
+				$qb
+					->leftJoin('a.assets', 'i')
+					->andWhere('i.imageMale IS NULL')
+					->andWhere('i.imageFemale IS NULL');
+			}
 
 			$count = $qb
 				->select('COUNT(a)')
@@ -73,12 +91,15 @@
 			foreach ($iterator as $data) {
 				$this->process($data[0]);
 
+				$this->manager->flush();
+
 				$this->progressBar->advance();
 			}
-
-			$this->manager->flush();
 		}
 
+		/**
+		 * @param Armor $armor
+		 */
 		protected function process(Armor $armor): void {
 			$uri = $this->getConfiguration()->getBaseUri()
 				->withPath('/' . FextralifeHelper::toWikiSlug($armor->getName()));
@@ -112,7 +133,7 @@
 				$armor->setAssets($assets = new ArmorAssets(null, null));
 
 			for ($i = 0; $i < $imageCount; $i++) {
-				$imageUrl = $images->eq($i)->attr('src');
+				$imageUrl = FextralifeHelper::fixWikiImageLink($images->eq($i)->attr('src'));
 				$asset = $this->getAssetByUrl($imageUrl);
 
 				if ($asset) {
@@ -136,13 +157,14 @@
 				$secondaryHash = hash_file('md5', $fileUri);
 				$bucketKey = S3Helper::toBucketKey(self::S3_BUCKET_PREFIX, $primaryHash, $secondaryHash, '.png');
 
-				$asset = $this->getAssetByHashes($primaryHash, $secondaryHash);
+				$asset = $this->getAssetByHashes($bucketKey, $primaryHash, $secondaryHash);
 
 				if (!$asset)
 					$asset = new Asset(S3Helper::toBucketUrl($bucketKey), $primaryHash, $secondaryHash);
 
 				$this->setAsset($assets, $genderMap[$i], $asset, $bucketKey, $file);
 
+				$this->imageCache[$bucketKey] = $asset;
 				$this->imageUrlCache[$imageUrl] = $asset;
 			}
 		}
@@ -190,13 +212,17 @@
 		}
 
 		/**
+		 * @param string $bucketKey
 		 * @param string $primary
 		 * @param string $secondary
 		 *
 		 * @return Asset|null
 		 */
-		protected function getAssetByHashes(string $primary, string $secondary): ?Asset {
-			return $this->manager->getRepository('App:Asset')->findOneBy([
+		protected function getAssetByHashes(string $bucketKey, string $primary, string $secondary): ?Asset {
+			if (array_key_exists($bucketKey, $this->imageCache))
+				return $this->imageCache[$bucketKey];
+
+			return $this->imageCache[$bucketKey] = $this->manager->getRepository('App:Asset')->findOneBy([
 				'primaryHash' => $primary,
 				'secondaryHash' => $secondary,
 			]);
