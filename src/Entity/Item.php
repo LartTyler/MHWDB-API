@@ -25,16 +25,6 @@
 		/**
 		 * @var int
 		 */
-		private $sellPrice = 0;
-
-		/**
-		 * @var int
-		 */
-		private $buyPrice = 0;
-
-		/**
-		 * @var int
-		 */
 		private $value = 0;
 
 		/**

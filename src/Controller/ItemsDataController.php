@@ -36,8 +36,6 @@
 				'description' => $entity->getDescription(),
 				'rarity' => $entity->getRarity(),
 				'carryLimit' => $entity->getCarryLimit(),
-				'sellPrice' => $entity->getSellPrice(),
-				'buyPrice' => $entity->getBuyPrice(),
 				'value' => $entity->getValue(),
 			];
 		}
