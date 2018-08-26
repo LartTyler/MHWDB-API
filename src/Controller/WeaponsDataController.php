@@ -50,21 +50,6 @@
 				'attributes' => $entity->getAttributes() ?: new \stdClass(),
 			];
 
-			// region Sharpness Fields
-			// TODO Deprecated: Remove on 2018-08-25
-			if (WeaponType::isMelee($entity->getType()) && $projection->isAllowed('sharpness')) {
-				$sharpness = $entity->getSharpness();
-
-				$output['sharpness'] = [
-					'red' => $sharpness->getRed(),
-					'orange' => $sharpness->getOrange(),
-					'yellow' => $sharpness->getYellow(),
-					'green' => $sharpness->getGreen(),
-					'blue' => $sharpness->getBlue(),
-					'white' => $sharpness->getWhite(),
-				];
-			}
-
 			if (WeaponType::isMelee($entity->getType()) && $projection->isAllowed('durability')) {
 				$durability = $entity->getDurability();
 
