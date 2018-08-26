@@ -2,22 +2,41 @@
 	namespace App\Entity;
 
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
+	use Doctrine\ORM\Mapping as ORM;
 
+	/**
+	 * @ORM\Entity()
+	 * @ORM\Table(
+	 *     name="assets",
+	 *     uniqueConstraints={
+	 *         @ORM\UniqueConstraint(columns={"primary_hash", "secondary_hash"})
+	 *     }
+	 * )
+	 *
+	 * Class Asset
+	 *
+	 * @package App\Entity
+	 */
 	class Asset implements EntityInterface {
 		use EntityTrait;
 
 		/**
+		 * @ORM\Column(type="text")
+		 *
 		 * @var string
 		 */
 		private $uri;
 
 		/**
+		 * @ORM\Column(type="string", length=128)
+		 *
 		 * @var string
 		 */
 		private $primaryHash;
 
 		/**
+		 * @ORM\Column(type="string", length=128)
+		 *
 		 * @var string
 		 */
 		private $secondaryHash;

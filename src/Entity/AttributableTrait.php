@@ -1,8 +1,12 @@
 <?php
 	namespace App\Entity;
 
+	use Doctrine\ORM\Mapping as ORM;
+
 	trait AttributableTrait {
 		/**
+		 * @ORM\Column(type="json", nullable=false)
+		 *
 		 * @var array
 		 */
 		protected $attributes = [];

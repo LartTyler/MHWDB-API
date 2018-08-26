@@ -1,13 +1,26 @@
 <?php
 	namespace App\Entity;
 
+	use Doctrine\ORM\Mapping as ORM;
+
+	/**
+	 * @ORM\Embeddable()
+	 *
+	 * Class WeaponAttackValues
+	 *
+	 * @package App\Entity
+	 */
 	class WeaponAttackValues {
 		/**
+		 * @ORM\Column(type="smallint", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $display = 0;
 
 		/**
+		 * @ORM\Column(type="smallint", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $raw = 0;

@@ -3,28 +3,45 @@
 
 	use App\Game\Attribute;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
+	use Doctrine\ORM\Mapping as ORM;
 
+	/**
+	 * @ORM\Entity()
+	 * @ORM\Table(name="skill_ranks")
+	 *
+	 * Class SkillRank
+	 *
+	 * @package App\Entity
+	 */
 	class SkillRank implements EntityInterface, SluggableInterface {
 		use EntityTrait;
 		use SluggableTrait;
 
 		/**
+		 * @ORM\ManyToOne(targetEntity="App\Entity\Skill", inversedBy="ranks")
+		 * @ORM\JoinColumn(nullable=false)
+		 *
 		 * @var Skill
 		 */
 		private $skill;
 
 		/**
+		 * @ORM\Column(type="smallint", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $level;
 
 		/**
+		 * @ORM\Column(type="text")
+		 *
 		 * @var string
 		 */
 		private $description;
 
 		/**
+		 * @ORM\Column(type="json")
+		 *
 		 * @var array
 		 */
 		private $modifiers = [];

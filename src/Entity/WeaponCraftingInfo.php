@@ -2,52 +2,79 @@
 	namespace App\Entity;
 
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\Common\Collections\Selectable;
+	use Doctrine\ORM\Mapping as ORM;
 
+	/**
+	 * @ORM\Entity()
+	 * @ORM\Table(name="weapon_crafting_info")
+	 *
+	 * Class WeaponCraftingInfo
+	 *
+	 * @package App\Entity
+	 */
 	class WeaponCraftingInfo implements EntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
 
 		/**
+		 * @ORM\Column(type="boolean")
+		 *
 		 * @var bool
 		 */
 		private $craftable;
 
 		/**
+		 * @ORM\ManyToOne(targetEntity="App\Entity\Weapon")
+		 *
 		 * @var Weapon|null
 		 */
 		private $previous;
 
 		/**
+		 * @ORM\ManyToMany(targetEntity="App\Entity\Weapon")
+		 * @ORM\JoinTable(name="weapon_crafting_info_branches")
+		 *
 		 * @var Collection|Selectable|Weapon[]
 		 */
 		private $branches;
 
 		/**
+		 * @ORM\ManyToMany(targetEntity="App\Entity\CraftingMaterialCost", orphanRemoval=true, cascade={"all"})
+		 * @ORM\JoinTable(name="weapon_crafting_info_crafting_material_costs")
+		 *
 		 * @var Collection|Selectable|CraftingMaterialCost[]
 		 */
 		private $craftingMaterials;
 
 		/**
+		 * @ORM\ManyToMany(targetEntity="App\Entity\CraftingMaterialCost", orphanRemoval=true, cascade={"all"})
+		 * @ORM\JoinTable(name="weapon_crafting_info_upgrade_material_costs")
+		 *
 		 * @var Collection|Selectable|CraftingMaterialCost[]
 		 */
 		private $upgradeMaterials;
 
 		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
+		 *
 		 * @var int
 		 * @internal Used to allow API queries against "branches.length"
 		 */
 		private $branchesLength = 0;
 
 		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
+		 *
 		 * @var int
 		 * @internal Used to allow API queries against "craftingMaterials.length"
 		 */
 		private $craftingMaterialsLength = 0;
 
 		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
+		 *
 		 * @var int
 		 * @internal Used to allow API queries against "upgradeMaterials.length"
 		 */

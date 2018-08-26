@@ -2,42 +2,69 @@
 	namespace App\Entity;
 
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
+	use Doctrine\ORM\Mapping as ORM;
 
+	/**
+	 * @ORM\Entity()
+	 * @ORM\Table(
+	 *     name="motion_values",
+	 *     uniqueConstraints={
+	 *         @ORM\UniqueConstraint(columns={"weapon_type", "name"})
+	 *     }
+	 * )
+	 *
+	 * Class MotionValue
+	 *
+	 * @package App\Entity
+	 */
 	class MotionValue implements EntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
 
 		/**
+		 * @ORM\Column(type="string", length=64)
+		 *
 		 * @var string
 		 */
 		private $name;
 
 		/**
+		 * @ORM\Column(type="string", length=32)
+		 *
 		 * @var string
 		 */
 		private $weaponType;
 
 		/**
+		 * @ORM\Column(type="string", length=32, nullable=true)
+		 *
 		 * @var string
 		 */
 		private $damageType = null;
 
 		/**
+		 * @ORM\Column(type="smallint", options={"unsigned": true}, name="stun_potency", nullable=true)
+		 *
 		 * @var int|null
 		 */
 		private $stun = null;
 
 		/**
+		 * @ORM\Column(type="smallint", options={"unsigned": true}, name="exhaust_potency", nullable=true)
+		 *
 		 * @var int|null
 		 */
 		private $exhaust = null;
 
 		/**
+		 * @ORM\Column(type="json")
+		 *
 		 * @var int[]
 		 */
 		private $hits = [];
 
 		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
+		 *
 		 * @var int
 		 * @internal Used to allow API queries against "hits.length"
 		 */

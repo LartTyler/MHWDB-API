@@ -2,26 +2,45 @@
 	namespace App\Entity;
 
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\Common\Collections\Criteria;
 	use Doctrine\Common\Collections\Selectable;
+	use Doctrine\ORM\Mapping as ORM;
 
+	/**
+	 * @ORM\Entity()
+	 * @ORM\Table(name="armor_set_bonuses")
+	 *
+	 * Class ArmorSetBonus
+	 *
+	 * @package App\Entity
+	 */
 	class ArmorSetBonus implements EntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
 
 		/**
+		 * @ORM\Column(type="string", length=64, unique=true)
+		 *
 		 * @var string
 		 */
 		private $name;
 
 		/**
+		 * @ORM\OneToMany(
+		 *     targetEntity="App\Entity\ArmorSetBonusRank",
+		 *     mappedBy="bonus",
+		 *     orphanRemoval=true,
+		 *     cascade={"all"}
+		 * )
+		 *
 		 * @var ArmorSetBonusRank[]|Collection|Selectable
 		 */
 		private $ranks;
 
 		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
+		 *
 		 * @var int
 		 * @internal Used to allow API queries against "ranks.length"
 		 */
