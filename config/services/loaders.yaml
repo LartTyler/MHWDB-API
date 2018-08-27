@@ -1,0 +1,15 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: false
+        public: false
+
+    App\Loaders\LoaderCollection:
+        arguments:
+            -
+                - '@App\Loaders\Loaders\LocationLoader'
+
+    App\Loaders\Loaders\LocationLoader:
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '%kernel.project_dir%/src/Resources/data/locations.json'
