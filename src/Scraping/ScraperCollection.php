@@ -1,9 +1,6 @@
 <?php
 	namespace App\Scraping;
 
-	use Doctrine\Common\Collections\ArrayCollection;
-	use Traversable;
-
 	class ScraperCollection implements \IteratorAggregate {
 		protected $scrapers;
 
