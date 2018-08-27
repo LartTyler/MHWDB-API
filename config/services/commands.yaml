@@ -21,6 +21,18 @@ services:
                 name: console.command
                 command: app:scrapers:list
 
+    App\Command\LoaderRunCommand:
+        tags:
+            -
+                name: console.command
+                command: app:loaders:run
+
+    App\Command\LoaderListCommand:
+        tags:
+            -
+                name: console.command
+                command: app:loaders:list
+
     App\Command\SyncEntityLengthCachesCommand:
         tags:
             -
