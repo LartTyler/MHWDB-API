@@ -8,18 +8,35 @@
 	use Symfony\Component\Console\Style\SymfonyStyle;
 
 	class ScraperListCommand extends Command {
+		/**
+		 * @var array
+		 */
 		private $scraperKeys;
 
+		/**
+		 * ScraperListCommand constructor.
+		 *
+		 * @param ScraperCollection $scrapers
+		 */
 		public function __construct(ScraperCollection $scrapers) {
 			parent::__construct();
 
 			$this->scraperKeys = array_keys($scrapers->getScrapers());
 		}
 
+		/**
+		 * @return void
+		 */
 		protected function configure() {
-			$this->setName('app:scrape:list');
+			$this->setName('app:scrapers:list');
 		}
 
+		/**
+		 * @param InputInterface  $input
+		 * @param OutputInterface $output
+		 *
+		 * @return void
+		 */
 		protected function execute(InputInterface $input, OutputInterface $output) {
 			$io = new SymfonyStyle($input, $output);
 			$types = [];

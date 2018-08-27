@@ -9,17 +9,17 @@ services:
         tags:
             - console.command
 
-    App\Command\ScrapeCommand:
+    App\Command\ScraperRunCommand:
         tags:
             -
                 name: console.command
-                command: app:scrape
+                command: app:scrapers:run
 
     App\Command\ScraperListCommand:
         tags:
             -
                 name: console.command
-                command: app:scrape:list
+                command: app:scrapers:list
 
     App\Command\SyncEntityLengthCachesCommand:
         tags:

@@ -12,7 +12,7 @@
 	use Symfony\Component\Console\Output\OutputInterface;
 	use Symfony\Component\Console\Style\SymfonyStyle;
 
-	class ScrapeCommand extends Command {
+	class ScraperRunCommand extends Command {
 		/**
 		 * @var ScraperCollection|ScraperInterface[]
 		 */
@@ -34,7 +34,7 @@
 		 */
 		protected function configure(): void {
 			$this
-				->setName('app:scrape')
+				->setName('app:scrapers:run')
 				->addOption('type', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY)
 				->addOption('context', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY)
 				->addOption('begin-at-type', null, InputOption::VALUE_REQUIRED)
