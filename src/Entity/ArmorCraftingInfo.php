@@ -2,20 +2,37 @@
 	namespace App\Entity;
 
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\Common\Collections\Selectable;
+	use Doctrine\ORM\Mapping as ORM;
 
+	/**
+	 * @ORM\Entity()
+	 * @ORM\Table(name="armor_crafting_info")
+	 *
+	 * Class ArmorCraftingInfo
+	 *
+	 * @package App\Entity
+	 */
 	class ArmorCraftingInfo implements EntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
 
 		/**
+		 * @ORM\ManyToMany(targetEntity="App\Entity\CraftingMaterialCost", orphanRemoval=true, cascade={"all"})
+		 * @ORM\JoinTable(
+		 *     name="armor_crafting_material_costs",
+		 *     inverseJoinColumns={
+		 *         @ORM\JoinColumn(unique=true)
+		 *     }
+		 * )
 		 * @var Collection|Selectable|CraftingMaterialCost[]
 		 */
 		private $materials;
 
 		/**
+		 * @ORM\Column(type="integer", nullable=false, options={"unsigned": true, "default": 0})
+		 *
 		 * @var int
 		 * @internal Used to allow API queries against "materials.length"
 		 */

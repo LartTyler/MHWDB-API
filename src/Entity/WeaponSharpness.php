@@ -2,37 +2,57 @@
 	namespace App\Entity;
 
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
+	use Doctrine\ORM\Mapping as ORM;
 
+	/**
+	 * @ORM\Entity()
+	 * @ORM\Table(name="weapon_sharpnesses")
+	 *
+	 * Class WeaponSharpness
+	 *
+	 * @package App\Entity
+	 */
 	class WeaponSharpness implements EntityInterface {
 		use EntityTrait;
 
 		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $red = 0;
 
 		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $orange = 0;
 
 		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $yellow = 0;
 
 		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $green = 0;
 
 		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $blue = 0;
 
 		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $white = 0;

@@ -1,18 +1,33 @@
 <?php
 	namespace App\Entity;
 
+	use Doctrine\ORM\Mapping as ORM;
+
+	/**
+	 * @ORM\Embeddable()
+	 *
+	 * Class ArmorDefenseValues
+	 *
+	 * @package App\Entity
+	 */
 	class ArmorDefenseValues implements \JsonSerializable {
 		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $base = 0;
 
 		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $max = 0;
 
 		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $augmented = 0;

@@ -157,8 +157,7 @@
 												'description' => $item->getDescription(),
 												'rarity' => $item->getRarity(),
 												'carryLimit' => $item->getCarryLimit(),
-												'sellPrice' => $item->getSellPrice(),
-												'buyPrice' => $item->getBuyPrice(),
+												'value' => $item->getValue(),
 											];
 										}
 										// endregion

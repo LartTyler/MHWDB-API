@@ -21,53 +21,11 @@ services:
                 name: console.command
                 command: app:scrape:list
 
-    App\Command\KiranicoFixWeaponNamesCommand:
-        tags:
-            -
-                name: console.command
-                command: app:kiranico:fix-weapon-names
-
-    App\Command\KiranicoFixArmorNamesCommand:
-        tags:
-            -
-                name: console.command
-                command: app:kiranico:fix-armor-names
-
-    App\Command\MigrateSlotAttributesCommand:
-        tags:
-            -
-                name: console.command
-                command: app:migrate:slot-attributes
-
-    App\Command\MigrateResistAttributesCommand:
-        tags:
-            -
-                name: console.command
-                command: app:migrate:resist-attributes
-
-    App\Command\MigrateArmorDefenseAttributeCommand:
-        tags:
-            -
-                name: console.command
-                command: app:migrate:armor-defense-attribute
-
-    App\Command\MigrateElementAttributesCommand:
-        tags:
-            -
-                name: console.command
-                command: app:migrate:weapon-element-attributes
-
     App\Command\SyncEntityLengthCachesCommand:
         tags:
             -
                 name: console.command
                 command: app:util:sync-entity-length-caches
-
-    App\Command\MHWGSyncSharpnessValues:
-        tags:
-            -
-                name: console.command
-                command: app:fix:sync-mhwg-sharpness-values
 
     App\Command\EntityDeleteCommand:
         tags:

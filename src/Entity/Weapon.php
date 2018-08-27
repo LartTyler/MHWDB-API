@@ -1,84 +1,122 @@
 <?php
 	namespace App\Entity;
 
-	use App\Game\Attribute;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\Common\Collections\Criteria;
 	use Doctrine\Common\Collections\Selectable;
+	use Doctrine\ORM\Mapping as ORM;
 
+	/**
+	 * @ORM\Entity()
+	 * @ORM\Table(
+	 *     name="weapons",
+	 *     indexes={
+	 *         @ORM\Index(columns={"type"})
+	 *     }
+	 * )
+	 *
+	 * Class Weapon
+	 *
+	 * @package App\Entity
+	 */
 	class Weapon implements EntityInterface, SluggableInterface, LengthCachingEntityInterface {
 		use EntityTrait;
 		use SluggableTrait;
 		use AttributableTrait;
 
 		/**
+		 * @ORM\Column(type="string", length=64, unique=true)
+		 *
 		 * @var string
 		 */
 		private $name;
 
 		/**
+		 * @ORM\Column(type="string", length=32)
+		 *
 		 * @var string
 		 */
 		private $type;
 
 		/**
+		 * @ORM\Column(type="smallint", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $rarity;
 
 		/**
+		 * @ORM\ManyToMany(targetEntity="App\Entity\Slot", orphanRemoval=true, cascade={"all"})
+		 * @ORM\JoinTable(name="weapon_slots")
+		 *
 		 * @var Collection|Selectable|Slot[]
 		 */
 		private $slots;
 
 		/**
-		 * @var WeaponSharpness
-		 * @deprecated Will be removed on 2018-08-25
-		 */
-		private $sharpness;
-
-		/**
+		 * @ORM\ManyToMany(targetEntity="App\Entity\WeaponSharpness", orphanRemoval=true, cascade={"all"})
+		 * @ORM\JoinTable(name="weapon_durability")
+		 *
 		 * @var Collection|Selectable|WeaponSharpness[]
 		 */
 		private $durability;
 
 		/**
+		 * @ORM\OneToMany(
+		 *     targetEntity="App\Entity\WeaponElement",
+		 *     mappedBy="weapon",
+		 *     orphanRemoval=true,
+		 *     cascade={"all"}
+		 * )
+		 *
 		 * @var Collection|Selectable|WeaponElement[]
 		 */
 		private $elements;
 
 		/**
+		 * @ORM\Embedded(class="App\Entity\WeaponAttackValues", columnPrefix="attack_")
+		 *
 		 * @var WeaponAttackValues
 		 */
 		private $attack;
 
 		/**
+		 * @ORM\OneToOne(targetEntity="App\Entity\WeaponCraftingInfo", orphanRemoval=true, cascade={"all"})
+		 *
 		 * @var WeaponCraftingInfo|null
 		 */
 		private $crafting = null;
 
 		/**
+		 * @ORM\OneToOne(targetEntity="App\Entity\WeaponAssets", orphanRemoval=true, cascade={"all"})
+		 *
 		 * @var WeaponAssets|null
 		 */
 		private $assets = null;
 
 		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
+		 *
 		 * @var int
 		 * @internal Used to allow API queries against "elements.length"
 		 */
 		private $elementsLength = 0;
 
 		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
+		 *
 		 * @var int
 		 * @internal Used to allow API queries against "slots.length"
 		 */
 		private $slotsLength = 0;
 
 		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
+		 *
 		 * @var int
+		 * @internal Used to allow API queries against "durability.length"
 		 */
 		private $durabilityLength = 0;
 
@@ -94,7 +132,6 @@
 			$this->type = $type;
 			$this->rarity = $rarity;
 			$this->slots = new ArrayCollection();
-			$this->sharpness = new WeaponSharpness();
 			$this->attack = new WeaponAttackValues();
 			$this->elements = new ArrayCollection();
 			$this->durability = new ArrayCollection();
@@ -188,13 +225,6 @@
 			$this->assets = $assets;
 
 			return $this;
-		}
-
-		/**
-		 * @return WeaponSharpness
-		 */
-		public function getSharpness(): WeaponSharpness {
-			return $this->sharpness;
 		}
 
 		/**

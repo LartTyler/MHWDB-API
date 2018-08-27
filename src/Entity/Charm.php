@@ -2,27 +2,41 @@
 	namespace App\Entity;
 
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\Common\Collections\Criteria;
 	use Doctrine\Common\Collections\Selectable;
+	use Doctrine\ORM\Mapping as ORM;
 
+	/**
+	 * @ORM\Entity()
+	 * @ORM\Table(name="charms")
+	 *
+	 * Class Charm
+	 *
+	 * @package App\Entity
+	 */
 	class Charm implements EntityInterface, SluggableInterface, LengthCachingEntityInterface {
 		use EntityTrait;
 		use SluggableTrait;
 
 		/**
+		 * @ORM\Column(type="string", length=64, unique=true)
+		 *
 		 * @var string
 		 */
 		private $name;
 
 		/**
+		 * @ORM\OneToMany(targetEntity="App\Entity\CharmRank", mappedBy="charm", orphanRemoval=true, cascade={"all"})
+		 *
 		 * @var Collection|Selectable|CharmRank[]
 		 */
 		private $ranks;
 
 		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
+		 *
 		 * @var int
 		 * @internal Used to allow API queries against "ranks.length"
 		 */

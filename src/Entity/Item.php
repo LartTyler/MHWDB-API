@@ -2,42 +2,50 @@
 	namespace App\Entity;
 
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
+	use Doctrine\ORM\Mapping as ORM;
 
+	/**
+	 * @ORM\Entity()
+	 * @ORM\Table(name="items")
+	 *
+	 * Class Item
+	 *
+	 * @package App\Entity
+	 */
 	class Item implements EntityInterface {
 		use EntityTrait;
 
 		/**
+		 * @ORM\Column(type="string", length=64, unique=true)
+		 *
 		 * @var string
 		 */
 		private $name;
 
 		/**
+		 * @ORM\Column(type="text")
+		 *
 		 * @var string
 		 */
 		private $description;
 
 		/**
+		 * @ORM\Column(type="smallint", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $rarity;
 
 		/**
-		 * @var int
-		 */
-		private $sellPrice = 0;
-
-		/**
-		 * @var int
-		 */
-		private $buyPrice = 0;
-
-		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true}, name="_value")
+		 *
 		 * @var int
 		 */
 		private $value = 0;
 
 		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $carryLimit = 0;
@@ -93,40 +101,6 @@
 		 */
 		public function setRarity(int $rarity) {
 			$this->rarity = $rarity;
-			return $this;
-		}
-
-		/**
-		 * @return int
-		 */
-		public function getSellPrice(): int {
-			return $this->sellPrice;
-		}
-
-		/**
-		 * @param int $sellPrice
-		 *
-		 * @return $this
-		 */
-		public function setSellPrice(int $sellPrice) {
-			$this->sellPrice = $sellPrice;
-			return $this;
-		}
-
-		/**
-		 * @return int
-		 */
-		public function getBuyPrice(): int {
-			return $this->buyPrice;
-		}
-
-		/**
-		 * @param int $buyPrice
-		 *
-		 * @return $this
-		 */
-		public function setBuyPrice(int $buyPrice) {
-			$this->buyPrice = $buyPrice;
 			return $this;
 		}
 

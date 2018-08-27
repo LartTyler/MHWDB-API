@@ -2,12 +2,22 @@
 	namespace App\Entity;
 
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
+	use Doctrine\ORM\Mapping as ORM;
 
+	/**
+	 * @ORM\Entity()
+	 * @ORM\Table(name="slots")
+	 *
+	 * Class Slot
+	 *
+	 * @package App\Entity
+	 */
 	class Slot implements EntityInterface {
 		use EntityTrait;
 
 		/**
+		 * @ORM\Column(type="smallint", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $rank;

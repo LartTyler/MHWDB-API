@@ -3,35 +3,53 @@
 
 	use App\Game\ArmorRank;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\Common\Collections\Selectable;
+	use Doctrine\ORM\Mapping as ORM;
 
+	/**
+	 * @ORM\Entity()
+	 * @ORM\Table(name="armor_sets")
+	 *
+	 * Class ArmorSet
+	 *
+	 * @package App\Entity
+	 */
 	class ArmorSet implements EntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
 
 		/**
+		 * @ORM\Column(type="string", length=64, unique=true)
+		 *
 		 * @var string
 		 */
 		private $name;
 
 		/**
+		 * @ORM\Column(type="string", length=16)
+		 *
 		 * @var string
 		 */
 		private $rank;
 
 		/**
+		 * @ORM\OneToMany(targetEntity="App\Entity\Armor", mappedBy="armorSet")
+		 *
 		 * @var Collection|Selectable|Armor[]
 		 */
 		private $pieces;
 
 		/**
+		 * @ORM\ManyToOne(targetEntity="App\Entity\ArmorSetBonus")
+		 *
 		 * @var ArmorSetBonus
 		 */
 		private $bonus = null;
 
 		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
+		 *
 		 * @var int
 		 * @internal Used to allow API queries against "pieces.length"
 		 */

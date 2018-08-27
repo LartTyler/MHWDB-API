@@ -3,36 +3,55 @@
 
 	use App\Utility\StringUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\Common\Collections\Selectable;
+	use Doctrine\ORM\Mapping as ORM;
 
+	/**
+	 * @ORM\Entity()
+	 * @ORM\Table(name="decorations")
+	 *
+	 * Class Decoration
+	 *
+	 * @package App\Entity
+	 */
 	class Decoration implements EntityInterface, SluggableInterface, LengthCachingEntityInterface {
 		use EntityTrait;
 		use SluggableTrait;
 
 		/**
+		 * @ORM\Column(type="string", length=64, unique=true)
+		 *
 		 * @var string
 		 */
 		private $name;
 
 		/**
+		 * @ORM\Column(type="smallint", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $slot;
 
 		/**
+		 * @ORM\Column(type="smallint", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $rarity;
 
 		/**
+		 * @ORM\ManyToMany(targetEntity="App\Entity\SkillRank")
+		 * @ORM\JoinTable(name="decorations_skill_ranks")
+		 *
 		 * @var Collection|Selectable|SkillRank[]
 		 */
 		private $skills;
 
 		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true})
+		 *
 		 * @var int
 		 * @internal Used to allow API queries against "skills.length"
 		 */

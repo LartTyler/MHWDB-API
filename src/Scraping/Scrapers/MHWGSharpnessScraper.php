@@ -153,19 +153,6 @@
 
 					$weapon->getDurability()->add($sharpness);
 				}
-
-				// Preserves BC for < 1.13.0
-				// TODO Deprecated: remove this on 2018-08-25
-				/** @var WeaponSharpness $baseSharpness */
-				$baseSharpness = $weapon->getDurability()->first();
-
-				$weapon->getSharpness()
-					->setRed(MHWGWeaponTreeHelper::toOldSharpnessValue($baseSharpness->getRed()))
-					->setOrange(MHWGWeaponTreeHelper::toOldSharpnessValue($baseSharpness->getOrange()))
-					->setYellow(MHWGWeaponTreeHelper::toOldSharpnessValue($baseSharpness->getYellow()))
-					->setGreen(MHWGWeaponTreeHelper::toOldSharpnessValue($baseSharpness->getGreen()))
-					->setBlue(MHWGWeaponTreeHelper::toOldSharpnessValue($baseSharpness->getBlue()))
-					->setWhite(MHWGWeaponTreeHelper::toOldSharpnessValue($baseSharpness->getWhite()));
 			}
 
 			return $ordinal;

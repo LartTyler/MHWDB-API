@@ -2,9 +2,12 @@
 	namespace App\Entity;
 
 	use App\Utility\StringUtil;
+	use Doctrine\ORM\Mapping as ORM;
 
 	trait SluggableTrait {
 		/**
+		 * @ORM\Column(type="string", length=64, nullable=false, unique=true)
+		 *
 		 * @var string
 		 */
 		protected $slug;

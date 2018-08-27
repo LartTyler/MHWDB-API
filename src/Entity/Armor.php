@@ -2,78 +2,124 @@
 	namespace App\Entity;
 
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\Common\Collections\Selectable;
+	use Doctrine\ORM\Mapping as ORM;
 
+	/**
+	 * @ORM\Entity()
+	 * @ORM\Table(
+	 *     name="armor",
+	 *     indexes={
+	 *         @ORM\Index(columns={"type"})
+	 *     }
+	 * )
+	 *
+	 * Class Armor
+	 *
+	 * @package App\Entity
+	 */
 	class Armor implements EntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
 		use SluggableTrait;
 		use AttributableTrait;
 
 		/**
+		 * @ORM\Column(type="string", length=64, unique=true)
+		 *
 		 * @var string
 		 */
 		private $name;
 
 		/**
+		 * @ORM\Column(type="string", length=32)
+		 *
 		 * @var string
 		 */
 		private $type;
 
 		/**
+		 * @ORM\Column(type="string", length=16)
+		 *
 		 * @var string
 		 */
 		private $rank;
 
 		/**
+		 * @ORM\Column(type="smallint", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $rarity;
 
 		/**
+		 * @ORM\Embedded(class="App\Entity\Resistances", columnPrefix="resist_")
+		 *
 		 * @var Resistances
 		 */
 		private $resistances;
 
 		/**
+		 * @ORM\Embedded(class="App\Entity\ArmorDefenseValues", columnPrefix="defense_")
+		 *
 		 * @var ArmorDefenseValues
 		 */
 		private $defense;
 
 		/**
+		 * @ORM\ManyToMany(targetEntity="App\Entity\SkillRank")
+		 * @ORM\JoinTable(name="armor_skill_ranks")
+		 *
 		 * @var Collection|Selectable|SkillRank[]
 		 */
 		private $skills;
 
 		/**
+		 * @ORM\ManyToMany(targetEntity="App\Entity\Slot", orphanRemoval=true, cascade={"all"})
+		 * @ORM\JoinTable(
+		 *     name="armor_slots",
+		 *     inverseJoinColumns={
+		 *         @ORM\JoinColumn(unique=true)
+		 *     }
+		 * )
+		 *
 		 * @var Collection|Selectable|Slot[]
 		 */
 		private $slots;
 
 		/**
+		 * @ORM\ManyToOne(targetEntity="App\Entity\ArmorSet", inversedBy="pieces")
+		 *
 		 * @var ArmorSet|null
 		 */
 		private $armorSet = null;
 
 		/**
+		 * @ORM\OneToOne(targetEntity="App\Entity\ArmorAssets", orphanRemoval=true, cascade={"all"})
+		 *
 		 * @var ArmorAssets|null
 		 */
 		private $assets = null;
 
 		/**
+		 * @ORM\OneToOne(targetEntity="App\Entity\ArmorCraftingInfo", orphanRemoval=true, cascade={"all"})
+		 *
 		 * @var ArmorCraftingInfo|null
 		 */
 		private $crafting = null;
 
 		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
+		 *
 		 * @var int
 		 * @internal Used to allow API queries against "skills.length"
 		 */
 		private $skillsLength = 0;
 
 		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
+		 *
 		 * @var int
 		 * @internal Used to allow API queries against "slots.length"
 		 */
