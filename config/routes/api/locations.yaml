@@ -1,0 +1,11 @@
+api.locations.list:
+    methods:
+        - GET
+    path: /locations
+    controller: 'App\Controller\LocationDataController::listAction'
+
+api.locations.read:
+    methods:
+        - GET
+    path: /locations/{idOrSlug}
+    controller: 'App\Controller\LocationDataController::readAction'
