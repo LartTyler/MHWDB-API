@@ -1,0 +1,11 @@
+api.ailments.list:
+    path: /ailments
+    methods:
+        - GET
+    controller: 'App\Controller\AilmentDataController::listAction'
+
+api.ailments.read:
+    path: /ailments/{idOrSlug}
+    methods:
+        - GET
+    controller: 'App\Controller\AilmentDataController::readAction'
