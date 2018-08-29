@@ -69,6 +69,15 @@
 		],
 		"post-update-cmd": [
 			"@auto-scripts"
+		],
+		"db:diff": [
+			"./bin/console --ansi doctrine:cache:clear doctrine.orm.default_metadata_cache",
+			"./bin/console --ansi doctrine:migrations:diff"
+		],
+		"db:migrate": "./bin/console --ansi doctrine:migrations:migrate",
+		"db:reset": [
+			"./db-reset.sh latest",
+			"./bin/console --ansi doctrine:migrations:migrate -n"
 		]
 	},
 	"conflict": {
