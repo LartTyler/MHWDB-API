@@ -8,8 +8,14 @@ services:
         arguments:
             -
                 - '@App\Loaders\Loaders\LocationLoader'
+                - '@App\Loaders\Loaders\AilmentLoader'
 
     App\Loaders\Loaders\LocationLoader:
         arguments:
             - '@doctrine.orm.entity_manager'
             - '%kernel.project_dir%/src/Resources/data/locations.json'
+
+    App\Loaders\Loaders\AilmentLoader:
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '%kernel.project_dir%/src/Resources/data/ailments.json'

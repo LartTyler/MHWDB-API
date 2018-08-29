@@ -2,6 +2,7 @@
 	namespace App\Loaders;
 
 	final class Type {
+		public const AILMENTS = 'ailments';
 		public const LOCATIONS = 'locations';
 
 		/**
