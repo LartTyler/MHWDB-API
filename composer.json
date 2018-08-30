@@ -77,7 +77,7 @@
 		"db:migrate": "./bin/console --ansi doctrine:migrations:migrate",
 		"db:reset": [
 			"./db-reset.sh latest",
-			"./bin/console --ansi doctrine:migrations:migrate -n"
+			"@db:migrate"
 		]
 	},
 	"conflict": {
