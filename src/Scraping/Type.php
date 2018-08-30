@@ -14,6 +14,7 @@
 		const WEAPON_IMAGES = 'weapon-images';
 		const MOTION_VALUES = 'motion-values';
 		const SHARPNESS = 'sharpness';
+		const MONSTERS = 'monsters';
 
 		/**
 		 * @var string[]|null

@@ -19,6 +19,7 @@ services:
                 - '@App\Scraping\Scrapers\MHWikiaWeaponIconsScraper'
                 - '@App\Scraping\Scrapers\FextralifeWeaponImagesScraper'
                 - '@App\Scraping\Scrapers\FextralifeArmorImageScraper'
+                - '@App\Scraping\Scrapers\FextralifeMonsterScraper'
 
     App\Scraping\Configurations\KiranicoConfiguration: ~
     App\Scraping\Configurations\MHWikiaConfiguration: ~
@@ -37,6 +38,7 @@ services:
     App\Scraping\Scrapers\MHWikiaWeaponIconsScraper: ~
     App\Scraping\Scrapers\FextralifeWeaponImagesScraper: ~
     App\Scraping\Scrapers\FextralifeArmorImageScraper: ~
+    App\Scraping\Scrapers\FextralifeMonsterScraper: ~
 
     App\Scraping\Scrapers\KiranicoSkillsScraper:
         class: App\Scraping\Scrapers\KiranicoSkillsScraper

@@ -21,6 +21,7 @@
 	use App\Scraping\ProgressAwareInterface;
 	use App\Scraping\ProgressAwareTrait;
 	use App\Scraping\ScraperInterface;
+	use App\Scraping\Scrapers\Helpers\HtmlHelper;
 	use App\Scraping\Scrapers\Helpers\MHWikiaHelper;
 	use App\Scraping\Type;
 	use App\Utility\StringUtil;
@@ -145,7 +146,7 @@
 					' section tag(s) on ' . $uri);
 			}
 
-			$generalStats = MHWikiaHelper::parseHtmlToKeyValuePairs($mainBlockSections->eq(0)->children());
+			$generalStats = HtmlHelper::parseHtmlToKeyValuePairs($mainBlockSections->eq(0)->children());
 
 			$weapon = $this->manager->getRepository('App:Weapon')->findOneBy([
 				'name' => $name,
