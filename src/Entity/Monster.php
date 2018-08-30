@@ -53,6 +53,14 @@
 		private $ailments;
 
 		/**
+		 * @ORM\ManyToMany(targetEntity="App\Entity\Location")
+		 * @ORM\JoinTable(name="monster_locations")
+		 *
+		 * @var Location[]|Collection|Selectable
+		 */
+		private $locations;
+
+		/**
 		 * @ORM\Column(type="text", nullable=true)
 		 *
 		 * @var string|null
@@ -85,6 +93,7 @@
 			$this->species = $species;
 
 			$this->ailments = new ArrayCollection();
+			$this->locations = new ArrayCollection();
 		}
 
 		/**
@@ -189,5 +198,12 @@
 		 */
 		public function getAilments() {
 			return $this->ailments;
+		}
+
+		/**
+		 * @return Location[]|Collection|Selectable
+		 */
+		public function getLocations() {
+			return $this->locations;
 		}
 	}
