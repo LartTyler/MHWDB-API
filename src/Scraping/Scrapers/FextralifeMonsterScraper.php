@@ -156,7 +156,6 @@
 					->setSpecies($species);
 
 				$monster->setElements([]);
-				$monster->setResistances([]);
 				$monster->getAilments()->clear();
 				$monster->getLocations()->clear();
 			}

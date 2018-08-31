@@ -61,6 +61,18 @@
 		private $locations;
 
 		/**
+		 * @ORM\OneToMany(
+		 *     targetEntity="App\Entity\MonsterResistance",
+		 *     mappedBy="monster",
+		 *     orphanRemoval=true,
+		 *     cascade={"all"}
+		 *	 )
+		 *
+		 * @var MonsterResistance[]|Collection|Selectable
+		 */
+		private $resistances = [];
+
+		/**
 		 * @ORM\Column(type="text", nullable=true)
 		 *
 		 * @var string|null
@@ -76,11 +88,6 @@
 		private $elements = [];
 
 		/**
-		 * @var string[]
-		 */
-		private $resistances = [];
-
-		/**
 		 * Monster constructor.
 		 *
 		 * @param string $name
@@ -94,6 +101,7 @@
 
 			$this->ailments = new ArrayCollection();
 			$this->locations = new ArrayCollection();
+			$this->resistances = new ArrayCollection();
 		}
 
 		/**
@@ -176,24 +184,6 @@
 		}
 
 		/**
-		 * @return string[]
-		 */
-		public function getResistances(): array {
-			return $this->resistances;
-		}
-
-		/**
-		 * @param string[] $resistances
-		 *
-		 * @return $this
-		 */
-		public function setResistances(array $resistances) {
-			$this->resistances = $resistances;
-
-			return $this;
-		}
-
-		/**
 		 * @return Ailment[]|Collection|Selectable
 		 */
 		public function getAilments() {
@@ -205,5 +195,12 @@
 		 */
 		public function getLocations() {
 			return $this->locations;
+		}
+
+		/**
+		 * @return MonsterResistance[]|Collection|Selectable
+		 */
+		public function getResistances() {
+			return $this->resistances;
 		}
 	}
