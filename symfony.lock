@@ -17,6 +17,12 @@
     "dbstudios/doze-bundle": {
         "version": "1.4.0"
     },
+    "dbstudios/veritas": {
+        "version": "0.5.0"
+    },
+    "dbstudios/veritas-bundle": {
+        "version": "0.6.0"
+    },
     "doctrine/annotations": {
         "version": "1.0",
         "recipe": {
@@ -252,6 +258,18 @@
             "branch": "master",
             "version": "4.0",
             "ref": "cda8b550123383d25827705d05a42acf6819fe4e"
+        }
+    },
+    "symfony/security": {
+        "version": "v4.1.4"
+    },
+    "symfony/security-bundle": {
+        "version": "3.3",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "3.3",
+            "ref": "f8a63faa0d9521526499c0a8f403c9964ecb0527"
         }
     },
     "symfony/serializer": {

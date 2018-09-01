@@ -1,0 +1,37 @@
+security:
+    role_hierarchy:
+        ROLE_ADMIN: ROLE_EDITOR
+        ROLE_EDITOR: ROLE_USER
+
+    providers:
+        veritas:
+            id: DaybreakStudios\VeritasBundle\Security\Core\User\JWTEntityUserProvider
+
+    encoders:
+        App\Entity\User: bcrypt
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        auth:
+            pattern: ^/auth
+            anonymous: ~
+
+        contrib:
+            pattern: ^/contrib
+            stateless: true
+            simple_preauth:
+                authenticator: dbstudios_veritas.security.authenticator
+
+        main:
+            anonymous: true
+
+    access_control:
+        -
+            path: ^/contrib/editors
+            roles: ROLE_EDITOR
+        -
+            path: ^/contrib
+            roles: ROLE_USER

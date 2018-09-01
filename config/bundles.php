@@ -8,4 +8,6 @@ return [
     Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle::class => ['all' => true],
     DaybreakStudios\DozeBundle\DaybreakStudiosDozeBundle::class => ['all' => true],
     Symfony\Bundle\WebServerBundle\WebServerBundle::class => ['dev' => true],
+    Symfony\Bundle\SecurityBundle\SecurityBundle::class => ['all' => true],
+    DaybreakStudios\VeritasBundle\DaybreakStudiosVeritasBundle::class => ['all' => true],
 ];
