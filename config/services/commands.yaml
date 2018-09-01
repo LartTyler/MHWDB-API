@@ -74,3 +74,9 @@ services:
             -
                 name: console.command
                 command: app:entity:delete
+
+    App\Command\FixEmptyAffinityValuesCommand:
+        tags:
+            -
+                name: console.command
+                command: app:fix:empty-affinity-values
