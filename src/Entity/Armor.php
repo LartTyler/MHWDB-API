@@ -20,7 +20,7 @@
 	 *
 	 * @package App\Entity
 	 */
-	class Armor implements EntityInterface, LengthCachingEntityInterface {
+	class Armor implements EntityInterface, SluggableInterface, LengthCachingEntityInterface {
 		use EntityTrait;
 		use SluggableTrait;
 		use AttributableTrait;

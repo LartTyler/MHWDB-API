@@ -9,7 +9,10 @@
 	use App\QueryDocument\Projection;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
+	use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 	use Symfony\Bridge\Doctrine\RegistryInterface;
+	use Symfony\Component\HttpFoundation\Request;
+	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\Routing\RouterInterface;
 
 	class ArmorDataController extends AbstractDataController {
@@ -22,6 +25,35 @@
 		 */
 		public function __construct(RegistryInterface $doctrine, ResponderService $responder, RouterInterface $router) {
 			parent::__construct($doctrine, $responder, $router, Armor::class);
+		}
+
+		/**
+		 * @Route(path="/armor", methods={"GET"}, name="armor.list")
+		 *
+		 * @param Request $request
+		 *
+		 * @return Response
+		 */
+		public function list(Request $request): Response {
+			return parent::list($request);
+		}
+
+		/**
+		 * @Route(
+		 *     path="/armor/{idOrSlug}",
+		 *     methods={"GET"},
+		 *     name="armor.read",
+		 *     requirements={
+		 *         "idOrSlug": "^(?!sets).+"
+		 *	   }
+		 *	 )
+		 *
+		 * @param string $idOrSlug
+		 *
+		 * @return Response
+		 */
+		public function read(string $idOrSlug): Response {
+			return parent::read($idOrSlug);
 		}
 
 		/**

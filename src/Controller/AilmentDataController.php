@@ -8,6 +8,9 @@
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Symfony\Bridge\Doctrine\RegistryInterface;
+	use Symfony\Component\HttpFoundation\Request;
+	use Symfony\Component\HttpFoundation\Response;
+	use Symfony\Component\Routing\Annotation\Route;
 	use Symfony\Component\Routing\RouterInterface;
 
 	class AilmentDataController extends AbstractDataController {
@@ -20,6 +23,28 @@
 		 */
 		public function __construct(RegistryInterface $doctrine, ResponderService $responder, RouterInterface $router) {
 			parent::__construct($doctrine, $responder, $router, Ailment::class);
+		}
+
+		/**
+		 * @Route(path="/ailments", methods={"GET"}, name="ailments.list")
+		 *
+		 * @param Request $request
+		 *
+		 * @return Response
+		 */
+		public function list(Request $request): Response {
+			return parent::list($request);
+		}
+
+		/**
+		 * @Route(path="/ailments/{id<\d+>}", methods={"GET"}, name="ailments.read")
+		 *
+		 * @param string $id
+		 *
+		 * @return Response
+		 */
+		public function read(string $id): Response {
+			return parent::read($id);
 		}
 
 		/**

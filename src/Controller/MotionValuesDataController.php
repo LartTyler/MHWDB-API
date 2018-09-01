@@ -8,7 +8,9 @@
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Symfony\Bridge\Doctrine\RegistryInterface;
+	use Symfony\Component\HttpFoundation\Request;
 	use Symfony\Component\HttpFoundation\Response;
+	use Symfony\Component\Routing\Annotation\Route;
 	use Symfony\Component\Routing\RouterInterface;
 
 	class MotionValuesDataController extends AbstractDataController {
@@ -24,17 +26,43 @@
 		}
 
 		/**
+		 * @Route(path="/motion-values", methods={"GET"}, name="motion-values.list")
+		 *
+		 * @param Request $request
+		 *
+		 * @return Response
+		 */
+		public function list(Request $request): Response {
+			return parent::list($request);
+		}
+
+		/**
+		 * @Route(path="/motion-values/{type<[A-Za-z-]+>}", methods={"GET"}, name="motion-values.list-by-type")
+		 *
 		 * @param string $type
 		 *
 		 * @return Response
 		 */
-		public function listByTypeAction(string $type): Response {
+		public function listByType(string $type) {
+			$type = strtolower($type);
+
 			if (!WeaponType::isValid($type))
 				return $this->respond(new UnknownWeaponTypeError($type));
 
-			return $this->respond($this->manager->getRepository('App:MotionValue')->findBy([
+			return $this->respond($this->manager->getRepository(MotionValue::class)->findBy([
 				'weaponType' => $type,
 			]));
+		}
+
+		/**
+		 * @Route(path="/motion-values/{id<\d+>}", methods={"GET"}, name="motion-values.read")
+		 *
+		 * @param string $id
+		 *
+		 * @return Response
+		 */
+		public function read(string $id): Response {
+			return parent::read($id);
 		}
 
 		/**

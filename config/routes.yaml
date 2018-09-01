@@ -1,9 +1,26 @@
-api._routes:
-    resource: 'routes/api'
-    type: directory
+app._annotations:
+    resource: '../src/Controller/'
+    type: annotation
+    defaults:
+        _format: json
 
 index:
     path: /
     controller: 'FrameworkBundle:Redirect:urlRedirect'
     defaults:
         path: 'https://docs.mhw-db.com/'
+
+auth:
+    path: /auth
+    methods:
+        - POST
+    controller: 'DaybreakStudiosVeritasBundle:Authentication:auth'
+    defaults:
+        repository: '%app.security.user_repository%'
+        property: 'email'
+
+auth.refresh:
+    path: /auth/refresh
+    methods:
+        - GET
+    controller: 'DaybreakStudiosVeritasBundle:Authentication:refresh'

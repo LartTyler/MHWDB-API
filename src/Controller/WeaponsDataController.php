@@ -12,6 +12,9 @@
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\Collection;
 	use Symfony\Bridge\Doctrine\RegistryInterface;
+	use Symfony\Component\HttpFoundation\Request;
+	use Symfony\Component\HttpFoundation\Response;
+	use Symfony\Component\Routing\Annotation\Route;
 	use Symfony\Component\Routing\RouterInterface;
 
 	class WeaponsDataController extends AbstractDataController {
@@ -24,6 +27,28 @@
 		 */
 		public function __construct(RegistryInterface $doctrine, ResponderService $responder, RouterInterface $router) {
 			parent::__construct($doctrine, $responder, $router, Weapon::class);
+		}
+
+		/**
+		 * @Route(path="/weapons", methods={"GET"}, name="weapons.list")
+		 *
+		 * @param Request $request
+		 *
+		 * @return Response
+		 */
+		public function list(Request $request): Response {
+			return parent::list($request);
+		}
+
+		/**
+		 * @Route(path="/weapons/{idOrSlug}", methods={"GET"}, name="weapons.read")
+		 *
+		 * @param string $idOrSlug
+		 *
+		 * @return Response
+		 */
+		public function read(string $idOrSlug): Response {
+			return parent::read($idOrSlug);
 		}
 
 		/**

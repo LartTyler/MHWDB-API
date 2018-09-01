@@ -9,6 +9,9 @@
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Symfony\Bridge\Doctrine\RegistryInterface;
+	use Symfony\Component\HttpFoundation\Request;
+	use Symfony\Component\HttpFoundation\Response;
+	use Symfony\Component\Routing\Annotation\Route;
 	use Symfony\Component\Routing\RouterInterface;
 
 	class CharmsDataController extends AbstractDataController {
@@ -21,6 +24,28 @@
 		 */
 		public function __construct(RegistryInterface $doctrine, ResponderService $responder, RouterInterface $router) {
 			parent::__construct($doctrine, $responder, $router, Charm::class);
+		}
+
+		/**
+		 * @Route(path="/charms", methods={"GET"}, name="charms.list")
+		 *
+		 * @param Request $request
+		 *
+		 * @return Response
+		 */
+		public function list(Request $request): Response {
+			return parent::list($request);
+		}
+
+		/**
+		 * @Route(path="/charms/{idOrSlug}", methods={"GET"}, name="charms.read")
+		 *
+		 * @param string $idOrSlug
+		 *
+		 * @return Response
+		 */
+		public function read(string $idOrSlug): Response {
+			return parent::read($idOrSlug);
 		}
 
 		/**

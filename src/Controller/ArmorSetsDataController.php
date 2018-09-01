@@ -13,6 +13,9 @@
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Symfony\Bridge\Doctrine\RegistryInterface;
+	use Symfony\Component\HttpFoundation\Request;
+	use Symfony\Component\HttpFoundation\Response;
+	use Symfony\Component\Routing\Annotation\Route;
 	use Symfony\Component\Routing\RouterInterface;
 
 	class ArmorSetsDataController extends AbstractDataController {
@@ -25,6 +28,28 @@
 		 */
 		public function __construct(RegistryInterface $doctrine, ResponderService $responder, RouterInterface $router) {
 			parent::__construct($doctrine, $responder, $router, ArmorSet::class);
+		}
+
+		/**
+		 * @Route(path="/armor/sets", methods={"GET"}, name="armor-sets.list", )
+		 *
+		 * @param Request $request
+		 *
+		 * @return Response
+		 */
+		public function list(Request $request): Response {
+			return parent::list($request);
+		}
+
+		/**
+		 * @Route(path="/armor/sets/{id<\d+>}", methods={"GET"}, name="armor-sets.read")
+		 *
+		 * @param string $id
+		 *
+		 * @return Response
+		 */
+		public function read(string $id): Response {
+			return parent::read($id);
 		}
 
 		/**

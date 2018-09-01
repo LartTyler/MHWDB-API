@@ -66,26 +66,48 @@
 		 *
 		 * @return Response
 		 */
-		public function listAction(Request $request): Response {
-			return $this->respond($this->doListAction($request));
-		}
-
-		/**
-		 * @param Request $request
-		 *
-		 * @return EntityInterface[]|Response
-		 */
-		protected function doListAction(Request $request) {
+		public function list(Request $request): Response {
 			if ($request->query->has('q')) {
-				$results = $this->getSearchResults($request->query->all());
+				$query = $request->query->all();
 
-				if ($results instanceof Response)
-					return $results;
+				if ($limit = ($query['limit'] ?? null))
+					unset($query['limit']);
 
-				return $results;
-			}
+				if ($offset = ($query['offset'] ?? null))
+					unset($query['offset']);
 
-			return $this->manager->getRepository($this->entityClass)->findAll();
+				if (!sizeof($query))
+					return $this->respond(new EmptySearchParametersError());
+
+				$queryBuilder = $this->manager->createQueryBuilder()
+					->from($this->entityClass, 'e')
+					->select('e')
+					->setMaxResults($limit)
+					->setFirstResult($offset);
+
+				$queryObject = $query['q'] ?? [];
+
+				if (is_string($queryObject)) {
+					$queryObject = json_decode($queryObject, true);
+
+					if (json_last_error() !== JSON_ERROR_NONE)
+						return $this->respond(new BadQueryObjectError());
+				}
+
+				if (!$queryObject)
+					return $this->respond(new EmptySearchParametersError());
+
+				try {
+					$this->get(ApiQueryManager::class)->apply($queryBuilder, $queryObject);
+				} catch (\Exception $e) {
+					return $this->respond(new SearchError($e->getMessage()));
+				}
+
+				$results = $queryBuilder->getQuery()->getResult();
+			} else
+				$results = $this->manager->getRepository($this->entityClass)->findAll();
+
+			return $this->respond($results);
 		}
 
 		/**
@@ -93,59 +115,19 @@
 		 *
 		 * @return Response
 		 */
-		public function readAction(string $idOrSlug): Response {
-			return $this->respond($this->doReadAction($idOrSlug));
-		}
+		public function read(string $idOrSlug): Response {
+			if (is_numeric($idOrSlug))
+				$entity = $this->manager->getRepository($this->entityClass)->find((int)$idOrSlug);
+			else {
+				if (!is_a($this->entityClass, SluggableInterface::class, true))
+					return $this->respond(new SlugNotSupportedError());
 
-		/**
-		 * @param string $idOrSlug
-		 *
-		 * @return SlugNotSupportedError|EntityInterface|null
-		 */
-		protected function doReadAction(string $idOrSlug) {
-			return $this->getEntity($idOrSlug);
-		}
-
-		/**
-		 * @param array $query
-		 *
-		 * @return EntityInterface[]|Response
-		 */
-		protected function getSearchResults(array $query) {
-			if ($limit = ($query['limit'] ?? null))
-				unset($query['limit']);
-
-			if ($offset = ($query['offset'] ?? null))
-				unset($query['offset']);
-
-			if (!sizeof($query))
-				return $this->responder->createErrorResponse(new EmptySearchParametersError());
-
-			$queryBuilder = $this->manager->createQueryBuilder()
-				->from($this->entityClass, 'e')
-				->select('e')
-				->setMaxResults($limit)
-				->setFirstResult($offset);
-
-			$queryObject = $query['q'] ?? [];
-
-			if (is_string($queryObject)) {
-				$queryObject = json_decode($queryObject, true);
-
-				if (json_last_error() !== JSON_ERROR_NONE)
-					return $this->responder->createErrorResponse(new BadQueryObjectError());
+				$entity = $this->manager->getRepository($this->entityClass)->findOneBy([
+					'slug' => $idOrSlug,
+				]);
 			}
 
-			if (!$queryObject)
-				return $this->responder->createErrorResponse(new EmptySearchParametersError());
-
-			try {
-				$this->get(ApiQueryManager::class)->apply($queryBuilder, $queryObject);
-			} catch (\Exception $e) {
-				return $this->responder->createErrorResponse(new SearchError($e->getMessage()));
-			}
-
-			return $queryBuilder->getQuery()->getResult();
+			return $this->respond($entity);
 		}
 
 		/**
@@ -194,26 +176,6 @@
 				'Cache-Control' => 'public, max-age=14400',
 				'Content-Type' => 'application/json',
 			]);
-		}
-
-		/**
-		 * @param string $idOrSlug
-		 *
-		 * @return SlugNotSupportedError|EntityInterface|null
-		 */
-		protected function getEntity(string $idOrSlug) {
-			if (is_numeric($idOrSlug))
-				$item = $this->manager->getRepository($this->entityClass)->find((int)$idOrSlug);
-			else {
-				if (!is_a($this->entityClass, SluggableInterface::class, true))
-					return new SlugNotSupportedError();
-
-				$item = $this->manager->getRepository($this->entityClass)->findOneBy([
-					'slug' => $idOrSlug,
-				]);
-			}
-
-			return $item;
 		}
 
 		/**
