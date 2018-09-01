@@ -20,10 +20,14 @@
 				'Sworn Rapiers+',
 				'Dancing Davul',
 				'Princess Panoply+',
+				'Kadachi Striker+',
+				'Tyrannis Glaive 1'
 			], [
 				'Sworn Rapiers +',
 				'Dancing Duval',
 				'Princess Panoply +',
+				'Kadachi Striker +',
+				'Tyrannis Glaive'
 			], $name);
 		}
 
