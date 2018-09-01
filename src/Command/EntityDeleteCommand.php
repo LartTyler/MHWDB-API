@@ -2,6 +2,7 @@
 	namespace App\Command;
 
 	use App\Entity\Armor;
+	use App\Entity\Weapon;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Persistence\ObjectManager;
 	use Symfony\Component\Console\Command\Command;
@@ -27,6 +28,9 @@
 			$this->manager = $manager;
 		}
 
+		/**
+		 * @return void
+		 */
 		protected function configure() {
 			$this
 				->setName('app:entity:delete')
@@ -34,6 +38,12 @@
 				->addArgument('id', InputArgument::REQUIRED);
 		}
 
+		/**
+		 * @param InputInterface  $input
+		 * @param OutputInterface $output
+		 *
+		 * @return int
+		 */
 		protected function execute(InputInterface $input, OutputInterface $output) {
 			$io = new SymfonyStyle($input, $output);
 
@@ -55,6 +65,14 @@
 
 			if ($entity instanceof Armor)
 				$entity->getCrafting()->getMaterials()->clear();
+			else if ($entity instanceof Weapon) {
+				$entity->getCrafting()->getCraftingMaterials()->clear();
+				$entity->getCrafting()->getUpgradeMaterials()->clear();
+				$entity->getCrafting()->getBranches()->clear();
+
+				if ($previous = $entity->getCrafting()->getPrevious())
+					$previous->getCrafting()->getBranches()->removeElement($entity);
+			}
 
 			$this->manager->remove($entity);
 			$this->manager->flush();
