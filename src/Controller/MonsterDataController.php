@@ -2,7 +2,6 @@
 	namespace App\Controller;
 
 	use App\Entity\Ailment;
-	use App\Entity\AilmentRecovery;
 	use App\Entity\Item;
 	use App\Entity\Location;
 	use App\Entity\Monster;
