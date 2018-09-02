@@ -3,6 +3,8 @@
 
 	use App\Entity\Asset;
 	use App\Entity\CraftingMaterialCost;
+	use App\Entity\Slot;
+	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\Collection;
 
 	final class ExportHelper {
@@ -40,5 +42,25 @@
 				'primaryHash' => $asset->getPrimaryHash(),
 				'secondaryHash' => $asset->getSecondaryHash(),
 			];
+		}
+
+		/**
+		 * @param EntityInterface $entity
+		 *
+		 * @return int
+		 */
+		public static function toReference(EntityInterface $entity): int {
+			return $entity->getId();
+		}
+
+		/**
+		 * @param Collection $collection
+		 *
+		 * @return int[]
+		 */
+		public static function toReferenceArray(Collection $collection): array {
+			return $collection->map(function(EntityInterface $entity): int {
+				return $entity->getId();
+			})->toArray();
 		}
 	}

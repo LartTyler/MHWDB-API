@@ -7,6 +7,8 @@ services:
     App\Export\ExportManager:
         arguments:
             -
+                - '@App\Export\Exporters\AilmentExporter'
                 - '@App\Export\Exporters\WeaponExporter'
 
+    App\Export\Exporters\AilmentExporter: ~
     App\Export\Exporters\WeaponExporter: ~

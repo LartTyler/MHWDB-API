@@ -67,9 +67,7 @@
 				$output['crafting'] = [
 					'craftable' => $crafting->isCraftable(),
 					'previous' => $crafting->getPrevious() ? $crafting->getPrevious()->getId() : null,
-					'branches' => $crafting->getBranches()->map(function(Weapon $weapon): int {
-						return $weapon->getId();
-					})->toArray(),
+					'branches' => ExportHelper::toReferenceArray($crafting->getBranches()),
 					'craftingMaterials' => ExportHelper::toSimpleCostArray($crafting->getCraftingMaterials()),
 					'upgradeMaterials' => ExportHelper::toSimpleCostArray($crafting->getUpgradeMaterials()),
 				];
