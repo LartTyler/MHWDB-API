@@ -45,8 +45,8 @@ services:
                 name: console.command
                 command: app:entity:delete
 
-    App\Command\FixEmptyAffinityValuesCommand:
+    App\Command\ExportCommand:
         tags:
             -
                 name: console.command
-                command: app:fix:empty-affinity-values
+                command: app:export

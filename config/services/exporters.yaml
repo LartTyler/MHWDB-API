@@ -1,0 +1,12 @@
+services:
+    _defaults:
+        public: false
+        autowire: true
+        autoconfigure: true
+
+    App\Export\ExportManager:
+        arguments:
+            -
+                - '@App\Export\Exporters\WeaponExporter'
+
+    App\Export\Exporters\WeaponExporter: ~
