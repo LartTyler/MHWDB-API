@@ -45,12 +45,12 @@
 		}
 
 		/**
-		 * @param EntityInterface $entity
+		 * @param EntityInterface|null $entity
 		 *
-		 * @return int
+		 * @return int|null
 		 */
-		public static function toReference(EntityInterface $entity): int {
-			return $entity->getId();
+		public static function toReference(?EntityInterface $entity): ?int {
+			return $entity ? $entity->getId() : null;
 		}
 
 		/**
