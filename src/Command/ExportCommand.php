@@ -70,6 +70,8 @@
 				->addArgument('output-path', InputArgument::REQUIRED, 'The path the app package should be saved to')
 				->addOption('entity', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
 					'If provided, only listed entities will be exported to the package (implies --no-clean)')
+				->addOption('target', 't', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+					'If provided, only export entities matching the given ID (format: "<entity>:<id>"')
 				->addOption('no-clean', null, InputOption::VALUE_NONE,
 					'Perform the export without cleaning the package directory first')
 				->addOption('yes', 'y', InputOption::VALUE_NONE, 'Answer "yes" to all questions');
@@ -116,13 +118,43 @@
 				}, $classes);
 			}
 
+			$targetCollections = [];
+
+			if ($rawTargets = $input->getOption('target')) {
+				foreach ($rawTargets as $rawTarget) {
+					$entity = strtok($rawTarget, ':');
+					$id = (int)strtok('');
+
+					if (!$id)
+						throw new \InvalidArgumentException('Invalid target descriptor: ' . $rawTarget);
+
+					if (!in_array($entity, $classes))
+						$classes[] = $entity;
+
+					if (!isset($targetCollections[$entity]))
+						$targetCollections[$entity] = [];
+
+					$targetCollections[$entity][] = $id;
+				}
+			}
+
 			$progress = new MultiProgressBar($output);
 			$progress->append(sizeof($classes));
 			$progress->start();
 
 			foreach ($classes as $class) {
+				$qb = $this->entityManager->createQueryBuilder()
+					->from($class, 'e')
+					->select('e');
+
+				if ($targets = ($targetCollections[$class] ?? null)) {
+					$qb
+						->andWhere('e.id IN (:targets)')
+						->setParameter('targets', $targets);
+				}
+
 				/** @var EntityInterface[] $entities */
-				$entities = $this->entityManager->getRepository($class)->findAll();
+				$entities = $qb->getQuery()->getResult();
 
 				$progress->append(sizeof($entities));
 
