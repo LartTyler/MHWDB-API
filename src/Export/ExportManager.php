@@ -2,6 +2,7 @@
 	namespace App\Export;
 
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
+	use Doctrine\ORM\Proxy\Proxy;
 
 	class ExportManager {
 		/**
@@ -46,8 +47,22 @@
 		 *
 		 * @return ExporterInterface|null
 		 */
-		public function getExporterForClass(string $class): ?ExporterInterface {
+		public function getExporter(string $class): ?ExporterInterface {
 			return $this->exporters[$class] ?? null;
+		}
+
+		/**
+		 * @param object $object
+		 *
+		 * @return ExporterInterface|null
+		 */
+		public function findExporter(object $object): ?ExporterInterface {
+			if ($exporter = $this->getExporter(get_class($object)))
+				return $exporter;
+			else if ($object instanceof Proxy)
+				return $this->getExporter(get_parent_class($object));
+
+			return null;
 		}
 
 		/**
@@ -56,10 +71,10 @@
 		 * @return Export
 		 */
 		public function export(EntityInterface $entity): Export {
-			$exporter = $this->getExporterForClass($class = get_class($entity));
+			$exporter = $this->findExporter($entity);
 
 			if (!$exporter)
-				throw new \InvalidArgumentException('Could not find exporter for ' . $class);
+				throw new \InvalidArgumentException('Could not find exporter for ' . get_class($entity));
 
 			return $exporter->export($entity);
 		}
