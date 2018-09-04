@@ -12,6 +12,7 @@ services:
                 - '@App\Export\Exporters\ArmorSetExporter'
                 - '@App\Export\Exporters\CharmExporter'
                 - '@App\Export\Exporters\DecorationExporter'
+                - '@App\Export\Exporters\ItemExporter'
                 - '@App\Export\Exporters\WeaponExporter'
 
     App\Export\Exporters\AilmentExporter: ~
