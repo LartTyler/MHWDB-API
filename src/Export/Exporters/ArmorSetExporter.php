@@ -5,6 +5,7 @@
 	use App\Entity\ArmorSet;
 	use App\Entity\ArmorSetBonusRank;
 	use App\Export\Export;
+	use App\Export\ExportHelper;
 
 	class ArmorSetExporter extends AbstractExporter {
 		/**
@@ -37,8 +38,7 @@
 					'ranks' => $bonus->getRanks()->map(function(ArmorSetBonusRank $rank): array {
 						return [
 							'pieces' => $rank->getPieces(),
-							'skill' => $rank->getSkill()->getSkill()->getId(),
-							'skillLevel' => $rank->getSkill()->getLevel(),
+							'skill' => ExportHelper::toSimpleSkillRank($rank->getSkill()),
 						];
 					})->toArray(),
 				];

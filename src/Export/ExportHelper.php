@@ -3,7 +3,7 @@
 
 	use App\Entity\Asset;
 	use App\Entity\CraftingMaterialCost;
-	use App\Entity\Slot;
+	use App\Entity\SkillRank;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\Collection;
 
@@ -38,9 +38,21 @@
 				return null;
 
 			return [
-				'uri' => $asset->getUri(),
 				'primaryHash' => $asset->getPrimaryHash(),
 				'secondaryHash' => $asset->getSecondaryHash(),
+				'uri' => $asset->getUri(),
+			];
+		}
+
+		/**
+		 * @param SkillRank $rank
+		 *
+		 * @return array
+		 */
+		public static function toSimpleSkillRank(SkillRank $rank): array {
+			return [
+				'level' => $rank->getLevel(),
+				'skill' => $rank->getSkill()->getId(),
 			];
 		}
 
