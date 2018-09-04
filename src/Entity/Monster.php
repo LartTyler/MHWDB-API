@@ -114,6 +114,7 @@
 			$this->ailments = new ArrayCollection();
 			$this->locations = new ArrayCollection();
 			$this->resistances = new ArrayCollection();
+			$this->weaknesses = new ArrayCollection();
 		}
 
 		/**
@@ -214,5 +215,12 @@
 		 */
 		public function getResistances() {
 			return $this->resistances;
+		}
+
+		/**
+		 * @return MonsterWeakness[]|Collection|Selectable
+		 */
+		public function getWeaknesses() {
+			return $this->weaknesses;
 		}
 	}
