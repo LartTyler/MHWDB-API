@@ -11,10 +11,12 @@ services:
                 - '@App\Export\Exporters\ArmorExporter'
                 - '@App\Export\Exporters\ArmorSetExporter'
                 - '@App\Export\Exporters\CharmExporter'
+                - '@App\Export\Exporters\DecorationExporter'
                 - '@App\Export\Exporters\WeaponExporter'
 
     App\Export\Exporters\AilmentExporter: ~
     App\Export\Exporters\ArmorExporter: ~
     App\Export\Exporters\ArmorSetExporter: ~
     App\Export\Exporters\CharmExporter: ~
+    App\Export\Exporters\DecorationExporter: ~
     App\Export\Exporters\WeaponExporter: ~
