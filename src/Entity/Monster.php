@@ -70,7 +70,19 @@
 		 *
 		 * @var MonsterResistance[]|Collection|Selectable
 		 */
-		private $resistances = [];
+		private $resistances;
+
+		/**
+		 * @ORM\OneToMany(
+		 *     targetEntity="App\Entity\MonsterWeakness",
+		 *     mappedBy="monster",
+		 *     orphanRemoval=true,
+		 *     cascade={"all"}
+		 * )
+		 *
+		 * @var MonsterWeakness[]|Collection|Selectable
+		 */
+		private $weaknesses;
 
 		/**
 		 * @ORM\Column(type="text", nullable=true)

@@ -6,7 +6,12 @@
 
 	/**
 	 * @ORM\Entity(readOnly=true)
-	 * @ORM\Table(name="monster_resistances")
+	 * @ORM\Table(
+	 *     name="monster_resistances",
+	 *     uniqueConstraints={
+	 *         @ORM\UniqueConstraint(columns={"monster_id", "element"})
+	 *     }
+	 * )
 	 *
 	 * Class MonsterResistance
 	 *
@@ -31,23 +36,21 @@
 		private $element;
 
 		/**
-		 * @ORM\Column(type="text")
+		 * @ORM\Column(type="text", nullable=true)
 		 *
-		 * @var string
+		 * @var string|null
 		 */
-		private $condition;
+		private $condition = null;
 
 		/**
 		 * MonsterResistance constructor.
 		 *
-		 * @param Monster $monster
-		 * @param string  $element
-		 * @param string  $condition
+		 * @param Monster     $monster
+		 * @param string      $element
 		 */
-		public function __construct(Monster $monster, string $element, string $condition) {
+		public function __construct(Monster $monster, string $element) {
 			$this->monster = $monster;
 			$this->element = $element;
-			$this->condition = $condition;
 		}
 
 		/**
@@ -65,9 +68,20 @@
 		}
 
 		/**
-		 * @return string
+		 * @return string|null
 		 */
-		public function getCondition(): string {
+		public function getCondition(): ?string {
 			return $this->condition;
+		}
+
+		/**
+		 * @param null|string $condition
+		 *
+		 * @return $this
+		 */
+		public function setCondition(?string $condition) {
+			$this->condition = $condition;
+
+			return $this;
 		}
 	}
