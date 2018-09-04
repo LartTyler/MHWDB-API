@@ -14,6 +14,7 @@ services:
                 - '@App\Export\Exporters\DecorationExporter'
                 - '@App\Export\Exporters\ItemExporter'
                 - '@App\Export\Exporters\LocationExporter'
+                - '@App\Export\Exporters\MotionValueExporter'
                 - '@App\Export\Exporters\WeaponExporter'
 
     App\Export\Exporters\AilmentExporter: ~
@@ -23,4 +24,5 @@ services:
     App\Export\Exporters\DecorationExporter: ~
     App\Export\Exporters\ItemExporter: ~
     App\Export\Exporters\LocationExporter: ~
+    App\Export\Exporters\MotionValueExporter: ~
     App\Export\Exporters\WeaponExporter: ~
