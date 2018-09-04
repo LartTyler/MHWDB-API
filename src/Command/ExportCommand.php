@@ -156,6 +156,12 @@
 				/** @var EntityInterface[] $entities */
 				$entities = $qb->getQuery()->getResult();
 
+				if (!sizeof($entities)) {
+					$progress->advance();
+
+					continue;
+				}
+
 				$progress->append(sizeof($entities));
 
 				foreach ($entities as $entity) {

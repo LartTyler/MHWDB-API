@@ -15,6 +15,7 @@ services:
                 - '@App\Export\Exporters\ItemExporter'
                 - '@App\Export\Exporters\LocationExporter'
                 - '@App\Export\Exporters\MotionValueExporter'
+                - '@App\Export\Exporters\MonsterExporter'
                 - '@App\Export\Exporters\SkillExporter'
                 - '@App\Export\Exporters\WeaponExporter'
 
@@ -26,5 +27,6 @@ services:
     App\Export\Exporters\ItemExporter: ~
     App\Export\Exporters\LocationExporter: ~
     App\Export\Exporters\MotionValueExporter: ~
+    App\Export\Exporters\MonsterExporter: ~
     App\Export\Exporters\SkillExporter: ~
     App\Export\Exporters\WeaponExporter: ~
