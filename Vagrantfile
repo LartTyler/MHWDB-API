@@ -15,7 +15,7 @@ Vagrant.configure("2") do |config|
 		vb.memory = "2048"
 	end
 
-	config.vm.provision "shell", inline: <<-SHELL
+	config.vm.provision "bootstrap", type: "shell", inline: <<-SHELL
 		apt-get update -y
 		apt-get remove apache2 -y
 
@@ -47,10 +47,17 @@ Vagrant.configure("2") do |config|
 		mysql -e "GRANT ALL ON application.* TO 'application'@'%';"
 	SHELL
 
-	config.vm.provision "shell", privileged: false, inline: <<-SHELL
+	config.vm.provision "install", type: "shell", privileged: false, inline: <<-SHELL
+		git clone https://github.com/LartTyler/MHWDB-Data /vagrant/data
+
 		echo "[client]" > ~/.my.cnf
 		echo "user=application" >> ~/.my.cnf
 		echo "database=application" >> ~/.my.cnf
+
+		cd /vagrant
+
+		composer install
+		composer db:reset
 
 		echo
 		echo "Installed packages:"

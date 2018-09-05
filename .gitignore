@@ -2,6 +2,9 @@
 /.vagrant
 /*-cloudimg-console.log
 
+# Data Repo
+/data
+
 ###> symfony/framework-bundle ###
 .env
 /public/bundles/
