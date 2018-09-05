@@ -236,9 +236,6 @@
     "symfony/options-resolver": {
         "version": "v4.0.4"
     },
-    "symfony/orm-pack": {
-        "version": "v1.0.5"
-    },
     "symfony/polyfill-ctype": {
         "version": "v1.9.0"
     },
