@@ -49,16 +49,27 @@
 		private $exportManager;
 
 		/**
+		 * @var string
+		 */
+		private $defaultExportPath;
+
+		/**
 		 * EntityExportCommand constructor.
 		 *
 		 * @param EntityManagerInterface $entityManager
 		 * @param ExportManager          $exportManager
+		 * @param string                 $defaultExportPath
 		 */
-		public function __construct(EntityManagerInterface $entityManager, ExportManager $exportManager) {
-			parent::__construct();
-
+		public function __construct(
+			EntityManagerInterface $entityManager,
+			ExportManager $exportManager,
+			string $defaultExportPath
+		) {
 			$this->entityManager = $entityManager;
 			$this->exportManager = $exportManager;
+			$this->defaultExportPath = $defaultExportPath;
+
+			parent::__construct();
 		}
 
 		/**
@@ -67,7 +78,8 @@
 		protected function configure(): void {
 			$this
 				->setName('app:export')
-				->addArgument('output-path', InputArgument::REQUIRED, 'The path the app package should be saved to')
+				->addArgument('output-path', InputArgument::OPTIONAL, 'The path the app package should be saved to',
+					$this->defaultExportPath)
 				->addOption('entity', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
 					'If provided, only listed entities will be exported to the package (implies --no-clean)')
 				->addOption('target', 't', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
