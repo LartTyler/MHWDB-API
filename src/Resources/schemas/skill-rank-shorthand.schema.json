@@ -1,0 +1,21 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://mhw-db.com/schemas/skill-rank-shorthand",
+	"title": "Skill Rank",
+	"description": "A Skill at a certain rank",
+	"type": "object",
+	"properties": {
+		"skill": {
+			"$ref": "https://mhw-db.com/schemas/entity-reference",
+			"description": "A reference to the rank's skill"
+		},
+		"level": {
+			"type": "integer",
+			"description": "The rank's level"
+		}
+	},
+	"required": [
+		"skill",
+		"level"
+	]
+}

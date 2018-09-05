@@ -1,0 +1,160 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://mhw-db.com/schemas/armor",
+	"title": "Armor",
+	"description": "A piece of armor",
+	"type": "object",
+	"properties": {
+		"armorSet": {
+			"$ref": "https://mhw-db.com/schemas/nullable-entity-reference",
+			"description": "An entity reference to the armor set this armor is part of"
+		},
+		"assets": {
+			"type": "object",
+			"description": "An object containing URIs to asset images",
+			"properties": {
+				"imageFemale": {
+					"type": ["object", "null"],
+					"description": "The image for the armor on a female model, or `null`",
+					"$ref": "https://mhw-db.com/schemas/asset"
+				},
+				"imageMale": {
+					"type": ["object", "null"],
+					"description": "The image for the armor on a male model, or `null`",
+					"$ref": "https://mhw-db.com/schemas/asset"
+				}
+			},
+			"required": [
+				"imageFemale",
+				"imageMale"
+			]
+		},
+		"attributes": {
+			"type": "object",
+			"description": "A dictionary of attributes for the armor"
+		},
+		"crafting": {
+			"type": "object",
+			"description": "An object describing crafting information for the armor",
+			"properties": {
+				"materials": {
+					"type": "array",
+					"description": "An array of materials needed to create the armor",
+					"items": {
+						"$ref": "https://mhw-db.com/schemas/material-cost"
+					}
+				}
+			},
+			"required": [
+				"materials"
+			]
+		},
+		"defense": {
+			"type": "object",
+			"description": "A dictionary of defense values at different breakpoints",
+			"properties": {
+				"base": {
+					"type": "integer",
+					"description": "The base defense value of the armor",
+					"minimum": 0
+				},
+				"max": {
+					"type": "integer",
+					"description": "The maximum, non-augmented defense value of the armor",
+					"minimum": 0
+				},
+				"augmented": {
+					"type": "integer",
+					"description": "The maximum augmented defense value of the armor",
+					"minimum": 0
+				}
+			},
+			"required": [
+				"base",
+				"max",
+				"augmented"
+			]
+		},
+		"name": {
+			"type": "string",
+			"description": "The name of the armor"
+		},
+		"rank": {
+			"type": "string",
+			"description": "The rank of the armor",
+			"enum": [
+				"low",
+				"high"
+			]
+		},
+		"resistances": {
+			"type": "object",
+			"description": "A dictionary describing the armor's elemental resistances",
+			"properties": {
+				"fire": {
+					"type": "integer",
+					"description": "The armor's fire resistance"
+				},
+				"water": {
+					"type": "integer",
+					"description": "The armor's water resistance"
+				},
+				"ice": {
+					"type": "integer",
+					"description": "The armor's ice resistance"
+				},
+				"thunder": {
+					"type": "integer",
+					"description": "The armor's thunder resistance"
+				},
+				"dragon": {
+					"type": "integer",
+					"description": "The armor's dragon resistance"
+				}
+			}
+		},
+		"skills": {
+			"type": "array",
+			"description": "An array of skill ranks (in shorthand format) provided by this armor",
+			"items": {
+				"$ref": "https://mhw-db.com/schemas/skill-rank-shorthand"
+			}
+		},
+		"slots": {
+			"type": "array",
+			"description": "An array of decoration slots available on the armor",
+			"items": {
+				"$ref": "https://mhw-db.com/schemas/slot"
+			}
+		},
+		"slug": {
+			"type": "string",
+			"description": "The armor's API slug"
+		},
+		"type": {
+			"type": "string",
+			"description": "The gear slot the armor fits in",
+			"enum": [
+				"head",
+				"chest",
+				"gloves",
+				"waist",
+				"legs"
+			]
+		}
+	},
+	"required": [
+		"armorSet",
+		"assets",
+		"attributes",
+		"crafting",
+		"defense",
+		"name",
+		"rank",
+		"resistances",
+		"skills",
+		"slots",
+		"slug",
+		"type"
+	]
+}
