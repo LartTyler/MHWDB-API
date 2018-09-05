@@ -104,18 +104,22 @@
 				$io->error('Cannot export to an empty path (or your filesystem\'s root, ya dingus)');
 
 				return;
-			} else if (!$input->getOption('yes') && file_exists($path) && sizeof(scandir($path)) > 2) {
-				if (!$io->confirm($path . ' is not empty. Are you sure you want to export there?', false)) {
-					$io->warning('User cancelled operation.');
-
-					return;
-				}
 			}
 
-			if (!$input->getOption('no-clean'))
-				exec(sprintf('rm -rf %s', escapeshellarg($path)));
+			if (!$input->getOption('no-clean')) {
+				if (!$input->getOption('yes') && file_exists($path) && sizeof(scandir($path)) > 2) {
+					if (!$io->confirm($path . ' is not empty. Are you sure you want to export there?', false)) {
+						$io->warning('User cancelled operation.');
 
-			mkdir($path, 0755, true);
+						return;
+					}
+				}
+
+				exec(sprintf('rm -rf %s', escapeshellarg($path)));
+			}
+
+			if (!file_exists($path))
+				mkdir($path, 0755, true);
 
 			$classes = $input->getOption('entity');
 
@@ -179,7 +183,7 @@
 				foreach ($entities as $entity) {
 					$export = $this->exportManager->export($entity);
 
-					$filename = $path . '/' . $export->getGroup() . '/' . $entity->getId() . '.json';
+					$filename = $path . '/json/' . $export->getGroup() . '/' . $entity->getId() . '.json';
 
 					if (!file_exists($dir = dirname($filename)))
 						mkdir($dir, 0755, true);
@@ -188,6 +192,19 @@
 						JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
 
 					file_put_contents($filename, $encoded);
+
+					if ($assets = $export->getAssets()) {
+						foreach ($assets as $asset) {
+							$filename = $path . '/assets/' . ltrim(parse_url($asset->getUri(), PHP_URL_PATH), '/');
+
+							if (file_exists($filename))
+								continue;
+							else if (!file_exists($dir = dirname($filename)))
+								mkdir($dir, 0755, true);
+
+							file_put_contents($filename, file_get_contents($asset->getUri()));
+						}
+					}
 
 					$progress->advance();
 				}

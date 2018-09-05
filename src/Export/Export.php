@@ -13,6 +13,11 @@
 		protected $group;
 
 		/**
+		 * @var AssetExport[]
+		 */
+		protected $assets = [];
+
+		/**
 		 * Export constructor.
 		 *
 		 * @param string $group
@@ -35,5 +40,23 @@
 		 */
 		public function getGroup(): string {
 			return $this->group;
+		}
+
+		/**
+		 * @return AssetExport[]
+		 */
+		public function getAssets(): array {
+			return $this->assets;
+		}
+
+		/**
+		 * @param AssetExport[] $assets
+		 *
+		 * @return $this
+		 */
+		public function setAssets(array $assets) {
+			$this->assets = $assets;
+
+			return $this;
 		}
 	}

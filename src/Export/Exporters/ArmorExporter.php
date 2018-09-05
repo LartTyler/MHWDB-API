@@ -2,7 +2,9 @@
 	namespace App\Export\Exporters;
 
 	use App\Entity\Armor;
+	use App\Entity\SkillRank;
 	use App\Entity\Slot;
+	use App\Export\AssetExport;
 	use App\Export\Export;
 	use App\Export\ExportHelper;
 	use App\Game\Element;
@@ -46,7 +48,9 @@
 					'max' => $defense->getMax(),
 					'augmented' => $defense->getAugmented(),
 				],
-				'skills' => ExportHelper::toReferenceArray($object->getSkills()),
+				'skills' => $object->getSkills()->map(function(SkillRank $rank): array {
+					return ExportHelper::toSimpleSkillRank($rank);
+				})->toArray(),
 				'slots' => $object->getSlots()->map(function(Slot $slot): array {
 					return [
 						'rank' => $slot->getRank(),
@@ -55,10 +59,19 @@
 				'armorSet' => ExportHelper::toReference($object->getArmorSet()),
 			];
 
+			/** @var AssetExport[] $assetExports */
+			$assetExports = [];
+
 			if ($assets = $object->getAssets()) {
+				if ($imageFemale = $assets->getImageFemale())
+					$assetExports[] = AssetExport::fromAsset($imageFemale);
+
+				if ($imageMale = $assets->getImageMale())
+					$assetExports[] = AssetExport::fromAsset($imageMale);
+
 				$output['assets'] = [
-					'imageFemale' => ExportHelper::toSimpleAsset($assets->getImageFemale()),
-					'imageMale' => ExportHelper::toSimpleAsset($assets->getImageMale()),
+					'imageFemale' => ExportHelper::toSimpleAsset($imageFemale),
+					'imageMale' => ExportHelper::toSimpleAsset($imageMale),
 				];
 			}
 
@@ -70,6 +83,9 @@
 
 			ksort($output);
 
-			return new Export('armor/' . $object->getRank(), $output);
+			$export = new Export('armor/' . $object->getRank(), $output);
+			$export->setAssets($assetExports);
+
+			return $export;
 		}
 	}

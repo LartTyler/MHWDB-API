@@ -5,6 +5,7 @@
 	use App\Entity\Weapon;
 	use App\Entity\WeaponElement;
 	use App\Entity\WeaponSharpness;
+	use App\Export\AssetExport;
 	use App\Export\Export;
 	use App\Export\ExporterInterface;
 	use App\Export\ExportHelper;
@@ -75,15 +76,27 @@
 				ksort($output['crafting']);
 			}
 
+			/** @var AssetExport[] $assets */
+			$assetExports = [];
+
 			if ($assets = $object->getAssets()) {
+				if ($icon = $assets->getIcon())
+					$assetExports[] = AssetExport::fromAsset($icon);
+
+				if ($image = $assets->getImage())
+					$assetExports[] = AssetExport::fromAsset($image);
+
 				$output['assets'] = [
-					'icon' => ExportHelper::toSimpleAsset($assets->getIcon()),
+					'icon' => ExportHelper::toSimpleAsset($icon),
 					'image' => ExportHelper::toSimpleAsset($assets->getImage()),
 				];
 			}
 
 			ksort($output);
 
-			return new Export('weapons/' . $object->getType(), $output);
+			$export = new Export('weapons/' . $object->getType(), $output);
+			$export->setAssets($assetExports);
+
+			return $export;
 		}
 	}
