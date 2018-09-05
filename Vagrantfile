@@ -58,6 +58,12 @@ Vagrant.configure("2") do |config|
 
 		composer install
 		composer db:reset
+	SHELL
+
+	config.vm.provision "run", type: "shell", run: "always", privileged: false, inline: <<-SHELL
+		cd /vagrant/data
+
+		git pull
 
 		echo
 		echo "Installed packages:"
