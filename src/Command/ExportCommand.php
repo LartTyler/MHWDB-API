@@ -87,7 +87,10 @@
 				->addOption('no-clean', null, InputOption::VALUE_NONE,
 					'Perform the export without cleaning the package directory first')
 				->addOption('yes', 'y', InputOption::VALUE_NONE, 'Answer "yes" to all questions')
-				->addOption('journal-only', null, InputOption::VALUE_NONE);
+				->addOption('journal-only', null, InputOption::VALUE_NONE, 'Only rebuild journal entries, do not ' .
+					'export data; implies --no-clean')
+				->addOption('skip-assets', null, InputOption::VALUE_NONE, 'Do not export / download any asset data; ' .
+					'implies --no-clean');
 		}
 
 		/**
@@ -108,8 +111,11 @@
 			}
 
 			$journalOnly = $input->getOption('journal-only');
+			$skipAssets = $input->getOption('skip-assets');
 
-			if (!$journalOnly && !$input->getOption('no-clean')) {
+			$noClean = $journalOnly || $skipAssets || $input->getOption('no-clean');
+
+			if (!$journalOnly && !$noClean) {
 				if (!$input->getOption('yes') && file_exists($path) && sizeof(scandir($path)) > 2) {
 					if (!$io->confirm($path . ' is not empty. Are you sure you want to export there?', false)) {
 						$io->warning('User cancelled operation.');
@@ -202,9 +208,9 @@
 					$filename = $groupPath . $entity->getId() . '.json';
 					$journal[$entity->getId()] = $filename;
 
-					// Once the filename has been put in the journal, we conver it to an absolute path for the
+					// Once the filename has been put in the journal, we convert it to an absolute path for the
 					// rest of the iteration.
-					$filename = $path . $filename;
+					$filename = $path . '/json/' . $topLevelGroup . '/' . $filename;
 
 					if ($journalOnly) {
 						$progress->advance();
@@ -220,7 +226,7 @@
 
 					file_put_contents($filename, $encoded);
 
-					if ($assets = $export->getAssets()) {
+					if (!$skipAssets && $assets = $export->getAssets()) {
 						foreach ($assets as $asset) {
 							$filename = $path . '/assets/' . ltrim(parse_url($asset->getUri(), PHP_URL_PATH), '/');
 

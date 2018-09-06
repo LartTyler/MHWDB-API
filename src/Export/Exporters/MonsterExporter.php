@@ -9,10 +9,19 @@
 
 	class MonsterExporter extends AbstractExporter {
 		/**
-		 * MonsterExporter constructor.
+		 * @var ExportHelper
 		 */
-		public function __construct() {
+		protected $helper;
+
+		/**
+		 * MonsterExporter constructor.
+		 *
+		 * @param ExportHelper $helper
+		 */
+		public function __construct(ExportHelper $helper) {
 			parent::__construct(Monster::class);
+
+			$this->helper = $helper;
 		}
 
 		/**
@@ -28,8 +37,8 @@
 				'name' => $object->getName(),
 				'type' => $object->getType(),
 				'species' => $object->getSpecies(),
-				'ailments' => ExportHelper::toReferenceArray($object->getAilments()),
-				'locations' => ExportHelper::toReferenceArray($object->getLocations()),
+				'ailments' => $this->helper->getReferenceArray($object->getAilments(), 'ailments.read'),
+				'locations' => $this->helper->getReferenceArray($object->getLocations(), 'locations.read'),
 				'resistances' => $object->getResistances()->map(function(MonsterResistance $resistance): array {
 					$output = [
 						'element' => $resistance->getElement(),

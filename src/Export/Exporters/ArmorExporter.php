@@ -11,10 +11,19 @@
 
 	class ArmorExporter extends AbstractExporter {
 		/**
-		 * ArmorExporter constructor.
+		 * @var ExportHelper
 		 */
-		public function __construct() {
+		protected $helper;
+
+		/**
+		 * ArmorExporter constructor.
+		 *
+		 * @param ExportHelper $helper
+		 */
+		public function __construct(ExportHelper $helper) {
 			parent::__construct(Armor::class);
+
+			$this->helper = $helper;
 		}
 
 		/**
@@ -48,15 +57,13 @@
 					'max' => $defense->getMax(),
 					'augmented' => $defense->getAugmented(),
 				],
-				'skills' => $object->getSkills()->map(function(SkillRank $rank): array {
-					return ExportHelper::toSimpleSkillRank($rank);
-				})->toArray(),
+				'skills' => $this->helper->toSimpleSkillRankArray($object->getSkills()),
 				'slots' => $object->getSlots()->map(function(Slot $slot): array {
 					return [
 						'rank' => $slot->getRank(),
 					];
 				})->toArray(),
-				'armorSet' => ExportHelper::toReference($object->getArmorSet()),
+				'armorSet' => $this->helper->getReference($object->getArmorSet(), 'armor-sets.read'),
 			];
 
 			/** @var AssetExport[] $assetExports */
@@ -77,7 +84,7 @@
 
 			if ($crafting = $object->getCrafting()) {
 				$output['crafting'] = [
-					'materials' => ExportHelper::toSimpleCostArray($crafting->getMaterials()),
+					'materials' => $this->helper->toSimpleCostArray($crafting->getMaterials()),
 				];
 			}
 

@@ -7,10 +7,18 @@
 
 	class AilmentExporter extends AbstractExporter {
 		/**
-		 * AilmentExporter constructor.
+		 * @var ExportHelper
 		 */
-		public function __construct() {
+		protected $helper;
+
+		/**
+		 * AilmentExporter constructor.
+		 *
+		 * @param ExportHelper $helper
+		 */
+		public function __construct(ExportHelper $helper) {
 			parent::__construct(Ailment::class);
+			$this->helper = $helper;
 		}
 
 		/**
@@ -30,11 +38,11 @@
 				'description' => $object->getDescription(),
 				'recovery' => [
 					'actions' => $recovery->getActions(),
-					'items' => ExportHelper::toReferenceArray($recovery->getItems()),
+					'items' => $this->helper->getReferenceArray($recovery->getItems(), 'items.read'),
 				],
 				'protection' => [
-					'items' => ExportHelper::toReferenceArray($protection->getItems()),
-					'skills' => ExportHelper::toReferenceArray($protection->getSkills()),
+					'items' => $this->helper->getReferenceArray($protection->getItems(), 'items.read'),
+					'skills' => $this->helper->getReferenceArray($protection->getSkills(), 'skills.read', 'idOrSlug'),
 				],
 			];
 

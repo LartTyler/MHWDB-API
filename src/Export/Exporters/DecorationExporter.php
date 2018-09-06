@@ -8,10 +8,19 @@
 
 	class DecorationExporter extends AbstractExporter {
 		/**
-		 * DecorationExporter constructor.
+		 * @var ExportHelper
 		 */
-		public function __construct() {
+		protected $helper;
+
+		/**
+		 * DecorationExporter constructor.
+		 *
+		 * @param ExportHelper $helper
+		 */
+		public function __construct(ExportHelper $helper) {
 			parent::__construct(Decoration::class);
+
+			$this->helper = $helper;
 		}
 
 		/**
@@ -28,9 +37,7 @@
 				'name' => $object->getName(),
 				'slot' => $object->getSlot(),
 				'rarity' => $object->getRarity(),
-				'skills' => $object->getSkills()->map(function(SkillRank $rank): array {
-					return ExportHelper::toSimpleSkillRank($rank);
-				})->toArray(),
+				'skills' => $this->helper->toSimpleSkillRankArray($object->getSkills()),
 			];
 
 			ksort($output);

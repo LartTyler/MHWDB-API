@@ -11,12 +11,21 @@
 	use App\Export\ExportHelper;
 	use App\Game\Sharpness;
 
-	class WeaponExporter implements ExporterInterface {
+	class WeaponExporter extends AbstractExporter {
 		/**
-		 * @return string
+		 * @var ExportHelper
 		 */
-		public function getSupportedClass(): string {
-			return Weapon::class;
+		protected $helper;
+
+		/**
+		 * WeaponExporter constructor.
+		 *
+		 * @param ExportHelper $helper
+		 */
+		public function __construct(ExportHelper $helper) {
+			parent::__construct(Weapon::class);
+
+			$this->helper = $helper;
 		}
 
 		/**
@@ -67,10 +76,10 @@
 			if ($crafting = $object->getCrafting()) {
 				$output['crafting'] = [
 					'craftable' => $crafting->isCraftable(),
-					'previous' => $crafting->getPrevious() ? $crafting->getPrevious()->getId() : null,
-					'branches' => ExportHelper::toReferenceArray($crafting->getBranches()),
-					'craftingMaterials' => ExportHelper::toSimpleCostArray($crafting->getCraftingMaterials()),
-					'upgradeMaterials' => ExportHelper::toSimpleCostArray($crafting->getUpgradeMaterials()),
+					'previous' => $this->helper->getReference($crafting->getPrevious(), 'weapons.read', 'idOrSlug'),
+					'branches' => $this->helper->getReferenceArray($crafting->getBranches(), 'weapons.read', 'idOrSlug'),
+					'craftingMaterials' => $this->helper->toSimpleCostArray($crafting->getCraftingMaterials()),
+					'upgradeMaterials' => $this->helper->toSimpleCostArray($crafting->getUpgradeMaterials()),
 				];
 
 				ksort($output['crafting']);

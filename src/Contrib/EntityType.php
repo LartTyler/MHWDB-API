@@ -45,4 +45,13 @@
 		 */
 		private function __construct() {
 		}
+
+		/**
+		 * @param string $value
+		 *
+		 * @return bool
+		 */
+		public static function isValid(string $value): bool {
+			return isset(self::ENTITY_CLASS_MAP[$value]);
+		}
 	}

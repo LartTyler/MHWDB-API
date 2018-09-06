@@ -9,10 +9,19 @@
 
 	class CharmExporter extends AbstractExporter {
 		/**
-		 * CharmExporter constructor.
+		 * @var ExportHelper
 		 */
-		public function __construct() {
+		protected $helper;
+
+		/**
+		 * CharmExporter constructor.
+		 *
+		 * @param ExportHelper $helper
+		 */
+		public function __construct(ExportHelper $helper) {
 			parent::__construct(Charm::class);
+
+			$this->helper = $helper;
 		}
 
 		/**
@@ -24,23 +33,25 @@
 			if (!($object instanceof Charm))
 				throw new \InvalidArgumentException('$object must be an instance of ' . Charm::class);
 
+			$helper = $this->helper;
+
 			$output = [
 				'slug' => $object->getSlug(),
 				'name' => $object->getName(),
-				'ranks' => $object->getRanks()->map(function(CharmRank $rank): array {
+				'ranks' => $object->getRanks()->map(function(CharmRank $rank) use ($helper): array {
 					$output = [
 						'name' => $rank->getName(),
 						'level' => $rank->getLevel(),
 						'rarity' => $rank->getRarity(),
-						'skills' => $rank->getSkills()->map(function(SkillRank $rank): array {
-							return ExportHelper::toSimpleSkillRank($rank);
+						'skills' => $rank->getSkills()->map(function(SkillRank $rank) use ($helper): array {
+							return $helper->toSimpleSkillRank($rank);
 						})->toArray(),
 					];
 
 					if ($crafting = $rank->getCrafting()) {
 						$output['crafting'] = [
 							'craftable' => $crafting->isCraftable(),
-							'materials' => ExportHelper::toSimpleCostArray($crafting->getMaterials()),
+							'materials' => $helper->toSimpleCostArray($crafting->getMaterials()),
 						];
 					}
 
