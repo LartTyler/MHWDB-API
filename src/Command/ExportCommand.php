@@ -86,7 +86,8 @@
 					'If provided, only export entities matching the given ID (format: "<entity>:<id>"')
 				->addOption('no-clean', null, InputOption::VALUE_NONE,
 					'Perform the export without cleaning the package directory first')
-				->addOption('yes', 'y', InputOption::VALUE_NONE, 'Answer "yes" to all questions');
+				->addOption('yes', 'y', InputOption::VALUE_NONE, 'Answer "yes" to all questions')
+				->addOption('journal-only', null, InputOption::VALUE_NONE);
 		}
 
 		/**
@@ -106,7 +107,9 @@
 				return;
 			}
 
-			if (!$input->getOption('no-clean')) {
+			$journalOnly = $input->getOption('journal-only');
+
+			if (!$journalOnly && !$input->getOption('no-clean')) {
 				if (!$input->getOption('yes') && file_exists($path) && sizeof(scandir($path)) > 2) {
 					if (!$io->confirm($path . ' is not empty. Are you sure you want to export there?', false)) {
 						$io->warning('User cancelled operation.');
@@ -115,7 +118,8 @@
 					}
 				}
 
-				exec(sprintf('rm -rf %s', escapeshellarg($path)));
+				exec(sprintf('rm -rf %s', escapeshellarg($path . '/json')));
+				exec(sprintf('rm -rf %s', escapeshellarg($path . '/assets')));
 			}
 
 			if (!file_exists($path))
@@ -180,10 +184,33 @@
 
 				$progress->append(sizeof($entities));
 
+				$journal = [];
+				$topLevelGroup = null;
+
 				foreach ($entities as $entity) {
 					$export = $this->exportManager->export($entity);
+					$group = $export->getGroup();
 
-					$filename = $path . '/json/' . $export->getGroup() . '/' . $entity->getId() . '.json';
+					if ($topLevelGroup === null)
+						$topLevelGroup = substr($group, 0, strpos($group, '/') ?: strlen($group));
+
+					$groupPath = ltrim(str_replace($topLevelGroup, '', $group), '/');
+
+					if ($groupPath)
+						$groupPath .= '/';
+
+					$filename = $groupPath . $entity->getId() . '.json';
+					$journal[$entity->getId()] = $filename;
+
+					// Once the filename has been put in the journal, we conver it to an absolute path for the
+					// rest of the iteration.
+					$filename = $path . $filename;
+
+					if ($journalOnly) {
+						$progress->advance();
+
+						continue;
+					}
 
 					if (!file_exists($dir = dirname($filename)))
 						mkdir($dir, 0755, true);
@@ -207,6 +234,17 @@
 					}
 
 					$progress->advance();
+				}
+
+				if ($journal) {
+					if (!$topLevelGroup) {
+						throw new \RuntimeException('No top level group found for ' . $class .
+							'; this is definitely not right');
+					}
+
+					$encoded = json_encode($journal, JSON_FORCE_OBJECT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+					file_put_contents($path . '/json/' . $topLevelGroup . '/.journal.json', $encoded);
 				}
 
 				$progress->advance();
