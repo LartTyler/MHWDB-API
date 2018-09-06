@@ -54,3 +54,9 @@ services:
             -
                 name: console.command
                 command: app:export
+
+    App\Command\UserCreateCommand:
+        tags:
+            -
+                name: console.command
+                command: app:user:create

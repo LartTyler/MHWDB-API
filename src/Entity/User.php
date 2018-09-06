@@ -2,6 +2,7 @@
 	namespace App\Entity;
 
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
+	use DaybreakStudios\VeritasBundle\Security\Core\User\VeritasUserInterface;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\Common\Collections\Criteria;
@@ -16,7 +17,7 @@
 	 *
 	 * @package App\Entity
 	 */
-	class User implements EntityInterface, UserInterface {
+	class User implements EntityInterface, UserInterface, VeritasUserInterface {
 		use EntityTrait;
 
 		/**
@@ -29,7 +30,7 @@
 		 * @ORM\Column(type="string", length=32, unique=true)
 		 * @var string
 		 */
-		private $username;
+		private $displayName;
 
 		/**
 		 * @ORM\OneToMany(targetEntity="App\Entity\UserRole", mappedBy="user", orphanRemoval=true, cascade={"all"})
@@ -48,13 +49,20 @@
 		 * User constructor.
 		 *
 		 * @param string $email
-		 * @param string $username
+		 * @param string $displayName
 		 */
-		public function __construct(string $email, string $username) {
+		public function __construct(string $email, string $displayName) {
 			$this->email = $email;
-			$this->username = $username;
+			$this->displayName = $displayName;
 
 			$this->roles = new ArrayCollection();
+		}
+
+		/**
+		 * @return int|null
+		 */
+		public function getSubjectIdentifier(): ?int {
+			return $this->getId();
 		}
 
 		/**
@@ -65,19 +73,31 @@
 		}
 
 		/**
+		 * Returns the identifier of the user.
+		 *
+		 * This method's name is completely misleading, but it has to be called this to work with Symfony's security
+		 * system.
+		 *
 		 * @return string
 		 */
 		public function getUsername(): string {
-			return $this->username;
+			return $this->getId();
 		}
 
 		/**
-		 * @param string $username
+		 * @return string
+		 */
+		public function getDisplayName(): string {
+			return $this->displayName;
+		}
+
+		/**
+		 * @param string $displayName
 		 *
 		 * @return $this
 		 */
-		public function setUsername(string $username) {
-			$this->username = $username;
+		public function setDisplayName(string $displayName) {
+			$this->displayName = $displayName;
 
 			return $this;
 		}
@@ -122,7 +142,7 @@
 		 * @return $this
 		 */
 		public function grantRole(string $name) {
-			if (!$this->hasRole($name))
+			if ($this->hasRole($name))
 				return $this;
 
 			$this->roles->add(new UserRole($this, $name));

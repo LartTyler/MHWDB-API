@@ -7,7 +7,12 @@
 
 	/**
 	 * @ORM\Entity(readOnly=true)
-	 * @ORM\Table(name="user_roles")
+	 * @ORM\Table(
+	 *     name="user_roles",
+	 *     uniqueConstraints={
+	 *         @ORM\UniqueConstraint(columns={"user_id", "name"})
+	 *     }
+	 * )
 	 *
 	 * Class UserRole
 	 *
@@ -25,6 +30,8 @@
 		private $user;
 
 		/**
+		 * @ORM\Column(type="string", length=32)
+		 *
 		 * @var string
 		 */
 		private $name;
@@ -47,5 +54,12 @@
 		 */
 		public function getUser(): User {
 			return $this->user;
+		}
+
+		/**
+		 * @return string
+		 */
+		public function getRole(): string {
+			return $this->name;
 		}
 	}

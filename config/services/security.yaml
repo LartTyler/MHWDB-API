@@ -12,3 +12,10 @@ services:
         arguments:
             - '@doctrine'
             - '%app.security.user_repository%'
+
+    App\Security\AuthenticationExceptionListener:
+        tags:
+            -
+                name: kernel.event_listener
+                event: kernel.response
+                priority: 0
