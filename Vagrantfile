@@ -63,6 +63,7 @@ Vagrant.configure("2") do |config|
 	config.vm.provision "run", type: "shell", run: "always", privileged: false, inline: <<-SHELL
 		cd /vagrant/data
 
+		git checkout working
 		git pull
 
 		echo
