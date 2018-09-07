@@ -1,0 +1,14 @@
+services:
+    _defaults:
+        public: false
+        autowire: true
+        autoconfigure: true
+        bind:
+            $contribDir: '%env(resolve:EXPORT_DEFAULT_PATH)%'
+
+    App\Controller\ContribController:
+        tags:
+            -
+                name: controller.service_arguments
+
+    App\Contrib\ContribHelper: ~

@@ -15,13 +15,6 @@ services:
         resource: '../src/Controller'
         tags: ['controller.service_arguments']
 
-    App\Controller\ContribController:
-        bind:
-            $contribDir: '%env(resolve:EXPORT_DEFAULT_PATH)%'
-        tags:
-            -
-                name: controller.service_arguments
-
     App\QueryDocument\ApiQueryManager:
         public: true
         arguments:

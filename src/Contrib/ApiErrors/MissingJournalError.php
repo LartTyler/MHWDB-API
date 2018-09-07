@@ -5,6 +5,6 @@
 
 	class MissingJournalError extends ApiError {
 		public function __construct(string $type) {
-			parent::__construct('contrib.journal_missing', 'Could not find .journal.json for ' . $type);
+			parent::__construct('contrib.journal_missing', 'Could not find a valid .journal.json for ' . $type);
 		}
 	}
