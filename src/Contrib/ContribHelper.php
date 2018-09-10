@@ -41,18 +41,24 @@
 		public function getContribPath(string $type, $id, string $target = 'json'): ?string {
 			$basePath = $this->getContribDir() . '/' . $target . '/' . $type;
 
+			if (!file_exists($basePath))
+				return null;
+
 			if (!isset($this->journals[$type])) {
-				$decoded = json_decode(file_get_contents($basePath . '/.journal.json'), true, 512, JSON_THROW_ON_ERROR);
+				$decoded = json_decode(file_get_contents($basePath . '/.journal.json'), true);
+
+				if (json_last_error() !== JSON_ERROR_NONE)
+					return null;
 
 				$this->journals[$type] = $decoded;
 			}
 
 			$path = $this->journals[$type][$id] ?? null;
 
-			if (!$path)
+			if (!$path || !file_exists($path = $basePath . '/' . $path))
 				return null;
 
-			return $basePath . '/' . $path;
+			return $path;
 		}
 
 		/**

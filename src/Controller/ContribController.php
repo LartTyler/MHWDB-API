@@ -3,9 +3,12 @@
 
 	use App\Contrib\ApiErrors\MissingJournalError;
 	use App\Contrib\ContribHelper;
+	use App\Contrib\Data\AilmentEntityData;
 	use App\Contrib\EntityType;
+	use App\Contrib\Data\Objects\Ailment;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use Symfony\Component\HttpFoundation\JsonResponse;
+	use Symfony\Component\HttpFoundation\Request;
 	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\Routing\Annotation\Route;
 
@@ -43,13 +46,9 @@
 			if (!EntityType::isValid($type))
 				return $this->responder->createNotFoundResponse();
 
-			try {
-				$path = $this->helper->getContribPath($type, $id);
-			} catch (\JsonException $e) {
-				return $this->responder->createErrorResponse(new MissingJournalError($type));
-			}
+			$path = $this->helper->getContribPath($type, $id);
 
-			if (!$path || !file_exists($path))
+			if (!$path)
 				return $this->responder->createNotFoundResponse();
 
 			return new JsonResponse(file_get_contents($path), Response::HTTP_OK, [
@@ -59,14 +58,21 @@
 		}
 
 		/**
-		 * @Route(path="/contrib/{type<a-z-]+>}/{id<\d+>}", methods={"PATCH"}, name="contrib.update")
+		 * @Route(path="/contrib/{type<[a-z-]+>}/{id<\d+>}", methods={"PATCH"}, name="contrib.update")
 		 *
-		 * @param string $type
-		 * @param string $id
+		 * @param Request $request
+		 * @param string  $type
+		 * @param string  $id
 		 *
 		 * @return Response
 		 */
-		public function update(string $type, string $id): Response {
-			// TODO Add contrib update method body
+		public function update(Request $request, string $type, string $id): Response {
+			if (!EntityType::isValid($type))
+				return $this->responder->createNotFoundResponse();
+
+			$path = $this->helper->getContribPath($type, $id);
+
+			if (!$path)
+				return $this->responder->createNotFoundResponse();
 		}
 	}
