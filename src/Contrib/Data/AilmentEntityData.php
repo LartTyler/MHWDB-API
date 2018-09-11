@@ -4,6 +4,13 @@
 	use App\Entity\Ailment;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 
+	/**
+	 * Class AilmentEntityData
+	 *
+	 * @package App\Contrib\Data
+	 *
+	 * @see Ailment
+	 */
 	class AilmentEntityData extends AbstractEntityData {
 		/**
 		 * @var string
@@ -24,6 +31,17 @@
 		 * @var AilmentRecoveryEntityData
 		 */
 		protected $recovery;
+
+		/**
+		 * AilmentEntityData constructor.
+		 *
+		 * @param string $name
+		 * @param string $description
+		 */
+		protected function __construct(string $name, string $description) {
+			$this->name = $name;
+			$this->description = $description;
+		}
 
 		/**
 		 * @return string
@@ -112,13 +130,11 @@
 		 * @return static
 		 */
 		public static function fromJson(object $source) {
-			$updater = new static();
-			$updater->name = $source->name;
-			$updater->description = $source->description;
-			$updater->protection = AilmentProtectionEntityData::fromJson($source->protection);
-			$updater->recovery = AilmentRecoveryEntityData::fromJson($source->recovery);
+			$data = new static($source->name, $source->description);
+			$data->protection = AilmentProtectionEntityData::fromJson($source->protection);
+			$data->recovery = AilmentRecoveryEntityData::fromJson($source->recovery);
 
-			return $updater;
+			return $data;
 		}
 
 		/**
@@ -128,14 +144,12 @@
 		 */
 		public static function fromEntity(EntityInterface $entity) {
 			if (!($entity instanceof Ailment))
-				throw new \InvalidArgumentException(static::class . ' can only load ' . Ailment::class . ' entities');
+				throw static::createLoadFailedException(Ailment::class);
 
-			$updater = new static();
-			$updater->name = $entity->getName();
-			$updater->description = $entity->getDescription();
-			$updater->protection = AilmentProtectionEntityData::fromEntity($entity->getProtection());
-			$updater->recovery = AilmentRecoveryEntityData::fromEntity($entity->getRecovery());
+			$data = new static($entity->getName(), $entity->getDescription());
+			$data->protection = AilmentProtectionEntityData::fromEntity($entity->getProtection());
+			$data->recovery = AilmentRecoveryEntityData::fromEntity($entity->getRecovery());
 
-			return $updater;
+			return $data;
 		}
 	}

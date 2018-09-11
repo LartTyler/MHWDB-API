@@ -4,15 +4,16 @@
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 
 	/**
-	 * An updater represents a single API object in memory that's waiting to be written to the data repository.
+	 * An entity data object represents a single API object in memory that's waiting to be written to the data
+	 * repository, or loaded from the data repository into the database.
 	 *
-	 * Interface UpdaterInterface
+	 * Interface EntityDataInterface
 	 *
-	 * @package App\Contrib\Updater
+	 * @package App\Contrib\Data
 	 */
 	interface EntityDataInterface {
 		/**
-		 * Loads values present in $data into the updater.
+		 * Loads values present in $data into the object, usually provided by a user through the contrib API.
 		 *
 		 * @param object $data
 		 *
@@ -26,8 +27,8 @@
 		public function normalize(): array;
 
 		/**
-		 * Instantiates the updater using data from the data repository. Be aware that certain assumptions about $source
-		 * are made and not checked, such as presence of most (if not all) fields.
+		 * Instantiates the entity data using data from the data repository. Be aware that certain assumptions about
+		 * $source are made and not checked for sanity, such as presence of most (if not all) fields.
 		 *
 		 * @param object $source
 		 *
@@ -36,7 +37,7 @@
 		public static function fromJson(object $source);
 
 		/**
-		 * Instantiates the updater using an entity.
+		 * Instantiates the entity data using an entity from the database.
 		 *
 		 * @param EntityInterface $entity
 		 *

@@ -2,6 +2,7 @@
 	namespace App\Entity;
 
 	use App\Game\Element;
+	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\ORM\Mapping as ORM;
 
 	/**
@@ -11,7 +12,7 @@
 	 *
 	 * @package App\Entity
 	 */
-	class Resistances implements \JsonSerializable {
+	class Resistances implements \JsonSerializable, EntityInterface {
 		/**
 		 * @ORM\Column(type="integer")
 		 *
@@ -46,6 +47,13 @@
 		 * @var int
 		 */
 		protected $dragon = 0;
+
+		/**
+		 * @return null
+		 */
+		public function getId() {
+			return null;
+		}
 
 		/**
 		 *

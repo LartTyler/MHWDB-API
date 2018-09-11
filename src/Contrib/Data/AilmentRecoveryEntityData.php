@@ -5,6 +5,13 @@
 	use App\Utility\ObjectUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 
+	/**
+	 * Class AilmentRecoveryEntityData
+	 *
+	 * @package App\Contrib\Data
+	 *
+	 * @see AilmentRecovery
+	 */
 	class AilmentRecoveryEntityData extends AbstractEntityData {
 		/**
 		 * @var string[]
@@ -94,10 +101,8 @@
 		 * @return static
 		 */
 		public static function fromEntity(EntityInterface $entity) {
-			if (!($entity instanceof AilmentRecovery)) {
-				throw new \InvalidArgumentException(static::class . ' can only load ' . AilmentRecovery::class .
-					' entities');
-			}
+			if (!($entity instanceof AilmentRecovery))
+				throw static::createLoadFailedException(AilmentRecovery::class);
 
 			$updater = new static();
 			$updater->actions = $entity->getActions();
