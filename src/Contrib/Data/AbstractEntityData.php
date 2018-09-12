@@ -60,7 +60,7 @@
 		 * @return static[]
 		 */
 		public static function fromJsonArray(array $array): array {
-			return array_map(function(object $rank): static {
+			return array_map(function(object $rank) {
 				return static::fromJson($rank);
 			}, $array);
 		}
@@ -71,7 +71,7 @@
 		 * @return static[]
 		 */
 		public static function fromEntityCollection(Collection $collection): array {
-			return $collection->map(function(EntityInterface $entity): static {
+			return $collection->map(function(EntityInterface $entity) {
 				return static::fromEntity($entity);
 			})->toArray();
 		}
