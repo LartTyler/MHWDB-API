@@ -9,8 +9,7 @@
 	 * Class SkillRankEntityData
 	 *
 	 * @package App\Contrib\Data
-	 *
-	 * @see SkillRank
+	 * @see     SkillRank
 	 */
 	class SimpleSkillRankEntityData extends AbstractEntityData {
 		/**
@@ -71,16 +70,6 @@
 		}
 
 		/**
-		 * @return array
-		 */
-		protected function doNormalize(): array {
-			return [
-				'skill' => $this->getSkill(),
-				'level' => $this->getLevel(),
-			];
-		}
-
-		/**
 		 * @param object $data
 		 *
 		 * @return void
@@ -91,6 +80,16 @@
 
 			if (ObjectUtil::isset($data, 'level'))
 				$this->setLevel($data->level);
+		}
+
+		/**
+		 * @return array
+		 */
+		protected function doNormalize(): array {
+			return [
+				'skill' => $this->getSkill(),
+				'level' => $this->getLevel(),
+			];
 		}
 
 		/**
