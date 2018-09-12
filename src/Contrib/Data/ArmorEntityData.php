@@ -2,8 +2,6 @@
 	namespace App\Contrib\Data;
 
 	use App\Entity\Armor;
-	use App\Entity\AttributableTrait;
-	use App\Entity\SluggableTrait;
 	use App\Utility\ObjectUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 
@@ -12,16 +10,18 @@
 	 *
 	 * @package App\Contrib\Data
 	 *
-	 * @see Armor
+	 * @see     Armor
 	 */
 	class ArmorEntityData extends AbstractEntityData {
-		use SluggableTrait;
-		use AttributableTrait;
-
 		/**
 		 * @var string
 		 */
 		protected $name;
+
+		/**
+		 * @var string
+		 */
+		protected $slug;
 
 		/**
 		 * @var string
@@ -59,6 +59,11 @@
 		protected $slots;
 
 		/**
+		 * @var object
+		 */
+		protected $attributes;
+
+		/**
 		 * @var int|null
 		 */
 		protected $armorSet = null;
@@ -77,15 +82,18 @@
 		 * ArmorEntityData constructor.
 		 *
 		 * @param string $name
+		 * @param string $slug
 		 * @param string $type
 		 * @param string $rank
 		 * @param int    $rarity
 		 */
-		protected function __construct(string $name, string $type, string $rank, int $rarity) {
+		protected function __construct(string $name, string $slug, string $type, string $rank, int $rarity) {
 			$this->name = $name;
+			$this->slug = $slug;
 			$this->type = $type;
 			$this->rank = $rank;
 			$this->rarity = $rarity;
+			$this->attributes = new \stdClass();
 		}
 
 		/**
@@ -102,6 +110,42 @@
 		 */
 		public function setName(string $name) {
 			$this->name = $name;
+
+			return $this;
+		}
+
+		/**
+		 * @return string
+		 */
+		public function getSlug(): string {
+			return $this->slug;
+		}
+
+		/**
+		 * @param string $slug
+		 *
+		 * @return $this
+		 */
+		public function setSlug(string $slug) {
+			$this->slug = $slug;
+
+			return $this;
+		}
+
+		/**
+		 * @return object
+		 */
+		public function getAttributes(): object {
+			return $this->attributes;
+		}
+
+		/**
+		 * @param object $attributes
+		 *
+		 * @return $this
+		 */
+		public function setAttributes(object $attributes) {
+			$this->attributes = $attributes;
 
 			return $this;
 		}
@@ -265,27 +309,6 @@
 		}
 
 		/**
-		 * @return array
-		 */
-		protected function doNormalize(): array {
-			return [
-				'slug' => $this->getSlug(),
-				'attributes' => $this->getAttributes() ?: new \stdClass(),
-				'name' => $this->getName(),
-				'type' => $this->getType(),
-				'rank' => $this->getRank(),
-				'rarity' => $this->getRarity(),
-				'resistances' => $this->getResistances()->normalize(),
-				'defense' => $this->getDefense()->normalize(),
-				'skills' => $this->getSkills(),
-				'slots' => static::normalizeArray($this->getSlots()),
-				'armorSet' => $this->getArmorSet(),
-				'assets' => $this->getAssets() ? $this->getAssets()->normalize() : null,
-				'crafting' => $this->getCrafting() ? $this->getCrafting()->normalize() : null,
-			];
-		}
-
-		/**
 		 * @param object $data
 		 *
 		 * @return void
@@ -345,12 +368,34 @@
 		}
 
 		/**
+		 * @return array
+		 */
+		protected function doNormalize(): array {
+			return [
+				'slug' => $this->getSlug(),
+				'attributes' => $this->getAttributes(),
+				'name' => $this->getName(),
+				'type' => $this->getType(),
+				'rank' => $this->getRank(),
+				'rarity' => $this->getRarity(),
+				'resistances' => $this->getResistances()->normalize(),
+				'defense' => $this->getDefense()->normalize(),
+				'skills' => static::normalizeArray($this->getSkills()),
+				'slots' => static::normalizeArray($this->getSlots()),
+				'armorSet' => $this->getArmorSet(),
+				'assets' => $this->getAssets() ? $this->getAssets()->normalize() : null,
+				'crafting' => $this->getCrafting() ? $this->getCrafting()->normalize() : null,
+			];
+		}
+
+		/**
 		 * @param object $source
 		 *
 		 * @return static
 		 */
 		public static function fromJson(object $source) {
-			$data = new static($source->name, $source->type, $source->rank, $source->rarity);
+			$data = new static($source->name, $source->slug, $source->type, $source->rank, $source->rarity);
+			$data->attributes = $source->attributes;
 			$data->resistances = ArmorResistancesEntityData::fromJson($source->resistances);
 			$data->defense = ArmorDefenseEntityData::fromJson($source->defense);
 			$data->armorSet = $source->armorSet;
@@ -375,7 +420,10 @@
 			if (!($entity instanceof Armor))
 				throw static::createLoadFailedException(Armor::class);
 
-			$data = new static($entity->getName(), $entity->getType(), $entity->getRank(), $entity->getRarity());
+			$data = new static($entity->getName(), $entity->getSlug(), $entity->getType(), $entity->getRank(),
+				$entity->getRarity());
+
+			$data->attributes = json_decode(json_encode((object)$entity->getAttributes()));
 			$data->resistances = ArmorResistancesEntityData::fromEntity($entity->getResistances());
 			$data->defense = ArmorDefenseEntityData::fromEntity($entity->getDefense());
 			$data->skills = SimpleSkillRankEntityData::fromEntityCollection($entity->getSkills());
