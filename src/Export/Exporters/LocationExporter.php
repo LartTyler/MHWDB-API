@@ -1,7 +1,7 @@
 <?php
 	namespace App\Export\Exporters;
 
-	use App\Entity\Camp;
+	use App\Contrib\Data\LocationEntityData;
 	use App\Entity\Location;
 	use App\Export\Export;
 
@@ -22,18 +22,7 @@
 			if (!($object instanceof Location))
 				throw new \InvalidArgumentException('$object must be an instance of ' . Location::class);
 
-			$output = [
-				'name' => $object->getName(),
-				'zoneCount' => $object->getZoneCount(),
-				'camps' => $object->getCamps()->map(function(Camp $camp): array {
-					return [
-						'name' => $camp->getName(),
-						'zone' => $camp->getZone(),
-					];
-				})->toArray(),
-			];
-
-			ksort($output);
+			$output = LocationEntityData::fromEntity($object)->normalize();
 
 			return new Export('locations', $output);
 		}
