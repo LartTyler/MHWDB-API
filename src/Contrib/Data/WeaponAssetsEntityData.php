@@ -104,8 +104,12 @@
 				throw static::createLoadFailedException(WeaponAssets::class);
 
 			$data = new static();
-			$data->icon = AssetEntityData::fromEntity($entity->getIcon());
-			$data->image = AssetEntityData::fromEntity($entity->getImage());
+
+			if ($icon = $entity->getIcon())
+				$data->icon = AssetEntityData::fromEntity($icon);
+
+			if ($image = $entity->getImage())
+				$data->image = AssetEntityData::fromEntity($image);
 
 			return $data;
 		}

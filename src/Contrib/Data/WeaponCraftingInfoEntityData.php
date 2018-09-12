@@ -196,12 +196,14 @@
 				throw static::createLoadFailedException(WeaponCraftingInfo::class);
 
 			$data = new static($entity->isCraftable());
-			$data->previous = $entity->getPrevious()->getId();
 			$data->branches = static::toIdArray($entity->getBranches());
 			$data->craftingMaterials =
 				CraftingMaterialCostEntityData::fromEntityCollection($entity->getCraftingMaterials());
 			$data->upgradeMaterials =
 				CraftingMaterialCostEntityData::fromEntityCollection($entity->getUpgradeMaterials());
+
+			if ($previous = $entity->getPrevious())
+				$data->previous = $previous->getId();
 
 			return $data;
 		}
