@@ -3,29 +3,5 @@
 	"$id": "https://mhw-db.com/schemas/entity-reference",
 	"title": "Entity Reference",
 	"description": "A reference to another entity in the API",
-	"type": "object",
-	"properties": {
-		"entity": {
-			"type": "string",
-			"description": "A string describing what type of entity this reference points to",
-			"enum": [
-				"ailment",
-				"armor",
-				"armor-set",
-				"charm",
-				"decoration",
-				"item",
-				"location",
-				"monster",
-				"motion-value",
-				"skill",
-				"weapon"
-			]
-		},
-		"uri": {
-			"type": "string",
-			"format": "uri-reference",
-			"description": "A URI of the entity being referenced, relative to the main API hostname (mhw-db.com)"
-		}
-	}
+	"type": "integer"
 }

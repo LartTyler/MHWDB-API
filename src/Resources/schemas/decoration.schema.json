@@ -1,0 +1,43 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://mhw-db.com/schemas/decoration",
+	"title": "Decoration",
+	"description": "A decoration",
+	"type": "object",
+	"properties": {
+		"name": {
+			"type": "string",
+			"description": "The name of the decoration"
+		},
+		"rarity": {
+			"type": "integer",
+			"description": "The decoration's rarity",
+			"minimum": 1,
+			"maximum": 8
+		},
+		"skills": {
+			"type": "array",
+			"description": "An array of skill ranks (in shorthand format) provided by the decoration",
+			"items": {
+				"$ref": "https://mhw-db.com/schemas/skill-rank-shorthand"
+			}
+		},
+		"slot": {
+			"type": "integer",
+			"description": "The slot that the decoration fits into",
+			"minimum": 1,
+			"maximum": 3
+		},
+		"slug": {
+			"type": "string",
+			"description": "The decoratin's unique slug"
+		}
+	},
+	"required": [
+		"name",
+		"rarity",
+		"skills",
+		"slot",
+		"slug"
+	]
+}
