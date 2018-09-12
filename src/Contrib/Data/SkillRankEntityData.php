@@ -171,7 +171,7 @@
 				throw static::createLoadFailedException(SkillRank::class);
 
 			$data = new static($entity->getSlug(), $entity->getLevel(), $entity->getDescription());
-			$data->modifiers = json_decode(json_encode($entity->getModifiers()));
+			$data->modifiers = json_decode(json_encode((object)$entity->getModifiers()));
 
 			return $data;
 		}
