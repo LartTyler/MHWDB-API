@@ -24,7 +24,7 @@
 		protected $level;
 
 		/**
-		 * @var SkillRankEntityData[]
+		 * @var SimpleSkillRankEntityData[]
 		 */
 		protected $skills;
 
@@ -86,14 +86,14 @@
 		}
 
 		/**
-		 * @return SkillRankEntityData[]
+		 * @return SimpleSkillRankEntityData[]
 		 */
 		public function getSkills(): array {
 			return $this->skills;
 		}
 
 		/**
-		 * @param SkillRankEntityData[] $skills
+		 * @param SimpleSkillRankEntityData[] $skills
 		 *
 		 * @return $this
 		 */
@@ -165,7 +165,7 @@
 				$this->setLevel($data->level);
 
 			if (ObjectUtil::isset($data, 'skills'))
-				$this->setSkills(SkillRankEntityData::fromJsonArray($data->skills));
+				$this->setSkills(SimpleSkillRankEntityData::fromJsonArray($data->skills));
 
 			if (ObjectUtil::isset($data, 'rarity'))
 				$this->setRarity($data->rarity);
@@ -190,7 +190,7 @@
 		public static function fromJson(object $source) {
 			$data = new static($source->name, $source->level);
 			$data->rarity = $source->rarity;
-			$data->skills = SkillRankEntityData::fromJsonArray($source->skills);
+			$data->skills = SimpleSkillRankEntityData::fromJsonArray($source->skills);
 
 			if ($source->crafting)
 				$data->crafting = CharmRankCraftingInfoEntityData::fromJson($source->crafting);
@@ -209,7 +209,7 @@
 
 			$data = new static($entity->getName(), $entity->getLevel());
 			$data->rarity = $entity->getRarity();
-			$data->skills = SkillRankEntityData::fromEntityCollection($entity->getSkills());
+			$data->skills = SimpleSkillRankEntityData::fromEntityCollection($entity->getSkills());
 
 			if ($crafting = $entity->getCrafting())
 				$data->crafting = CharmRankCraftingInfoEntityData::fromEntity($crafting);

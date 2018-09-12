@@ -354,7 +354,7 @@
 			$data->resistances = ArmorResistancesEntityData::fromJson($source->resistances);
 			$data->defense = ArmorDefenseEntityData::fromJson($source->defense);
 			$data->armorSet = $source->armorSet;
-			$data->skills = SkillRankEntityData::fromJsonArray($source->skills);
+			$data->skills = SimpleSkillRankEntityData::fromJsonArray($source->skills);
 			$data->slots = SlotEntityData::fromJsonArray($source->slots);
 
 			if ($source->assets)
@@ -378,7 +378,7 @@
 			$data = new static($entity->getName(), $entity->getType(), $entity->getRank(), $entity->getRarity());
 			$data->resistances = ArmorResistancesEntityData::fromEntity($entity->getResistances());
 			$data->defense = ArmorDefenseEntityData::fromEntity($entity->getDefense());
-			$data->skills = SkillRankEntityData::fromEntityCollection($entity->getSkills());
+			$data->skills = SimpleSkillRankEntityData::fromEntityCollection($entity->getSkills());
 			$data->slots = SlotEntityData::fromEntityCollection($entity->getSlots());
 
 			if ($armorSet = $entity->getArmorSet())

@@ -19,7 +19,7 @@
 		protected $pieces;
 
 		/**
-		 * @var SkillRankEntityData
+		 * @var SimpleSkillRankEntityData
 		 */
 		protected $skill;
 
@@ -51,9 +51,9 @@
 		}
 
 		/**
-		 * @return SkillRankEntityData
+		 * @return SimpleSkillRankEntityData
 		 */
-		public function getSkill(): SkillRankEntityData {
+		public function getSkill(): SimpleSkillRankEntityData {
 			return $this->skill;
 		}
 
@@ -87,7 +87,7 @@
 		 */
 		public static function fromJson(object $source) {
 			$data = new static($source->pieces);
-			$data->skill = SkillRankEntityData::fromJson($source->skill);
+			$data->skill = SimpleSkillRankEntityData::fromJson($source->skill);
 
 			return $data;
 		}
@@ -102,7 +102,7 @@
 				throw static::createLoadFailedException(ArmorSetBonusRank::class);
 
 			$data = new static($entity->getPieces());
-			$data->skill = SkillRankEntityData::fromEntity($entity->getSkill());
+			$data->skill = SimpleSkillRankEntityData::fromEntity($entity->getSkill());
 
 			return $data;
 		}

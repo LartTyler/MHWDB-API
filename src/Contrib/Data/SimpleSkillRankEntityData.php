@@ -12,7 +12,7 @@
 	 *
 	 * @see SkillRank
 	 */
-	class SkillRankEntityData extends AbstractEntityData {
+	class SimpleSkillRankEntityData extends AbstractEntityData {
 		/**
 		 * @var int
 		 */

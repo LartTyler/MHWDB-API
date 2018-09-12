@@ -34,7 +34,7 @@
 		protected $rarity;
 
 		/**
-		 * @var SkillRankEntityData[]
+		 * @var SimpleSkillRankEntityData[]
 		 */
 		protected $skills = [];
 
@@ -126,14 +126,14 @@
 		}
 
 		/**
-		 * @return SkillRankEntityData[]
+		 * @return SimpleSkillRankEntityData[]
 		 */
 		public function getSkills(): array {
 			return $this->skills;
 		}
 
 		/**
-		 * @param SkillRankEntityData[] $skills
+		 * @param SimpleSkillRankEntityData[] $skills
 		 *
 		 * @return $this
 		 */
@@ -175,7 +175,7 @@
 				$this->setRarity($data->rarity);
 
 			if (ObjectUtil::isset($data, 'skills'))
-				$this->setSkills(SkillRankEntityData::fromJsonArray($data->skills));
+				$this->setSkills(SimpleSkillRankEntityData::fromJsonArray($data->skills));
 		}
 
 		/**
@@ -185,7 +185,7 @@
 		 */
 		public static function fromJson(object $source) {
 			$data = new static($source->name, $source->slug, $source->slot, $source->rarity);
-			$data->skills = SkillRankEntityData::fromJsonArray($source->skills);
+			$data->skills = SimpleSkillRankEntityData::fromJsonArray($source->skills);
 
 			return $data;
 		}
@@ -200,7 +200,7 @@
 				throw static::createLoadFailedException(Decoration::class);
 
 			$data = new static($entity->getName(), $entity->getSlug(), $entity->getSlot(), $entity->getRarity());
-			$data->skills = SkillRankEntityData::fromEntityCollection($entity->getSkills());
+			$data->skills = SimpleSkillRankEntityData::fromEntityCollection($entity->getSkills());
 
 			return $data;
 		}
