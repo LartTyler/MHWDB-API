@@ -19,7 +19,7 @@
 		protected $name;
 
 		/**
-		 * @var string
+		 * @var int
 		 */
 		protected $zone;
 
@@ -27,9 +27,9 @@
 		 * CampEntityData constructor.
 		 *
 		 * @param string $name
-		 * @param string $zone
+		 * @param int $zone
 		 */
-		protected function __construct(string $name, string $zone) {
+		protected function __construct(string $name, int $zone) {
 			$this->name = $name;
 			$this->zone = $zone;
 		}
@@ -53,18 +53,18 @@
 		}
 
 		/**
-		 * @return string
+		 * @return int
 		 */
-		public function getZone(): string {
+		public function getZone(): int {
 			return $this->zone;
 		}
 
 		/**
-		 * @param string $zone
+		 * @param int $zone
 		 *
 		 * @return $this
 		 */
-		public function setZone(string $zone) {
+		public function setZone(int $zone) {
 			$this->zone = $zone;
 
 			return $this;
