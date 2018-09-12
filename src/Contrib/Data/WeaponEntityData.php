@@ -377,8 +377,8 @@
 				throw static::createLoadFailedException(Weapon::class);
 
 			$data = new static($entity->getName(), $entity->getSlug(), $entity->getType(), $entity->getRarity());
-			$data->attributes = WeaponAttackEntityData::fromEntity($entity->getAttack());
-			$data->attributes = $entity->getAttributes();
+			$data->attack = WeaponAttackEntityData::fromEntity($entity->getAttack());
+			$data->attributes = json_decode(json_encode((object)$entity->getAttributes()));
 			$data->slots = SlotEntityData::fromEntityCollection($entity->getSlots());
 			$data->durability = WeaponSharpnessEntityData::fromEntityCollection($entity->getDurability());
 			$data->elements = WeaponElementEntityData::fromEntityCollection($entity->getElements());
