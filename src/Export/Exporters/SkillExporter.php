@@ -1,8 +1,8 @@
 <?php
 	namespace App\Export\Exporters;
 
+	use App\Contrib\Data\SkillEntityData;
 	use App\Entity\Skill;
-	use App\Entity\SkillRank;
 	use App\Export\Export;
 
 	class SkillExporter extends AbstractExporter {
@@ -22,25 +22,7 @@
 			if (!($object instanceof Skill))
 				throw new \InvalidArgumentException('$object must be an instance of ' . Skill::class);
 
-			$output = [
-				'slug' => $object->getSlug(),
-				'name' => $object->getName(),
-				'ranks' => $object->getRanks()->map(function(SkillRank $rank): array {
-					$output = [
-						'slug' => $rank->getSlug(),
-						'level' => $rank->getLevel(),
-						'description' => $rank->getDescription(),
-						'modifiers' => $rank->getModifiers(),
-					];
-
-					ksort($output);
-
-					return $output;
-				})->toArray(),
-				'description' => $object->getDescription(),
-			];
-
-			ksort($output);
+			$output = SkillEntityData::fromEntity($object)->normalize();
 
 			return new Export('skills', $output);
 		}
