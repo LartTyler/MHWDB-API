@@ -4,22 +4,13 @@
 	use App\Contrib\Data\AilmentEntityData;
 	use App\Entity\Ailment;
 	use App\Export\Export;
-	use App\Export\ExportHelper;
 
 	class AilmentExporter extends AbstractExporter {
 		/**
-		 * @var ExportHelper
-		 */
-		protected $helper;
-
-		/**
 		 * AilmentExporter constructor.
-		 *
-		 * @param ExportHelper $helper
 		 */
-		public function __construct(ExportHelper $helper) {
+		public function __construct() {
 			parent::__construct(Ailment::class);
-			$this->helper = $helper;
 		}
 
 		/**
