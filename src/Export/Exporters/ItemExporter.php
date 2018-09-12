@@ -1,6 +1,7 @@
 <?php
 	namespace App\Export\Exporters;
 
+	use App\Contrib\Data\ItemEntityData;
 	use App\Entity\Item;
 	use App\Export\Export;
 
@@ -21,15 +22,7 @@
 			if (!($object instanceof Item))
 				throw new \InvalidArgumentException('$object must be an instance of ' . Item::class);
 
-			$output = [
-				'name' => $object->getName(),
-				'description' => $object->getDescription(),
-				'rarity' => $object->getRarity(),
-				'value' => $object->getValue(),
-				'carryLimit' => $object->getCarryLimit(),
-			];
-
-			ksort($output);
+			$output = ItemEntityData::fromEntity($object)->normalize();
 
 			return new Export('items', $output);
 		}
