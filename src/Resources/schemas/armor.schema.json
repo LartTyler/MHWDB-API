@@ -10,18 +10,16 @@
 			"description": "An entity reference to the armor set this armor is part of"
 		},
 		"assets": {
-			"type": "object",
+			"type": ["object", "null"],
 			"description": "An object containing URIs to asset images",
 			"properties": {
 				"imageFemale": {
-					"type": ["object", "null"],
-					"description": "The image for the armor on a female model, or `null`",
-					"$ref": "https://mhw-db.com/schemas/asset"
+					"$ref": "https://mhw-db.com/schemas/asset",
+					"description": "The image for the armor on a female model, or `null`"
 				},
 				"imageMale": {
-					"type": ["object", "null"],
-					"description": "The image for the armor on a male model, or `null`",
-					"$ref": "https://mhw-db.com/schemas/asset"
+					"$ref": "https://mhw-db.com/schemas/asset",
+					"description": "The image for the armor on a male model, or `null`"
 				}
 			},
 			"required": [
