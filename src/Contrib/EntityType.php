@@ -1,17 +1,16 @@
 <?php
 	namespace App\Contrib;
 
-	use App\Entity\Ailment;
-	use App\Entity\Armor;
-	use App\Entity\ArmorSet;
-	use App\Entity\Charm;
-	use App\Entity\Decoration;
-	use App\Entity\Item;
-	use App\Entity\Location;
-	use App\Entity\Monster;
-	use App\Entity\MotionValue;
-	use App\Entity\Skill;
-	use App\Entity\Weapon;
+	use App\Contrib\Data\AilmentEntityData;
+	use App\Contrib\Data\ArmorEntityData;
+	use App\Contrib\Data\ArmorSetEntityData;
+	use App\Contrib\Data\DecorationEntityData;
+	use App\Contrib\Data\ItemEntityData;
+	use App\Contrib\Data\LocationEntityData;
+	use App\Contrib\Data\MonsterEntityData;
+	use App\Contrib\Data\MotionValueEntityData;
+	use App\Contrib\Data\SkillEntityData;
+	use App\Contrib\Data\WeaponEntityData;
 
 	final class EntityType {
 		public const AILMENTS = 'ailments';
@@ -26,19 +25,23 @@
 		public const SKILLS = 'skills';
 		public const WEAPONS = 'weapons';
 
-		public const ENTITY_CLASS_MAP = [
-			self::AILMENTS => Ailment::class,
-			self::ARMORS => Armor::class,
-			self::ARMOR_SETS => ArmorSet::class,
-			self::CHARMS => Charm::class,
-			self::DECORATIONS => Decoration::class,
-			self::ITEMS => Item::class,
-			self::LOCATIONS => Location::class,
-			self::MONSTERS => Monster::class,
-			self::MOTION_VALUES => MotionValue::class,
-			self::SKILLS => Skill::class,
-			self::WEAPONS => Weapon::class,
+		public const DATA_CLASS_MAP = [
+			self::AILMENTS => AilmentEntityData::class,
+			self::ARMORS => ArmorEntityData::class,
+			self::ARMOR_SETS => ArmorSetEntityData::class,
+			self::DECORATIONS => DecorationEntityData::class,
+			self::ITEMS => ItemEntityData::class,
+			self::LOCATIONS => LocationEntityData::class,
+			self::MONSTERS => MonsterEntityData::class,
+			self::MOTION_VALUES => MotionValueEntityData::class,
+			self::SKILLS => SkillEntityData::class,
+			self::WEAPONS => WeaponEntityData::class,
 		];
+
+		/**
+		 * @var string[]|null
+		 */
+		private static $types = null;
 
 		/**
 		 * EntityType constructor.
@@ -47,11 +50,30 @@
 		}
 
 		/**
+		 * @return string[]
+		 */
+		public static function all(): array {
+			if (self::$types === null)
+				self::$types = (new \ReflectionClass(self::class))->getConstants();
+
+			return self::$types;
+		}
+
+		/**
 		 * @param string $value
 		 *
 		 * @return bool
 		 */
 		public static function isValid(string $value): bool {
-			return isset(self::ENTITY_CLASS_MAP[$value]);
+			return in_array($value, self::all());
+		}
+
+		/**
+		 * @param string $type
+		 *
+		 * @return null|string
+		 */
+		public static function getDataClass(string $type): ?string {
+			return self::DATA_CLASS_MAP[$type] ?? null;
 		}
 	}

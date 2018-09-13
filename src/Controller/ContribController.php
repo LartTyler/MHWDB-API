@@ -1,11 +1,14 @@
 <?php
 	namespace App\Controller;
 
-	use App\Contrib\ApiErrors\MissingJournalError;
+	use App\Contrib\ApiErrors\InvalidPayloadError;
+	use App\Contrib\ApiErrors\UpdateError;
 	use App\Contrib\ContribHelper;
-	use App\Contrib\Data\AilmentEntityData;
-	use App\Contrib\EntityType;
+	use App\Contrib\Data\EntityDataInterface;
 	use App\Contrib\Data\Objects\Ailment;
+	use App\Contrib\EntityType;
+	use DaybreakStudios\Doze\Errors\ApiErrorInterface;
+	use DaybreakStudios\Doze\Errors\NotFoundError;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use Symfony\Component\HttpFoundation\JsonResponse;
 	use Symfony\Component\HttpFoundation\Request;
@@ -44,17 +47,14 @@
 		 */
 		public function read(string $type, string $id): Response {
 			if (!EntityType::isValid($type))
-				return $this->responder->createNotFoundResponse();
+				return $this->respond(new NotFoundError());
 
 			$path = $this->helper->getContribPath($type, $id);
 
 			if (!$path)
-				return $this->responder->createNotFoundResponse();
+				return $this->respond(new NotFoundError());
 
-			return new JsonResponse(file_get_contents($path), Response::HTTP_OK, [
-				'Cache-Control' => 'public, max-age=14400',
-				'Content-Type' => 'application/json',
-			], true);
+			return $this->respond(file_get_contents($path), true);
 		}
 
 		/**
@@ -68,11 +68,51 @@
 		 */
 		public function update(Request $request, string $type, string $id): Response {
 			if (!EntityType::isValid($type))
-				return $this->responder->createNotFoundResponse();
+				return $this->respond(new NotFoundError());
 
 			$path = $this->helper->getContribPath($type, $id);
 
 			if (!$path)
-				return $this->responder->createNotFoundResponse();
+				return $this->respond(new NotFoundError());
+
+			$class = EntityType::getDataClass($type);
+
+			if (!$class)
+				return $this->respond(new NotFoundError());
+
+			$payload = json_decode($request->getContent());
+
+			if (json_last_error() !== JSON_ERROR_NONE || !$payload || !get_object_vars($payload))
+				return $this->respond(new InvalidPayloadError());
+
+			try {
+				/** @var EntityDataInterface $data */
+				$data = call_user_func([$class, 'fromJson'], json_decode(file_get_contents($path)));
+				$data->update($payload);
+			} catch (\Exception $e) {
+				return $this->respond(new UpdateError());
+			}
+
+			file_put_contents($path, ContribHelper::encode($output = $data->normalize()));
+
+			return $this->respond($output);
+		}
+
+		/**
+		 * @param ApiErrorInterface|string|array|object $data
+		 * @param bool                                  $json
+		 * @param null                                  $status
+		 * @param array                                 $headers
+		 *
+		 * @return JsonResponse|Response
+		 */
+		protected function respond($data, bool $json = false, $status = null, array $headers = []) {
+			if ($data instanceof ApiErrorInterface)
+				return $this->responder->createErrorResponse($data, $status, $headers);
+
+			return new JsonResponse($data, $status ?? Response::HTTP_OK, $headers + [
+				'Cache-Control' => 'public, max-age=14400',
+				'Content-Type' => 'application/json',
+			], $json);
 		}
 	}
