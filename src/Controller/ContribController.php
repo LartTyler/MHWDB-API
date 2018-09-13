@@ -1,6 +1,7 @@
 <?php
 	namespace App\Controller;
 
+	use App\Contrib\ApiErrors\CreateError;
 	use App\Contrib\ApiErrors\InvalidPayloadError;
 	use App\Contrib\ApiErrors\UpdateError;
 	use App\Contrib\Data\EntityDataInterface;
@@ -38,7 +39,45 @@
 		}
 
 		/**
-		 * @Route(path="/contrib/{type<[a-z-]+>}/{id<\d+>}", methods={"GET"}, name="contrib.read")
+		 * @Route(path="/contrib/{type<[a-z-]+>}", methods={"PUT"}, name="contrib.create")
+		 *
+		 * @param Request $request
+		 * @param string  $type
+		 *
+		 * @return Response
+		 */
+		public function create(Request $request, string $type): Response {
+			if (!EntityType::isValid($type))
+				return $this->respond(new NotFoundError());
+
+			$class = EntityType::getDataClass($type);
+
+			if (!$class)
+				return $this->respond(new NotFoundError());
+
+			$payload = json_decode($request->getContent());
+
+			if (json_last_error() !== JSON_ERROR_NONE || !$payload || !get_object_vars($payload))
+				return $this->respond(new InvalidPayloadError());
+
+			try {
+				/** @var EntityDataInterface $data */
+				$data = call_user_func([$class, 'fromJson'], $payload);
+			} catch (\Exception $e) {
+				return $this->respond(new CreateError());
+			}
+
+			$output = $data->normalize();
+
+			$id = $this->contribManager->getGroup($type)->create($output, $data->getEntityGroupName(true));
+
+			return $this->respond($output, false, null, [
+				'X-Contrib-Data-Id' => $id,
+			]);
+		}
+
+		/**
+		 * @Route(path="/contrib/{type<[a-z-]+>}/{id<[A-Za-z\d-]+>}", methods={"GET"}, name="contrib.read")
 		 *
 		 * @param string $type
 		 * @param string $id
@@ -49,7 +88,7 @@
 			if (!EntityType::isValid($type))
 				return $this->respond(new NotFoundError());
 
-			$data = $this->contribManager->getGroup($type)->get((int)$id);
+			$data = $this->contribManager->getGroup($type)->get($id);
 
 			if (!$data)
 				return $this->respond(new NotFoundError());
@@ -58,7 +97,7 @@
 		}
 
 		/**
-		 * @Route(path="/contrib/{type<[a-z-]+>}/{id<\d+>}", methods={"PATCH"}, name="contrib.update")
+		 * @Route(path="/contrib/{type<[a-z-]+>}/{id<[A-Za-z\d-]+>}", methods={"PATCH"}, name="contrib.update")
 		 *
 		 * @param Request $request
 		 * @param string  $type
@@ -100,7 +139,7 @@
 		}
 
 		/**
-		 * @Route(path="/contrib/{type<[a-z-]+>}/{id<\d+>}", methods={"DELETE"}, name="contrib.delete")
+		 * @Route(path="/contrib/{type<[a-z-]+>}/{id<[A-Za-z\d-]+>}", methods={"DELETE"}, name="contrib.delete")
 		 *
 		 * @param string $type
 		 * @param string $id
@@ -111,7 +150,7 @@
 			if (!EntityType::isValid($type))
 				return $this->respond(new NotFoundError());
 
-			$found = $this->contribManager->getGroup($type)->delete((int)$id);
+			$found = $this->contribManager->getGroup($type)->delete($id);
 
 			if (!$found)
 				return $this->respond(new NotFoundError());
@@ -132,8 +171,8 @@
 				return $this->responder->createErrorResponse($data, $status, $headers);
 
 			return new JsonResponse($data, $status ?? Response::HTTP_OK, $headers + [
-				'Cache-Control' => 'public, max-age=14400',
-				'Content-Type' => 'application/json',
-			], $json);
+					'Cache-Control' => 'public, max-age=14400',
+					'Content-Type' => 'application/json',
+				], $json);
 		}
 	}
