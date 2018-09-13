@@ -56,6 +56,13 @@
 		/**
 		 * @return string
 		 */
+		public function doGetEntityGroupName(): ?string {
+			return 'decorations';
+		}
+
+		/**
+		 * @return string
+		 */
 		public function getSlug(): string {
 			return $this->slug;
 		}

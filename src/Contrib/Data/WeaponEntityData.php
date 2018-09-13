@@ -86,6 +86,13 @@
 		/**
 		 * @return string
 		 */
+		public function doGetEntityGroupName(): ?string {
+			return 'weapons/' . $this->getType();
+		}
+
+		/**
+		 * @return string
+		 */
 		public function getName(): string {
 			return $this->name;
 		}

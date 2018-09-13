@@ -27,6 +27,13 @@
 		public function normalize(): array;
 
 		/**
+		 * @param bool $short if true, return the group name without the top-level group name.
+		 *
+		 * @return string|null
+		 */
+		public function getEntityGroupName(bool $short = false): ?string;
+
+		/**
 		 * Instantiates the entity data using data from the data repository. Be aware that certain assumptions about
 		 * $source are made and not checked for sanity, such as presence of most (if not all) fields.
 		 *

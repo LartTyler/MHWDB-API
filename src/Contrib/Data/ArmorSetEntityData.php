@@ -48,6 +48,13 @@
 		/**
 		 * @return string
 		 */
+		public function doGetEntityGroupName(): ?string {
+			return 'armor-sets/' . $this->getRank();
+		}
+
+		/**
+		 * @return string
+		 */
 		public function getName(): string {
 			return $this->name;
 		}

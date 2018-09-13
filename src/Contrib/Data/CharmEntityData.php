@@ -42,6 +42,13 @@
 		/**
 		 * @return string
 		 */
+		public function doGetEntityGroupName(): ?string {
+			return 'charms';
+		}
+
+		/**
+		 * @return string
+		 */
 		public function getSlug(): string {
 			return $this->slug;
 		}

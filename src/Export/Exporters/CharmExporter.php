@@ -22,8 +22,8 @@
 			if (!($object instanceof Charm))
 				throw new \InvalidArgumentException('$object must be an instance of ' . Charm::class);
 
-			$output = CharmEntityData::fromEntity($object)->normalize();
+			$data = CharmEntityData::fromEntity($object);
 
-			return new Export('charms', $output);
+			return new Export($data->getEntityGroupName(), $data->normalize());
 		}
 	}

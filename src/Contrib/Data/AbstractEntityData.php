@@ -6,6 +6,30 @@
 
 	abstract class AbstractEntityData implements EntityDataInterface {
 		/**
+		 * Not all entity data objects need to have a group. It's up to the processor to determine if the return value
+		 * from this method is correct, or if it was from an entity that should not be a top level entity.
+		 *
+		 * @param bool $short if true, return the group name without the top-level group name.
+		 *
+		 * @return string|null
+		 */
+		public function getEntityGroupName(bool $short = false): ?string {
+			$group = $this->doGetEntityGroupName();
+
+			if ($short && ($pos = strpos($group, '/')) !== false)
+				$group = substr($group, $pos + 1);
+
+			return $group;
+		}
+
+		/**
+		 * @return null|string
+		 */
+		protected function doGetEntityGroupName(): ?string {
+			return null;
+		}
+
+		/**
 		 * @return array
 		 */
 		public function normalize(): array {

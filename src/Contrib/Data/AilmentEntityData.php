@@ -46,6 +46,13 @@
 		/**
 		 * @return string
 		 */
+		public function doGetEntityGroupName(): ?string {
+			return 'ailments';
+		}
+
+		/**
+		 * @return string
+		 */
 		public function getName(): string {
 			return $this->name;
 		}

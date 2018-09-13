@@ -22,8 +22,8 @@
 			if (!($object instanceof Item))
 				throw new \InvalidArgumentException('$object must be an instance of ' . Item::class);
 
-			$output = ItemEntityData::fromEntity($object)->normalize();
+			$data = ItemEntityData::fromEntity($object);
 
-			return new Export('items', $output);
+			return new Export($data->getEntityGroupName(), $data->normalize());
 		}
 	}

@@ -22,8 +22,8 @@
 			if (!($object instanceof ArmorSet))
 				throw new \InvalidArgumentException('$object must be an instance of ' . ArmorSet::class);
 
-			$output = ArmorSetEntityData::fromEntity($object)->normalize();
+			$data = ArmorSetEntityData::fromEntity($object);
 
-			return new Export('armor-sets/' . $object->getRank(), $output);
+			return new Export($data->getEntityGroupName(), $data->normalize());
 		}
 	}

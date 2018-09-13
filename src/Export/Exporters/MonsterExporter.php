@@ -22,8 +22,8 @@
 			if (!($object instanceof Monster))
 				throw new \InvalidArgumentException('$object must be an instance of ' . Monster::class);
 
-			$output = MonsterEntityData::fromEntity($object)->normalize();
+			$data = MonsterEntityData::fromEntity($object);
 
-			return new Export('monsters', $output);
+			return new Export($data->getEntityGroupName(), $data->normalize());
 		}
 	}

@@ -25,7 +25,7 @@
 				throw new \InvalidArgumentException('$object must be an instance of ' . Weapon::class);
 
 			$data = WeaponEntityData::fromEntity($object);
-			$export = new Export('weapons/' . $object->getType(), $data->normalize());
+			$export = new Export($data->getEntityGroupName(), $data->normalize());
 
 			$assetExports = [];
 

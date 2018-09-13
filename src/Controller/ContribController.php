@@ -94,7 +94,7 @@
 				return $this->respond(new UpdateError());
 			}
 
-			$group->put((int)$id, $output = $data->normalize());
+			$group->put((int)$id, $output = $data->normalize(), $data->getEntityGroupName(true));
 
 			return $this->respond($output);
 		}

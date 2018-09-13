@@ -22,8 +22,8 @@
 			if (!($object instanceof Skill))
 				throw new \InvalidArgumentException('$object must be an instance of ' . Skill::class);
 
-			$output = SkillEntityData::fromEntity($object)->normalize();
+			$data = SkillEntityData::fromEntity($object);
 
-			return new Export('skills', $output);
+			return new Export($data->getEntityGroupName(), $data->normalize());
 		}
 	}

@@ -22,8 +22,8 @@
 			if (!($object instanceof Ailment))
 				throw new \InvalidArgumentException('$object must be an instance of ' . Ailment::class);
 
-			$output = AilmentEntityData::fromEntity($object)->normalize();
+			$data = AilmentEntityData::fromEntity($object);
 
-			return new Export('ailments', $output);
+			return new Export($data->getEntityGroupName(), $data->normalize());
 		}
 	}

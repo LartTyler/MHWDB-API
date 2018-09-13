@@ -22,8 +22,8 @@
 			if (!($object instanceof MotionValue))
 				throw new \InvalidArgumentException('$object must be an instance of ' . MotionValue::class);
 
-			$output = MotionValueEntityData::fromEntity($object)->normalize();
+			$data = MotionValueEntityData::fromEntity($object);
 
-			return new Export('motion-values/' . $object->getWeaponType(), $output);
+			return new Export($data->getEntityGroupName(), $data->normalize());
 		}
 	}

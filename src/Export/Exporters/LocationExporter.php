@@ -22,8 +22,8 @@
 			if (!($object instanceof Location))
 				throw new \InvalidArgumentException('$object must be an instance of ' . Location::class);
 
-			$output = LocationEntityData::fromEntity($object)->normalize();
+			$data = LocationEntityData::fromEntity($object);
 
-			return new Export('locations', $output);
+			return new Export($data->getEntityGroupName(), $data->normalize());
 		}
 	}

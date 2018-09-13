@@ -4,6 +4,7 @@
 	use App\Contrib\Data\AilmentEntityData;
 	use App\Contrib\Data\ArmorEntityData;
 	use App\Contrib\Data\ArmorSetEntityData;
+	use App\Contrib\Data\CharmEntityData;
 	use App\Contrib\Data\DecorationEntityData;
 	use App\Contrib\Data\ItemEntityData;
 	use App\Contrib\Data\LocationEntityData;
@@ -29,6 +30,7 @@
 			self::AILMENTS => AilmentEntityData::class,
 			self::ARMORS => ArmorEntityData::class,
 			self::ARMOR_SETS => ArmorSetEntityData::class,
+			self::CHARMS => CharmEntityData::class,
 			self::DECORATIONS => DecorationEntityData::class,
 			self::ITEMS => ItemEntityData::class,
 			self::LOCATIONS => LocationEntityData::class,

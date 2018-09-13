@@ -76,6 +76,13 @@
 		/**
 		 * @return string
 		 */
+		public function doGetEntityGroupName(): ?string {
+			return 'monsters/' . $this->getType();
+		}
+
+		/**
+		 * @return string
+		 */
 		public function getName(): string {
 			return $this->name;
 		}

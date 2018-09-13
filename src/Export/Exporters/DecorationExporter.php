@@ -22,8 +22,8 @@
 			if (!($object instanceof Decoration))
 				throw new \InvalidArgumentException('$object must be an instance of ' . Decoration::class);
 
-			$output = DecorationEntityData::fromEntity($object)->normalize();
+			$data = DecorationEntityData::fromEntity($object);
 
-			return new Export('decorations', $output);
+			return new Export($data->getEntityGroupName(), $data->normalize());
 		}
 	}
