@@ -1,7 +1,5 @@
 <?php
-	namespace App\Scraping;
-
-	use App\Console\MultiProgressBar;
+	namespace App\Console;
 
 	trait ProgressAwareTrait {
 		/**

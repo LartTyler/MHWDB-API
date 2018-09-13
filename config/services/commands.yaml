@@ -9,18 +9,6 @@ services:
         tags:
             - console.command
 
-    App\Command\ScraperRunCommand:
-        tags:
-            -
-                name: console.command
-                command: app:scrapers:run
-
-    App\Command\ScraperListCommand:
-        tags:
-            -
-                name: console.command
-                command: app:scrapers:list
-
     App\Command\LoaderRunCommand:
         tags:
             -
