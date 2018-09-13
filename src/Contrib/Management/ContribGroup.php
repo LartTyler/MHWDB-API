@@ -112,20 +112,20 @@
 		/**
 		 * @param int $id
 		 *
-		 * @return $this
+		 * @return bool
 		 */
-		public function delete(int $id) {
+		public function delete(int $id): bool {
 			$path = $this->getPathFromJournal($id);
 
 			if (!$path)
-				return $this;
+				return false;
 
 			$this->getJournal()->delete($id);
 
 			$this->unlink(Target::JSON, $path);
 			$this->write(Target::JSON, '/.journal.json', $this->encode($this->getJournal()));
 
-			return $this;
+			return true;
 		}
 
 		/**

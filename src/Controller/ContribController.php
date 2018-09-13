@@ -3,10 +3,10 @@
 
 	use App\Contrib\ApiErrors\InvalidPayloadError;
 	use App\Contrib\ApiErrors\UpdateError;
-	use App\Contrib\ContribHelper;
 	use App\Contrib\Data\EntityDataInterface;
 	use App\Contrib\EntityType;
 	use App\Contrib\Management\ContribManager;
+	use App\Response\NoContentResponse;
 	use DaybreakStudios\Doze\Errors\ApiErrorInterface;
 	use DaybreakStudios\Doze\Errors\NotFoundError;
 	use DaybreakStudios\DozeBundle\ResponderService;
@@ -97,6 +97,26 @@
 			$group->put((int)$id, $output = $data->normalize(), $data->getEntityGroupName(true));
 
 			return $this->respond($output);
+		}
+
+		/**
+		 * @Route(path="/contrib/{type<[a-z-]+>}/{id<\d+>}", methods={"DELETE"}, name="contrib.delete")
+		 *
+		 * @param string $type
+		 * @param string $id
+		 *
+		 * @return Response
+		 */
+		public function delete(string $type, string $id): Response {
+			if (!EntityType::isValid($type))
+				return $this->respond(new NotFoundError());
+
+			$found = $this->contribManager->getGroup($type)->delete((int)$id);
+
+			if (!$found)
+				return $this->respond(new NotFoundError());
+
+			return new NoContentResponse();
 		}
 
 		/**

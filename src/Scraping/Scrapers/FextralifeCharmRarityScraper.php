@@ -1,6 +1,7 @@
 <?php
 	namespace App\Scraping\Scrapers;
 
+	use App\Entity\CharmRank;
 	use App\Scraping\AbstractScraper;
 	use App\Scraping\Configurations\FextralifeConfiguration;
 	use App\Scraping\ProgressAwareInterface;
@@ -43,6 +44,7 @@
 			foreach ($charms as $charm) {
 				$baseRarity = 0;
 
+				/** @var CharmRank $rank */
 				foreach ($charm->getRanks() as $rank) {
 					$slug = strtr(preg_replace_callback('/\d+$/', function(array $matches) {
 						return RomanNumeral::toNumeral((int)$matches[0]);

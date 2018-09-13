@@ -71,6 +71,11 @@
 			$this->manager->flush();
 		}
 
+		/**
+		 * @param Crawler $row
+		 *
+		 * @return void
+		 */
 		protected function process(Crawler $row) {
 			/**
 			 * For items:

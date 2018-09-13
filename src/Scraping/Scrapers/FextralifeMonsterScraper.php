@@ -3,7 +3,6 @@
 
 	use App\Entity\Ailment;
 	use App\Entity\Monster;
-	use App\Game\Element;
 	use App\Game\MonsterSpecies;
 	use App\Game\MonsterType;
 	use App\Scraping\AbstractScraper;

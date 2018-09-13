@@ -19,6 +19,13 @@
 		 */
 		protected $camps;
 
+		/**
+		 * LocationSchema constructor.
+		 *
+		 * @param string $name
+		 * @param int    $zoneCount
+		 * @param array  $camps
+		 */
 		public function __construct(string $name, int $zoneCount, array $camps) {
 			$this->name = $name;
 			$this->zoneCount = $zoneCount;

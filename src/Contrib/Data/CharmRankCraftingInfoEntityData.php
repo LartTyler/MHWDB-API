@@ -2,7 +2,6 @@
 	namespace App\Contrib\Data;
 
 	use App\Entity\CharmRankCraftingInfo;
-	use App\Entity\CraftingMaterialCost;
 	use App\Utility\ObjectUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 

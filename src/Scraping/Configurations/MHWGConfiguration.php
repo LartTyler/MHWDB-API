@@ -2,7 +2,6 @@
 	namespace App\Scraping\Configurations;
 
 	use App\Scraping\Configuration;
-	use Doctrine\Common\Persistence\ObjectManager;
 	use Http\Client\Common\HttpMethodsClient;
 	use Http\Message\UriFactory;
 

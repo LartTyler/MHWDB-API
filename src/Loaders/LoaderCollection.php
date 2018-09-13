@@ -71,6 +71,9 @@
 			return sizeof($this->loaders);
 		}
 
+		/**
+		 * @return \ArrayIterator
+		 */
 		public function getIterator(): \ArrayIterator {
 			return new \ArrayIterator($this->loaders);
 		}

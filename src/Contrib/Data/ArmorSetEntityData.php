@@ -1,7 +1,6 @@
 <?php
 	namespace App\Contrib\Data;
 
-	use App\Entity\Armor;
 	use App\Entity\ArmorSet;
 	use App\Utility\ObjectUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
