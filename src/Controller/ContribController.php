@@ -5,8 +5,8 @@
 	use App\Contrib\ApiErrors\UpdateError;
 	use App\Contrib\ContribHelper;
 	use App\Contrib\Data\EntityDataInterface;
-	use App\Contrib\Data\Objects\Ailment;
 	use App\Contrib\EntityType;
+	use App\Contrib\Management\ContribManager;
 	use DaybreakStudios\Doze\Errors\ApiErrorInterface;
 	use DaybreakStudios\Doze\Errors\NotFoundError;
 	use DaybreakStudios\DozeBundle\ResponderService;
@@ -22,19 +22,19 @@
 		protected $responder;
 
 		/**
-		 * @var ContribHelper
+		 * @var ContribManager
 		 */
-		protected $helper;
+		protected $contribManager;
 
 		/**
 		 * ContribController constructor.
 		 *
 		 * @param ResponderService $responder
-		 * @param ContribHelper    $helper
+		 * @param ContribManager   $contribManager
 		 */
-		public function __construct(ResponderService $responder, ContribHelper $helper) {
+		public function __construct(ResponderService $responder, ContribManager $contribManager) {
 			$this->responder = $responder;
-			$this->helper = $helper;
+			$this->contribManager = $contribManager;
 		}
 
 		/**
@@ -49,12 +49,12 @@
 			if (!EntityType::isValid($type))
 				return $this->respond(new NotFoundError());
 
-			$path = $this->helper->getContribPath($type, $id);
+			$data = $this->contribManager->getGroup($type)->get((int)$id);
 
-			if (!$path)
+			if (!$data)
 				return $this->respond(new NotFoundError());
 
-			return $this->respond(file_get_contents($path), true);
+			return $this->respond($data);
 		}
 
 		/**
@@ -70,11 +70,6 @@
 			if (!EntityType::isValid($type))
 				return $this->respond(new NotFoundError());
 
-			$path = $this->helper->getContribPath($type, $id);
-
-			if (!$path)
-				return $this->respond(new NotFoundError());
-
 			$class = EntityType::getDataClass($type);
 
 			if (!$class)
@@ -85,15 +80,21 @@
 			if (json_last_error() !== JSON_ERROR_NONE || !$payload || !get_object_vars($payload))
 				return $this->respond(new InvalidPayloadError());
 
+			$group = $this->contribManager->getGroup($type);
+			$data = $group->get((int)$id);
+
+			if (!$data)
+				return $this->respond(new NotFoundError());
+
 			try {
 				/** @var EntityDataInterface $data */
-				$data = call_user_func([$class, 'fromJson'], json_decode(file_get_contents($path)));
+				$data = call_user_func([$class, 'fromJson'], $data);
 				$data->update($payload);
 			} catch (\Exception $e) {
 				return $this->respond(new UpdateError());
 			}
 
-			file_put_contents($path, ContribHelper::encode($output = $data->normalize()));
+			$group->put((int)$id, $output = $data->normalize());
 
 			return $this->respond($output);
 		}
