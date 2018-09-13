@@ -3,7 +3,7 @@
 	"$id": "https://mhw-db.com/schemas/asset",
 	"title": "Asset",
 	"description": "An asset",
-	"type": "object",
+	"type": ["object", "null"],
 	"properties": {
 		"primaryHash": {
 			"type": "string",
