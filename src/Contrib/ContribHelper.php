@@ -76,4 +76,27 @@
 		public function clearJournals(): void {
 			$this->journals = [];
 		}
+
+		/**
+		 * Encodes data intended for the data repository. Necessary to ensure consistent formatting for data files.
+		 *
+		 * @param object|array $data
+		 * @param bool         $pretty
+		 * @param int          $args
+		 *
+		 * @return string
+		 */
+		public static function encode($data, bool $pretty = true, int $args = 0): string {
+			$args |= JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
+
+			if ($pretty)
+				$args |= JSON_PRETTY_PRINT;
+
+			$output = json_encode($data, $args);
+
+			if ($pretty)
+				$output = str_replace('    ', "\t", $output);
+
+			return $output;
+		}
 	}

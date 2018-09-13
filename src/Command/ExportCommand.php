@@ -2,6 +2,7 @@
 	namespace App\Command;
 
 	use App\Console\MultiProgressBar;
+	use App\Contrib\ContribHelper;
 	use App\Entity\Ailment;
 	use App\Entity\Armor;
 	use App\Entity\ArmorSet;
@@ -221,8 +222,7 @@
 					if (!file_exists($dir = dirname($filename)))
 						mkdir($dir, 0755, true);
 
-					$encoded = str_replace('    ', "\t", json_encode($export->getData(),
-						JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+					$encoded = ContribHelper::encode($export->getData());
 
 					file_put_contents($filename, $encoded);
 
@@ -248,7 +248,7 @@
 							'; this is definitely not right');
 					}
 
-					$encoded = json_encode($journal, JSON_FORCE_OBJECT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+					$encoded = ContribHelper::encode($journal, false, JSON_FORCE_OBJECT);
 
 					file_put_contents($path . '/json/' . $topLevelGroup . '/.journal.json', $encoded);
 				}
