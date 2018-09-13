@@ -35,7 +35,12 @@
 			if (!file_exists($path))
 				return $this->responder->createNotFoundResponse();
 
-			return new JsonResponse(file_get_contents($path), Response::HTTP_OK, [
+			$schema = file_get_contents($path);
+
+			if ($this->getParameter('kernel.environment') === 'dev')
+				$schema = str_replace('https://mhw-db.com/schemas/', 'http://localhost:8000/schemas/', $schema);
+
+			return new JsonResponse($schema, Response::HTTP_OK, [
 				'Cache-Control' => 'public, max-age=14400',
 				'Content-Type' => 'application/json',
 			], true);
