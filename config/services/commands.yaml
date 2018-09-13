@@ -46,10 +46,8 @@ services:
                 command: app:entity:delete
 
     App\Command\ExportCommand:
-        arguments:
-            - '@doctrine.orm.entity_manager'
-            - '@App\Export\ExportManager'
-            - '%env(resolve:EXPORT_DEFAULT_PATH)%'
+        bind:
+            $contribDir: '%env(resolve:EXPORT_DEFAULT_PATH)%'
         tags:
             -
                 name: console.command

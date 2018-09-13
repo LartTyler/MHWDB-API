@@ -2,7 +2,7 @@
 	namespace App\Command;
 
 	use App\Console\MultiProgressBar;
-	use App\Contrib\ContribHelper;
+	use App\Contrib\Management\ContribManager;
 	use App\Entity\Ailment;
 	use App\Entity\Armor;
 	use App\Entity\ArmorSet;
@@ -50,25 +50,33 @@
 		private $exportManager;
 
 		/**
+		 * @var ContribManager
+		 */
+		protected $contribManager;
+
+		/**
 		 * @var string
 		 */
-		private $defaultExportPath;
+		private $contribDir;
 
 		/**
 		 * EntityExportCommand constructor.
 		 *
 		 * @param EntityManagerInterface $entityManager
 		 * @param ExportManager          $exportManager
-		 * @param string                 $defaultExportPath
+		 * @param ContribManager         $contribManager
+		 * @param string                 $contribDir
 		 */
 		public function __construct(
 			EntityManagerInterface $entityManager,
 			ExportManager $exportManager,
-			string $defaultExportPath
+			ContribManager $contribManager,
+			string $contribDir
 		) {
 			$this->entityManager = $entityManager;
 			$this->exportManager = $exportManager;
-			$this->defaultExportPath = $defaultExportPath;
+			$this->contribManager = $contribManager;
+			$this->contribDir = $contribDir;
 
 			parent::__construct();
 		}
@@ -80,7 +88,7 @@
 			$this
 				->setName('app:export')
 				->addArgument('output-path', InputArgument::OPTIONAL, 'The path the app package should be saved to',
-					$this->defaultExportPath)
+					$this->contribDir)
 				->addOption('entity', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
 					'If provided, only listed entities will be exported to the package (implies --no-clean)')
 				->addOption('target', 't', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
@@ -88,8 +96,6 @@
 				->addOption('no-clean', null, InputOption::VALUE_NONE,
 					'Perform the export without cleaning the package directory first')
 				->addOption('yes', 'y', InputOption::VALUE_NONE, 'Answer "yes" to all questions')
-				->addOption('journal-only', null, InputOption::VALUE_NONE, 'Only rebuild journal entries, do not ' .
-					'export data; implies --no-clean')
 				->addOption('skip-assets', null, InputOption::VALUE_NONE, 'Do not export / download any asset data; ' .
 					'implies --no-clean');
 		}
@@ -111,12 +117,10 @@
 				return;
 			}
 
-			$journalOnly = $input->getOption('journal-only');
 			$skipAssets = $input->getOption('skip-assets');
+			$noClean = $skipAssets || $input->getOption('no-clean');
 
-			$noClean = $journalOnly || $skipAssets || $input->getOption('no-clean');
-
-			if (!$journalOnly && !$noClean) {
+			if (!$noClean) {
 				if (!$input->getOption('yes') && file_exists($path) && sizeof(scandir($path)) > 2) {
 					if (!$io->confirm($path . ' is not empty. Are you sure you want to export there?', false)) {
 						$io->warning('User cancelled operation.');
@@ -191,66 +195,33 @@
 
 				$progress->append(sizeof($entities));
 
-				$journal = [];
-				$topLevelGroup = null;
+				$group = null;
 
 				foreach ($entities as $entity) {
 					$export = $this->exportManager->export($entity);
-					$group = $export->getGroup();
+					$fullGroupName = $export->getGroup();
 
-					if ($topLevelGroup === null)
-						$topLevelGroup = substr($group, 0, strpos($group, '/') ?: strlen($group));
+					if ($group === null) {
+						$group = substr($fullGroupName, 0, strpos($fullGroupName, '/') ?: strlen($fullGroupName));
 
-					$groupPath = ltrim(str_replace($topLevelGroup, '', $group), '/');
+						$contrib = $this->contribManager->getGroup($group);
 
-					if ($groupPath)
-						$groupPath .= '/';
+						$contrib->getJournal()
+							->clearCreated()
+							->clearDeleted();
+					} else
+						$contrib = $this->contribManager->getGroup($group);
 
-					$filename = $groupPath . $entity->getId() . '.json';
-					$journal[$entity->getId()] = $filename;
+					$subgroup = ltrim(str_replace($group, '', $fullGroupName), '/') ?: null;
 
-					// Once the filename has been put in the journal, we convert it to an absolute path for the
-					// rest of the iteration.
-					$filename = $path . '/json/' . $topLevelGroup . '/' . $filename;
-
-					if ($journalOnly) {
-						$progress->advance();
-
-						continue;
-					}
-
-					if (!file_exists($dir = dirname($filename)))
-						mkdir($dir, 0755, true);
-
-					$encoded = ContribHelper::encode($export->getData());
-
-					file_put_contents($filename, $encoded);
+					$contrib->put($entity->getId(), $export->getData(), $subgroup);
 
 					if (!$skipAssets && $assets = $export->getAssets()) {
-						foreach ($assets as $asset) {
-							$filename = $path . '/assets/' . ltrim(parse_url($asset->getUri(), PHP_URL_PATH), '/');
-
-							if (file_exists($filename))
-								continue;
-							else if (!file_exists($dir = dirname($filename)))
-								mkdir($dir, 0755, true);
-
-							file_put_contents($filename, file_get_contents($asset->getUri()));
-						}
+						foreach ($assets as $asset)
+							$contrib->putAsset($asset->getUri());
 					}
 
 					$progress->advance();
-				}
-
-				if ($journal) {
-					if (!$topLevelGroup) {
-						throw new \RuntimeException('No top level group found for ' . $class .
-							'; this is definitely not right');
-					}
-
-					$encoded = ContribHelper::encode($journal, false, JSON_FORCE_OBJECT);
-
-					file_put_contents($path . '/json/' . $topLevelGroup . '/.journal.json', $encoded);
 				}
 
 				$progress->advance();
