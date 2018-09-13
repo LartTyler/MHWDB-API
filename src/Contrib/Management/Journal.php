@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 	namespace App\Contrib\Management;
 
 	class Journal implements \JsonSerializable {
@@ -41,34 +41,32 @@
 		}
 
 		/**
-		 * @param int $id
+		 * @param int|string $id
 		 *
 		 * @return null|string
 		 */
-		public function get(int $id): ?string {
+		public function get($id): ?string {
+			if (isset($this->data['created'][$id]))
+				return $this->data['created'][$id];
+
 			return $this->data[(string)$id] ?? null;
 		}
 
 		/**
-		 * @param int $id
+		 * @param int|string $id
 		 *
 		 * @return $this
 		 */
-		public function delete(int $id) {
-			unset($this->data[(string)$id]);
+		public function delete($id) {
+			if (isset($this->data['created'][$id]))
+				unset($this->data['created'][$id]);
+			else {
+				unset($this->data[(string)$id]);
 
-			$this->data['deleted'][] = $id;
+				$this->data['deleted'][] = $id;
+			}
 
 			return $this;
-		}
-
-		/**
-		 * @param int $id
-		 *
-		 * @return bool
-		 */
-		public function has(int $id): bool {
-			return $this->get($id) !== null;
 		}
 
 		/**

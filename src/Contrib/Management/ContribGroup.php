@@ -96,11 +96,11 @@
 		}
 
 		/**
-		 * @param int $id
+		 * @param int|string $id
 		 *
 		 * @return object|null
 		 */
-		public function get(int $id): ?object {
+		public function get($id): ?object {
 			$path = $this->getPathFromJournal($id);
 
 			if (!$path)
@@ -110,11 +110,11 @@
 		}
 
 		/**
-		 * @param int $id
+		 * @param int|string $id
 		 *
 		 * @return bool
 		 */
-		public function delete(int $id): bool {
+		public function delete($id): bool {
 			$path = $this->getPathFromJournal($id);
 
 			if (!$path)
@@ -132,9 +132,9 @@
 		 * @param array       $data
 		 * @param string|null $subgroup
 		 *
-		 * @return $this
+		 * @return string
 		 */
-		public function create(array $data, string $subgroup = null) {
+		public function create(array $data, string $subgroup = null): string {
 			$id = base64_encode(microtime());
 
 			$path = $id . '.json';
@@ -147,15 +147,15 @@
 			$this->write(Target::JSON, $path, $this->encode($data));
 			$this->write(Target::JSON, '/.journal.json', $this->encode($this->getJournal()));
 
-			return $this;
+			return $id;
 		}
 
 		/**
-		 * @param int $id
+		 * @param int|string $id
 		 *
 		 * @return null|string
 		 */
-		protected function getPathFromJournal(int $id): ?string {
+		protected function getPathFromJournal($id): ?string {
 			$path = $this->getJournal()->get($id);
 
 			if (!$path || !$this->exists(Target::JSON, $path))
