@@ -88,8 +88,8 @@
 		 */
 		public static function fromJson(object $source) {
 			$data = new static();
-			$data->icon = $source->icon;
-			$data->image = $source->image;
+			$data->icon = AssetEntityData::fromJson($source->icon);
+			$data->image = AssetEntityData::fromJson($source->image);
 
 			return $data;
 		}
