@@ -5,10 +5,6 @@
 	"description": "A piece of armor",
 	"type": "object",
 	"properties": {
-		"armorSet": {
-			"$ref": "https://mhw-db.com/schemas/nullable-entity-reference",
-			"description": "An entity reference to the armor set this armor is part of"
-		},
 		"assets": {
 			"type": ["object", "null"],
 			"description": "An object containing URIs to asset images",

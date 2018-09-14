@@ -64,11 +64,6 @@
 		protected $attributes;
 
 		/**
-		 * @var int|null
-		 */
-		protected $armorSet = null;
-
-		/**
 		 * @var ArmorAssetsEntityData|null
 		 */
 		protected $assets = null;
@@ -262,24 +257,6 @@
 		}
 
 		/**
-		 * @return int|null
-		 */
-		public function getArmorSet(): ?int {
-			return $this->armorSet;
-		}
-
-		/**
-		 * @param int|null $armorSet
-		 *
-		 * @return $this
-		 */
-		public function setArmorSet(?int $armorSet) {
-			$this->armorSet = $armorSet;
-
-			return $this;
-		}
-
-		/**
 		 * @return ArmorAssetsEntityData|null
 		 */
 		public function getAssets(): ?ArmorAssetsEntityData {
@@ -348,9 +325,6 @@
 			if (ObjectUtil::isset($data, 'slots'))
 				$this->setSlots(SlotEntityData::fromJsonArray($data->slots));
 
-			if (ObjectUtil::isset($data, 'armorSet'))
-				$this->setArmorSet($data->armorSet);
-
 			if (ObjectUtil::isset($data, 'assets')) {
 				$value = $data->assets;
 
@@ -389,7 +363,6 @@
 				'defense' => $this->getDefense()->normalize(),
 				'skills' => static::normalizeArray($this->getSkills()),
 				'slots' => static::normalizeArray($this->getSlots()),
-				'armorSet' => $this->getArmorSet(),
 				'assets' => $this->getAssets() ? $this->getAssets()->normalize() : null,
 				'crafting' => $this->getCrafting() ? $this->getCrafting()->normalize() : null,
 			];
@@ -405,7 +378,6 @@
 			$data->attributes = $source->attributes;
 			$data->resistances = ArmorResistancesEntityData::fromJson($source->resistances);
 			$data->defense = ArmorDefenseEntityData::fromJson($source->defense);
-			$data->armorSet = $source->armorSet;
 			$data->skills = SimpleSkillRankEntityData::fromJsonArray($source->skills);
 			$data->slots = SlotEntityData::fromJsonArray($source->slots);
 
@@ -435,9 +407,6 @@
 			$data->defense = ArmorDefenseEntityData::fromEntity($entity->getDefense());
 			$data->skills = SimpleSkillRankEntityData::fromEntityCollection($entity->getSkills());
 			$data->slots = SlotEntityData::fromEntityCollection($entity->getSlots());
-
-			if ($armorSet = $entity->getArmorSet())
-				$data->armorSet = $armorSet->getId();
 
 			if ($assets = $entity->getAssets())
 				$data->assets = ArmorAssetsEntityData::fromEntity($assets);
