@@ -110,6 +110,20 @@
 		}
 
 		/**
+		 * @param string $uri
+		 *
+		 * @return string|null
+		 */
+		public function getAssetPath(string $uri): ?string {
+			$path = $this->getTargetRoot(Target::ASSETS) . ltrim(parse_url($uri, PHP_URL_PATH), '/');
+
+			if (!file_exists($path))
+				return null;
+
+			return $path;
+		}
+
+		/**
 		 * @param int|string $id
 		 *
 		 * @return bool

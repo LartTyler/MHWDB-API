@@ -44,4 +44,14 @@
 			return new \RuntimeException('Could not find related reference to ' . $class . ' with ID ' . $id . '(in ' .
 				$where . ')');
 		}
+
+		/**
+		 * @param string $uri
+		 *
+		 * @return \RuntimeException
+		 */
+		protected function createAssetNotFoundException(string $uri): \RuntimeException {
+			return new \RuntimeException('The asset at ' . $uri .
+				' could not be matched to an asset in the data repository.');
+		}
 	}
