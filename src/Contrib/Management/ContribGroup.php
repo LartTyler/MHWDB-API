@@ -166,6 +166,9 @@
 		 * @return $this
 		 */
 		public function replace($oldId, $newId) {
+			if ($oldId === $newId)
+				return $this;
+
 			$oldPath = $this->getPathFromJournal($oldId);
 
 			if (!$oldPath)
@@ -178,6 +181,10 @@
 			$this->getJournal()
 				->delete($oldId)
 				->set($newId, $newPath);
+
+			$this->write(Target::JSON, '/.journal.json', $this->encode($this->getJournal()));
+
+			$this->replacedIds[$oldId] = $newId;
 
 			return $this;
 		}
