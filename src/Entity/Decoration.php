@@ -17,15 +17,15 @@
 	 * @package App\Entity
 	 */
 	class Decoration implements EntityInterface, SluggableInterface, LengthCachingEntityInterface {
-		use EntityTrait;
-		use SluggableTrait;
-
 		/**
 		 * @ORM\Column(type="string", length=64, unique=true)
 		 *
 		 * @var string
 		 */
 		private $name;
+
+		use EntityTrait;
+		use SluggableTrait;
 
 		/**
 		 * @ORM\Column(type="smallint", options={"unsigned": true})
@@ -78,6 +78,17 @@
 		 */
 		public function getName(): string {
 			return $this->name;
+		}
+
+		/**
+		 * @param string $name
+		 *
+		 * @return $this
+		 */
+		public function setName(string $name) {
+			$this->name = $name;
+
+			return $this;
 		}
 
 		/**

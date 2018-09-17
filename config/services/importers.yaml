@@ -11,6 +11,7 @@ services:
                 - '@App\Import\Importers\ArmorImporter'
                 - '@App\Import\Importers\ArmorSetImporter'
                 - '@App\Import\Importers\CharmImporter'
+                - '@App\Import\Importers\DecorationImporter'
 
     App\Import\AssetManager:
         bind:
@@ -20,3 +21,4 @@ services:
     App\Import\Importers\ArmorImporter: ~
     App\Import\Importers\ArmorSetImporter: ~
     App\Import\Importers\CharmImporter: ~
+    App\Import\Importers\DecorationImporter: ~
