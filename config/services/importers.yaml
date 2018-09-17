@@ -14,6 +14,7 @@ services:
                 - '@App\Import\Importers\CharmImporter'
                 - '@App\Import\Importers\DecorationImporter'
                 - '@App\Import\Importers\LocationImporter'
+                - '@App\Import\Importers\MotionValueImporter'
 
     App\Import\AssetManager:
         bind:
@@ -26,3 +27,4 @@ services:
     App\Import\Importers\DecorationImporter: ~
     App\Import\Importers\ItemImporter: ~
     App\Import\Importers\LocationImporter: ~
+    App\Import\Importers\MotionValueImporter: ~
