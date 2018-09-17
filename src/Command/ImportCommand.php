@@ -135,6 +135,8 @@
 
 				$progress->append(sizeof($allIds));
 
+				$replacements = [];
+
 				foreach ($allIds as $id) {
 					/** @var EntityInterface|null $entity */
 					$entity = $this->entityManager->getRepository($class)->find($id);
@@ -144,15 +146,18 @@
 						$entity = $this->importManager->create($class, $data);
 
 						$this->entityManager->persist($entity);
+
+						$replacements[$id] = $entity;
 					} else
 						$this->importManager->import($entity, $data);
 
-					$this->entityManager->flush();
-
-					$group->replace($id, $entity->getId());
-
 					$progress->advance();
 				}
+
+				$this->entityManager->flush();
+
+				foreach ($replacements as $oldId => $entity)
+					$group->replace($oldId, $entity->getId());
 
 				$progress->advance();
 			}
