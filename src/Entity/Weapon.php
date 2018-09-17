@@ -167,6 +167,17 @@
 		}
 
 		/**
+		 * @param string $type
+		 *
+		 * @return $this
+		 */
+		public function setType(string $type) {
+			$this->type = $type;
+
+			return $this;
+		}
+
+		/**
 		 * @return int
 		 */
 		public function getRarity(): int {
@@ -242,7 +253,7 @@
 		public function getElement(string $element): ?WeaponElement {
 			$matches = $this->getElements()->matching(
 				Criteria::create()->
-					where(Criteria::expr()->eq('type', strtolower($element)))
+				where(Criteria::expr()->eq('type', strtolower($element)))
 			);
 
 			if ($matches->count())

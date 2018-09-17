@@ -16,6 +16,7 @@ services:
                 - '@App\Import\Importers\DecorationImporter'
                 - '@App\Import\Importers\LocationImporter'
                 - '@App\Import\Importers\MotionValueImporter'
+                - '@App\Import\Importers\WeaponImporter'
 
     App\Import\AssetManager:
         bind:
@@ -30,3 +31,4 @@ services:
     App\Import\Importers\LocationImporter: ~
     App\Import\Importers\MotionValueImporter: ~
     App\Import\Importers\SkillImporter: ~
+    App\Import\Importers\WeaponImporter: ~
