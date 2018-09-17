@@ -2,6 +2,7 @@
 	namespace App\Import\Importers;
 
 	use App\Contrib\EntityType;
+	use App\Contrib\Management\ContribManager;
 	use App\Entity\Armor;
 	use App\Entity\ArmorAssets;
 	use App\Entity\ArmorCraftingInfo;
@@ -12,19 +13,45 @@
 	use App\Entity\SkillRank;
 	use App\Entity\Slot;
 	use App\Game\Gender;
+	use App\Import\AssetManager;
 	use App\Import\ManagedDeleteInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
+	use Doctrine\ORM\EntityManager;
+	use Doctrine\ORM\EntityManagerInterface;
 
 	class ArmorImporter extends AbstractImporter implements ManagedDeleteInterface {
-		use EntityManagerAwareTrait;
-		use AssetManagerAwareTrait;
-		use ContribManagerAwareTrait;
+		/**
+		 * @var EntityManager
+		 */
+		protected $entityManager;
+
+		/**
+		 * @var AssetManager
+		 */
+		protected $assetManager;
+
+		/**
+		 * @var ContribManager
+		 */
+		protected $contribManager;
 
 		/**
 		 * ArmorImporter constructor.
+		 *
+		 * @param EntityManagerInterface $entityManager
+		 * @param AssetManager           $assetManager
+		 * @param ContribManager         $contribManager
 		 */
-		public function __construct() {
+		public function __construct(
+			EntityManagerInterface $entityManager,
+			AssetManager $assetManager,
+			ContribManager $contribManager
+		) {
 			parent::__construct(Armor::class);
+
+			$this->entityManager = $entityManager;
+			$this->assetManager = $assetManager;
+			$this->contribManager = $contribManager;
 		}
 
 		/**
@@ -61,13 +88,14 @@
 
 			$entity->getSkills()->clear();
 
-			foreach ($data->skills as $i => $definition) {
-				$skill = $this->entityManager->getRepository(Skill::class)->find($definition->skill);
+			$skillGroup = $this->contribManager->getGroup(EntityType::SKILLS);
 
-				if (!$skill) {
-					throw $this->createMissingReferenceException('skills[' . $i . '].skill', Skill::class,
-						$definition->skill);
-				}
+			foreach ($data->skills as $i => $definition) {
+				$skillId = $skillGroup->getTrueId($defense->skill);
+				$skill = $this->entityManager->getRepository(Skill::class)->find($skillId);
+
+				if (!$skill)
+					throw $this->createMissingReferenceException('skills[' . $i . '].skill', Skill::class, $skillId);
 
 				$rank = $skill->getRank($definition->level);
 
@@ -123,6 +151,9 @@
 								$image->primaryHash,
 								$image->secondaryHash
 							);
+
+							$this->entityManager->persist($asset);
+							$this->entityManager->flush($asset);
 						}
 
 						call_user_func([$assets, $setter], $asset);

@@ -2,6 +2,7 @@
 	namespace App\Import\Importers;
 
 	use App\Contrib\EntityType;
+	use App\Contrib\Management\ContribManager;
 	use App\Entity\Armor;
 	use App\Entity\ArmorSet;
 	use App\Entity\ArmorSetBonus;
@@ -9,16 +10,30 @@
 	use App\Entity\Skill;
 	use App\Entity\SkillRank;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
+	use Doctrine\ORM\EntityManagerInterface;
 
 	class ArmorSetImporter extends AbstractImporter {
-		use EntityManagerAwareTrait;
-		use ContribManagerAwareTrait;
+		/**
+		 * @var EntityManagerInterface
+		 */
+		protected $entityManager;
+
+		/**
+		 * @var ContribManager
+		 */
+		protected $contribManager;
 
 		/**
 		 * ArmorSetImporter constructor.
+		 *
+		 * @param EntityManagerInterface $entityManager
+		 * @param ContribManager         $contribManager
 		 */
-		public function __construct() {
+		public function __construct(EntityManagerInterface $entityManager, ContribManager $contribManager) {
 			parent::__construct(ArmorSet::class);
+
+			$this->entityManager = $entityManager;
+			$this->contribManager = $contribManager;
 		}
 
 		/**
@@ -50,8 +65,10 @@
 
 			$entity->getPieces()->clear();
 
+			$armorGroup = $this->contribManager->getGroup(EntityType::ARMOR);
+
 			foreach ($data->pieces as $i => $armorId) {
-				$armorId = $this->contribManager->getGroup(EntityType::ARMOR)->getTrueId($armorId);
+				$armorId = $armorGroup->getTrueId($armorId);
 				$armor = $this->entityManager->getRepository(Armor::class)->find($armorId);
 
 				if (!$armor)
@@ -72,11 +89,10 @@
 
 				$bonus->getRanks()->clear();
 
-				foreach ($definition->ranks as $i => $rankDefinition) {
-					$skillId = $this->contribManager->getGroup(EntityType::SKILLS)
-						->getTrueId($rankDefinition->skill->skill);
+				$skillGroup = $this->contribManager->getGroup(EntityType::SKILLS);
 
-					/** @var Skill|null $skill */
+				foreach ($definition->ranks as $i => $rankDefinition) {
+					$skillId = $skillGroup->getTrueId($rankDefinition->skill->skill);
 					$skill = $this->entityManager->getRepository(Skill::class)->find($skillId);
 
 					if (!$skillId) {

@@ -10,6 +10,7 @@ services:
                 - '@App\Import\Importers\AilmentImporter'
                 - '@App\Import\Importers\ArmorImporter'
                 - '@App\Import\Importers\ArmorSetImporter'
+                - '@App\Import\Importers\CharmImporter'
 
     App\Import\AssetManager:
         bind:
@@ -18,3 +19,4 @@ services:
     App\Import\Importers\AilmentImporter: ~
     App\Import\Importers\ArmorImporter: ~
     App\Import\Importers\ArmorSetImporter: ~
+    App\Import\Importers\CharmImporter: ~
