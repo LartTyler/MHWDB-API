@@ -7,6 +7,7 @@ services:
     App\Import\ImportManager:
         arguments:
             -
+                - '@App\Import\Importers\ItemImporter'
                 - '@App\Import\Importers\AilmentImporter'
                 - '@App\Import\Importers\ArmorImporter'
                 - '@App\Import\Importers\ArmorSetImporter'
@@ -22,3 +23,4 @@ services:
     App\Import\Importers\ArmorSetImporter: ~
     App\Import\Importers\CharmImporter: ~
     App\Import\Importers\DecorationImporter: ~
+    App\Import\Importers\ItemImporter: ~
