@@ -13,6 +13,14 @@
 		protected $journal;
 
 		/**
+		 * Contains a mapping of any IDs that have been replaced by {@see ContribGroup::replace()}. Used to map created
+		 * objects to their new entity ID (from the database).
+		 *
+		 * @var array
+		 */
+		protected $replacedIds = [];
+
+		/**
 		 * ContribGroup constructor.
 		 *
 		 * @param string $rootTemplate
@@ -137,6 +145,18 @@
 				return null;
 
 			return $path;
+		}
+
+		/**
+		 * If the value in $id has been replaced by a call to {@see ContribGroup::replace()}, then this method will
+		 * return it's new ID. Otherwise, it simply returns the passed value.
+		 *
+		 * @param string|int $id
+		 *
+		 * @return string|int
+		 */
+		public function getTrueId($id) {
+			return $this->replacedIds[$id] ?? $id;
 		}
 
 		/**
