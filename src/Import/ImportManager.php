@@ -77,17 +77,15 @@
 		 * @param string $class
 		 * @param object $data
 		 *
-		 * @return $this
+		 * @return EntityInterface
 		 */
-		public function create(string $class, object $data) {
+		public function create(string $class, object $data): EntityInterface {
 			$importer = $this->getImporter($class);
 
 			if (!$importer)
 				throw new \InvalidArgumentException('No importer found for ' . $class);
 
-			$importer->create($data);
-
-			return $this;
+			return $importer->create($data);
 		}
 
 		/**
