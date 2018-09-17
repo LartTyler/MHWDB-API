@@ -6,6 +6,7 @@
 	use App\Contrib\Management\ContribManager;
 	use App\Import\ImportManager;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
+	use Doctrine\ORM\EntityManager;
 	use Doctrine\ORM\EntityManagerInterface;
 	use Symfony\Component\Console\Command\Command;
 	use Symfony\Component\Console\Input\InputInterface;
@@ -15,7 +16,7 @@
 
 	class ImportCommand extends Command {
 		/**
-		 * @var EntityManagerInterface
+		 * @var EntityManagerInterface|EntityManager
 		 */
 		protected $entityManager;
 
@@ -139,10 +140,15 @@
 					$entity = $this->entityManager->getRepository($class)->find($id);
 					$data = $group->get($id);
 
-					if (!$entity)
-						$this->importManager->create($class, $data);
-					else
+					if (!$entity) {
+						$entity = $this->importManager->create($class, $data);
+
+						$this->entityManager->persist($entity);
+					} else
 						$this->importManager->import($entity, $data);
+
+					$this->entityManager->flush();
+					$this->entityManager->detach($entity);
 
 					$progress->advance();
 				}
