@@ -36,6 +36,11 @@
 		protected $contribManager;
 
 		/**
+		 * @var Asset[]
+		 */
+		protected $assetCache = [];
+
+		/**
 		 * ArmorImporter constructor.
 		 *
 		 * @param EntityManagerInterface $entityManager
@@ -125,25 +130,10 @@
 					$key = 'image' . ucfirst($gender);
 					$image = $definition->{$key};
 
-					/** @var Asset|null $asset */
-					$asset = call_user_func([$assets, 'get' . ucfirst($key)]);
-
-					if ($asset) {
-						$path = parse_url($asset->getUri(), PHP_URL_PATH);
-
-						if ($path === $image->uri)
-							continue;
-
-						$this->assetManager->delete($path);
-					}
-
 					$setter = 'set' . ucfirst($key);
 
 					if ($image) {
-						$asset = $this->entityManager->getRepository(Asset::class)->findOneBy([
-							'primaryHash' => $image->primaryHash,
-							'secondaryHash' => $image->secondaryHash,
-						]);
+						$asset = $this->getAsset($image->primaryHash, $image->secondaryHash);
 
 						if (!$asset) {
 							$asset = new Asset(
@@ -152,8 +142,7 @@
 								$image->secondaryHash
 							);
 
-							$this->entityManager->persist($asset);
-							$this->entityManager->flush($asset);
+							$this->assetCache[$image->primaryHash . '.' . $image->secondaryHash] = $asset;
 						}
 
 						call_user_func([$assets, $setter], $asset);
@@ -171,17 +160,8 @@
 					} else
 						call_user_func([$assets, $setter], null);
 				}
-			} else if ($assets = $entity->getAssets()) {
-				if ($asset = $assets->getImageMale())
-					$this->assetManager->deleteUri($asset->getUri());
-
-				if ($asset = $assets->getImageFemale())
-					$this->assetManager->deleteUri($asset->getUri());
-
-				$assets
-					->setImageMale(null)
-					->setImageFemale(null);
-			}
+			} else
+				$entity->setAssets(null);
 
 			if ($definition = $data->crafting) {
 				$crafting = $entity->getCrafting();
@@ -237,5 +217,23 @@
 
 			if ($asset = $assets->getImageFemale())
 				$this->assetManager->deleteUri($asset->getUri());
+		}
+
+		/**
+		 * @param string $primaryHash
+		 * @param string $secondaryHash
+		 *
+		 * @return Asset|null
+		 */
+		protected function getAsset(string $primaryHash, string $secondaryHash): ?Asset {
+			$key = $primaryHash . '.' . $secondaryHash;
+
+			if (isset($this->assetCache[$key]))
+				return $this->assetCache[$key];
+
+			return $this->assetCache[$key] = $this->entityManager->getRepository(Asset::class)->findOneBy([
+				'primaryHash' => $primaryHash,
+				'secondaryHash' => $secondaryHash,
+			]);
 		}
 	}
