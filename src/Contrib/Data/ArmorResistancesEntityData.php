@@ -150,7 +150,7 @@
 			return [
 				'fire' => $this->getFire(),
 				'water' => $this->getWater(),
-				'ice' => $this->getWater(),
+				'ice' => $this->getIce(),
 				'thunder' => $this->getThunder(),
 				'dragon' => $this->getDragon(),
 			];
