@@ -61,6 +61,9 @@ Vagrant.configure("2") do |config|
 	SHELL
 
 	config.vm.provision "run", type: "shell", run: "always", privileged: false, inline: <<-SHELL
+		git reset --hard
+		git checkout develop
+
 		echo
 		echo "Installed packages:"
 		echo "  -> PHP 7.2 (with extensions: mysqlnd, curl, zip, mbstring, xml, xdebug, memcached, gd)"
