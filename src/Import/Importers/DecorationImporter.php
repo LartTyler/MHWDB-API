@@ -72,11 +72,12 @@
 		}
 
 		/**
+		 * @param string $id
 		 * @param object $data
 		 *
 		 * @return EntityInterface
 		 */
-		public function create(object $data): EntityInterface {
+		public function create(string $id, object $data): EntityInterface {
 			$decoration = new Decoration($data->name, $data->slot, $data->rarity);
 
 			$this->import($decoration, $data);

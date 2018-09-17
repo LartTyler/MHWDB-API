@@ -143,7 +143,7 @@
 					$data = $group->get($id);
 
 					if (!$entity) {
-						$entity = $this->importManager->create($class, $data);
+						$entity = $this->importManager->create($class, $id, $data);
 
 						$this->entityManager->persist($entity);
 

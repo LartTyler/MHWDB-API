@@ -36,11 +36,12 @@
 		}
 
 		/**
+		 * @param string $id
 		 * @param object $data
 		 *
 		 * @return EntityInterface
 		 */
-		public function create(object $data): EntityInterface {
+		public function create(string $id, object $data): EntityInterface {
 			$skill = new Skill($data->name);
 
 			$this->import($skill, $data);

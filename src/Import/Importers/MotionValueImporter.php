@@ -32,11 +32,12 @@
 		}
 
 		/**
+		 * @param string $id
 		 * @param object $data
 		 *
 		 * @return EntityInterface
 		 */
-		public function create(object $data): EntityInterface {
+		public function create(string $id, object $data): EntityInterface {
 			$motionValue = new MotionValue($data->name, $data->weaponType);
 
 			$this->import($motionValue, $data);

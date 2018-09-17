@@ -90,11 +90,12 @@
 		}
 
 		/**
+		 * @param string $id
 		 * @param object $data
 		 *
 		 * @return EntityInterface
 		 */
-		public function create(object $data): EntityInterface {
+		public function create(string $id, object $data): EntityInterface {
 			$ailment = new Ailment($data->name, $data->description);
 
 			$this->import($ailment, $data);

@@ -155,7 +155,7 @@
 
 							$handle = fopen($assetPath, 'r');
 
-							$this->assetManager->put(ltrim(parse_url($image->uri, PHP_URL_PATH), '/'), $handle);
+							$this->assetManager->put(ltrim($image->uri, '/'), $handle);
 						}
 					} else
 						call_user_func([$assets, $setter], null);
@@ -186,11 +186,12 @@
 		}
 
 		/**
+		 * @param string $id
 		 * @param object $data
 		 *
 		 * @return EntityInterface
 		 */
-		public function create(object $data): EntityInterface {
+		public function create(string $id, object $data): EntityInterface {
 			$armor = new Armor($data->name, $data->type, $data->rank, $data->rarity);
 
 			$this->import($armor, $data);

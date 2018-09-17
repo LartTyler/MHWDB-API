@@ -31,11 +31,12 @@
 		}
 
 		/**
+		 * @param string $id
 		 * @param object $data
 		 *
 		 * @return EntityInterface
 		 */
-		public function create(object $data): EntityInterface {
+		public function create(string $id, object $data): EntityInterface {
 			$item = new Item($data->name, $data->description, $data->rarity);
 
 			$this->import($item, $data);
