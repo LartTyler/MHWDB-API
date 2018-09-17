@@ -32,4 +32,17 @@
 
 			return $this->groups[$type] = new ContribGroup($this->contribDir . '/:target/' . $type);
 		}
+
+		/**
+		 * @param array $targets
+		 *
+		 * @return void
+		 */
+		public function clean(array $targets = []): void {
+			if (!$targets)
+				$targets = [Target::ASSETS, Target::JSON];
+
+			foreach ($targets as $target)
+				exec(sprintf('rm -rf %s', escapeshellarg($this->contribDir . '/' . $target)));
+		}
 	}

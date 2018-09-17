@@ -24,7 +24,7 @@
 		 *
 		 * @return $this
 		 */
-		protected function setSlug(string $slug) {
+		public function setSlug(string $slug) {
 			$this->slug = StringUtil::toSlug($slug);
 
 			return $this;

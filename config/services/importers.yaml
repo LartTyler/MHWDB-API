@@ -1,0 +1,18 @@
+services:
+    _defaults:
+        public: false
+        autowire: true
+        autoconfigure: true
+
+    App\Import\ImportManager:
+        arguments:
+            -
+                - '@App\Import\Importers\AilmentImporter'
+                - '@App\Import\Importers\ArmorImporter'
+
+    App\Import\AssetManager:
+        bind:
+            $bucket: '%env(resolve:ASSETS_BUCKET_NAME)%'
+
+    App\Import\Importers\AilmentImporter: ~
+    App\Import\Importers\ArmorImporter: ~

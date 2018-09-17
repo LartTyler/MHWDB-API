@@ -15,6 +15,7 @@
 	use App\Entity\Skill;
 	use App\Entity\Weapon;
 	use App\Export\ExportManager;
+	use App\Import\AssetManager;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\ORM\EntityManagerInterface;
 	use Symfony\Component\Console\Command\Command;
@@ -38,6 +39,11 @@
 			Skill::class,
 			Weapon::class,
 		];
+
+		/**
+		 * @var AssetManager
+		 */
+		protected $assetManager;
 
 		/**
 		 * @var EntityManagerInterface
@@ -65,17 +71,20 @@
 		 * @param EntityManagerInterface $entityManager
 		 * @param ExportManager          $exportManager
 		 * @param ContribManager         $contribManager
+		 * @param AssetManager           $assetManager
 		 * @param string                 $contribDir
 		 */
 		public function __construct(
 			EntityManagerInterface $entityManager,
 			ExportManager $exportManager,
 			ContribManager $contribManager,
+			AssetManager $assetManager,
 			string $contribDir
 		) {
 			$this->entityManager = $entityManager;
 			$this->exportManager = $exportManager;
 			$this->contribManager = $contribManager;
+			$this->assetManager = $assetManager;
 			$this->contribDir = $contribDir;
 
 			parent::__construct();
@@ -217,8 +226,14 @@
 					$contrib->put($entity->getId(), $export->getData(), $subgroup);
 
 					if (!$skipAssets && $assets = $export->getAssets()) {
-						foreach ($assets as $asset)
-							$contrib->putAsset($asset->getUri());
+						foreach ($assets as $asset) {
+							$assetData = file_get_contents($uri = $this->assetManager->toBucketUri($asset->getUri()));
+
+							if ($assetData === false)
+								throw new \RuntimeException('Could not retrieve ' . $uri);
+
+							$contrib->putAsset($asset->getUri(), $assetData);
+						}
 					}
 
 					$progress->advance();

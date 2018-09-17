@@ -12,10 +12,21 @@
 	use App\Contrib\Data\MotionValueEntityData;
 	use App\Contrib\Data\SkillEntityData;
 	use App\Contrib\Data\WeaponEntityData;
+	use App\Entity\Ailment;
+	use App\Entity\Armor;
+	use App\Entity\ArmorSet;
+	use App\Entity\Charm;
+	use App\Entity\Decoration;
+	use App\Entity\Item;
+	use App\Entity\Location;
+	use App\Entity\Monster;
+	use App\Entity\MotionValue;
+	use App\Entity\Skill;
+	use App\Entity\Weapon;
 
 	final class EntityType {
 		public const AILMENTS = 'ailments';
-		public const ARMORS = 'armors';
+		public const ARMOR = 'armor';
 		public const ARMOR_SETS = 'armor-sets';
 		public const CHARMS = 'charms';
 		public const DECORATIONS = 'decorations';
@@ -28,7 +39,7 @@
 
 		public const DATA_CLASS_MAP = [
 			self::AILMENTS => AilmentEntityData::class,
-			self::ARMORS => ArmorEntityData::class,
+			self::ARMOR => ArmorEntityData::class,
 			self::ARMOR_SETS => ArmorSetEntityData::class,
 			self::CHARMS => CharmEntityData::class,
 			self::DECORATIONS => DecorationEntityData::class,
@@ -38,6 +49,20 @@
 			self::MOTION_VALUES => MotionValueEntityData::class,
 			self::SKILLS => SkillEntityData::class,
 			self::WEAPONS => WeaponEntityData::class,
+		];
+
+		public const ENTITY_CLASS_MAP = [
+			Ailment::class => self::AILMENTS,
+			Armor::class => self::ARMOR,
+			ArmorSet::class => self::ARMOR_SETS,
+			Charm::class => self::CHARMS,
+			Decoration::class => self::DECORATIONS,
+			Item::class => self::ITEMS,
+			Location::class => self::LOCATIONS,
+			Monster::class => self::MONSTERS,
+			MotionValue::class => self::MOTION_VALUES,
+			Skill::class => self::SKILLS,
+			Weapon::class => self::WEAPONS,
 		];
 
 		/**

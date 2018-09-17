@@ -4,14 +4,18 @@
 	use App\Contrib\EntityType;
 	use App\Entity\Armor;
 	use App\Entity\ArmorAssets;
+	use App\Entity\ArmorCraftingInfo;
 	use App\Entity\Asset;
+	use App\Entity\CraftingMaterialCost;
+	use App\Entity\Item;
 	use App\Entity\Skill;
 	use App\Entity\SkillRank;
 	use App\Entity\Slot;
 	use App\Game\Gender;
+	use App\Import\ManagedDeleteInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 
-	class ArmorImporter extends AbstractImporter {
+	class ArmorImporter extends AbstractImporter implements ManagedDeleteInterface {
 		use EntityManagerAwareTrait;
 		use AssetManagerAwareTrait;
 		use ContribManagerAwareTrait;
@@ -36,7 +40,7 @@
 			$entity
 				->setSlug($data->slug)
 				->setName($data->name)
-				->setAttributes($data->attributes)
+				->setAttributes((array)$data->attributes)
 				->setType($data->type)
 				->setRank($data->rank)
 				->setRarity($data->rarity);
@@ -104,7 +108,7 @@
 
 						call_user_func([$assets, $setter], $asset);
 
-						$assetPath = $this->contribManager->getGroup(EntityType::ARMORS)->getAssetPath($image->uri);
+						$assetPath = $this->contribManager->getGroup(EntityType::ARMOR)->getAssetPath($image->uri);
 
 						if (!$assetPath)
 							throw $this->createAssetNotFoundException($image->uri);
@@ -127,7 +131,26 @@
 					->setImageFemale(null);
 			}
 
-			// TODO Add crafting info import
+			if ($definition = $data->crafting) {
+				$crafting = $entity->getCrafting();
+
+				if (!$crafting)
+					$entity->setCrafting($crafting = new ArmorCraftingInfo());
+
+				$crafting->getMaterials()->clear();
+
+				foreach ($definition->materials as $i => $cost) {
+					$item = $this->entityManager->getRepository(Item::class)->find($cost->item);
+
+					if (!$item) {
+						throw $this->createMissingReferenceException('crafting.materials[' . $i . '].item', Item::class,
+							$cost->item);
+					}
+
+					$crafting->getMaterials()->add(new CraftingMaterialCost($item, $cost->quantity));
+				}
+			} else
+				$entity->setCrafting(null);
 		}
 
 		/**
@@ -141,5 +164,26 @@
 			$this->import($armor, $data);
 
 			return $armor;
+		}
+
+		/**
+		 * @param EntityInterface $entity
+		 *
+		 * @return void
+		 */
+		public function delete(EntityInterface $entity): void {
+			if (!($entity instanceof Armor))
+				throw $this->createCannotImportException();
+
+			$assets = $entity->getAssets();
+
+			if (!$assets)
+				return;
+
+			if ($asset = $assets->getImageMale())
+				$this->assetManager->deleteUri($asset->getUri());
+
+			if ($asset = $assets->getImageFemale())
+				$this->assetManager->deleteUri($asset->getUri());
 		}
 	}

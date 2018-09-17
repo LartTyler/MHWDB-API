@@ -81,18 +81,34 @@
 
 		/**
 		 * @param string $uri
+		 * @param string $contents
 		 *
 		 * @return $this
 		 */
-		public function putAsset(string $uri) {
+		public function putAsset(string $uri, string $contents) {
 			$path = parse_url($uri, PHP_URL_PATH);
 
 			if ($this->exists(Target::ASSETS, $path))
 				return $this;
 
-			$this->write(Target::ASSETS, $path, file_get_contents($uri));
+			$this->write(Target::ASSETS, $path, $contents);
 
 			return $this;
+		}
+
+		/**
+		 * Returns an array of all IDs in this group. If the {@see Journal} contains any items in `created`, those will
+		 * always be included at the top of the array, in the order they were defined in.
+		 *
+		 * @return string[]
+		 */
+		public function getAllIds(): array {
+			$all = $this->getJournal()->all();
+
+			unset($all['created']);
+			unset($all['deleted']);
+
+			return array_keys($all);
 		}
 
 		/**
@@ -115,12 +131,35 @@
 		 * @return string|null
 		 */
 		public function getAssetPath(string $uri): ?string {
-			$path = $this->getTargetRoot(Target::ASSETS) . ltrim(parse_url($uri, PHP_URL_PATH), '/');
+			$path = $this->getTargetRoot(Target::ASSETS) . '/' . basename(parse_url($uri, PHP_URL_PATH));
 
 			if (!file_exists($path))
 				return null;
 
 			return $path;
+		}
+
+		/**
+		 * @param string|int $oldId
+		 * @param string|int $newId
+		 *
+		 * @return $this
+		 */
+		public function replace($oldId, $newId) {
+			$oldPath = $this->getPathFromJournal($oldId);
+
+			if (!$oldPath)
+				throw new \InvalidArgumentException($oldId . ' could not be found in the journal');
+
+			$newPath = dirname($oldPath) . '/' . $newId . substr($oldPath, strrpos($oldPath, '.'));
+
+			$this->rename(Target::JSON, $oldPath, $newPath);
+
+			$this->getJournal()
+				->delete($oldId)
+				->set($newId, $newPath);
+
+			return $this;
 		}
 
 		/**
@@ -229,6 +268,26 @@
 		 */
 		protected function exists(string $target, string $path): bool {
 			return file_exists($this->getTargetRoot($target) . '/' . ltrim($path, '/'));
+		}
+
+		/**
+		 * @param string $target
+		 * @param string $oldPath
+		 * @param string $newPath
+		 *
+		 * @return $this
+		 */
+		protected function rename(string $target, string $oldPath, string $newPath) {
+			$oldPath = $this->getTargetRoot($target) . '/' . ltrim($oldPath, '/');
+
+			if (!file_exists($oldPath))
+				throw new \InvalidArgumentException('Could not find file at ' . $oldPath);
+
+			$newPath = $this->getTargetRoot($target) . '/' . ltrim($newPath, '/');
+
+			rename($oldPath, $newPath);
+
+			return $this;
 		}
 
 		/**

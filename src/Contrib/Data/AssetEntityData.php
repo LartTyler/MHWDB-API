@@ -38,7 +38,7 @@
 		public function __construct(string $primaryHash, string $secondaryHash, string $uri) {
 			$this->primaryHash = $primaryHash;
 			$this->secondaryHash = $secondaryHash;
-			$this->uri = $uri;
+			$this->uri = parse_url($uri, PHP_URL_PATH);
 		}
 
 		/**
@@ -90,7 +90,7 @@
 		 * @return $this
 		 */
 		public function setUri(string $uri) {
-			$this->uri = $uri;
+			$this->uri = parse_url($uri, PHP_URL_PATH);
 
 			return $this;
 		}

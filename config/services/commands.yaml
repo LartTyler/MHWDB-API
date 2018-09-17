@@ -46,3 +46,9 @@ services:
             -
                 name: console.command
                 command: app:user:create
+
+    App\Command\ImportCommand:
+        tags:
+            -
+                name: console.command
+                command: app:import

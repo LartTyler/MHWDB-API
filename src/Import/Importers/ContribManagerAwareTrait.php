@@ -10,6 +10,8 @@
 		protected $contribManager = null;
 
 		/**
+		 * @required
+		 *
 		 * @param ContribManager $contribManager
 		 */
 		public function setContribManager(ContribManager $contribManager) {

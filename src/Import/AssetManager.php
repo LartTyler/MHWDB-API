@@ -21,7 +21,7 @@
 		 * @param Sdk    $aws
 		 * @param string $bucket
 		 */
-		public function __construct(Sdk $aws, string $bucket = 'assets.mhw-db.com') {
+		public function __construct(Sdk $aws, string $bucket) {
 			$this->s3Client = $aws->createS3();
 			$this->bucket = $bucket;
 		}
@@ -83,5 +83,14 @@
 		 */
 		public function has(string $key): bool {
 			return $this->s3Client->doesObjectExist($this->bucket, $key);
+		}
+
+		/**
+		 * @param string $key
+		 *
+		 * @return string
+		 */
+		public function toBucketUri(string $key): string {
+			return 'https://' . $this->bucket . '/' . ltrim($key, '/');
 		}
 	}

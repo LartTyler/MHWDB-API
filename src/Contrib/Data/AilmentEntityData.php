@@ -20,6 +20,11 @@
 		/**
 		 * @var string
 		 */
+		protected $slug;
+
+		/**
+		 * @var string
+		 */
 		protected $description;
 
 		/**
@@ -36,10 +41,12 @@
 		 * AilmentEntityData constructor.
 		 *
 		 * @param string $name
+		 * @param string $slug
 		 * @param string $description
 		 */
-		protected function __construct(string $name, string $description) {
+		protected function __construct(string $name, string $slug, string $description) {
 			$this->name = $name;
+			$this->slug = $slug;
 			$this->description = $description;
 		}
 
@@ -64,6 +71,24 @@
 		 */
 		public function setName(string $name) {
 			$this->name = $name;
+
+			return $this;
+		}
+
+		/**
+		 * @return string
+		 */
+		public function getSlug(): string {
+			return $this->slug;
+		}
+
+		/**
+		 * @param string $slug
+		 *
+		 * @return $this
+		 */
+		public function setSlug(string $slug) {
+			$this->slug = $slug;
 
 			return $this;
 		}
@@ -125,6 +150,7 @@
 		protected function doNormalize(): array {
 			return [
 				'name' => $this->getName(),
+				'slug' => $this->getSlug(),
 				'description' => $this->getDescription(),
 				'protection' => $this->protection->normalize(),
 				'recovery' => $this->recovery->normalize(),
@@ -137,7 +163,7 @@
 		 * @return static
 		 */
 		public static function fromJson(object $source) {
-			$data = new static($source->name, $source->description);
+			$data = new static($source->name, $source->slug, $source->description);
 			$data->protection = AilmentProtectionEntityData::fromJson($source->protection);
 			$data->recovery = AilmentRecoveryEntityData::fromJson($source->recovery);
 
@@ -153,7 +179,7 @@
 			if (!($entity instanceof Ailment))
 				throw static::createLoadFailedException(Ailment::class);
 
-			$data = new static($entity->getName(), $entity->getDescription());
+			$data = new static($entity->getName(), $entity->getSlug(), $entity->getDescription());
 			$data->protection = AilmentProtectionEntityData::fromEntity($entity->getProtection());
 			$data->recovery = AilmentRecoveryEntityData::fromEntity($entity->getRecovery());
 
