@@ -148,7 +148,8 @@
 						$this->importManager->import($entity, $data);
 
 					$this->entityManager->flush();
-					$this->entityManager->detach($entity);
+
+					$group->replace($id, $entity->getId());
 
 					$progress->advance();
 				}
