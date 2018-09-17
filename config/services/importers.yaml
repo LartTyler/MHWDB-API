@@ -13,6 +13,7 @@ services:
                 - '@App\Import\Importers\ArmorSetImporter'
                 - '@App\Import\Importers\CharmImporter'
                 - '@App\Import\Importers\DecorationImporter'
+                - '@App\Import\Importers\LocationImporter'
 
     App\Import\AssetManager:
         bind:
@@ -24,3 +25,4 @@ services:
     App\Import\Importers\CharmImporter: ~
     App\Import\Importers\DecorationImporter: ~
     App\Import\Importers\ItemImporter: ~
+    App\Import\Importers\LocationImporter: ~
