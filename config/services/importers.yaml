@@ -8,6 +8,7 @@ services:
         arguments:
             -
                 - '@App\Import\Importers\ItemImporter'
+                - '@App\Import\Importers\SkillImporter'
                 - '@App\Import\Importers\AilmentImporter'
                 - '@App\Import\Importers\ArmorImporter'
                 - '@App\Import\Importers\ArmorSetImporter'
@@ -28,3 +29,4 @@ services:
     App\Import\Importers\ItemImporter: ~
     App\Import\Importers\LocationImporter: ~
     App\Import\Importers\MotionValueImporter: ~
+    App\Import\Importers\SkillImporter: ~
