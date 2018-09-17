@@ -91,31 +91,52 @@
 					$assets = new ArmorAssets(null, null);
 
 					$entity->setAssets($assets);
-				} else {
-					$assets
-						->setImageMale(null)
-						->setImageFemale(null);
 				}
 
 				foreach (Gender::ALL as $gender) {
 					$key = 'image' . ucfirst($gender);
-					$setter = 'set' . ucfirst($key);
-
 					$image = $definition->{$key};
 
+					/** @var Asset|null $asset */
+					$asset = call_user_func([$assets, 'get' . ucfirst($key)]);
+
+					if ($asset) {
+						$path = parse_url($asset->getUri(), PHP_URL_PATH);
+
+						if ($path === $image->uri)
+							continue;
+
+						$this->assetManager->delete($path);
+					}
+
+					$setter = 'set' . ucfirst($key);
+
 					if ($image) {
-						$asset = new Asset($image->uri, $image->primaryHash, $image->secondaryHash);
+						$asset = $this->entityManager->getRepository(Asset::class)->findOneBy([
+							'primaryHash' => $image->primaryHash,
+							'secondaryHash' => $image->secondaryHash,
+						]);
+
+						if (!$asset) {
+							$asset = new Asset(
+								$this->assetManager->toBucketUri($image->uri),
+								$image->primaryHash,
+								$image->secondaryHash
+							);
+						}
 
 						call_user_func([$assets, $setter], $asset);
 
-						$assetPath = $this->contribManager->getGroup(EntityType::ARMOR)->getAssetPath($image->uri);
+						if (!$asset->getId()) {
+							$assetPath = $this->contribManager->getGroup(EntityType::ARMOR)->getAssetPath($image->uri);
 
-						if (!$assetPath)
-							throw $this->createAssetNotFoundException($image->uri);
+							if (!$assetPath)
+								throw $this->createAssetNotFoundException($image->uri);
 
-						$handle = fopen($assetPath, 'r');
+							$handle = fopen($assetPath, 'r');
 
-						$this->assetManager->put(ltrim(parse_url($image->uri, PHP_URL_PATH), '/'), $handle);
+							$this->assetManager->put(ltrim(parse_url($image->uri, PHP_URL_PATH), '/'), $handle);
+						}
 					} else
 						call_user_func([$assets, $setter], null);
 				}
