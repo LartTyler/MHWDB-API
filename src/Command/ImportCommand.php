@@ -77,7 +77,7 @@
 
 			if ($rawTargets = $input->getOption('target')) {
 				foreach ($rawTargets as $rawTarget) {
-					$entity = $this->toFullyQualifiedClassName(strtok($rawTargets, ':'));
+					$entity = $this->toFullyQualifiedClassName(strtok($rawTarget, ':'));
 					$id = strtok('');
 
 					if (!$id)
