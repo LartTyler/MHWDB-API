@@ -178,10 +178,10 @@
 		 */
 		public static function fromJson(object $source) {
 			$data = new static($source->craftable);
-			$data->previous = $source->previous;
-			$data->branches = $source->branches;
-			$data->craftingMaterials = CraftingMaterialCostEntityData::fromJsonArray($source->craftingMaterials);
-			$data->upgradeMaterials = CraftingMaterialCostEntityData::fromJsonArray($source->upgradeMaterials);
+			$data->previous = $source->previous ?? null;
+			$data->branches = $source->branches ?? [];
+			$data->craftingMaterials = CraftingMaterialCostEntityData::fromJsonArray($source->craftingMaterials ?? []);
+			$data->upgradeMaterials = CraftingMaterialCostEntityData::fromJsonArray($source->upgradeMaterials ?? []);
 
 			return $data;
 		}

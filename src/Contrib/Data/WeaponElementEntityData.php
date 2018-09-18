@@ -139,6 +139,6 @@
 		 * @return static
 		 */
 		public static function fromJson(object $source) {
-			return new static($source->type, $source->damage, $source->hidden);
+			return new static($source->type, $source->damage, $source->hidden ?? false);
 		}
 	}
