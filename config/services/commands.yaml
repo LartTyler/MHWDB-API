@@ -52,3 +52,9 @@ services:
             -
                 name: console.command
                 command: app:import
+
+    App\Command\ContribPushCommand:
+        tags:
+            -
+                name: console.command
+                command: app:contrib:push
