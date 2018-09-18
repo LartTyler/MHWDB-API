@@ -3,6 +3,11 @@
 
 	class ContribGroup {
 		/**
+		 * @var ContribManager
+		 */
+		protected $contribManager;
+
+		/**
 		 * @var string
 		 */
 		protected $rootTemplate;
@@ -23,9 +28,11 @@
 		/**
 		 * ContribGroup constructor.
 		 *
-		 * @param string $rootTemplate
+		 * @param ContribManager $contribManager
+		 * @param string         $rootTemplate
 		 */
-		public function __construct(string $rootTemplate) {
+		public function __construct(ContribManager $contribManager, string $rootTemplate) {
+			$this->contribManager = $contribManager;
 			$this->rootTemplate = $rootTemplate;
 
 			if ($this->exists(Target::JSON, '.journal.json')) {
@@ -67,13 +74,13 @@
 		}
 
 		/**
-		 * @param int         $id
+		 * @param int|string  $id
 		 * @param array       $data
 		 * @param string|null $subgroup
 		 *
 		 * @return $this
 		 */
-		public function put(int $id, array $data, string $subgroup = null) {
+		public function put($id, array $data, string $subgroup = null) {
 			$path = $id . '.json';
 
 			if ($subgroup)
@@ -83,6 +90,13 @@
 
 			$this->write(Target::JSON, $path, $this->encode($data));
 			$this->write(Target::JSON, '/.journal.json', $this->encode($this->getJournal()));
+
+			$fullPath = $this->toProjectRelativePath(Target::JSON, $path);
+
+			$this->contribManager->commit('Update ' . $fullPath, [
+				$fullPath => Action::ADD,
+				$this->toProjectRelativePath(Target::JSON, '/.journal.json') => Action::ADD,
+			]);
 
 			return $this;
 		}
@@ -100,6 +114,12 @@
 				return $this;
 
 			$this->write(Target::ASSETS, $path, $contents);
+
+			$fullPath = $this->toProjectRelativePath(Target::ASSETS, $path);
+
+			$this->contribManager->commit('Add ' . $fullPath, [
+				$fullPath => Action::ADD,
+			]);
 
 			return $this;
 		}
@@ -186,6 +206,14 @@
 
 			$this->replacedIds[$oldId] = $newId;
 
+			$fullOldPath = $this->toProjectRelativePath(Target::JSON, $oldPath);
+
+			$this->contribManager->commit('Replace ' . $fullOldPath, [
+				$fullOldPath => Action::REMOVE,
+				$this->toProjectRelativePath(Target::JSON, $newPath) => Action::ADD,
+				$this->toProjectRelativePath(Target::JSON, '/.journal.json') => Action::ADD,
+			]);
+
 			return $this;
 		}
 
@@ -204,6 +232,13 @@
 
 			$this->unlink(Target::JSON, $path);
 			$this->write(Target::JSON, '/.journal.json', $this->encode($this->getJournal()));
+
+			$fullPath = $this->toProjectRelativePath(Target::JSON, $path);
+
+			$this->contribManager->commit('Delete ' . $fullPath, [
+				$fullPath => Action::REMOVE,
+				$this->toProjectRelativePath(Target::JSON, '/.journal.json') => Action::ADD,
+			]);
 
 			return true;
 		}
@@ -226,6 +261,13 @@
 
 			$this->write(Target::JSON, $path, $this->encode($data));
 			$this->write(Target::JSON, '/.journal.json', $this->encode($this->getJournal()));
+
+			$fullPath = $this->toProjectRelativePath(Target::JSON, $path);
+
+			$this->contribManager->commit('Create ' . $fullPath, [
+				$fullPath => Action::ADD,
+				$this->toProjectRelativePath(Target::JSON, '/.journal.json') => Action::ADD,
+			]);
 
 			return $id;
 		}
@@ -336,5 +378,19 @@
 				$output = str_replace('    ', "\t", $output);
 
 			return $output;
+		}
+
+		/**
+		 * Converts a group-relative path to a path relative to the root of the contrib repository.
+		 *
+		 * @param string $target
+		 * @param string $path
+		 *
+		 * @return string
+		 */
+		protected function toProjectRelativePath(string $target, string $path): string {
+			$root = str_replace($this->contribManager->getContribDir(), '', $this->getTargetRoot($target));
+
+			return ltrim($root, '/') . '/' . ltrim($path, '/');
 		}
 	}

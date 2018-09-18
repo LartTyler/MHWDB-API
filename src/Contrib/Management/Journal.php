@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 1);
 	namespace App\Contrib\Management;
 
 	class Journal implements \JsonSerializable {
@@ -28,13 +28,20 @@
 		}
 
 		/**
-		 * @param int    $id
-		 * @param string $path
+		 * @param string|int $id
+		 * @param string     $path
 		 *
 		 * @return $this
 		 */
-		public function set(int $id, string $path) {
-			$this->data[(string)$id] = $path;
+		public function set($id, string $path) {
+			if ($this->get($id) === $path)
+				return $this;
+
+			if (isset($this->data['created'][$id]))
+				$this->data['created'][$id] = $path;
+			else
+				$this->data[(string)$id] = $path;
+
 			$this->dirty = true;
 
 			return $this;

@@ -120,7 +120,7 @@
 				return $this->respond(new InvalidPayloadError());
 
 			$group = $this->contribManager->getGroup($type);
-			$data = $group->get((int)$id);
+			$data = $group->get($id);
 
 			if (!$data)
 				return $this->respond(new NotFoundError());
@@ -133,7 +133,7 @@
 				return $this->respond(new UpdateError());
 			}
 
-			$group->put((int)$id, $output = $data->normalize(), $data->getEntityGroupName(true));
+			$group->put($id, $output = $data->normalize(), $data->getEntityGroupName(true));
 
 			return $this->respond($output);
 		}
