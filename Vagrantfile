@@ -64,6 +64,8 @@ Vagrant.configure("2") do |config|
 	SHELL
 
 	config.vm.provision "run", type: "shell", run: "always", privileged: false, inline: <<-SHELL
+		cd /vagrant/data
+
 		git reset --hard
 		git checkout develop
 
