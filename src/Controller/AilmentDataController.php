@@ -61,6 +61,9 @@
 		 * @param string             $id
 		 *
 		 * @return Response
+		 * @throws \App\Api\Exceptions\ContribNotSupportedException
+		 * @throws \Doctrine\ORM\ORMException
+		 * @throws \Doctrine\ORM\OptimisticLockException
 		 */
 		public function update(
 			AilmentDataManager $dataManager,
