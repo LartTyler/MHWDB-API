@@ -87,7 +87,7 @@
 		 *
 		 * @return static
 		 */
-		public static function fromJson(object $source) {
+		public static function doFromJson(object $source) {
 			$updater = new static();
 			$updater->items = $source->items;
 			$updater->skills = $source->skills;
@@ -100,7 +100,7 @@
 		 *
 		 * @return static
 		 */
-		public static function fromEntity(EntityInterface $entity) {
+		public static function doFromEntity(EntityInterface $entity) {
 			if (!($entity instanceof AilmentProtection))
 				throw static::createLoadFailedException(AilmentProtection::class);
 

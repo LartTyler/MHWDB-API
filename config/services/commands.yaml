@@ -36,6 +36,17 @@ services:
     App\Command\ExportCommand:
         bind:
             $contribDir: '%env(resolve:EXPORT_DEFAULT_PATH)%'
+            $dataManagers:
+                - '@App\Contrib\Management\Entity\ItemDataManager'
+                - '@App\Contrib\Management\Entity\LocationDataManager'
+                - '@App\Contrib\Management\Entity\MotionValueDataManager'
+                - '@App\Contrib\Management\Entity\SkillDataManager'
+                - '@App\Contrib\Management\Entity\CharmDataManager'
+                - '@App\Contrib\Management\Entity\DecorationDataManager'
+                - '@App\Contrib\Management\Entity\AilmentDataManager'
+                - '@App\Contrib\Management\Entity\ArmorDataManager'
+                - '@App\Contrib\Management\Entity\ArmorSetDataManager'
+                - '@App\Contrib\Management\Entity\WeaponDataManager'
         tags:
             -
                 name: console.command

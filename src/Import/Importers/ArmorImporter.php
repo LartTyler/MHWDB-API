@@ -105,8 +105,11 @@
 				$rank = $skill->getRank($definition->level);
 
 				if (!$rank) {
-					throw $this->createMissingReferenceException('skills[' . $i . '].level', SkillRank::class,
-						$definition->level);
+					throw $this->createMissingReferenceException(
+						'skills[' . $i . '].level',
+						SkillRank::class,
+						$definition->level
+					);
 				}
 
 				$entity->getSkills()->add($rank);
@@ -175,8 +178,11 @@
 					$item = $this->entityManager->getRepository(Item::class)->find($cost->item);
 
 					if (!$item) {
-						throw $this->createMissingReferenceException('crafting.materials[' . $i . '].item', Item::class,
-							$cost->item);
+						throw $this->createMissingReferenceException(
+							'crafting.materials[' . $i . '].item',
+							Item::class,
+							$cost->item
+						);
 					}
 
 					$crafting->getMaterials()->add(new CraftingMaterialCost($item, $cost->quantity));
@@ -186,13 +192,14 @@
 		}
 
 		/**
-		 * @param string $id
+		 * @param int    $id
 		 * @param object $data
 		 *
 		 * @return EntityInterface
 		 */
-		public function create(string $id, object $data): EntityInterface {
+		public function create(?int $id, object $data): EntityInterface {
 			$armor = new Armor($data->name, $data->type, $data->rank, $data->rarity);
+			$armor->setId($id);
 
 			$this->import($armor, $data);
 
@@ -232,9 +239,11 @@
 			if (isset($this->assetCache[$key]))
 				return $this->assetCache[$key];
 
-			return $this->assetCache[$key] = $this->entityManager->getRepository(Asset::class)->findOneBy([
-				'primaryHash' => $primaryHash,
-				'secondaryHash' => $secondaryHash,
-			]);
+			return $this->assetCache[$key] = $this->entityManager->getRepository(Asset::class)->findOneBy(
+				[
+					'primaryHash' => $primaryHash,
+					'secondaryHash' => $secondaryHash,
+				]
+			);
 		}
 	}

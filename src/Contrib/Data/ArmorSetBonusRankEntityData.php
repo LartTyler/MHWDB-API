@@ -85,7 +85,7 @@
 		 *
 		 * @return static
 		 */
-		public static function fromJson(object $source) {
+		public static function doFromJson(object $source) {
 			$data = new static($source->pieces);
 			$data->skill = SimpleSkillRankEntityData::fromJson($source->skill);
 
@@ -97,7 +97,7 @@
 		 *
 		 * @return static
 		 */
-		public static function fromEntity(EntityInterface $entity) {
+		public static function doFromEntity(EntityInterface $entity) {
 			if (!($entity instanceof ArmorSetBonusRank))
 				throw static::createLoadFailedException(ArmorSetBonusRank::class);
 

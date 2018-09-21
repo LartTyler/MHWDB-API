@@ -172,7 +172,7 @@
 		 *
 		 * @return static
 		 */
-		public static function fromJson(object $source) {
+		public static function doFromJson(object $source) {
 			$data = new static($source->name, $source->rank);
 			$data->pieces = $source->pieces;
 
@@ -187,7 +187,7 @@
 		 *
 		 * @return static
 		 */
-		public static function fromEntity(EntityInterface $entity) {
+		public static function doFromEntity(EntityInterface $entity) {
 			if (!($entity instanceof ArmorSet))
 				throw static::createLoadFailedException(ArmorSet::class);
 

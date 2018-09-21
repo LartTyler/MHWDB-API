@@ -81,7 +81,7 @@
 		 * @return string
 		 */
 		public function getUsername(): string {
-			return $this->getId();
+			return $this->getEmail();
 		}
 
 		/**

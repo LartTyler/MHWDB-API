@@ -188,7 +188,7 @@
 		 *
 		 * @return AbstractEntityData|ItemEntityData
 		 */
-		public static function fromJson(object $source) {
+		public static function doFromJson(object $source) {
 			$data = new static($source->name, $source->description, $source->rarity);
 			$data->value = $source->value;
 			$data->carryLimit = $source->carryLimit;
@@ -201,7 +201,7 @@
 		 *
 		 * @return AbstractEntityData|ItemEntityData
 		 */
-		public static function fromEntity(EntityInterface $entity) {
+		public static function doFromEntity(EntityInterface $entity) {
 			if (!($entity instanceof Item))
 				throw static::createLoadFailedException(Item::class);
 

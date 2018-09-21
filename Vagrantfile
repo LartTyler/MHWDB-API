@@ -48,6 +48,9 @@ Vagrant.configure("2") do |config|
 	SHELL
 
 	config.vm.provision "install", type: "shell", privileged: false, inline: <<-SHELL
+		git config --global user.email "contributor@mhw-db.com"
+		git config --global user.name "Anonymous Contributor"
+
 		git clone https://github.com/LartTyler/MHWDB-Data /vagrant/data
 
 		echo "[client]" > ~/.my.cnf
@@ -78,5 +81,10 @@ Vagrant.configure("2") do |config|
 		echo "  -> IDE Key: application"
 		echo "  -> Remote Autostart: Yes"
 		echo "  -> Remote Connectback: Yes"
+		echo
+		echo "If you need to publish changes to the contrib repository (and I mean actually push the changes, not just"
+		echo "test it locally), you'll need to run the following commands from within your local Vagrant box."
+		echo "  -> git config --global user.email 'your-email@example.com'"
+		echo "  -> git config --global user.name 'Your Name'"
 	SHELL
 end

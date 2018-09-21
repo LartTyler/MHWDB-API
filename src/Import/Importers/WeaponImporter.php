@@ -130,8 +130,11 @@
 					$previous = $this->getWeapon($definition->previous);
 
 					if (!$previous) {
-						throw $this->createMissingReferenceException('crafting.previous', Weapon::class,
-							$definition->previous);
+						throw $this->createMissingReferenceException(
+							'crafting.previous',
+							Weapon::class,
+							$definition->previous
+						);
 					}
 
 					$crafting->setPrevious($previous);
@@ -156,8 +159,12 @@
 						$item = $this->entityManager->getRepository(Item::class)->find($itemId);
 
 						if (!$item) {
-							throw $this->createMissingReferenceException('crafting.' . $type . 'Materials[' . $i .
-								'].item', Item::class, $itemId);
+							throw $this->createMissingReferenceException(
+								'crafting.' . $type . 'Materials[' . $i .
+								'].item',
+								Item::class,
+								$itemId
+							);
 						}
 
 						$collection->add(new CraftingMaterialCost($item, $cost->quantity));
@@ -211,13 +218,15 @@
 		}
 
 		/**
-		 * @param string $id
+		 * @param int    $id
 		 * @param object $data
 		 *
 		 * @return EntityInterface
 		 */
-		public function create(string $id, object $data): EntityInterface {
+		public function create(?int $id, object $data): EntityInterface {
 			$weapon = new Weapon($data->name, $data->type, $data->rarity);
+			$weapon->setId($id);
+
 			$this->weaponCache[$id] = $weapon;
 
 			$this->import($weapon, $data);
@@ -249,9 +258,11 @@
 			if (isset($this->assetCache[$key]))
 				return $this->assetCache[$key];
 
-			return $this->assetCache[$key] = $this->entityManager->getRepository(Asset::class)->findOneBy([
-				'primaryHash' => $primaryHash,
-				'secondaryHash' => $secondaryHash,
-			]);
+			return $this->assetCache[$key] = $this->entityManager->getRepository(Asset::class)->findOneBy(
+				[
+					'primaryHash' => $primaryHash,
+					'secondaryHash' => $secondaryHash,
+				]
+			);
 		}
 	}

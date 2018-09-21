@@ -19,59 +19,40 @@
 		 */
 		public function __construct(array $data) {
 			$this->data = $data;
-
-			if (!isset($this->data['created']))
-				$this->data['created'] = [];
-
-			if (!isset($this->data['deleted']))
-				$this->data['deleted'] = [];
 		}
 
 		/**
-		 * @param string|int $id
+		 * @param int $id
 		 * @param string     $path
 		 *
 		 * @return $this
 		 */
-		public function set($id, string $path) {
+		public function set(int $id, string $path) {
 			if ($this->get($id) === $path)
 				return $this;
 
-			if (isset($this->data['created'][$id]))
-				$this->data['created'][$id] = $path;
-			else
-				$this->data[(string)$id] = $path;
-
+			$this->data[(string)$id] = $path;
 			$this->dirty = true;
 
 			return $this;
 		}
 
 		/**
-		 * @param int|string $id
+		 * @param int $id
 		 *
 		 * @return null|string
 		 */
-		public function get($id): ?string {
-			if (isset($this->data['created'][$id]))
-				return $this->data['created'][$id];
-
+		public function get(int $id): ?string {
 			return $this->data[(string)$id] ?? null;
 		}
 
 		/**
-		 * @param int|string $id
+		 * @param int $id
 		 *
 		 * @return $this
 		 */
-		public function delete($id) {
-			if (isset($this->data['created'][$id]))
-				unset($this->data['created'][$id]);
-			else {
-				unset($this->data[(string)$id]);
-
-				$this->data['deleted'][] = $id;
-			}
+		public function delete(int $id) {
+			unset($this->data[(string)$id]);
 
 			return $this;
 		}
@@ -81,6 +62,7 @@
 		 * @param string $path
 		 *
 		 * @return $this
+		 * @deprecated Support for deferred creation is being removed
 		 */
 		public function setCreated(string $id, string $path) {
 			$this->data['created'][$id] = $path;
@@ -90,6 +72,7 @@
 
 		/**
 		 * @return array
+		 * @deprecated Support for deferred creation is being removed
 		 */
 		public function getCreated(): array {
 			return $this->data['created'];
@@ -97,6 +80,7 @@
 
 		/**
 		 * @return $this
+		 * @deprecated Support for deferred creation is being removed
 		 */
 		public function clearCreated() {
 			$this->data['created'] = [];
@@ -106,6 +90,7 @@
 
 		/**
 		 * @return array
+		 * @deprecated Support for deferred deletion is being removed
 		 */
 		public function getDeleted(): array {
 			return $this->data['deleted'];
@@ -113,6 +98,7 @@
 
 		/**
 		 * @return $this
+		 * @deprecated Support for deferred deletion is being removed
 		 */
 		public function clearDeleted() {
 			$this->data['deleted'] = [];
@@ -130,12 +116,7 @@
 				$this->dirty = false;
 			}
 
-			$data = $this->data;
-
-			if (!$data['created'])
-				$data['created'] = new \stdClass();
-
-			return $data;
+			return $this->data;
 		}
 
 		/**

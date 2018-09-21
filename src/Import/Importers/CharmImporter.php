@@ -64,15 +64,21 @@
 					$skill = $this->entityManager->getRepository(Skill::class)->find($skillId);
 
 					if (!$skill) {
-						throw $this->createMissingReferenceException('skills[' . $i . '].skill', Skill::class,
-							$skillId);
+						throw $this->createMissingReferenceException(
+							'skills[' . $i . '].skill',
+							Skill::class,
+							$skillId
+						);
 					}
 
 					$skillRank = $skill->getRank($skillDefinition->level);
 
 					if (!$skillRank) {
-						throw $this->createMissingReferenceException('skills[' . $i . '].level', SkillRank::class,
-							$skillDefinition->level);
+						throw $this->createMissingReferenceException(
+							'skills[' . $i . '].level',
+							SkillRank::class,
+							$skillDefinition->level
+						);
 					}
 
 					$rank->getSkills()->add($skillRank);
@@ -87,8 +93,11 @@
 					$item = $this->entityManager->getRepository(Item::class)->find($itemId);
 
 					if (!$item) {
-						throw $this->createMissingReferenceException('crafting.materials[' . $i . '].item', Item::class,
-							$itemId);
+						throw $this->createMissingReferenceException(
+							'crafting.materials[' . $i . '].item',
+							Item::class,
+							$itemId
+						);
 					}
 
 					$crafting->getMaterials()->add(new CraftingMaterialCost($item, $costDefinition->quantity));
@@ -97,13 +106,14 @@
 		}
 
 		/**
-		 * @param string $id
+		 * @param int    $id
 		 * @param object $data
 		 *
 		 * @return EntityInterface
 		 */
-		public function create(string $id, object $data): EntityInterface {
+		public function create(?int $id, object $data): EntityInterface {
 			$charm = new Charm($data->name);
+			$charm->setId($id);
 
 			$this->import($charm, $data);
 

@@ -86,7 +86,7 @@
 		 *
 		 * @return static
 		 */
-		public static function fromJson(object $source) {
+		public static function doFromJson(object $source) {
 			$data = new static();
 			$data->icon = AssetEntityData::fromJson($source->icon);
 			$data->image = AssetEntityData::fromJson($source->image);
@@ -99,7 +99,7 @@
 		 *
 		 * @return static
 		 */
-		public static function fromEntity(EntityInterface $entity) {
+		public static function doFromEntity(EntityInterface $entity) {
 			if (!($entity instanceof WeaponAssets))
 				throw static::createLoadFailedException(WeaponAssets::class);
 

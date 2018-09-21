@@ -13,6 +13,12 @@
 			parent::__construct(Skill::class);
 		}
 
+		/**
+		 * @param EntityInterface $entity
+		 * @param object          $data
+		 *
+		 * @return void
+		 */
 		public function import(EntityInterface $entity, object $data): void {
 			if (!($entity instanceof Skill))
 				throw $this->createCannotImportException();
@@ -36,13 +42,14 @@
 		}
 
 		/**
-		 * @param string $id
+		 * @param int    $id
 		 * @param object $data
 		 *
 		 * @return EntityInterface
 		 */
-		public function create(string $id, object $data): EntityInterface {
+		public function create(?int $id, object $data): EntityInterface {
 			$skill = new Skill($data->name);
+			$skill->setId($id);
 
 			$this->import($skill, $data);
 

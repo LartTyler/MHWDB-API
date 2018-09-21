@@ -2,6 +2,7 @@
 	namespace App\Command;
 
 	use App\Console\MultiProgressBar;
+	use App\Contrib\DataManagerInterface;
 	use App\Contrib\Management\ContribManager;
 	use App\Entity\Ailment;
 	use App\Entity\Armor;
@@ -14,8 +15,6 @@
 	use App\Entity\MotionValue;
 	use App\Entity\Skill;
 	use App\Entity\Weapon;
-	use App\Export\ExportManager;
-	use App\Import\AssetManager;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\ORM\EntityManagerInterface;
 	use Symfony\Component\Console\Command\Command;
@@ -41,9 +40,9 @@
 		];
 
 		/**
-		 * @var AssetManager
+		 * @var ContribManager
 		 */
-		protected $assetManager;
+		protected $contribManager;
 
 		/**
 		 * @var EntityManagerInterface
@@ -51,41 +50,35 @@
 		private $entityManager;
 
 		/**
-		 * @var ExportManager
-		 */
-		private $exportManager;
-
-		/**
-		 * @var ContribManager
-		 */
-		protected $contribManager;
-
-		/**
 		 * @var string
 		 */
 		private $contribDir;
 
 		/**
+		 * @var DataManagerInterface[]
+		 */
+		private $dataManagers = [];
+
+		/**
 		 * EntityExportCommand constructor.
 		 *
 		 * @param EntityManagerInterface $entityManager
-		 * @param ExportManager          $exportManager
 		 * @param ContribManager         $contribManager
-		 * @param AssetManager           $assetManager
+		 * @param DataManagerInterface[] $dataManagers
 		 * @param string                 $contribDir
 		 */
 		public function __construct(
 			EntityManagerInterface $entityManager,
-			ExportManager $exportManager,
 			ContribManager $contribManager,
-			AssetManager $assetManager,
+			array $dataManagers,
 			string $contribDir
 		) {
 			$this->entityManager = $entityManager;
-			$this->exportManager = $exportManager;
 			$this->contribManager = $contribManager;
-			$this->assetManager = $assetManager;
 			$this->contribDir = $contribDir;
+
+			foreach ($dataManagers as $dataManager)
+				$this->dataManagers[$dataManager->getEntityClass()] = $dataManager;
 
 			parent::__construct();
 		}
@@ -96,17 +89,37 @@
 		protected function configure(): void {
 			$this
 				->setName('app:export')
-				->addArgument('output-path', InputArgument::OPTIONAL, 'The path the app package should be saved to',
-					$this->contribDir)
-				->addOption('entity', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-					'If provided, only listed entities will be exported to the package (implies --no-clean)')
-				->addOption('target', 't', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-					'If provided, only export entities matching the given ID (format: "<entity>:<id>"')
-				->addOption('no-clean', null, InputOption::VALUE_NONE,
-					'Perform the export without cleaning the package directory first')
+				->addArgument(
+					'output-path',
+					InputArgument::OPTIONAL,
+					'The path the app package should be saved to',
+					$this->contribDir
+				)
+				->addOption(
+					'entity',
+					null,
+					InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+					'If provided, only listed entities will be exported to the package (implies --no-clean)'
+				)
+				->addOption(
+					'target',
+					't',
+					InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+					'If provided, only export entities matching the given ID (format: "<entity>:<id>"'
+				)
+				->addOption(
+					'no-clean',
+					null,
+					InputOption::VALUE_NONE,
+					'Perform the export without cleaning the package directory first'
+				)
 				->addOption('yes', 'y', InputOption::VALUE_NONE, 'Answer "yes" to all questions')
-				->addOption('skip-assets', null, InputOption::VALUE_NONE, 'Do not export / download any asset data; ' .
-					'implies --no-clean');
+				->addOption(
+					'dump-only',
+					null,
+					InputOption::VALUE_NONE,
+					'Do not commit or push any changes, only write them to disk'
+				);
 		}
 
 		/**
@@ -126,10 +139,7 @@
 				return;
 			}
 
-			$skipAssets = $input->getOption('skip-assets');
-			$noClean = $skipAssets || $input->getOption('no-clean');
-
-			if (!$noClean) {
+			if (!$input->getOption('no-clean')) {
 				if (!$input->getOption('yes') && file_exists($path) && sizeof(scandir($path)) > 2) {
 					if (!$io->confirm($path . ' is not empty. Are you sure you want to export there?', false)) {
 						$io->warning('User cancelled operation.');
@@ -145,17 +155,26 @@
 			if (!file_exists($path))
 				mkdir($path, 0755, true);
 
+			if ($input->getOption('dump-only')) {
+				$this->contribManager
+					->setAllowCommits(false)
+					->setAllowPush(false);
+			}
+
 			$classes = $input->getOption('entity');
 
 			if (!$classes)
 				$classes = self::ENTITY_LIST;
 			else {
-				$classes = array_map(function(string $name): string {
-					if (strpos($name, '\\') === false)
-						$name = 'App\\Entity\\' . ucfirst($name);
+				$classes = array_map(
+					function(string $name): string {
+						if (strpos($name, '\\') === false)
+							$name = 'App\\Entity\\' . ucfirst($name);
 
-					return $name;
-				}, $classes);
+						return $name;
+					},
+					$classes
+				);
 			}
 
 			$targetCollections = [];
@@ -202,39 +221,15 @@
 					continue;
 				}
 
+				$dataManager = $this->dataManagers[$class] ?? null;
+
+				if (!$dataManager)
+					throw new \InvalidArgumentException('No manager found for ' . $class);
+
 				$progress->append(sizeof($entities));
 
-				$group = null;
-
 				foreach ($entities as $entity) {
-					$export = $this->exportManager->export($entity);
-					$fullGroupName = $export->getGroup();
-
-					if ($group === null) {
-						$group = substr($fullGroupName, 0, strpos($fullGroupName, '/') ?: strlen($fullGroupName));
-
-						$contrib = $this->contribManager->getGroup($group);
-
-						$contrib->getJournal()
-							->clearCreated()
-							->clearDeleted();
-					} else
-						$contrib = $this->contribManager->getGroup($group);
-
-					$subgroup = ltrim(str_replace($group, '', $fullGroupName), '/') ?: null;
-
-					$contrib->put($entity->getId(), $export->getData(), $subgroup);
-
-					if (!$skipAssets && $assets = $export->getAssets()) {
-						foreach ($assets as $asset) {
-							$assetData = file_get_contents($uri = $this->assetManager->toBucketUri($asset->getUri()));
-
-							if ($assetData === false)
-								throw new \RuntimeException('Could not retrieve ' . $uri);
-
-							$contrib->putAsset($asset->getUri(), $assetData);
-						}
-					}
+					$dataManager->export($entity);
 
 					$progress->advance();
 				}

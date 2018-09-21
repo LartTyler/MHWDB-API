@@ -55,13 +55,14 @@
 		}
 
 		/**
-		 * @param string $id
+		 * @param int    $id
 		 * @param object $data
 		 *
 		 * @return EntityInterface
 		 */
-		public function create(string $id, object $data): EntityInterface {
+		public function create(?int $id, object $data): EntityInterface {
 			$location = new Location($data->name, $data->zoneCount);
+			$location->setId($id);
 
 			$this->import($location, $data);
 

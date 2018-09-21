@@ -34,3 +34,9 @@ services:
             -
                 name: doctrine.event_listener
                 event: preUpdate
+
+    App\Doctrine\AssignedIdentityListener:
+        tags:
+            -
+                name: doctrine.event_listener
+                event: prePersist

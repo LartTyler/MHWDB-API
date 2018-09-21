@@ -126,7 +126,7 @@
 		 *
 		 * @return static
 		 */
-		public static function fromEntity(EntityInterface $entity) {
+		public static function doFromEntity(EntityInterface $entity) {
 			if (!($entity instanceof WeaponElement))
 				throw static::createLoadFailedException(WeaponElement::class);
 
@@ -138,7 +138,7 @@
 		 *
 		 * @return static
 		 */
-		public static function fromJson(object $source) {
+		public static function doFromJson(object $source) {
 			return new static($source->type, $source->damage, $source->hidden ?? false);
 		}
 	}

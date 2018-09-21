@@ -194,7 +194,7 @@
 		 *
 		 * @return static
 		 */
-		public static function fromJson(object $source) {
+		public static function doFromJson(object $source) {
 			$data = new static();
 			$data->red = $source->red;
 			$data->orange = $source->orange;
@@ -211,7 +211,7 @@
 		 *
 		 * @return static
 		 */
-		public static function fromEntity(EntityInterface $entity) {
+		public static function doFromEntity(EntityInterface $entity) {
 			if (!($entity instanceof WeaponSharpness))
 				throw static::createLoadFailedException(WeaponSharpness::class);
 

@@ -96,7 +96,7 @@
 		 *
 		 * @return static
 		 */
-		public static function fromJson(object $source) {
+		public static function doFromJson(object $source) {
 			$data = new static($source->name);
 			$data->ranks = ArmorSetBonusRankEntityData::fromJsonArray($source->ranks);
 
@@ -108,7 +108,7 @@
 		 *
 		 * @return static
 		 */
-		public static function fromEntity(EntityInterface $entity) {
+		public static function doFromEntity(EntityInterface $entity) {
 			if (!($entity instanceof ArmorSetBonus))
 				throw static::createLoadFailedException(ArmorSetBonus::class);
 

@@ -12,15 +12,3 @@ index:
 
 auth:
     path: /auth
-    methods:
-        - POST
-    controller: 'DaybreakStudiosVeritasBundle:Authentication:auth'
-    defaults:
-        repository: '%app.security.user_repository%'
-        property: 'email'
-
-auth.refresh:
-    path: /auth/refresh
-    methods:
-        - GET
-    controller: 'DaybreakStudiosVeritasBundle:Authentication:refresh'

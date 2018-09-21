@@ -154,7 +154,7 @@
 		 *
 		 * @return static
 		 */
-		public static function fromJson(object $source) {
+		public static function doFromJson(object $source) {
 			$data = new static($source->slug, $source->level, $source->description);
 			$data->modifiers = $source->modifiers;
 
@@ -166,7 +166,7 @@
 		 *
 		 * @return static
 		 */
-		public static function fromEntity(EntityInterface $entity) {
+		public static function doFromEntity(EntityInterface $entity) {
 			if (!($entity instanceof SkillRank))
 				throw static::createLoadFailedException(SkillRank::class);
 

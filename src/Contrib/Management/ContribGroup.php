@@ -74,13 +74,13 @@
 		}
 
 		/**
-		 * @param int|string  $id
+		 * @param int         $id
 		 * @param array       $data
 		 * @param string|null $subgroup
 		 *
 		 * @return $this
 		 */
-		public function put($id, array $data, string $subgroup = null) {
+		public function put(int $id, array $data, string $subgroup = null) {
 			$path = $id . '.json';
 
 			if ($subgroup)
@@ -93,23 +93,24 @@
 
 			$fullPath = $this->toProjectRelativePath(Target::JSON, $path);
 
-			$this->contribManager->commit('Update ' . $fullPath, [
-				$fullPath => Action::ADD,
-				$this->toProjectRelativePath(Target::JSON, '/.journal.json') => Action::ADD,
-			]);
+			$this->contribManager->commit(
+				'Update ' . $fullPath,
+				[
+					$fullPath => Action::ADD,
+					$this->toProjectRelativePath(Target::JSON, '/.journal.json') => Action::ADD,
+				]
+			);
 
 			return $this;
 		}
 
 		/**
-		 * @param string $uri
+		 * @param string $path
 		 * @param string $contents
 		 *
 		 * @return $this
 		 */
-		public function putAsset(string $uri, string $contents) {
-			$path = parse_url($uri, PHP_URL_PATH);
-
+		public function putAsset(string $path, string $contents) {
 			if ($this->exists(Target::ASSETS, $path))
 				return $this;
 
@@ -117,9 +118,12 @@
 
 			$fullPath = $this->toProjectRelativePath(Target::ASSETS, $path);
 
-			$this->contribManager->commit('Add ' . $fullPath, [
-				$fullPath => Action::ADD,
-			]);
+			$this->contribManager->commit(
+				'Add ' . $fullPath,
+				[
+					$fullPath => Action::ADD,
+				]
+			);
 
 			return $this;
 		}
@@ -140,11 +144,11 @@
 		}
 
 		/**
-		 * @param int|string $id
+		 * @param int $id
 		 *
 		 * @return object|null
 		 */
-		public function get($id): ?object {
+		public function get(int $id): ?object {
 			$path = $this->getPathFromJournal($id);
 
 			if (!$path)
@@ -159,7 +163,12 @@
 		 * @return string|null
 		 */
 		public function getAssetPath(string $uri): ?string {
-			$path = $this->getTargetRoot(Target::ASSETS) . '/' . basename(parse_url($uri, PHP_URL_PATH));
+			$path = ltrim(parse_url($uri, PHP_URL_PATH), '/');
+
+			if (($pos = strpos($path, '/')) !== false)
+				$path = substr($path, $pos + 1);
+
+			$path = $this->getTargetRoot(Target::ASSETS) . '/' . $path;
 
 			if (!file_exists($path))
 				return null;
@@ -174,6 +183,7 @@
 		 * @param string|int $id
 		 *
 		 * @return string|int
+		 * @deprecated Support for deferred object creation is being removed
 		 */
 		public function getTrueId($id) {
 			return $this->replacedIds[$id] ?? $id;
@@ -184,6 +194,7 @@
 		 * @param string|int $newId
 		 *
 		 * @return $this
+		 * @deprecated Support for deferred object creation is being removed
 		 */
 		public function replace($oldId, $newId) {
 			if ($oldId === $newId)
@@ -208,21 +219,24 @@
 
 			$fullOldPath = $this->toProjectRelativePath(Target::JSON, $oldPath);
 
-			$this->contribManager->commit('Replace ' . $fullOldPath, [
-				$fullOldPath => Action::REMOVE,
-				$this->toProjectRelativePath(Target::JSON, $newPath) => Action::ADD,
-				$this->toProjectRelativePath(Target::JSON, '/.journal.json') => Action::ADD,
-			]);
+			$this->contribManager->commit(
+				'Replace ' . $fullOldPath,
+				[
+					$fullOldPath => Action::REMOVE,
+					$this->toProjectRelativePath(Target::JSON, $newPath) => Action::ADD,
+					$this->toProjectRelativePath(Target::JSON, '/.journal.json') => Action::ADD,
+				]
+			);
 
 			return $this;
 		}
 
 		/**
-		 * @param int|string $id
+		 * @param int $id
 		 *
 		 * @return bool
 		 */
-		public function delete($id): bool {
+		public function delete(int $id): bool {
 			$path = $this->getPathFromJournal($id);
 
 			if (!$path)
@@ -235,10 +249,13 @@
 
 			$fullPath = $this->toProjectRelativePath(Target::JSON, $path);
 
-			$this->contribManager->commit('Delete ' . $fullPath, [
-				$fullPath => Action::REMOVE,
-				$this->toProjectRelativePath(Target::JSON, '/.journal.json') => Action::ADD,
-			]);
+			$this->contribManager->commit(
+				'Delete ' . $fullPath,
+				[
+					$fullPath => Action::REMOVE,
+					$this->toProjectRelativePath(Target::JSON, '/.journal.json') => Action::ADD,
+				]
+			);
 
 			return true;
 		}
@@ -248,6 +265,7 @@
 		 * @param string|null $subgroup
 		 *
 		 * @return string
+		 * @deprecated Support for deferred object creation is being removed
 		 */
 		public function create(array $data, string $subgroup = null): string {
 			$id = base64_encode(microtime());
@@ -264,20 +282,23 @@
 
 			$fullPath = $this->toProjectRelativePath(Target::JSON, $path);
 
-			$this->contribManager->commit('Create ' . $fullPath, [
-				$fullPath => Action::ADD,
-				$this->toProjectRelativePath(Target::JSON, '/.journal.json') => Action::ADD,
-			]);
+			$this->contribManager->commit(
+				'Create ' . $fullPath,
+				[
+					$fullPath => Action::ADD,
+					$this->toProjectRelativePath(Target::JSON, '/.journal.json') => Action::ADD,
+				]
+			);
 
 			return $id;
 		}
 
 		/**
-		 * @param int|string $id
+		 * @param int $id
 		 *
 		 * @return null|string
 		 */
-		protected function getPathFromJournal($id): ?string {
+		protected function getPathFromJournal(int $id): ?string {
 			$path = $this->getJournal()->get($id);
 
 			if (!$path || !$this->exists(Target::JSON, $path))
@@ -345,6 +366,7 @@
 		 * @param string $newPath
 		 *
 		 * @return $this
+		 * @deprecated With deferred creation being removed, this method is no longer necessary
 		 */
 		protected function rename(string $target, string $oldPath, string $newPath) {
 			$oldPath = $this->getTargetRoot($target) . '/' . ltrim($oldPath, '/');

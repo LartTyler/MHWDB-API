@@ -190,7 +190,7 @@
 		 *
 		 * @return static
 		 */
-		public static function fromJson(object $source) {
+		public static function doFromJson(object $source) {
 			$data = new static($source->name, $source->slug, $source->slot, $source->rarity);
 			$data->skills = SimpleSkillRankEntityData::fromJsonArray($source->skills);
 
@@ -202,7 +202,7 @@
 		 *
 		 * @return static
 		 */
-		public static function fromEntity(EntityInterface $entity) {
+		public static function doFromEntity(EntityInterface $entity) {
 			if (!($entity instanceof Decoration))
 				throw static::createLoadFailedException(Decoration::class);
 

@@ -18,10 +18,10 @@
 		public function import(EntityInterface $entity, object $data): void;
 
 		/**
-		 * @param string $id
+		 * @param int    $id
 		 * @param object $data
 		 *
 		 * @return EntityInterface
 		 */
-		public function create(string $id, object $data): EntityInterface;
+		public function create(?int $id, object $data): EntityInterface;
 	}

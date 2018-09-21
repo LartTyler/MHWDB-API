@@ -298,7 +298,7 @@
 		 *
 		 * @return static
 		 */
-		public static function fromJson(object $source) {
+		public static function doFromJson(object $source) {
 			$data = new static($source->name, $source->type, $source->species);
 			$data->ailments = $source->ailments;
 			$data->locations = $source->locations;
@@ -315,7 +315,7 @@
 		 *
 		 * @return static
 		 */
-		public static function fromEntity(EntityInterface $entity) {
+		public static function doFromEntity(EntityInterface $entity) {
 			if (!($entity instanceof Monster))
 				throw static::createLoadFailedException(Monster::class);
 

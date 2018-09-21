@@ -58,7 +58,7 @@
 				$item = $this->entityManager->getRepository(Item::class)->find($itemGroup->getTrueId($itemId));
 
 				if (!$item)
-					throw $this->createMissingReferenceException('procetion.items', Item::class, $itemId);
+					throw $this->createMissingReferenceException('protection.items', Item::class, $itemId);
 
 				$protection->getItems()->add($item);
 			}
@@ -90,13 +90,14 @@
 		}
 
 		/**
-		 * @param string $id
+		 * @param int    $id
 		 * @param object $data
 		 *
 		 * @return EntityInterface
 		 */
-		public function create(string $id, object $data): EntityInterface {
+		public function create(?int $id, object $data): EntityInterface {
 			$ailment = new Ailment($data->name, $data->description);
+			$ailment->setId($id);
 
 			$this->import($ailment, $data);
 

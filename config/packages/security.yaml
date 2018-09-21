@@ -4,8 +4,10 @@ security:
         ROLE_EDITOR: ROLE_USER
 
     providers:
-        veritas:
-            id: DaybreakStudios\VeritasBundle\Security\Core\User\JWTEntityUserProvider
+        doctrine:
+            entity:
+                class: App\Entity\User
+                property: email
 
     encoders:
         App\Entity\User: bcrypt
@@ -17,21 +19,16 @@ security:
 
         auth:
             pattern: ^/auth
-            anonymous: ~
-
-        contrib:
-            pattern: ^/contrib
+            anonymous: true
             stateless: true
-            simple_preauth:
-                authenticator: dbstudios_veritas.security.authenticator
+            json_login:
+                check_path: /auth
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
 
         main:
             anonymous: true
-
-    access_control:
-        -
-            path: ^/contrib/editors
-            roles: ROLE_EDITOR
-        -
-            path: ^/contrib
-            roles: ROLE_USER
+            stateless: true
+            guard:
+                authenticators:
+                    - lexik_jwt_authentication.jwt_token_authenticator

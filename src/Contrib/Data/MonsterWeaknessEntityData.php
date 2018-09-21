@@ -125,7 +125,7 @@
 		 *
 		 * @return static
 		 */
-		public static function fromJson(object $source) {
+		public static function doFromJson(object $source) {
 			$data = new static($source->element, $source->stars);
 			$data->condition = $source->condition;
 
@@ -137,7 +137,7 @@
 		 *
 		 * @return static
 		 */
-		public static function fromEntity(EntityInterface $entity) {
+		public static function doFromEntity(EntityInterface $entity) {
 			if (!($entity instanceof MonsterWeakness))
 				throw static::createLoadFailedException(MonsterWeakness::class);
 

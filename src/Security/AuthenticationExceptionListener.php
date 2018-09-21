@@ -2,6 +2,7 @@
 	namespace App\Security;
 
 	use DaybreakStudios\DozeBundle\ResponderService;
+	use Lexik\Bundle\JWTAuthenticationBundle\Response\JWTAuthenticationFailureResponse;
 	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 
@@ -26,7 +27,9 @@
 		 * @return void
 		 */
 		public function onKernelResponse(FilterResponseEvent $event) {
-			if ($event->getResponse()->getStatusCode() !== Response::HTTP_FORBIDDEN)
+			$response = $event->getResponse();
+
+			if (!($response instanceof JWTAuthenticationFailureResponse))
 				return;
 
 			$event->setResponse($this->responder->createAccessDeniedResponse());

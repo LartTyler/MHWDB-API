@@ -63,8 +63,11 @@
 				$skillRank = $skill->getRank($definition->level);
 
 				if (!$skillRank) {
-					throw $this->createMissingReferenceException('skills[' . $i . '].level', SkillRank::class,
-						$definition->level);
+					throw $this->createMissingReferenceException(
+						'skills[' . $i . '].level',
+						SkillRank::class,
+						$definition->level
+					);
 				}
 
 				$entity->getSkills()->add($skillRank);
@@ -72,13 +75,14 @@
 		}
 
 		/**
-		 * @param string $id
+		 * @param int    $id
 		 * @param object $data
 		 *
 		 * @return EntityInterface
 		 */
-		public function create(string $id, object $data): EntityInterface {
+		public function create(?int $id, object $data): EntityInterface {
 			$decoration = new Decoration($data->name, $data->slot, $data->rarity);
+			$decoration->setId($id);
 
 			$this->import($decoration, $data);
 
