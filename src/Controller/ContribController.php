@@ -39,6 +39,30 @@
 		}
 
 		/**
+		 * @Route(path="/contrib/{type<[a-z-]+>}", methods={"GET"}, name="contrib.list")
+		 *
+		 * @param string $type
+		 *
+		 * @return Response
+		 */
+		public function list(string $type): Response {
+			if (!EntityType::isValid($type))
+				return $this->respond(new NotFoundError());
+
+			$output = [];
+			$contrib = $this->contribManager->getGroup($type);
+
+			foreach ($contrib->getJournal()->all() as $key => $value) {
+				if (!is_string($value))
+					continue;
+
+				$output[] = $contrib->get($key);
+			}
+
+			return $this->respond($output);
+		}
+
+		/**
 		 * @Route(path="/contrib/{type<[a-z-]+>}", methods={"PUT"}, name="contrib.create")
 		 *
 		 * @param Request $request
