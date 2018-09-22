@@ -16,6 +16,7 @@
 	use App\Response\BadProjectionObjectError;
 	use App\Response\BadQueryObjectError;
 	use App\Response\EmptySearchParametersError;
+	use App\Response\NoContentResponse;
 	use App\Response\SearchError;
 	use App\Response\SlugNotSupportedError;
 	use DaybreakStudios\Doze\Errors\ApiErrorInterface;
@@ -165,13 +166,9 @@
 		 * @throws \Doctrine\ORM\ORMException
 		 * @throws \Doctrine\ORM\OptimisticLockException
 		 */
-		public function doUpdate(
-			DataManagerInterface $dataManager,
-			Request $request,
-			string $idOrSlug
-		): Response {
+		public function doUpdate(DataManagerInterface $dataManager, Request $request, string $idOrSlug): Response {
 			if (!$this->contribType)
-				throw new ContribNotSupportedException($idOrSlug);
+				throw new ContribNotSupportedException($this->entityClass);
 
 			try {
 				$entity = $this->getEntityFromIdOrSlug($idOrSlug);
@@ -205,6 +202,37 @@
 			$this->manager->flush();
 
 			return $this->respond($entity);
+		}
+
+		/**
+		 * @param DataManagerInterface $dataManager
+		 * @param string               $idOrSlug
+		 *
+		 * @return Response
+		 * @throws ContribNotSupportedException
+		 * @throws \Doctrine\ORM\ORMException
+		 */
+		public function doDelete(DataManagerInterface $dataManager, string $idOrSlug): Response {
+			if (!$this->contribType)
+				throw new ContribNotSupportedException($this->entityClass);
+
+			try {
+				$entity = $this->getEntityFromIdOrSlug($idOrSlug);
+			} catch (SlugNotSupportedException $e) {
+				return $this->respond(new SlugNotSupportedError());
+			}
+
+			if (!$entity)
+				return $this->respond(new NotFoundError());
+
+			if (json_last_error() !== JSON_ERROR_NONE)
+				return $this->respond(new InvalidPayloadError());
+
+			$dataManager->delete($entity);
+
+			$this->manager->remove($entity);
+
+			return new NoContentResponse();
 		}
 
 		/**

@@ -78,6 +78,7 @@
 
 		/**
 		 * @return string[]
+		 * @throws \ReflectionException
 		 */
 		public static function all(): array {
 			if (self::$types === null)
@@ -90,6 +91,7 @@
 		 * @param string $value
 		 *
 		 * @return bool
+		 * @throws \ReflectionException
 		 */
 		public static function isValid(string $value): bool {
 			return in_array($value, self::all());

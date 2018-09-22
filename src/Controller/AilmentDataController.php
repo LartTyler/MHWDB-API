@@ -74,6 +74,18 @@
 		}
 
 		/**
+		 * @param AilmentDataManager $dataManager
+		 * @param string             $id
+		 *
+		 * @return Response
+		 * @throws \App\Api\Exceptions\ContribNotSupportedException
+		 * @throws \Doctrine\ORM\ORMException
+		 */
+		public function delete(AilmentDataManager $dataManager, string $id): Response {
+			return parent::doDelete($dataManager, $id);
+		}
+
+		/**
 		 * @param Ailment|EntityInterface|null $entity
 		 * @param Projection                   $projection
 		 *
