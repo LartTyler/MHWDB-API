@@ -3,6 +3,7 @@
 
 	use App\Contrib\Data\AilmentEntityData;
 	use App\Contrib\Data\ArmorEntityData;
+	use App\Contrib\Data\ArmorSetBonusEntityData;
 	use App\Contrib\Data\ArmorSetEntityData;
 	use App\Contrib\Data\CharmEntityData;
 	use App\Contrib\Data\DecorationEntityData;
@@ -15,6 +16,7 @@
 	use App\Entity\Ailment;
 	use App\Entity\Armor;
 	use App\Entity\ArmorSet;
+	use App\Entity\ArmorSetBonus;
 	use App\Entity\Charm;
 	use App\Entity\Decoration;
 	use App\Entity\Item;
@@ -28,6 +30,7 @@
 		public const AILMENTS = 'ailments';
 		public const ARMOR = 'armor';
 		public const ARMOR_SETS = 'armor-sets';
+		public const ARMOR_SET_BONUSES = 'armor-set-bonuses';
 		public const CHARMS = 'charms';
 		public const DECORATIONS = 'decorations';
 		public const ITEMS = 'items';
@@ -41,6 +44,7 @@
 			self::AILMENTS => AilmentEntityData::class,
 			self::ARMOR => ArmorEntityData::class,
 			self::ARMOR_SETS => ArmorSetEntityData::class,
+			self::ARMOR_SET_BONUSES => ArmorSetBonusEntityData::class,
 			self::CHARMS => CharmEntityData::class,
 			self::DECORATIONS => DecorationEntityData::class,
 			self::ITEMS => ItemEntityData::class,
@@ -55,6 +59,7 @@
 			Ailment::class => self::AILMENTS,
 			Armor::class => self::ARMOR,
 			ArmorSet::class => self::ARMOR_SETS,
+			ArmorSetBonus::class => self::ARMOR_SET_BONUSES,
 			Charm::class => self::CHARMS,
 			Decoration::class => self::DECORATIONS,
 			Item::class => self::ITEMS,

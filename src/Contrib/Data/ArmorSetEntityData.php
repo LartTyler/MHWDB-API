@@ -29,7 +29,7 @@
 		protected $pieces = [];
 
 		/**
-		 * @var ArmorSetBonusEntityData|null
+		 * @var int|null
 		 */
 		protected $bonus = null;
 
@@ -106,18 +106,18 @@
 		}
 
 		/**
-		 * @return ArmorSetBonusEntityData|null
+		 * @return int|null
 		 */
-		public function getBonus(): ?ArmorSetBonusEntityData {
+		public function getBonus(): ?int {
 			return $this->bonus;
 		}
 
 		/**
-		 * @param ArmorSetBonusEntityData|null $bonus
+		 * @param int|null $bonus
 		 *
 		 * @return $this
 		 */
-		public function setBonus(?ArmorSetBonusEntityData $bonus) {
+		public function setBonus(?int $bonus) {
 			$this->bonus = $bonus;
 
 			return $this;
@@ -127,16 +127,11 @@
 		 * @return array
 		 */
 		protected function doNormalize(): array {
-			$bonus = $this->getBonus();
-
-			if ($bonus)
-				$bonus = $bonus->normalize();
-
 			return [
 				'name' => $this->getName(),
 				'rank' => $this->getRank(),
 				'pieces' => $this->getPieces(),
-				'bonus' => $bonus,
+				'bonus' => $this->getBonus(),
 			];
 		}
 
@@ -155,16 +150,8 @@
 			if (ObjectUtil::isset($data, 'pieces'))
 				$this->setPieces($data->pieces);
 
-			if (ObjectUtil::isset($data, 'bonus')) {
-				$bonus = $data->bonus;
-
-				if ($bonus && $this->getBonus())
-					$this->getBonus()->update($bonus);
-				else if ($bonus)
-					$this->setBonus(ArmorSetBonusEntityData::fromJson($bonus));
-				else
-					$this->setBonus(null);
-			}
+			if (ObjectUtil::isset($data, 'bonus'))
+				$this->setBonus($data->bonus);
 		}
 
 		/**
@@ -177,7 +164,7 @@
 			$data->pieces = $source->pieces;
 
 			if ($source->bonus)
-				$data->bonus = ArmorSetBonusEntityData::fromJson($source->bonus);
+				$data->bonus = $source->bonus;
 
 			return $data;
 		}
@@ -195,7 +182,7 @@
 			$data->pieces = static::toIdArray($entity->getPieces());
 
 			if ($bonus = $entity->getBonus())
-				$data->bonus = ArmorSetBonusEntityData::fromEntity($bonus);
+				$data->bonus = $entity->getBonus()->getId();
 
 			return $data;
 		}

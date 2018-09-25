@@ -2,15 +2,15 @@
 	namespace App\Controller;
 
 	use App\Api\Exceptions\ContribNotSupportedException;
+	use App\Api\Exceptions\DeleteFailedException;
 	use App\Api\Exceptions\SlugNotSupportedException;
+	use App\Contrib\ApiErrors\DeleteError;
 	use App\Contrib\ApiErrors\InvalidPayloadError;
 	use App\Contrib\ApiErrors\UpdateError;
 	use App\Contrib\Data\EntityDataInterface;
 	use App\Contrib\DataManagerInterface;
 	use App\Contrib\EntityType;
-	use App\Contrib\Management\ContribManager;
 	use App\Entity\SluggableInterface;
-	use App\Import\ImportManager;
 	use App\QueryDocument\ApiQueryManager;
 	use App\QueryDocument\Projection;
 	use App\Response\BadProjectionObjectError;
@@ -225,10 +225,11 @@
 			if (!$entity)
 				return $this->respond(new NotFoundError());
 
-			if (json_last_error() !== JSON_ERROR_NONE)
-				return $this->respond(new InvalidPayloadError());
-
-			$dataManager->delete($entity);
+			try {
+				$dataManager->delete($entity);
+			} catch (DeleteFailedException $e) {
+				return $this->respond(new DeleteError($e->getMessage()));
+			}
 
 			$this->manager->remove($entity);
 
@@ -299,9 +300,9 @@
 
 			return new JsonResponse(
 				$data, $status, [
-				'Cache-Control' => 'public, max-age=14400',
-				'Content-Type' => 'application/json',
-			]
+					'Cache-Control' => 'public, max-age=14400',
+					'Content-Type' => 'application/json',
+				]
 			);
 		}
 

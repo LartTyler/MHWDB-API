@@ -1,6 +1,7 @@
 <?php
 	namespace App\Import\Importers;
 
+	use App\Contrib\Delete\DeleteResult;
 	use App\Contrib\EntityType;
 	use App\Contrib\Management\ContribManager;
 	use App\Entity\Armor;
@@ -207,14 +208,11 @@
 		}
 
 		/**
-		 * @param EntityInterface $entity
+		 * @param EntityInterface|Armor $entity
 		 *
 		 * @return void
 		 */
 		public function delete(EntityInterface $entity): void {
-			if (!($entity instanceof Armor))
-				throw $this->createCannotImportException();
-
 			$assets = $entity->getAssets();
 
 			if (!$assets)

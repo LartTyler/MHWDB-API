@@ -1,15 +1,19 @@
 <?php
 	namespace App\Import\Importers;
 
+	use App\Contrib\Delete\DependentObjectsFailureReason;
 	use App\Contrib\EntityType;
+	use App\Contrib\Exceptions\DeleteFailedException;
 	use App\Contrib\Management\ContribManager;
 	use App\Entity\Ailment;
 	use App\Entity\Item;
+	use App\Entity\Monster;
 	use App\Entity\Skill;
+	use App\Import\ManagedDeleteInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\ORM\EntityManagerInterface;
 
-	class AilmentImporter extends AbstractImporter {
+	class AilmentImporter extends AbstractImporter implements ManagedDeleteInterface {
 		/**
 		 * @var EntityManagerInterface
 		 */
@@ -102,5 +106,37 @@
 			$this->import($ailment, $data);
 
 			return $ailment;
+		}
+
+		/**
+		 * @param EntityInterface|Ailment $entity
+		 *
+		 * @return void
+		 */
+		public function delete(EntityInterface $entity): void {
+			$qb = $this->entityManager->createQueryBuilder()
+				->from(Monster::class, 'm')
+				->leftJoin('m.ailments', 'a')
+				->where('a.id = :ailment')
+				->setParameter('ailment', $entity);
+
+			$count = (int)$qb
+				->select('COUNT(m)')
+				->getQuery()
+					->getSingleScalarResult();
+
+			if ($count > 0) {
+				$sample = $qb
+					->select('m.id AS id')
+					->setMaxResults(5)
+					->getQuery()
+						->getArrayResult();
+
+				$sample = array_map(function(array $row): int {
+					return $row['id'];
+				}, $sample);
+
+				throw new DeleteFailedException(new DependentObjectsFailureReason('Monster', $sample, $count));
+			}
 		}
 	}

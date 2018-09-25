@@ -3,6 +3,7 @@
 
 	use App\Contrib\Data\EntityDataInterface;
 	use App\Contrib\DataManagerInterface;
+	use App\Contrib\Delete\DeleteResult;
 	use App\Contrib\EntityType;
 	use App\Contrib\Management\ContribGroup;
 	use App\Import\ImporterInterface;
@@ -99,6 +100,8 @@
 		 * @return void
 		 */
 		public function delete(EntityInterface $entity): void {
+			$this->contribGroup->delete($entity->getId());
+
 			if (!($this->importer instanceof ManagedDeleteInterface))
 				return;
 

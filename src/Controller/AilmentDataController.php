@@ -2,12 +2,10 @@
 	namespace App\Controller;
 
 	use App\Contrib\EntityType;
-	use App\Contrib\Management\ContribManager;
 	use App\Contrib\Management\Entity\AilmentDataManager;
 	use App\Entity\Ailment;
 	use App\Entity\Item;
 	use App\Entity\Skill;
-	use App\Import\ImportManager;
 	use App\QueryDocument\Projection;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;

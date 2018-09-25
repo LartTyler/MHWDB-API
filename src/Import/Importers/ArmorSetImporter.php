@@ -9,10 +9,11 @@
 	use App\Entity\ArmorSetBonusRank;
 	use App\Entity\Skill;
 	use App\Entity\SkillRank;
+	use App\Import\ManagedDeleteInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\ORM\EntityManagerInterface;
 
-	class ArmorSetImporter extends AbstractImporter {
+	class ArmorSetImporter extends AbstractImporter implements ManagedDeleteInterface {
 		/**
 		 * @var EntityManagerInterface
 		 */
@@ -80,38 +81,37 @@
 				$armor->setArmorSet($entity);
 			}
 
-			if ($definition = $data->bonus) {
-				$bonus = $entity->getBonus();
+			if ($bonusId = $data->bonus) {
+				$bonus = $this->entityManager->getRepository(ArmorSetBonus::class)->find($bonusId);
 
-				if (!$bonus) {
-					$bonus = new ArmorSetBonus($definition->name);
+				if (!$bonus)
+					throw $this->createMissingReferenceException('bonus', ArmorSetBonus::class, $bonusId);
 
-					$entity->setBonus($bonus);
-				}
-
-				$bonus->getRanks()->clear();
-
-				$skillGroup = $this->contribManager->getGroup(EntityType::SKILLS);
-
-				foreach ($definition->ranks as $i => $rankDefinition) {
-					$skillId = $skillGroup->getTrueId($rankDefinition->skill->skill);
-					$skill = $this->entityManager->getRepository(Skill::class)->find($skillId);
-
-					if (!$skillId) {
-						throw $this->createMissingReferenceException('bonus.ranks[' . $i . '].skill.skill',
-							Skill::class, $skillId);
-					}
-
-					$skillRank = $skill->getRank($rankDefinition->skill->level);
-
-					if (!$skillRank) {
-						throw $this->createMissingReferenceException('bonus.ranks[' . $i . '].skill.level',
-							SkillRank::class, $rankDefinition->skill->level);
-					}
-
-					$bonus->getRanks()->add(new ArmorSetBonusRank($bonus, $rankDefinition->pieces, $skillRank));
-				}
+				$entity->setBonus($bonus);
 			} else
 				$entity->setBonus(null);
+		}
+
+		/**
+		 * @param EntityInterface|ArmorSet $entity
+		 *
+		 * @return void
+		 */
+		public function delete(EntityInterface $entity): void {
+			foreach ($entity->getPieces() as $piece)
+				$piece->setArmorSet(null);
+
+			$otherSets = (int)$this->entityManager->createQueryBuilder()
+				->from(ArmorSet::class, 's')
+				->select('COUNT(s)')
+				->where('s.id != :set')
+				->andWhere('IDENTITY(s.bonus) = :bonus')
+				->setParameter('set', $entity)
+				->setParameter('bonus', $entity->getBonus())
+				->getQuery()
+					->getSingleScalarResult();
+
+			if ($otherSets === 0)
+				$this->entityManager->remove($entity->getBonus());
 		}
 	}

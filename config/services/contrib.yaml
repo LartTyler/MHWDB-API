@@ -16,6 +16,7 @@ services:
     App\Contrib\Management\Entity\AilmentDataManager: ~
     App\Contrib\Management\Entity\ArmorDataManager: ~
     App\Contrib\Management\Entity\ArmorSetDataManager: ~
+    App\Contrib\Management\Entity\ArmorSetBonusDataManager: ~
     App\Contrib\Management\Entity\CharmDataManager: ~
     App\Contrib\Management\Entity\DecorationDataManager: ~
     App\Contrib\Management\Entity\ItemDataManager: ~
