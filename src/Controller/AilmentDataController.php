@@ -1,15 +1,12 @@
 <?php
 	namespace App\Controller;
 
-	use App\Contrib\EntityType;
-	use App\Contrib\Management\Entity\AilmentDataManager;
 	use App\Entity\Ailment;
 	use App\Entity\Item;
 	use App\Entity\Skill;
 	use App\QueryDocument\Projection;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 	use Symfony\Bridge\Doctrine\RegistryInterface;
 	use Symfony\Component\HttpFoundation\Request;
 	use Symfony\Component\HttpFoundation\Response;
@@ -25,7 +22,7 @@
 		 * @param RouterInterface   $router
 		 */
 		public function __construct(RegistryInterface $doctrine, ResponderService $responder, RouterInterface $router) {
-			parent::__construct($doctrine, $responder, $router, Ailment::class, EntityType::AILMENTS);
+			parent::__construct($doctrine, $responder, $router, Ailment::class);
 		}
 
 		/**
@@ -48,39 +45,6 @@
 		 */
 		public function read(string $id): Response {
 			return parent::read($id);
-		}
-
-		/**
-		 * @Route(path="/ailments/{id<\d+>}", methods={"PATCH"}, name="ailments.update")
-		 * @IsGranted("ROLE_USER")
-		 *
-		 * @param AilmentDataManager $dataManager
-		 * @param Request            $request
-		 * @param string             $id
-		 *
-		 * @return Response
-		 * @throws \App\Api\Exceptions\ContribNotSupportedException
-		 * @throws \Doctrine\ORM\ORMException
-		 * @throws \Doctrine\ORM\OptimisticLockException
-		 */
-		public function update(
-			AilmentDataManager $dataManager,
-			Request $request,
-			string $id
-		): Response {
-			return parent::doUpdate($dataManager, $request, $id);
-		}
-
-		/**
-		 * @param AilmentDataManager $dataManager
-		 * @param string             $id
-		 *
-		 * @return Response
-		 * @throws \App\Api\Exceptions\ContribNotSupportedException
-		 * @throws \Doctrine\ORM\ORMException
-		 */
-		public function delete(AilmentDataManager $dataManager, string $id): Response {
-			return parent::doDelete($dataManager, $id);
 		}
 
 		/**
