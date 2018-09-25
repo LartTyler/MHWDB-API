@@ -41,14 +41,14 @@
 		}
 
 		/**
-		 * @Route(path="/weapons/{idOrSlug}", methods={"GET"}, name="weapons.read")
+		 * @Route(path="/weapons/{weapon<\d+>}", methods={"GET"}, name="weapons.read")
 		 *
-		 * @param string $idOrSlug
+		 * @param Weapon $weapon
 		 *
 		 * @return Response
 		 */
-		public function read(string $idOrSlug): Response {
-			return parent::read($idOrSlug);
+		public function read(Weapon $weapon): Response {
+			return $this->respond($weapon);
 		}
 
 		/**
@@ -63,7 +63,6 @@
 
 			$output = [
 				'id' => $entity->getId(),
-				'slug' => $entity->getSlug(),
 				'name' => $entity->getName(),
 				'type' => $entity->getType(),
 				'rarity' => $entity->getRarity(),

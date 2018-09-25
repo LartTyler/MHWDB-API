@@ -36,14 +36,14 @@
 		}
 
 		/**
-		 * @Route(path="/decorations/{idOrSlug}", methods={"GET"}, name="decorations.read")
+		 * @Route(path="/decorations/{decoration<\d+>}", methods={"GET"}, name="decorations.read")
 		 *
-		 * @param string $idOrSlug
+		 * @param Decoration $decoration
 		 *
 		 * @return Response
 		 */
-		public function read(string $idOrSlug): Response {
-			return parent::read($idOrSlug);
+		public function read(Decoration $decoration): Response {
+			return $this->respond($decoration);
 		}
 
 		/**
@@ -58,7 +58,6 @@
 
 			$output = [
 				'id' => $entity->getId(),
-				'slug' => $entity->getSlug(),
 				'name' => $entity->getName(),
 				'rarity' => $entity->getRarity(),
 				'slot' => $entity->getSlot(),
@@ -69,7 +68,6 @@
 				$output['skills'] = array_map(function(SkillRank $rank) use ($projection): array {
 					$output = [
 						'id' => $rank->getId(),
-						'slug' => $rank->getSlug(),
 						'description' => $rank->getDescription(),
 						'level' => $rank->getLevel(),
 						'modifiers' => $rank->getModifiers(),

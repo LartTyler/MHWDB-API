@@ -21,9 +21,8 @@
 	 *
 	 * @package App\Entity
 	 */
-	class Weapon implements EntityInterface, SluggableInterface, LengthCachingEntityInterface {
+	class Weapon implements EntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
-		use SluggableTrait;
 		use AttributableTrait;
 
 		/**
@@ -135,8 +134,6 @@
 			$this->attack = new WeaponAttackValues();
 			$this->elements = new ArrayCollection();
 			$this->durability = new ArrayCollection();
-
-			$this->setSlug($name);
 		}
 
 		/**
@@ -153,8 +150,6 @@
 		 */
 		public function setName($name) {
 			$this->name = $name;
-
-			$this->setSlug($name);
 
 			return $this;
 		}

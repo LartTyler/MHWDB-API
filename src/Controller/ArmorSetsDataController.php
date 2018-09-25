@@ -42,14 +42,14 @@
 		}
 
 		/**
-		 * @Route(path="/armor/sets/{id<\d+>}", methods={"GET"}, name="armor-sets.read")
+		 * @Route(path="/armor/sets/{set<\d+>}", methods={"GET"}, name="armor-sets.read")
 		 *
-		 * @param string $id
+		 * @param ArmorSet $set
 		 *
 		 * @return Response
 		 */
-		public function read(string $id): Response {
-			return parent::read($id);
+		public function read(ArmorSet $set): Response {
+			return $this->respond($set);
 		}
 
 		/**
@@ -76,7 +76,6 @@
 
 					$output = [
 						'id' => $armor->getId(),
-						'slug' => $armor->getSlug(),
 						'name' => $armor->getName(),
 						'type' => $armor->getType(),
 						'rank' => $armor->getRank(),
@@ -112,7 +111,6 @@
 						$output['skills'] = array_map(function(SkillRank $rank) use ($projection): array {
 							$output = [
 								'id' => $rank->getId(),
-								'slug' => $rank->getSlug(),
 								'level' => $rank->getLevel(),
 								'description' => $rank->getDescription(),
 								'modifiers' => $rank->getModifiers(),
@@ -226,7 +224,6 @@
 
 									$output['skill'] = [
 										'id' => $skillRank->getId(),
-										'slug' => $skillRank->getSlug(),
 										'level' => $skillRank->getLevel(),
 										'description' => $skillRank->getDescription(),
 										'modifiers' => $skillRank->getModifiers() ?: new \stdClass(),

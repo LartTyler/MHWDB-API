@@ -36,14 +36,14 @@
 		}
 
 		/**
-		 * @Route(path="/skills/{idOrSlug}", methods={"GET"}, name="skills.read")
+		 * @Route(path="/skills/{skill<\d+>}", methods={"GET"}, name="skills.read")
 		 *
-		 * @param string $idOrSlug
+		 * @param Skill $skill
 		 *
 		 * @return Response
 		 */
-		public function read(string $idOrSlug): Response {
-			return parent::read($idOrSlug);
+		public function read(Skill $skill): Response {
+			return $this->respond($skill);
 		}
 
 		/**
@@ -58,7 +58,6 @@
 
 			$output = [
 				'id' => $entity->getId(),
-				'slug' => $entity->getSlug(),
 				'name' => $entity->getName(),
 				'description' => $entity->getDescription(),
 			];
@@ -70,7 +69,6 @@
 
 					return [
 						'id' => $rank->getId(),
-						'slug' => $rank->getSlug(),
 						'skill' => $rank->getSkill()->getId(),
 						'skillName' => $rank->getSkill()->getName(),
 						'level' => $rank->getLevel(),

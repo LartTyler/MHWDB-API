@@ -20,9 +20,8 @@
 	 *
 	 * @package App\Entity
 	 */
-	class Armor implements EntityInterface, SluggableInterface, LengthCachingEntityInterface {
+	class Armor implements EntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
-		use SluggableTrait;
 		use AttributableTrait;
 
 		/**
@@ -142,8 +141,6 @@
 			$this->defense = new ArmorDefenseValues();
 			$this->skills = new ArrayCollection();
 			$this->slots = new ArrayCollection();
-
-			$this->setSlug($name);
 		}
 
 		/**

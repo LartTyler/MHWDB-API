@@ -36,14 +36,14 @@
 		}
 
 		/**
-		 * @Route(path="/locations/{id<\d+>}", methods={"GET"}, name="locations.read")
+		 * @Route(path="/locations/{location<\d+>}", methods={"GET"}, name="locations.read")
 		 *
-		 * @param string $id
+		 * @param Location $location
 		 *
 		 * @return Response
 		 */
-		public function read(string $id): Response {
-			return parent::read($id);
+		public function read(Location $location): Response {
+			return $this->respond($location);
 		}
 
 		/**

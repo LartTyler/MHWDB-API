@@ -16,9 +16,8 @@
 	 *
 	 * @package App\Entity
 	 */
-	class Charm implements EntityInterface, SluggableInterface, LengthCachingEntityInterface {
+	class Charm implements EntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
-		use SluggableTrait;
 
 		/**
 		 * @ORM\Column(type="string", length=64, unique=true)
@@ -50,8 +49,6 @@
 		public function __construct(string $name) {
 			$this->name = $name;
 			$this->ranks = new ArrayCollection();
-
-			$this->setSlug($name);
 		}
 
 		/**

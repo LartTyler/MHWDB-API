@@ -39,14 +39,14 @@
 		}
 
 		/**
-		 * @Route(path="/monsters/{id<\d+>}", methods={"GET"}, name="monsters.read")
+		 * @Route(path="/monsters/{monster<\d+>}", methods={"GET"}, name="monsters.read")
 		 *
-		 * @param string $id
+		 * @param Monster $monster
 		 *
 		 * @return Response
 		 */
-		public function read(string $id): Response {
-			return parent::read($id);
+		public function read(Monster $monster): Response {
+			return $this->respond($monster);
 		}
 
 		/**

@@ -4,6 +4,13 @@
 	use App\Utility\StringUtil;
 	use Doctrine\ORM\Mapping as ORM;
 
+	/**
+	 * Trait SluggableTrait
+	 *
+	 * @package App\Entity
+	 *
+	 * @deprecated
+	 */
 	trait SluggableTrait {
 		/**
 		 * @ORM\Column(type="string", length=64, nullable=false, unique=true)

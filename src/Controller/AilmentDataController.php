@@ -37,14 +37,14 @@
 		}
 
 		/**
-		 * @Route(path="/ailments/{id<\d+>}", methods={"GET"}, name="ailments.read")
+		 * @Route(path="/ailments/{ailment<\d+>}", methods={"GET"}, name="ailments.read")
 		 *
-		 * @param string $id
+		 * @param Ailment $ailment
 		 *
 		 * @return Response
 		 */
-		public function read(string $id): Response {
-			return parent::read($id);
+		public function read(Ailment $ailment): Response {
+			return $this->respond($ailment);
 		}
 
 		/**

@@ -55,14 +55,14 @@
 		}
 
 		/**
-		 * @Route(path="/motion-values/{id<\d+>}", methods={"GET"}, name="motion-values.read")
+		 * @Route(path="/motion-values/{motionValue<\d+>}", methods={"GET"}, name="motion-values.read")
 		 *
-		 * @param string $id
+		 * @param MotionValue $motionValue
 		 *
 		 * @return Response
 		 */
-		public function read(string $id): Response {
-			return parent::read($id);
+		public function read(MotionValue $motionValue): Response {
+			return $this->respond($motionValue);
 		}
 
 		/**

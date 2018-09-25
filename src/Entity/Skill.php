@@ -16,9 +16,8 @@
 	 *
 	 * @package App\Entity
 	 */
-	class Skill implements EntityInterface, SluggableInterface, LengthCachingEntityInterface {
+	class Skill implements EntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
-		use SluggableTrait;
 
 		/**
 		 * @ORM\Column(type="string", length=64, unique=true)
@@ -57,8 +56,6 @@
 		public function __construct(string $name) {
 			$this->name = $name;
 			$this->ranks = new ArrayCollection();
-
-			$this->updateSlug();
 		}
 
 		/**
@@ -75,8 +72,6 @@
 		 */
 		public function setName(string $name) {
 			$this->name = $name;
-
-			$this->updateSlug();
 
 			return $this;
 		}
@@ -104,13 +99,6 @@
 				return $matched->first();
 
 			return null;
-		}
-
-		/**
-		 * @return void
-		 */
-		protected function updateSlug(): void {
-			$this->setSlug($this->getName());
 		}
 
 		/**

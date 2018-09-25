@@ -35,14 +35,14 @@
 		}
 
 		/**
-		 * @Route(path="/items/{id<\d+>}", methods={"GET"}, name="items.read")
+		 * @Route(path="/items/{item<\d+>}", methods={"GET"}, name="items.read")
 		 *
-		 * @param string $id
+		 * @param Item $item
 		 *
 		 * @return Response
 		 */
-		public function read(string $id): Response {
-			return parent::read($id);
+		public function read(Item $item): Response {
+			return $this->respond($item);
 		}
 
 		/**

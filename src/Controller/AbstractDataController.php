@@ -1,15 +1,12 @@
 <?php
 	namespace App\Controller;
 
-	use App\Api\Exceptions\SlugNotSupportedException;
-	use App\Entity\SluggableInterface;
 	use App\QueryDocument\ApiQueryManager;
 	use App\QueryDocument\Projection;
 	use App\Response\BadProjectionObjectError;
 	use App\Response\BadQueryObjectError;
 	use App\Response\EmptySearchParametersError;
 	use App\Response\SearchError;
-	use App\Response\SlugNotSupportedError;
 	use DaybreakStudios\Doze\Errors\ApiErrorInterface;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -112,38 +109,12 @@
 		}
 
 		/**
-		 * @param string $idOrSlug
-		 *
-		 * @return Response
-		 */
-		public function read(string $idOrSlug): Response {
-			try {
-				$entity = $this->getEntityFromIdOrSlug($idOrSlug);
-			} catch (SlugNotSupportedException $e) {
-				return $this->respond(new SlugNotSupportedError());
-			}
-
-			return $this->respond($entity);
-		}
-
-		/**
-		 * @param string $idOrSlug
+		 * @param int $id
 		 *
 		 * @return EntityInterface|null
 		 */
-		protected function getEntityFromIdOrSlug(string $idOrSlug): ?EntityInterface {
-			if (is_numeric($idOrSlug))
-				return $this->manager->getRepository($this->entityClass)->find((int)$idOrSlug);
-			else {
-				if (!is_a($this->entityClass, SluggableInterface::class, true))
-					throw new SlugNotSupportedException($this->entityClass);
-
-				return $this->manager->getRepository($this->entityClass)->findOneBy(
-					[
-						'slug' => $idOrSlug,
-					]
-				);
-			}
+		protected function getEntity(int $id): ?EntityInterface {
+			return $this->manager->getRepository($this->entityClass)->find($id);
 		}
 
 		/**

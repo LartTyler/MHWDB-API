@@ -38,14 +38,14 @@
 		}
 
 		/**
-		 * @Route(path="/charms/{idOrSlug}", methods={"GET"}, name="charms.read")
+		 * @Route(path="/charms/{charm<\d+>}", methods={"GET"}, name="charms.read")
 		 *
-		 * @param string $idOrSlug
+		 * @param Charm $charm
 		 *
 		 * @return Response
 		 */
-		public function read(string $idOrSlug): Response {
-			return parent::read($idOrSlug);
+		public function read(Charm $charm): Response {
+			return $this->respond($charm);
 		}
 
 		/**
@@ -60,7 +60,6 @@
 
 			$output = [
 				'id' => $entity->getId(),
-				'slug' => $entity->getSlug(),
 				'name' => $entity->getName(),
 			];
 
@@ -78,7 +77,6 @@
 						$output['skills'] = array_map(function(SkillRank $skillRank) use ($projection): array {
 							$output = [
 								'id' => $skillRank->getId(),
-								'slug' => $skillRank->getSlug(),
 								'level' => $skillRank->getLevel(),
 								'description' => $skillRank->getDescription(),
 								'modifiers' => $skillRank->getModifiers(),
