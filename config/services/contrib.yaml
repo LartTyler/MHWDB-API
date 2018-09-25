@@ -3,24 +3,10 @@ services:
         public: false
         autowire: true
         autoconfigure: true
-        bind:
-            $contribDir: '%env(resolve:EXPORT_DEFAULT_PATH)%'
 
-    App\Controller\ContribController:
-        tags:
+    App\Contrib\TransformerManager:
+        arguments:
             -
-                name: controller.service_arguments
+                - '@App\Contrib\Transformers\AilmentTransformer'
 
-    App\Contrib\Management\ContribManager: ~
-
-    App\Contrib\Management\Entity\AilmentDataManager: ~
-    App\Contrib\Management\Entity\ArmorDataManager: ~
-    App\Contrib\Management\Entity\ArmorSetDataManager: ~
-    App\Contrib\Management\Entity\ArmorSetBonusDataManager: ~
-    App\Contrib\Management\Entity\CharmDataManager: ~
-    App\Contrib\Management\Entity\DecorationDataManager: ~
-    App\Contrib\Management\Entity\ItemDataManager: ~
-    App\Contrib\Management\Entity\LocationDataManager: ~
-    App\Contrib\Management\Entity\MotionValueDataManager: ~
-    App\Contrib\Management\Entity\SkillDataManager: ~
-    App\Contrib\Management\Entity\WeaponDataManager: ~
+    App\Contrib\Transformers\AilmentTransformer: ~
