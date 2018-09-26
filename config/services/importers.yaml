@@ -19,10 +19,6 @@ services:
                 - '@App\Import\Importers\MotionValueImporter'
                 - '@App\Import\Importers\WeaponImporter'
 
-    App\Import\AssetManager:
-        bind:
-            $bucket: '%env(resolve:ASSETS_BUCKET_NAME)%'
-
     App\Import\Importers\AilmentImporter: ~
     App\Import\Importers\ArmorImporter: ~
     App\Import\Importers\ArmorSetBonusImporter: ~

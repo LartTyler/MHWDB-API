@@ -4,5 +4,9 @@ services:
         autowire: true
         autoconfigure: true
 
+    App\Contrib\BucketManager:
+        bind:
+            $bucket: '%env(resolve:ASSETS_BUCKET_NAME)%'
+
     App\Contrib\Transformers\AilmentTransformer: ~
     App\Contrib\Transformers\ArmorTransformer: ~

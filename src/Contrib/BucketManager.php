@@ -4,7 +4,7 @@
 	use Aws\S3\S3Client;
 	use Aws\Sdk;
 
-	class AssetManager {
+	class BucketManager {
 		/**
 		 * @var S3Client
 		 */
@@ -31,7 +31,7 @@
 		 * @param resource $image
 		 * @param string   $contentType
 		 *
-		 * @return AssetManager
+		 * @return BucketManager
 		 */
 		public function put(string $key, $image, string $contentType = 'image/png') {
 			if (!is_resource($image))
