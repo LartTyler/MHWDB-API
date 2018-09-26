@@ -10,18 +10,8 @@
 	use App\Game\Element;
 	use App\Utility\ObjectUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use Doctrine\ORM\EntityManagerInterface;
 
 	class ArmorTransformer extends AbstractTransformer {
-		/**
-		 * ArmorTransformer constructor.
-		 *
-		 * @param EntityManagerInterface $entityManager
-		 */
-		public function __construct(EntityManagerInterface $entityManager) {
-			parent::__construct($entityManager);
-		}
-
 		/**
 		 * @param EntityInterface $entity
 		 * @param object          $data

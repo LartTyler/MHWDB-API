@@ -8,23 +8,8 @@
 	use App\Entity\Skill;
 	use App\Utility\ObjectUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use Doctrine\ORM\EntityManagerInterface;
 
 	class AilmentTransformer extends AbstractTransformer {
-		/**
-		 * @var EntityManagerInterface
-		 */
-		protected $entityManager;
-
-		/**
-		 * AilmentTransformer constructor.
-		 *
-		 * @param EntityManagerInterface $entityManager
-		 */
-		public function __construct(EntityManagerInterface $entityManager) {
-			parent::__construct($entityManager);
-		}
-
 		/**
 		 * @param EntityInterface $entity
 		 * @param object          $data
@@ -116,7 +101,7 @@
 				->where('a.id = :ailment')
 				->setParameter('ailment', $entity)
 				->getQuery()
-				->getResult();
+					->getResult();
 
 			foreach ($monsters as $monster)
 				$monster->getAilments()->removeElement($entity);
