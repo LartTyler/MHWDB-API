@@ -1,6 +1,7 @@
 <?php
 	namespace App\Controller;
 
+	use App\Contrib\Transformers\ArmorSetTransformer;
 	use App\Entity\Armor;
 	use App\Entity\ArmorSet;
 	use App\Entity\ArmorSetBonusRank;
@@ -11,6 +12,7 @@
 	use App\Game\Element;
 	use App\QueryDocument\Projection;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
+	use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 	use Symfony\Component\HttpFoundation\Request;
 	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\Routing\Annotation\Route;
@@ -35,6 +37,19 @@
 		}
 
 		/**
+		 * @Route(path="/armor/sets", methods={"PUT"}, name="armor-sets.create")
+		 * @IsGranted("ROLE_EDITOR")
+		 *
+		 * @param ArmorSetTransformer $transformer
+		 * @param Request             $request
+		 *
+		 * @return Response
+		 */
+		public function create(ArmorSetTransformer $transformer, Request $request): Response {
+			return $this->doCreate($transformer, $request);
+		}
+
+		/**
 		 * @Route(path="/armor/sets/{set<\d+>}", methods={"GET"}, name="armor-sets.read")
 		 *
 		 * @param ArmorSet $set
@@ -43,6 +58,33 @@
 		 */
 		public function read(ArmorSet $set): Response {
 			return $this->respond($set);
+		}
+
+		/**
+		 * @Route(path="/armor/sets/{set<\d+>}", methods={"PATCH"}, name="armor-sets.update")
+		 * @IsGranted("ROLE_EDITOR")
+		 *
+		 * @param ArmorSetTransformer $transformer
+		 * @param Request             $request
+		 * @param ArmorSet            $set
+		 *
+		 * @return Response
+		 */
+		public function update(ArmorSetTransformer $transformer, Request $request, ArmorSet $set): Response {
+			return $this->doUpdate($transformer, $set, $request);
+		}
+
+		/**
+		 * @Route(path="/armor/sets/{set<\d+>}", methods={"DELETE"}, name="armor-sets.delete")
+		 * @IsGranted("ROLE_EDITOR")
+		 *
+		 * @param ArmorSetTransformer $transformer
+		 * @param ArmorSet            $set
+		 *
+		 * @return Response
+		 */
+		public function delete(ArmorSetTransformer $transformer, ArmorSet $set): Response {
+			return $this->doDelete($transformer, $set);
 		}
 
 		/**
