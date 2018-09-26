@@ -150,21 +150,5 @@
 
 			if ($set = $entity->getArmorSet())
 				$set->getPieces()->removeElement($entity);
-
-			if ($assets = $entity->getAssets()) {
-				/** @var Asset|null $asset */
-				foreach ([$assets->getImageMale(), $assets->getImageFemale()] as $asset) {
-					if (!$asset)
-						continue;
-
-					$count = $this->getAssetUsageCount($asset);
-
-					if ($count > 1)
-						continue;
-
-					$this->assetManager->deleteUri($asset->getUri());
-					$this->entityManager->remove($asset);
-				}
-			}
 		}
 	}
