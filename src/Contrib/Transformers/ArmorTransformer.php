@@ -6,7 +6,7 @@
 	use App\Entity\Armor;
 	use App\Entity\ArmorCraftingInfo;
 	use App\Entity\ArmorSet;
-	use App\Entity\Slot;
+	use App\Entity\ArmorSlot;
 	use App\Game\Element;
 	use App\Utility\ObjectUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -80,7 +80,7 @@
 					if (!ObjectUtil::isset($definition, 'rank'))
 						throw ValidationException::missingFields(['slots[' . $index . '].rank']);
 
-					$entity->getSlots()->add(new Slot($definition->rank));
+					$entity->getSlots()->add(new ArmorSlot($entity, $definition->rank));
 				}
 			}
 

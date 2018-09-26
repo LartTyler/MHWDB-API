@@ -75,15 +75,9 @@
 		private $skills;
 
 		/**
-		 * @ORM\ManyToMany(targetEntity="App\Entity\Slot", orphanRemoval=true, cascade={"all"})
-		 * @ORM\JoinTable(
-		 *     name="armor_slots",
-		 *     inverseJoinColumns={
-		 *         @ORM\JoinColumn(unique=true)
-		 *     }
-		 * )
+		 * @ORM\OneToMany(targetEntity="App\Entity\ArmorSlot", mappedBy="armor", orphanRemoval=true, cascade={"all"})
 		 *
-		 * @var Collection|Selectable|Slot[]
+		 * @var Collection|Selectable|ArmorSlot[]
 		 */
 		private $slots;
 
@@ -137,8 +131,10 @@
 			$this->type = $type;
 			$this->rank = $rank;
 			$this->rarity = $rarity;
+
 			$this->resistances = new Resistances();
 			$this->defense = new ArmorDefenseValues();
+
 			$this->skills = new ArrayCollection();
 			$this->slots = new ArrayCollection();
 		}
@@ -187,7 +183,7 @@
 		}
 
 		/**
-		 * @return Slot[]|Collection|Selectable
+		 * @return ArmorSlot[]|Collection|Selectable
 		 */
 		public function getSlots() {
 			return $this->slots;

@@ -2,10 +2,10 @@
 	namespace App\Controller;
 
 	use App\Entity\CraftingMaterialCost;
-	use App\Entity\Slot;
 	use App\Entity\Weapon;
 	use App\Entity\WeaponElement;
 	use App\Entity\WeaponSharpness;
+	use App\Entity\WeaponSlot;
 	use App\Game\WeaponType;
 	use App\QueryDocument\Projection;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -70,38 +70,47 @@
 			if (WeaponType::isMelee($entity->getType()) && $projection->isAllowed('durability')) {
 				$durability = $entity->getDurability();
 
-				$output['durability'] = array_map(function(WeaponSharpness $sharpness): array {
-					return [
-						'red' => $sharpness->getRed(),
-						'orange' => $sharpness->getOrange(),
-						'yellow' => $sharpness->getYellow(),
-						'green' => $sharpness->getGreen(),
-						'blue' => $sharpness->getBlue(),
-						'white' => $sharpness->getWhite(),
-					];
-				}, $durability->toArray());
+				$output['durability'] = array_map(
+					function(WeaponSharpness $sharpness): array {
+						return [
+							'red' => $sharpness->getRed(),
+							'orange' => $sharpness->getOrange(),
+							'yellow' => $sharpness->getYellow(),
+							'green' => $sharpness->getGreen(),
+							'blue' => $sharpness->getBlue(),
+							'white' => $sharpness->getWhite(),
+						];
+					},
+					$durability->toArray()
+				);
 			}
 			// endregion
 
 			// region Slots Fields
 			if ($projection->isAllowed('slots')) {
-				$output['slots'] = array_map(function(Slot $slot): array {
-					return [
-						'rank' => $slot->getRank(),
-					];
-				}, $entity->getSlots()->toArray());
+				$output['slots'] = array_map(
+					function(WeaponSlot $slot): array {
+						return [
+							'rank' => $slot->getRank(),
+						];
+					},
+					$entity->getSlots()->toArray()
+				);
 			}
 			// endregion
 
 			// region Elements Fields
 			if ($projection->isAllowed('elements')) {
-				$output['elements'] = array_map(function(WeaponElement $element): array {
-					return [
-						'type' => $element->getType(),
-						'damage' => $element->getDamage(),
-						'hidden' => $element->isHidden(),
-					];
-				}, $entity->getElements()->toArray());
+				$output['elements'] = array_map(
+					function(WeaponElement $element): array {
+						return [
+							'type' => $element->getType(),
+							'damage' => $element->getDamage(),
+							'hidden' => $element->isHidden(),
+						];
+					},
+					$entity->getElements()->toArray()
+				);
 			}
 			// endregion
 
@@ -117,29 +126,32 @@
 					 * @return array
 					 */
 					$transformer = function(string $type, Collection $costs) use ($projection): array {
-						return array_map(function(CraftingMaterialCost $cost) use ($projection, $type): array {
-							$output = [
-								'quantity' => $cost->getQuantity(),
-							];
-
-							// region Item Fields
-							if ($projection->isAllowed(sprintf('crafting.%s.item', $type))) {
-								$item = $cost->getItem();
-
-								$output['item'] = [
-									'id' => $item->getId(),
-									'name' => $item->getName(),
-									'description' => $item->getDescription(),
-									'rarity' => $item->getRarity(),
-									'carryLimit' => $item->getCarryLimit(),
-									'value' => $item->getValue(),
+						return array_map(
+							function(CraftingMaterialCost $cost) use ($projection, $type): array {
+								$output = [
+									'quantity' => $cost->getQuantity(),
 								];
-							}
 
-							// endregion
+								// region Item Fields
+								if ($projection->isAllowed(sprintf('crafting.%s.item', $type))) {
+									$item = $cost->getItem();
 
-							return $output;
-						}, $costs->toArray());
+									$output['item'] = [
+										'id' => $item->getId(),
+										'name' => $item->getName(),
+										'description' => $item->getDescription(),
+										'rarity' => $item->getRarity(),
+										'carryLimit' => $item->getCarryLimit(),
+										'value' => $item->getValue(),
+									];
+								}
+
+								// endregion
+
+								return $output;
+							},
+							$costs->toArray()
+						);
 					};
 
 					$output['crafting'] = [
@@ -156,23 +168,32 @@
 
 					// region Branches Fields
 					if ($projection->isAllowed('crafting.branches')) {
-						$output['crafting']['branches'] = array_map(function(Weapon $branch): int {
-							return $branch->getId();
-						}, $crafting->getBranches()->toArray());
+						$output['crafting']['branches'] = array_map(
+							function(Weapon $branch): int {
+								return $branch->getId();
+							},
+							$crafting->getBranches()->toArray()
+						);
 					}
 					// endregion
 
 					// region Crafting Materials Fields
 					if ($projection->isAllowed('crafting.craftingMaterials')) {
-						$output['crafting']['craftingMaterials'] = call_user_func($transformer, 'craftingMaterials',
-							$crafting->getCraftingMaterials());
+						$output['crafting']['craftingMaterials'] = call_user_func(
+							$transformer,
+							'craftingMaterials',
+							$crafting->getCraftingMaterials()
+						);
 					}
 					// endregion
 
 					// region Upgrade Materials Fields
 					if ($projection->isAllowed('crafting.upgradeMaterials')) {
-						$output['crafting']['upgradeMaterials'] = call_user_func($transformer, 'upgradeMaterials',
-							$crafting->getUpgradeMaterials());
+						$output['crafting']['upgradeMaterials'] = call_user_func(
+							$transformer,
+							'upgradeMaterials',
+							$crafting->getUpgradeMaterials()
+						);
 					}
 					// endregion
 				} else
