@@ -17,6 +17,13 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
+        auth_refresh:
+            pattern: ^/auth/refresh
+            stateless: true
+            guard:
+                authenticators:
+                    - lexik_jwt_authentication.jwt_token_authenticator
+
         auth:
             pattern: ^/auth
             anonymous: true
