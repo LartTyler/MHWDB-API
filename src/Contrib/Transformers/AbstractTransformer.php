@@ -118,8 +118,16 @@
 					]
 				);
 
-				if ($missing)
-					throw ValidationException::missingFields($missing);
+				if ($missing) {
+					throw ValidationException::missingFields(
+						array_map(
+							function(string $key) use ($path, $index): string {
+								return $path . '[' . $index . '].' . $key;
+							},
+							$missing
+						)
+					);
+				}
 
 				$skill = $this->entityManager->getRepository(Skill::class)->find($rank->skill);
 
@@ -154,8 +162,16 @@
 					]
 				);
 
-				if ($missing)
-					throw ValidationException::missingFields($missing);
+				if ($missing) {
+					throw ValidationException::missingFields(
+						array_map(
+							function(string $key) use ($path, $index): string {
+								return $path . '[' . $index . '].' . $key;
+							},
+							$missing
+						)
+					);
+				}
 
 				$item = $this->entityManager->getRepository(Item::class)->find($cost->item);
 
