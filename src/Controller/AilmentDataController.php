@@ -1,28 +1,24 @@
 <?php
 	namespace App\Controller;
 
+	use App\Contrib\ApiErrors\InvalidPayloadError;
+	use App\Contrib\Transformers\AilmentTransformer;
 	use App\Entity\Ailment;
 	use App\Entity\Item;
 	use App\Entity\Skill;
 	use App\QueryDocument\Projection;
-	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use Symfony\Bridge\Doctrine\RegistryInterface;
+	use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 	use Symfony\Component\HttpFoundation\Request;
 	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\Routing\Annotation\Route;
-	use Symfony\Component\Routing\RouterInterface;
 
 	class AilmentDataController extends AbstractDataController {
 		/**
 		 * AilmentDataController constructor.
-		 *
-		 * @param RegistryInterface $doctrine
-		 * @param ResponderService  $responder
-		 * @param RouterInterface   $router
 		 */
-		public function __construct(RegistryInterface $doctrine, ResponderService $responder, RouterInterface $router) {
-			parent::__construct($doctrine, $responder, $router, Ailment::class);
+		public function __construct() {
+			parent::__construct(Ailment::class);
 		}
 
 		/**
@@ -37,6 +33,19 @@
 		}
 
 		/**
+		 * @Route(path="/ailments", methods={"PUT"}, name="ailments.create")
+		 * @IsGranted("ROLE_EDITOR")
+		 *
+		 * @param AilmentTransformer $transformer
+		 * @param Request            $request
+		 *
+		 * @return Response
+		 */
+		public function create(AilmentTransformer $transformer, Request $request): Response {
+			return $this->doCreate($transformer, $request);
+		}
+
+		/**
 		 * @Route(path="/ailments/{ailment<\d+>}", methods={"GET"}, name="ailments.read")
 		 *
 		 * @param Ailment $ailment
@@ -45,6 +54,33 @@
 		 */
 		public function read(Ailment $ailment): Response {
 			return $this->respond($ailment);
+		}
+
+		/**
+		 * @Route(path="/ailments/{ailment<\d+>}", methods={"PATCH"}, name="ailments.update")
+		 * @IsGranted("ROLE_EDITOR")
+		 *
+		 * @param AilmentTransformer $transformer
+		 * @param Ailment            $ailment
+		 * @param Request            $request
+		 *
+		 * @return Response
+		 */
+		public function update(AilmentTransformer $transformer, Ailment $ailment, Request $request): Response {
+			return $this->doUpdate($transformer, $ailment, $request);
+		}
+
+		/**
+		 * @Route(path="/ailments/{ailment<\d+>}", methods={"DELETE"}, name="ailments.delete")
+		 * @IsGranted("ROLE_EDITOR")
+		 *
+		 * @param AilmentTransformer $transformer
+		 * @param Ailment            $ailment
+		 *
+		 * @return Response
+		 */
+		public function delete(AilmentTransformer $transformer, Ailment $ailment): Response {
+			return $this->doDelete($transformer, $ailment);
 		}
 
 		/**

@@ -10,24 +10,17 @@
 	use App\Entity\Slot;
 	use App\Game\Element;
 	use App\QueryDocument\Projection;
-	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use Symfony\Bridge\Doctrine\RegistryInterface;
 	use Symfony\Component\HttpFoundation\Request;
 	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\Routing\Annotation\Route;
-	use Symfony\Component\Routing\RouterInterface;
 
 	class ArmorSetsDataController extends AbstractDataController {
 		/**
 		 * ArmorSetsDataController constructor.
-		 *
-		 * @param RegistryInterface $doctrine
-		 * @param ResponderService  $responder
-		 * @param RouterInterface   $router
 		 */
-		public function __construct(RegistryInterface $doctrine, ResponderService $responder, RouterInterface $router) {
-			parent::__construct($doctrine, $responder, $router, ArmorSet::class);
+		public function __construct() {
+			parent::__construct(ArmorSet::class);
 		}
 
 		/**
@@ -149,9 +142,10 @@
 								$output['assets']['imageMale'] = call_user_func($transformer, $assets->getImageMale());
 
 							if ($projection->isAllowed('pieces.assets.imageFemale'))
-								$output['assets']['imageFemale'] = call_user_func($transformer, $assets->getImageFemale());
- 						} else
- 							$output['assets'] = null;
+								$output['assets']['imageFemale'] =
+									call_user_func($transformer, $assets->getImageFemale());
+						} else
+							$output['assets'] = null;
 					}
 					// endregion
 
@@ -183,6 +177,7 @@
 												'value' => $item->getValue(),
 											];
 										}
+
 										// endregion
 
 										return $output;
@@ -193,6 +188,7 @@
 						} else
 							$output['crafting'] = null;
 					}
+
 					// endregion
 
 					return $output;
@@ -235,6 +231,7 @@
 									if ($projection->isAllowed('bonus.ranks.skill.skillName'))
 										$output['skill']['skillName'] = $skillRank->getSkill()->getName();
 								}
+
 								// endregion
 
 								return $output;
@@ -245,6 +242,7 @@
 				} else
 					$output['bonus'] = null;
 			}
+
 			// endregion
 
 			return $output;

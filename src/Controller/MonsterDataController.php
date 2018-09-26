@@ -7,24 +7,17 @@
 	use App\Entity\Monster;
 	use App\Entity\Skill;
 	use App\QueryDocument\Projection;
-	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use Symfony\Bridge\Doctrine\RegistryInterface;
 	use Symfony\Component\HttpFoundation\Request;
 	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\Routing\Annotation\Route;
-	use Symfony\Component\Routing\RouterInterface;
 
 	class MonsterDataController extends AbstractDataController {
 		/**
 		 * MonsterDataController constructor.
-		 *
-		 * @param RegistryInterface $doctrine
-		 * @param ResponderService  $responder
-		 * @param RouterInterface   $router
 		 */
-		public function __construct(RegistryInterface $doctrine, ResponderService $responder, RouterInterface $router) {
-			parent::__construct($doctrine, $responder, $router, Monster::class);
+		public function __construct() {
+			parent::__construct(Monster::class);
 		}
 
 		/**
@@ -51,7 +44,7 @@
 
 		/**
 		 * @param Monster|EntityInterface|null $entity
-		 * @param Projection           $projection
+		 * @param Projection                   $projection
 		 *
 		 * @return array|null
 		 */

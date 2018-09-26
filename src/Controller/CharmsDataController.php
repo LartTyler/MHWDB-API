@@ -6,24 +6,17 @@
 	use App\Entity\CraftingMaterialCost;
 	use App\Entity\SkillRank;
 	use App\QueryDocument\Projection;
-	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use Symfony\Bridge\Doctrine\RegistryInterface;
 	use Symfony\Component\HttpFoundation\Request;
 	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\Routing\Annotation\Route;
-	use Symfony\Component\Routing\RouterInterface;
 
 	class CharmsDataController extends AbstractDataController {
 		/**
 		 * CharmsDataController constructor.
-		 *
-		 * @param RegistryInterface $doctrine
-		 * @param ResponderService  $responder
-		 * @param RouterInterface   $router
 		 */
-		public function __construct(RegistryInterface $doctrine, ResponderService $responder, RouterInterface $router) {
-			parent::__construct($doctrine, $responder, $router, Charm::class);
+		public function __construct() {
+			parent::__construct(Charm::class);
 		}
 
 		/**
@@ -123,6 +116,7 @@
 												'value' => $item->getValue(),
 											];
 										}
+
 										// endregion
 
 										return $output;
@@ -133,11 +127,13 @@
 						} else
 							$output['crafting'] = null;
 					}
+
 					// endregion
 
 					return $output;
 				}, $entity->getRanks()->toArray());
 			}
+
 			// endregion
 
 			return $output;

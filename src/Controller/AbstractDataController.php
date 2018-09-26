@@ -1,17 +1,22 @@
 <?php
 	namespace App\Controller;
 
+	use App\Contrib\ApiErrors\CreateError;
+	use App\Contrib\ApiErrors\InvalidPayloadError;
+	use App\Contrib\ApiErrors\UpdateError;
+	use App\Contrib\Exceptions\ContribException;
+	use App\Contrib\TransformerInterface;
 	use App\QueryDocument\ApiQueryManager;
 	use App\QueryDocument\Projection;
 	use App\Response\BadProjectionObjectError;
 	use App\Response\BadQueryObjectError;
 	use App\Response\EmptySearchParametersError;
+	use App\Response\NoContentResponse;
 	use App\Response\SearchError;
 	use DaybreakStudios\Doze\Errors\ApiErrorInterface;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use Doctrine\ORM\EntityManager;
-	use Symfony\Bridge\Doctrine\RegistryInterface;
+	use Doctrine\ORM\EntityManagerInterface;
 	use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 	use Symfony\Component\HttpFoundation\JsonResponse;
 	use Symfony\Component\HttpFoundation\Request;
@@ -20,9 +25,9 @@
 
 	abstract class AbstractDataController extends Controller {
 		/**
-		 * @var EntityManager
+		 * @var EntityManagerInterface
 		 */
-		protected $manager;
+		protected $entityManager;
 
 		/**
 		 * @var ResponderService
@@ -42,21 +47,43 @@
 		/**
 		 * AbstractCrudController constructor.
 		 *
-		 * @param RegistryInterface $doctrine
-		 * @param ResponderService  $responder
-		 * @param RouterInterface   $router
-		 * @param string            $entityClass
+		 * @param string $entityClass
 		 */
-		public function __construct(
-			RegistryInterface $doctrine,
-			ResponderService $responder,
-			RouterInterface $router,
-			string $entityClass
-		) {
-			$this->manager = $doctrine->getManager();
-			$this->responder = $responder;
-			$this->router = $router;
+		public function __construct(string $entityClass) {
 			$this->entityClass = $entityClass;
+		}
+
+		/**
+		 * @required
+		 *
+		 * @param EntityManagerInterface $entityManager
+		 *
+		 * @return void
+		 */
+		public function setEntityManager(EntityManagerInterface $entityManager): void {
+			$this->entityManager = $entityManager;
+		}
+
+		/**
+		 * @required
+		 *
+		 * @param ResponderService $responder
+		 *
+		 * @return void
+		 */
+		public function setResponder(ResponderService $responder): void {
+			$this->responder = $responder;
+		}
+
+		/**
+		 * @required
+		 *
+		 * @param RouterInterface $router
+		 *
+		 * @return void
+		 */
+		public function setRouter(RouterInterface $router): void {
+			$this->router = $router;
 		}
 
 		/**
@@ -77,7 +104,7 @@
 				if (!sizeof($query))
 					return $this->respond(new EmptySearchParametersError());
 
-				$queryBuilder = $this->manager->createQueryBuilder()
+				$queryBuilder = $this->entityManager->createQueryBuilder()
 					->from($this->entityClass, 'e')
 					->select('e')
 					->setMaxResults($limit)
@@ -103,9 +130,74 @@
 
 				$results = $queryBuilder->getQuery()->getResult();
 			} else
-				$results = $this->manager->getRepository($this->entityClass)->findAll();
+				$results = $this->entityManager->getRepository($this->entityClass)->findAll();
 
 			return $this->respond($results);
+		}
+
+		/**
+		 * @param TransformerInterface $transformer
+		 * @param Request              $request
+		 *
+		 * @return Response
+		 */
+		protected function doCreate(TransformerInterface $transformer, Request $request): Response {
+			$payload = json_decode($request->getContent());
+
+			if (json_last_error() !== JSON_ERROR_NONE)
+				return $this->respond(new InvalidPayloadError());
+
+			try {
+				$entity = $transformer->create($payload);
+			} catch (ContribException $e) {
+				return $this->respond(new CreateError($e->getMessage()));
+			}
+
+			$this->entityManager->flush();
+
+			return $this->respond($entity);
+		}
+
+		/**
+		 * @param TransformerInterface $transformer
+		 * @param EntityInterface      $entity
+		 * @param Request              $request
+		 *
+		 * @return Response
+		 */
+		protected function doUpdate(
+			TransformerInterface $transformer,
+			EntityInterface $entity,
+			Request $request
+		): Response {
+			$payload = json_decode($request->getContent());
+
+			if (json_last_error() !== JSON_ERROR_NONE)
+				return $this->respond(new InvalidPayloadError());
+
+			try {
+				$transformer->update($entity, $payload);
+			} catch (ContribException $e) {
+				return $this->respond(new UpdateError($e->getMessage()));
+			}
+
+			$this->entityManager->flush();
+
+			return $this->respond($entity);
+		}
+
+		/**
+		 * @param TransformerInterface $transformer
+		 * @param EntityInterface      $entity
+		 *
+		 * @return Response
+		 */
+		protected function doDelete(TransformerInterface $transformer, EntityInterface $entity): Response {
+			$transformer->delete($entity);
+
+			$this->entityManager->flush();
+
+			return new NoContentResponse();
 		}
 
 		/**
@@ -114,7 +206,7 @@
 		 * @return EntityInterface|null
 		 */
 		protected function getEntity(int $id): ?EntityInterface {
-			return $this->manager->getRepository($this->entityClass)->find($id);
+			return $this->entityManager->getRepository($this->entityClass)->find($id);
 		}
 
 		/**

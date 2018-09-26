@@ -22,11 +22,13 @@
 		}
 
 		/**
-		 * @param string $field
+		 * @param string[] $fields
 		 *
 		 * @return static
 		 */
-		public static function missingField(string $field) {
-			return new static('You must provide a value for the field ' . $field);
+		public static function missingFields(array $fields) {
+			return new static(
+				sprintf('You must provide a value for the following field(s): [%s]', implode(', ', $fields))
+			);
 		}
 	}

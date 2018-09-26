@@ -26,25 +26,6 @@
 		}
 
 		/**
-		 * @param object $data
-		 *
-		 * @return EntityInterface
-		 */
-		public function create(object $data): EntityInterface {
-			if (!ObjectUtil::isset($data, 'name'))
-				throw ValidationException::missingField('name');
-			else if (!ObjectUtil::isset($data, 'description'))
-				throw ValidationException::missingField('description');
-
-			$ailment = new Ailment($data->name, $data->description);
-			$this->update($ailment, $data);
-
-			$this->entityManager->persist($ailment);
-
-			return $ailment;
-		}
-
-		/**
 		 * @param EntityInterface $entity
 		 * @param object          $data
 		 *
@@ -102,11 +83,28 @@
 		}
 
 		/**
+		 * @param object $data
+		 *
+		 * @return EntityInterface
+		 */
+		protected function doCreate(object $data): EntityInterface {
+			$missing = ObjectUtil::getMissingProperties($data, [
+				'name',
+				'description',
+			]);
+
+			if ($missing)
+				throw ValidationException::missingFields($missing);
+
+			return new Ailment($data->name, $data->description);
+		}
+
+		/**
 		 * @param EntityInterface $entity
 		 *
 		 * @return void
 		 */
-		public function delete(EntityInterface $entity): void {
+		protected function doDelete(EntityInterface $entity): void {
 			if (!($entity instanceof Ailment))
 				throw $this->createEntityNotSupportedException();
 
@@ -122,7 +120,5 @@
 
 			foreach ($monsters as $monster)
 				$monster->getAilments()->removeElement($entity);
-
-			$this->entityManager->remove($entity);
 		}
 	}

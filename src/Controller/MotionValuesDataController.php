@@ -5,24 +5,17 @@
 	use App\Game\WeaponType;
 	use App\QueryDocument\Projection;
 	use App\Response\UnknownWeaponTypeError;
-	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use Symfony\Bridge\Doctrine\RegistryInterface;
 	use Symfony\Component\HttpFoundation\Request;
 	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\Routing\Annotation\Route;
-	use Symfony\Component\Routing\RouterInterface;
 
 	class MotionValuesDataController extends AbstractDataController {
 		/**
 		 * MotionValuesDataController constructor.
-		 *
-		 * @param RegistryInterface $doctrine
-		 * @param ResponderService  $responder
-		 * @param RouterInterface   $router
 		 */
-		public function __construct(RegistryInterface $doctrine, ResponderService $responder, RouterInterface $router) {
-			parent::__construct($doctrine, $responder, $router, MotionValue::class);
+		public function __construct() {
+			parent::__construct(MotionValue::class);
 		}
 
 		/**
@@ -49,7 +42,7 @@
 			if (!WeaponType::isValid($type))
 				return $this->respond(new UnknownWeaponTypeError($type));
 
-			return $this->respond($this->manager->getRepository(MotionValue::class)->findBy([
+			return $this->respond($this->entityManager->getRepository(MotionValue::class)->findBy([
 				'weaponType' => $type,
 			]));
 		}

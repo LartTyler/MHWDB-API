@@ -8,25 +8,18 @@
 	use App\Entity\WeaponSharpness;
 	use App\Game\WeaponType;
 	use App\QueryDocument\Projection;
-	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\Collection;
-	use Symfony\Bridge\Doctrine\RegistryInterface;
 	use Symfony\Component\HttpFoundation\Request;
 	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\Routing\Annotation\Route;
-	use Symfony\Component\Routing\RouterInterface;
 
 	class WeaponsDataController extends AbstractDataController {
 		/**
 		 * WeaponsDataController constructor.
-		 *
-		 * @param RegistryInterface $doctrine
-		 * @param ResponderService  $responder
-		 * @param RouterInterface   $router
 		 */
-		public function __construct(RegistryInterface $doctrine, ResponderService $responder, RouterInterface $router) {
-			parent::__construct($doctrine, $responder, $router, Weapon::class);
+		public function __construct() {
+			parent::__construct(Weapon::class);
 		}
 
 		/**
@@ -142,6 +135,7 @@
 									'value' => $item->getValue(),
 								];
 							}
+
 							// endregion
 
 							return $output;
@@ -211,6 +205,7 @@
 				} else
 					$output['assets'] = null;
 			}
+
 			// endregion
 
 			return $output;

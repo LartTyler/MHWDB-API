@@ -4,9 +4,5 @@ services:
         autowire: true
         autoconfigure: true
 
-    App\Contrib\TransformerManager:
-        arguments:
-            -
-                - '@App\Contrib\Transformers\AilmentTransformer'
-
     App\Contrib\Transformers\AilmentTransformer: ~
+    App\Contrib\Transformers\ArmorTransformer: ~
