@@ -31,4 +31,13 @@
 				sprintf('You must provide a value for the following field(s): [%s]', implode(', ', $fields))
 			);
 		}
+
+		/**
+		 * @param string $field
+		 *
+		 * @return static
+		 */
+		public static function fieldNotSupported(string $field) {
+			return new static('The API does not support updating ' . $field);
+		}
 	}

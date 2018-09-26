@@ -7,13 +7,6 @@
 
 	interface TransformerInterface {
 		/**
-		 * Returns the fully-qualified name of the entity class that the transformer supports.
-		 *
-		 * @return string
-		 */
-		public function getEntityClass(): string;
-
-		/**
 		 * Creates a new entity from the provided values. Please note that this method will persist the entity to
 		 * Doctrine, but will NOT flush the changes.
 		 *

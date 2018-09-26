@@ -22,7 +22,7 @@
 		 * @param EntityManagerInterface $entityManager
 		 */
 		public function __construct(EntityManagerInterface $entityManager) {
-			parent::__construct($entityManager, Ailment::class);
+			parent::__construct($entityManager);
 		}
 
 		/**
@@ -33,7 +33,7 @@
 		 */
 		public function update(EntityInterface $entity, object $data): void {
 			if (!($entity instanceof Ailment))
-				throw $this->createEntityNotSupportedException();
+				throw $this->createEntityNotSupportedException(get_class($entity));
 
 			if (ObjectUtil::isset($data, 'name'))
 				$entity->setName($data->name);
@@ -106,7 +106,7 @@
 		 */
 		protected function doDelete(EntityInterface $entity): void {
 			if (!($entity instanceof Ailment))
-				throw $this->createEntityNotSupportedException();
+				throw $this->createEntityNotSupportedException(get_class($entity));
 
 			/** @var Monster[] $monsters */
 			$monsters = $this->entityManager->createQueryBuilder()

@@ -4,12 +4,9 @@
 	use App\Contrib\Exceptions\IntegrityException;
 	use App\Contrib\Exceptions\ValidationException;
 	use App\Contrib\TransformerInterface;
-	use App\Entity\ArmorAssets;
-	use App\Entity\Asset;
 	use App\Entity\CraftingMaterialCost;
 	use App\Entity\Item;
 	use App\Entity\Skill;
-	use App\Entity\WeaponAssets;
 	use App\Utility\ObjectUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\Collection;
@@ -22,26 +19,12 @@
 		protected $entityManager;
 
 		/**
-		 * @var string
-		 */
-		protected $entityClass;
-
-		/**
 		 * AbstractTransformer constructor.
 		 *
 		 * @param EntityManagerInterface $entityManager
-		 * @param string                 $entityClass
 		 */
-		public function __construct(EntityManagerInterface $entityManager, string $entityClass) {
+		public function __construct(EntityManagerInterface $entityManager) {
 			$this->entityManager = $entityManager;
-			$this->entityClass = $entityClass;
-		}
-
-		/**
-		 * @return string
-		 */
-		public function getEntityClass(): string {
-			return $this->entityClass;
 		}
 
 		/**
@@ -84,12 +67,12 @@
 		protected abstract function doDelete(EntityInterface $entity): void;
 
 		/**
+		 * @param string $class
+		 *
 		 * @return \InvalidArgumentException
 		 */
-		protected function createEntityNotSupportedException(): \InvalidArgumentException {
-			return new \InvalidArgumentException(
-				'This transformer only supports ' . $this->getEntityClass() . ' entities'
-			);
+		protected function createEntityNotSupportedException(string $class): \InvalidArgumentException {
+			return new \InvalidArgumentException('This transformer does not support transforming ' . $class);
 		}
 
 		/**
@@ -127,10 +110,13 @@
 			$collection->clear();
 
 			foreach ($ranks as $index => $rank) {
-				$missing = ObjectUtil::getMissingProperties($rank, [
-					'skill',
-					'level',
-				]);
+				$missing = ObjectUtil::getMissingProperties(
+					$rank,
+					[
+						'skill',
+						'level',
+					]
+				);
 
 				if ($missing)
 					throw ValidationException::missingFields($missing);
@@ -160,10 +146,13 @@
 			$collection->clear();
 
 			foreach ($costs as $index => $cost) {
-				$missing = ObjectUtil::getMissingProperties($cost, [
-					'item',
-					'quantity',
-				]);
+				$missing = ObjectUtil::getMissingProperties(
+					$cost,
+					[
+						'item',
+						'quantity',
+					]
+				);
 
 				if ($missing)
 					throw ValidationException::missingFields($missing);
@@ -175,30 +164,5 @@
 
 				$collection->add(new CraftingMaterialCost($item, $cost->quantity));
 			}
-		}
-
-		/**
-		 * @param Asset $asset
-		 *
-		 * @return int
-		 */
-		protected function getAssetUsageCount(Asset $asset): int {
-			$count = (int)$this->entityManager->createQueryBuilder()
-				->from(WeaponAssets::class, 'a')
-				->select('COUNT(a)')
-				->where('a.icon = :asset')
-				->orWhere('a.image = :asset')
-				->setParameter('asset', $asset)
-				->getQuery()
-				->getSingleScalarResult();
-
-			return $count + (int)$this->entityManager->createQueryBuilder()
-					->from(ArmorAssets::class, 'a')
-					->select('COUNT(a)')
-					->where('a.imageFemale = :asset')
-					->orWhere('a.imageMale = :asset')
-					->setParameter('asset', $asset)
-					->getQuery()
-					->getSingleScalarResult();
 		}
 	}
