@@ -28,6 +28,7 @@
 
 		/**
 		 * @ORM\OneToMany(targetEntity="App\Entity\CharmRank", mappedBy="charm", orphanRemoval=true, cascade={"all"})
+		 * @ORM\OrderBy(value={"level": "ASC"})
 		 *
 		 * @var Collection|Selectable|CharmRank[]
 		 */

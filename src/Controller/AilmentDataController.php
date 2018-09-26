@@ -1,7 +1,6 @@
 <?php
 	namespace App\Controller;
 
-	use App\Contrib\ApiErrors\InvalidPayloadError;
 	use App\Contrib\Transformers\AilmentTransformer;
 	use App\Entity\Ailment;
 	use App\Entity\Item;
