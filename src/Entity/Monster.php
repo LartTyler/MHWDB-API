@@ -11,7 +11,7 @@
 	use Doctrine\ORM\Mapping as ORM;
 
 	/**
-	 * @ORM\Entity()
+	 * @ORM\Entity(repositoryClass="App\Repository\MonsterRepository")
 	 * @ORM\Table(name="monsters")
 	 *
 	 * Class Monster

@@ -93,15 +93,7 @@
 			if (!($entity instanceof Ailment))
 				throw $this->createEntityNotSupportedException(get_class($entity));
 
-			/** @var Monster[] $monsters */
-			$monsters = $this->entityManager->createQueryBuilder()
-				->from(Monster::class, 'm')
-				->leftJoin('m.ailments', 'a')
-				->select('m')
-				->where('a.id = :ailment')
-				->setParameter('ailment', $entity)
-				->getQuery()
-					->getResult();
+			$monsters = $this->entityManager->getRepository(Monster::class)->findByAilment($entity);
 
 			foreach ($monsters as $monster)
 				$monster->getAilments()->removeElement($entity);
