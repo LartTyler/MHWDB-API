@@ -11,12 +11,24 @@
 		 * @return static
 		 */
 		public static function invalidFieldType(string $field, string $expected) {
+			return static::invalidFieldValue(
+				$field,
+				'It should be ' . StringUtil::getIndefinateArticle($expected) . ' ' . $expected
+			);
+		}
+
+		/**
+		 * @param string $field
+		 * @param string $explanation
+		 *
+		 * @return static
+		 */
+		public static function invalidFieldValue(string $field, string $explanation) {
 			return new static(
 				sprintf(
-					'You provided an invalid value for %s; it should be %s %s',
+					'You provided an invalid value for %s; %s',
 					$field,
-					StringUtil::getIndefinateArticle($expected),
-					$expected
+					$explanation
 				)
 			);
 		}

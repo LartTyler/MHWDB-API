@@ -14,3 +14,4 @@ services:
     App\Contrib\Transformers\CharmTransformer: ~
     App\Contrib\Transformers\DecorationTransformer: ~
     App\Contrib\Transformers\ItemTransformer: ~
+    App\Contrib\Transformers\LocationTransformer: ~

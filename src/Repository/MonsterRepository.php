@@ -2,6 +2,7 @@
 	namespace App\Repository;
 
 	use App\Entity\Ailment;
+	use App\Entity\Location;
 	use App\Entity\Monster;
 	use Doctrine\ORM\EntityRepository;
 
@@ -18,6 +19,21 @@
 				->select('m')
 				->where('a.id = :ailment')
 				->setParameter('ailment', $ailment)
+				->getQuery()
+				->getResult();
+		}
+
+		/**
+		 * @param Location $location
+		 *
+		 * @return Monster[]
+		 */
+		public function findByLocation(Location $location): array {
+			return $this->getEntityManager()->createQueryBuilder()
+				->from(Monster::class, 'm')
+				->select('m')
+				->where(':location MEMBER OF m.locations')
+				->setParameter('location', $location)
 				->getQuery()
 				->getResult();
 		}
