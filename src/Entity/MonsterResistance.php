@@ -6,12 +6,7 @@
 
 	/**
 	 * @ORM\Entity(readOnly=true)
-	 * @ORM\Table(
-	 *     name="monster_resistances",
-	 *     uniqueConstraints={
-	 *         @ORM\UniqueConstraint(columns={"monster_id", "element"})
-	 *     }
-	 * )
+	 * @ORM\Table(name="monster_resistances")
 	 *
 	 * Class MonsterResistance
 	 *

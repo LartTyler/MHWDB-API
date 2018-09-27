@@ -5,13 +5,8 @@
 	use Doctrine\ORM\Mapping as ORM;
 
 	/**
-	 * @ORM\Entity()
-	 * @ORM\Table(
-	 *     name="monster_weaknesses",
-	 *     uniqueConstraints={
-	 *         @ORM\UniqueConstraint(columns={"monster_id", "element"})
-	 *     }
-	 * )
+	 * @ORM\Entity(readOnly=true)
+	 * @ORM\Table(name="monster_weaknesses")
 	 *
 	 * Class MonsterWeakness
 	 *
