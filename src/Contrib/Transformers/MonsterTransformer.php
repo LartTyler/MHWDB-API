@@ -11,6 +11,12 @@
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 
 	class MonsterTransformer extends AbstractTransformer {
+		/**
+		 * @param EntityInterface $entity
+		 * @param object          $data
+		 *
+		 * @return void
+		 */
 		public function update(EntityInterface $entity, object $data): void {
 			if (!($entity instanceof Monster))
 				throw $this->createEntityNotSupportedException(get_class($entity));
