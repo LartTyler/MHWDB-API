@@ -38,7 +38,7 @@
 		private $stars;
 
 		/**
-		 * @ORM\Column(type="text", nullable=true)
+		 * @ORM\Column(type="text", nullable=true, name="_condition")
 		 *
 		 * @var null|string
 		 */

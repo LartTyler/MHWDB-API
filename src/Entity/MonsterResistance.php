@@ -31,7 +31,7 @@
 		private $element;
 
 		/**
-		 * @ORM\Column(type="text", nullable=true)
+		 * @ORM\Column(type="text", nullable=true, name="_condition")
 		 *
 		 * @var string|null
 		 */
