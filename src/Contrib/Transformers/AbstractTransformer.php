@@ -76,6 +76,28 @@
 		}
 
 		/**
+		 * @param string   $prefix
+		 * @param int      $index
+		 * @param string[] $keys
+		 *
+		 * @return ValidationException
+		 */
+		protected function createMissingArrayFieldsException(
+			string $prefix,
+			int $index,
+			array $keys
+		): ValidationException {
+			return ValidationException::missingFields(
+				array_map(
+					function(string $key) use ($prefix, $index): string {
+						return $prefix . '[' . $index . '].' . $key;
+					},
+					$keys
+				)
+			);
+		}
+
+		/**
 		 * @param string     $path
 		 * @param Collection $collection
 		 * @param string     $class
@@ -118,16 +140,8 @@
 					]
 				);
 
-				if ($missing) {
-					throw ValidationException::missingFields(
-						array_map(
-							function(string $key) use ($path, $index): string {
-								return $path . '[' . $index . '].' . $key;
-							},
-							$missing
-						)
-					);
-				}
+				if ($missing)
+					throw $this->createMissingArrayFieldsException($path, $index, $missing);
 
 				$skill = $this->entityManager->getRepository(Skill::class)->find($rank->skill);
 
@@ -162,16 +176,8 @@
 					]
 				);
 
-				if ($missing) {
-					throw ValidationException::missingFields(
-						array_map(
-							function(string $key) use ($path, $index): string {
-								return $path . '[' . $index . '].' . $key;
-							},
-							$missing
-						)
-					);
-				}
+				if ($missing)
+					throw $this->createMissingArrayFieldsException($path, $index, $missing);
 
 				$item = $this->entityManager->getRepository(Item::class)->find($cost->item);
 
