@@ -8,7 +8,6 @@
 		 * InvalidPayloadError constructor.
 		 */
 		public function __construct() {
-			parent::__construct('contrib.invalid_payload',
-				'The payload you provided was empty, or could not be understood');
+			parent::__construct('contrib.invalid_payload', 'You must provide a valid JSON payload in your request');
 		}
 	}

@@ -48,27 +48,20 @@ Vagrant.configure("2") do |config|
 	SHELL
 
 	config.vm.provision "install", type: "shell", privileged: false, inline: <<-SHELL
-		git config --global user.email "contributor@mhw-db.com"
-		git config --global user.name "Anonymous Contributor"
-
-		git clone https://github.com/LartTyler/MHWDB-Data /vagrant/data
-
 		echo "[client]" > ~/.my.cnf
 		echo "user=application" >> ~/.my.cnf
 		echo "database=application" >> ~/.my.cnf
 
 		cd /vagrant
 
+		openssl genrsa -out config/jwt/private.pem 4096
+		openssl rsa -pubout -in config/jwt/private.pem -out config/jwt/public.pem
+
 		composer install
 		composer db:reset
 	SHELL
 
 	config.vm.provision "run", type: "shell", run: "always", privileged: false, inline: <<-SHELL
-		cd /vagrant/data
-
-		git reset --hard
-		git checkout develop
-
 		echo
 		echo "Installed packages:"
 		echo "  -> PHP 7.2 (with extensions: mysqlnd, curl, zip, mbstring, xml, xdebug, memcached, gd)"
@@ -83,10 +76,5 @@ Vagrant.configure("2") do |config|
 		echo "  -> IDE Key: application"
 		echo "  -> Remote Autostart: Yes"
 		echo "  -> Remote Connectback: Yes"
-		echo
-		echo "If you need to publish changes to the contrib repository (and I mean actually push the changes, not just"
-		echo "test it locally), you'll need to run the following commands from within your local Vagrant box."
-		echo "  -> git config --global user.email 'your-email@example.com'"
-		echo "  -> git config --global user.name 'Your Name'"
 	SHELL
 end

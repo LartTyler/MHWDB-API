@@ -1,27 +1,22 @@
 <?php
 	namespace App\Controller;
 
+	use App\Contrib\Transformers\DecorationTransformer;
 	use App\Entity\Decoration;
 	use App\Entity\SkillRank;
 	use App\QueryDocument\Projection;
-	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use Symfony\Bridge\Doctrine\RegistryInterface;
+	use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 	use Symfony\Component\HttpFoundation\Request;
 	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\Routing\Annotation\Route;
-	use Symfony\Component\Routing\RouterInterface;
 
 	class DecorationsDataController extends AbstractDataController {
 		/**
 		 * DecorationsDataController constructor.
-		 *
-		 * @param RegistryInterface $doctrine
-		 * @param ResponderService  $responder
-		 * @param RouterInterface   $router
 		 */
-		public function __construct(RegistryInterface $doctrine, ResponderService $responder, RouterInterface $router) {
-			parent::__construct($doctrine, $responder, $router, Decoration::class);
+		public function __construct() {
+			parent::__construct(Decoration::class);
 		}
 
 		/**
@@ -36,14 +31,54 @@
 		}
 
 		/**
-		 * @Route(path="/decorations/{idOrSlug}", methods={"GET"}, name="decorations.read")
+		 * @Route(path="/decorations", methods={"PUT"}, name="decorations.create")
+		 * @IsGranted("ROLE_EDITOR")
 		 *
-		 * @param string $idOrSlug
+		 * @param DecorationTransformer $transformer
+		 * @param Request               $request
 		 *
 		 * @return Response
 		 */
-		public function read(string $idOrSlug): Response {
-			return parent::read($idOrSlug);
+		public function create(DecorationTransformer $transformer, Request $request): Response {
+			return $this->doCreate($transformer, $request);
+		}
+
+		/**
+		 * @Route(path="/decorations/{decoration<\d+>}", methods={"GET"}, name="decorations.read")
+		 *
+		 * @param Decoration $decoration
+		 *
+		 * @return Response
+		 */
+		public function read(Decoration $decoration): Response {
+			return $this->respond($decoration);
+		}
+
+		/**
+		 * @Route(path="/decorations/{decoration<\d+>}", methods={"PATCH"}, name="decorations.update")
+		 * @IsGranted("ROLE_EDITOR")
+		 *
+		 * @param DecorationTransformer $transformer
+		 * @param Request               $request
+		 * @param Decoration            $decoration
+		 *
+		 * @return Response
+		 */
+		public function update(DecorationTransformer $transformer, Request $request, Decoration $decoration): Response {
+			return $this->doUpdate($transformer, $decoration, $request);
+		}
+
+		/**
+		 * @Route(path="/decorations/{decoration<\d+>}", methods={"DELETE"}, name="decorations.delete")
+		 * @IsGranted("ROLE_EDITOR")
+		 *
+		 * @param DecorationTransformer $transformer
+		 * @param Decoration            $decoration
+		 *
+		 * @return Response
+		 */
+		public function delete(DecorationTransformer $transformer, Decoration $decoration): Response {
+			return $this->doDelete($transformer, $decoration);
 		}
 
 		/**
@@ -58,7 +93,6 @@
 
 			$output = [
 				'id' => $entity->getId(),
-				'slug' => $entity->getSlug(),
 				'name' => $entity->getName(),
 				'rarity' => $entity->getRarity(),
 				'slot' => $entity->getSlot(),
@@ -69,7 +103,6 @@
 				$output['skills'] = array_map(function(SkillRank $rank) use ($projection): array {
 					$output = [
 						'id' => $rank->getId(),
-						'slug' => $rank->getSlug(),
 						'description' => $rank->getDescription(),
 						'level' => $rank->getLevel(),
 						'modifiers' => $rank->getModifiers(),
@@ -84,6 +117,7 @@
 					return $output;
 				}, $entity->getSkills()->toArray());
 			}
+
 			// endregion
 
 			return $output;

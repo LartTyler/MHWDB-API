@@ -5,14 +5,9 @@
 	use Doctrine\ORM\Mapping as ORM;
 
 	/**
-	 * @ORM\Entity()
-	 * @ORM\Table(name="slots")
-	 *
-	 * Class Slot
-	 *
 	 * @package App\Entity
 	 */
-	class Slot implements EntityInterface {
+	abstract class Slot implements EntityInterface {
 		use EntityTrait;
 
 		/**
@@ -20,7 +15,7 @@
 		 *
 		 * @var int
 		 */
-		private $rank;
+		protected $rank;
 
 		/**
 		 * Slot constructor.

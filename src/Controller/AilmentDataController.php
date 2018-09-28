@@ -1,33 +1,23 @@
 <?php
 	namespace App\Controller;
 
-	use App\Contrib\EntityType;
-	use App\Contrib\Management\ContribManager;
-	use App\Contrib\Management\Entity\AilmentDataManager;
+	use App\Contrib\Transformers\AilmentTransformer;
 	use App\Entity\Ailment;
 	use App\Entity\Item;
 	use App\Entity\Skill;
-	use App\Import\ImportManager;
 	use App\QueryDocument\Projection;
-	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-	use Symfony\Bridge\Doctrine\RegistryInterface;
 	use Symfony\Component\HttpFoundation\Request;
 	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\Routing\Annotation\Route;
-	use Symfony\Component\Routing\RouterInterface;
 
 	class AilmentDataController extends AbstractDataController {
 		/**
 		 * AilmentDataController constructor.
-		 *
-		 * @param RegistryInterface $doctrine
-		 * @param ResponderService  $responder
-		 * @param RouterInterface   $router
 		 */
-		public function __construct(RegistryInterface $doctrine, ResponderService $responder, RouterInterface $router) {
-			parent::__construct($doctrine, $responder, $router, Ailment::class, EntityType::AILMENTS);
+		public function __construct() {
+			parent::__construct(Ailment::class);
 		}
 
 		/**
@@ -42,47 +32,54 @@
 		}
 
 		/**
-		 * @Route(path="/ailments/{id<\d+>}", methods={"GET"}, name="ailments.read")
+		 * @Route(path="/ailments", methods={"PUT"}, name="ailments.create")
+		 * @IsGranted("ROLE_EDITOR")
 		 *
-		 * @param string $id
-		 *
-		 * @return Response
-		 */
-		public function read(string $id): Response {
-			return parent::read($id);
-		}
-
-		/**
-		 * @Route(path="/ailments/{id<\d+>}", methods={"PATCH"}, name="ailments.update")
-		 * @IsGranted("ROLE_USER")
-		 *
-		 * @param AilmentDataManager $dataManager
+		 * @param AilmentTransformer $transformer
 		 * @param Request            $request
-		 * @param string             $id
 		 *
 		 * @return Response
-		 * @throws \App\Api\Exceptions\ContribNotSupportedException
-		 * @throws \Doctrine\ORM\ORMException
-		 * @throws \Doctrine\ORM\OptimisticLockException
 		 */
-		public function update(
-			AilmentDataManager $dataManager,
-			Request $request,
-			string $id
-		): Response {
-			return parent::doUpdate($dataManager, $request, $id);
+		public function create(AilmentTransformer $transformer, Request $request): Response {
+			return $this->doCreate($transformer, $request);
 		}
 
 		/**
-		 * @param AilmentDataManager $dataManager
-		 * @param string             $id
+		 * @Route(path="/ailments/{ailment<\d+>}", methods={"GET"}, name="ailments.read")
+		 *
+		 * @param Ailment $ailment
 		 *
 		 * @return Response
-		 * @throws \App\Api\Exceptions\ContribNotSupportedException
-		 * @throws \Doctrine\ORM\ORMException
 		 */
-		public function delete(AilmentDataManager $dataManager, string $id): Response {
-			return parent::doDelete($dataManager, $id);
+		public function read(Ailment $ailment): Response {
+			return $this->respond($ailment);
+		}
+
+		/**
+		 * @Route(path="/ailments/{ailment<\d+>}", methods={"PATCH"}, name="ailments.update")
+		 * @IsGranted("ROLE_EDITOR")
+		 *
+		 * @param AilmentTransformer $transformer
+		 * @param Ailment            $ailment
+		 * @param Request            $request
+		 *
+		 * @return Response
+		 */
+		public function update(AilmentTransformer $transformer, Ailment $ailment, Request $request): Response {
+			return $this->doUpdate($transformer, $ailment, $request);
+		}
+
+		/**
+		 * @Route(path="/ailments/{ailment<\d+>}", methods={"DELETE"}, name="ailments.delete")
+		 * @IsGranted("ROLE_EDITOR")
+		 *
+		 * @param AilmentTransformer $transformer
+		 * @param Ailment            $ailment
+		 *
+		 * @return Response
+		 */
+		public function delete(AilmentTransformer $transformer, Ailment $ailment): Response {
+			return $this->doDelete($transformer, $ailment);
 		}
 
 		/**

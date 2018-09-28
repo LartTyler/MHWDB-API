@@ -1,26 +1,21 @@
 <?php
 	namespace App\Controller;
 
+	use App\Contrib\Transformers\ItemTransformer;
 	use App\Entity\Item;
 	use App\QueryDocument\Projection;
-	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use Symfony\Bridge\Doctrine\RegistryInterface;
+	use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 	use Symfony\Component\HttpFoundation\Request;
 	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\Routing\Annotation\Route;
-	use Symfony\Component\Routing\RouterInterface;
 
 	class ItemsDataController extends AbstractDataController {
 		/**
 		 * ItemsDataController constructor.
-		 *
-		 * @param RegistryInterface $doctrine
-		 * @param ResponderService  $responder
-		 * @param RouterInterface   $router
 		 */
-		public function __construct(RegistryInterface $doctrine, ResponderService $responder, RouterInterface $router) {
-			parent::__construct($doctrine, $responder, $router, Item::class);
+		public function __construct() {
+			parent::__construct(Item::class);
 		}
 
 		/**
@@ -35,14 +30,54 @@
 		}
 
 		/**
-		 * @Route(path="/items/{id<\d+>}", methods={"GET"}, name="items.read")
+		 * @Route(path="/items", methods={"PUT"}, name="items.create")
+		 * @IsGranted("ROLE_EDITOR")
 		 *
-		 * @param string $id
+		 * @param ItemTransformer $transformer
+		 * @param Request         $request
 		 *
 		 * @return Response
 		 */
-		public function read(string $id): Response {
-			return parent::read($id);
+		public function create(ItemTransformer $transformer, Request $request): Response {
+			return $this->doCreate($transformer, $request);
+		}
+
+		/**
+		 * @Route(path="/items/{item<\d+>}", methods={"GET"}, name="items.read")
+		 *
+		 * @param Item $item
+		 *
+		 * @return Response
+		 */
+		public function read(Item $item): Response {
+			return $this->respond($item);
+		}
+
+		/**
+		 * @Route(path="/items/{item<\d+>}", methods={"PATCH"}, name="items.update")
+		 * @IsGranted("ROLE_EDITOR")
+		 *
+		 * @param ItemTransformer $transformer
+		 * @param Request         $request
+		 * @param Item            $item
+		 *
+		 * @return Response
+		 */
+		public function update(ItemTransformer $transformer, Request $request, Item $item): Response {
+			return $this->doUpdate($transformer, $item, $request);
+		}
+
+		/**
+		 * @Route(path="/items/{item<\d+>}", methods={"DELETE"}, name="items.delete")
+		 * @IsGranted("ROLE_EDITOR")
+		 *
+		 * @param ItemTransformer $transformer
+		 * @param Item            $item
+		 *
+		 * @return Response
+		 */
+		public function delete(ItemTransformer $transformer, Item $item): Response {
+			return $this->doDelete($transformer, $item);
 		}
 
 		/**

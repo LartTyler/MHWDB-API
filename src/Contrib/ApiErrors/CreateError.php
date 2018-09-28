@@ -5,10 +5,11 @@
 
 	class CreateError extends ApiError {
 		/**
-		 * UpdateError constructor.
+		 * CreateError constructor.
+		 *
+		 * @param string $message
 		 */
-		public function __construct() {
-			parent::__construct('contrib.create_failed',
-				'Could not complete your create request. Check your data and try again.');
+		public function __construct(string $message) {
+			parent::__construct('contrib.create_failed', 'Could not create: ' . $message);
 		}
 	}

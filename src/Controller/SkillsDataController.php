@@ -1,27 +1,22 @@
 <?php
 	namespace App\Controller;
 
+	use App\Contrib\Transformers\SkillTransformer;
 	use App\Entity\Skill;
 	use App\Entity\SkillRank;
 	use App\QueryDocument\Projection;
-	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use Symfony\Bridge\Doctrine\RegistryInterface;
+	use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 	use Symfony\Component\HttpFoundation\Request;
 	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\Routing\Annotation\Route;
-	use Symfony\Component\Routing\RouterInterface;
 
 	class SkillsDataController extends AbstractDataController {
 		/**
 		 * SkillsCrudController constructor.
-		 *
-		 * @param RegistryInterface $doctrine
-		 * @param ResponderService  $responder
-		 * @param RouterInterface   $router
 		 */
-		public function __construct(RegistryInterface $doctrine, ResponderService $responder, RouterInterface $router) {
-			parent::__construct($doctrine, $responder, $router, Skill::class);
+		public function __construct() {
+			parent::__construct(Skill::class);
 		}
 
 		/**
@@ -36,14 +31,53 @@
 		}
 
 		/**
-		 * @Route(path="/skills/{idOrSlug}", methods={"GET"}, name="skills.read")
+		 * @Route(path="/skills", methods={"PUT"}, name="skills.create")
+		 * @IsGranted("ROLE_EDITOR")
 		 *
-		 * @param string $idOrSlug
+		 * @param SkillTransformer $transformer
+		 * @param Request          $request
 		 *
 		 * @return Response
 		 */
-		public function read(string $idOrSlug): Response {
-			return parent::read($idOrSlug);
+		public function create(SkillTransformer $transformer, Request $request): Response {
+			return $this->doCreate($transformer, $request);
+		}
+
+		/**
+		 * @Route(path="/skills/{skill<\d+>}", methods={"GET"}, name="skills.read")
+		 *
+		 * @param Skill $skill
+		 *
+		 * @return Response
+		 */
+		public function read(Skill $skill): Response {
+			return $this->respond($skill);
+		}
+
+		/**
+		 * @Route(path="/skills/{skill<\d+>}", methods={"PATCH"}, name="skills.update")
+		 * @IsGranted("ROLE_EDITOR")
+		 *
+		 * @param SkillTransformer $transformer
+		 * @param Request          $request
+		 * @param Skill            $skill
+		 *
+		 * @return Response
+		 */
+		public function update(SkillTransformer $transformer, Request $request, Skill $skill): Response {
+			return $this->doUpdate($transformer, $skill, $request);
+		}
+
+		/**
+		 * @Route(path="/skills/{skill<\d+>}", methods={"DELETE"}, name="skills.delete")
+		 *
+		 * @param SkillTransformer $transformer
+		 * @param Skill            $skill
+		 *
+		 * @return Response
+		 */
+		public function delete(SkillTransformer $transformer, Skill $skill): Response {
+			return $this->doDelete($transformer, $skill);
 		}
 
 		/**
@@ -58,7 +92,6 @@
 
 			$output = [
 				'id' => $entity->getId(),
-				'slug' => $entity->getSlug(),
 				'name' => $entity->getName(),
 				'description' => $entity->getDescription(),
 			];
@@ -70,7 +103,6 @@
 
 					return [
 						'id' => $rank->getId(),
-						'slug' => $rank->getSlug(),
 						'skill' => $rank->getSkill()->getId(),
 						'skillName' => $rank->getSkill()->getName(),
 						'level' => $rank->getLevel(),
@@ -79,6 +111,7 @@
 					];
 				}, $entity->getRanks()->toArray());
 			}
+
 			// endregion
 
 			return $output;

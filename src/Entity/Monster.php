@@ -11,7 +11,7 @@
 	use Doctrine\ORM\Mapping as ORM;
 
 	/**
-	 * @ORM\Entity()
+	 * @ORM\Entity(repositoryClass="App\Repository\MonsterRepository")
 	 * @ORM\Table(name="monsters")
 	 *
 	 * Class Monster
@@ -66,7 +66,7 @@
 		 *     mappedBy="monster",
 		 *     orphanRemoval=true,
 		 *     cascade={"all"}
-		 *	 )
+		 * )
 		 *
 		 * @var MonsterResistance[]|Collection|Selectable
 		 */
@@ -122,6 +122,17 @@
 		 */
 		public function getName(): string {
 			return $this->name;
+		}
+
+		/**
+		 * @param string $name
+		 *
+		 * @return $this
+		 */
+		public function setName(string $name) {
+			$this->name = $name;
+
+			return $this;
 		}
 
 		/**

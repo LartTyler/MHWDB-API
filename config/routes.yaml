@@ -10,5 +10,5 @@ index:
     defaults:
         path: 'https://docs.mhw-db.com/'
 
-auth:
+auth.login:
     path: /auth
