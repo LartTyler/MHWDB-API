@@ -27,18 +27,18 @@
 		private $name;
 
 		/**
+		 * @ORM\Column(type="text")
+		 *
+		 * @var string
+		 */
+		private $description;
+
+		/**
 		 * @ORM\OneToMany(targetEntity="App\Entity\SkillRank", mappedBy="skill", orphanRemoval=true, cascade={"all"})
 		 *
 		 * @var Collection|Selectable|SkillRank[]
 		 */
 		private $ranks;
-
-		/**
-		 * @ORM\Column(type="text")
-		 *
-		 * @var string|null
-		 */
-		private $description = null;
 
 		/**
 		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
@@ -52,9 +52,12 @@
 		 * Skill constructor.
 		 *
 		 * @param string $name
+		 * @param string $description
 		 */
-		public function __construct(string $name) {
+		public function __construct(string $name, string $description) {
 			$this->name = $name;
+			$this->description = $description;
+
 			$this->ranks = new ArrayCollection();
 		}
 
@@ -102,19 +105,20 @@
 		}
 
 		/**
-		 * @return null|string
+		 * @return string
 		 */
-		public function getDescription() {
+		public function getDescription(): string {
 			return $this->description;
 		}
 
 		/**
-		 * @param null|string $description
+		 * @param string $description
 		 *
 		 * @return $this
 		 */
-		public function setDescription(?string $description) {
+		public function setDescription(string $description) {
 			$this->description = $description;
+
 			return $this;
 		}
 

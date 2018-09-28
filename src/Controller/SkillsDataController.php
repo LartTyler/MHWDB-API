@@ -1,10 +1,12 @@
 <?php
 	namespace App\Controller;
 
+	use App\Contrib\Transformers\SkillTransformer;
 	use App\Entity\Skill;
 	use App\Entity\SkillRank;
 	use App\QueryDocument\Projection;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
+	use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 	use Symfony\Component\HttpFoundation\Request;
 	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\Routing\Annotation\Route;
@@ -29,6 +31,19 @@
 		}
 
 		/**
+		 * @Route(path="/skills", methods={"PUT"}, name="skills.create")
+		 * @IsGranted("ROLE_EDITOR")
+		 *
+		 * @param SkillTransformer $transformer
+		 * @param Request          $request
+		 *
+		 * @return Response
+		 */
+		public function create(SkillTransformer $transformer, Request $request): Response {
+			return $this->doCreate($transformer, $request);
+		}
+
+		/**
 		 * @Route(path="/skills/{skill<\d+>}", methods={"GET"}, name="skills.read")
 		 *
 		 * @param Skill $skill
@@ -37,6 +52,32 @@
 		 */
 		public function read(Skill $skill): Response {
 			return $this->respond($skill);
+		}
+
+		/**
+		 * @Route(path="/skills/{skill<\d+>}", methods={"PATCH"}, name="skills.update")
+		 * @IsGranted("ROLE_EDITOR")
+		 *
+		 * @param SkillTransformer $transformer
+		 * @param Request          $request
+		 * @param Skill            $skill
+		 *
+		 * @return Response
+		 */
+		public function update(SkillTransformer $transformer, Request $request, Skill $skill): Response {
+			return $this->doUpdate($transformer, $skill, $request);
+		}
+
+		/**
+		 * @Route(path="/skills/{skill<\d+>}", methods={"DELETE"}, name="skills.delete")
+		 *
+		 * @param SkillTransformer $transformer
+		 * @param Skill            $skill
+		 *
+		 * @return Response
+		 */
+		public function delete(SkillTransformer $transformer, Skill $skill): Response {
+			return $this->doDelete($transformer, $skill);
 		}
 
 		/**
