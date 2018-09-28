@@ -7,6 +7,7 @@
 	use App\Entity\CraftingMaterialCost;
 	use App\Entity\Item;
 	use App\Entity\Skill;
+	use App\Entity\SkillRank;
 	use App\Utility\ObjectUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\Collection;
@@ -132,29 +133,49 @@
 			$collection->clear();
 
 			foreach ($ranks as $index => $rank) {
-				$missing = ObjectUtil::getMissingProperties(
-					$rank,
-					[
-						'skill',
-						'level',
-					]
-				);
-
-				if ($missing)
-					throw $this->createMissingArrayFieldsException($path, $index, $missing);
-
-				$skill = $this->entityManager->getRepository(Skill::class)->find($rank->skill);
-
-				if (!$skill)
-					throw IntegrityException::missingReference($path . '[' . $index . '].skill', 'Skill');
-
-				$skillRank = $skill->getRank($rank->level);
-
-				if (!$skillRank)
-					throw IntegrityException::missingReference($path . '[' . $index . '].level', 'SkillRank');
+				$skillRank = $this->getSkillRankFromSimpleSkill($path . '[' . $index . ']', $rank);
 
 				$collection->add($skillRank);
 			}
+		}
+
+		/**
+		 * @param string $path
+		 * @param object $definition
+		 *
+		 * @return SkillRank
+		 */
+		protected function getSkillRankFromSimpleSkill(string $path, object $definition): SkillRank {
+			$missing = ObjectUtil::getMissingProperties(
+				$definition,
+				[
+					'skill',
+					'level',
+				]
+			);
+
+			if ($missing) {
+				throw ValidationException::missingFields(
+					array_map(
+						function(string $key) use ($path): string {
+							return $path . '.' . $key;
+						},
+						$missing
+					)
+				);
+			}
+
+			$skill = $this->entityManager->getRepository(Skill::class)->find($definition->skill);
+
+			if (!$skill)
+				throw IntegrityException::missingReference($path . '.skill', 'Skill');
+
+			$skillRank = $skill->getRank($definition->level);
+
+			if (!$skillRank)
+				throw IntegrityException::missingReference($path . '.level', 'SkillRank');
+
+			return $skillRank;
 		}
 
 		/**

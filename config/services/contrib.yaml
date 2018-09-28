@@ -11,6 +11,7 @@ services:
     App\Contrib\Transformers\AilmentTransformer: ~
     App\Contrib\Transformers\ArmorTransformer: ~
     App\Contrib\Transformers\ArmorSetTransformer: ~
+    App\Contrib\Transformers\ArmorSetBonusTransformer: ~
     App\Contrib\Transformers\CharmTransformer: ~
     App\Contrib\Transformers\DecorationTransformer: ~
     App\Contrib\Transformers\ItemTransformer: ~

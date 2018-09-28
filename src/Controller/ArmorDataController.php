@@ -141,8 +141,6 @@
 							'level' => $rank->getLevel(),
 							'description' => $rank->getDescription(),
 							'modifiers' => $rank->getModifiers() ?: new \stdClass(),
-							'skill' => $rank->getSkill()->getId(),
-							'skillName' => $rank->getSkill()->getName(),
 						];
 
 						if ($projection->isAllowed('skills.skill'))
@@ -169,13 +167,17 @@
 						'rank' => $armorSet->getRank(),
 					];
 
-					if ($projection->isAllowed('armorSet.pieces'))
+					if ($projection->isAllowed('armorSet.pieces')) {
 						$output['armorSet']['pieces'] = array_map(
 							function(Armor $armor): int {
 								return $armor->getId();
 							},
 							$armorSet->getPieces()->toArray()
 						);
+					}
+
+					if ($projection->isAllowed('armorSet.bonus'))
+						$output['armorSet']['bonus'] = $armorSet->getBonus()->getId();
 				} else
 					$output['armorSet'] = null;
 			}
