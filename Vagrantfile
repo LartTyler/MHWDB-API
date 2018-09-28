@@ -54,6 +54,9 @@ Vagrant.configure("2") do |config|
 
 		cd /vagrant
 
+		openssl genrsa -out config/jwt/private.pem 4096
+		openssl rsa -pubout -in config/jwt/private.pem -out config/jwt/public.pem
+
 		composer install
 		composer db:reset
 	SHELL
