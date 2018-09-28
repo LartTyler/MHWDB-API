@@ -1,11 +1,13 @@
 <?php
 	namespace App\Controller;
 
+	use App\Contrib\Transformers\MotionValueTransformer;
 	use App\Entity\MotionValue;
 	use App\Game\WeaponType;
 	use App\QueryDocument\Projection;
 	use App\Response\UnknownWeaponTypeError;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
+	use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 	use Symfony\Component\HttpFoundation\Request;
 	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\Routing\Annotation\Route;
@@ -48,6 +50,19 @@
 		}
 
 		/**
+		 * @Route(path="/motion-values", methods={"PUT"}, name="motion-values.create")
+		 * @IsGranted("ROLE_EDITOR")
+		 *
+		 * @param MotionValueTransformer $transformer
+		 * @param Request                $request
+		 *
+		 * @return Response
+		 */
+		public function create(MotionValueTransformer $transformer, Request $request): Response {
+			return $this->doCreate($transformer, $request);
+		}
+
+		/**
 		 * @Route(path="/motion-values/{motionValue<\d+>}", methods={"GET"}, name="motion-values.read")
 		 *
 		 * @param MotionValue $motionValue
@@ -56,6 +71,37 @@
 		 */
 		public function read(MotionValue $motionValue): Response {
 			return $this->respond($motionValue);
+		}
+
+		/**
+		 * @Route(path="/motion-values/{motionValue<\d+>}", methods={"PATCH"}, name="motion-values.update")
+		 * @IsGranted("ROLE_EDITOR")
+		 *
+		 * @param MotionValueTransformer $transformer
+		 * @param Request                $request
+		 * @param MotionValue            $motionValue
+		 *
+		 * @return Response
+		 */
+		public function update(
+			MotionValueTransformer $transformer,
+			Request $request,
+			MotionValue $motionValue
+		): Response {
+			return $this->doUpdate($transformer, $motionValue, $request);
+		}
+
+		/**
+		 * @Route(path="/motion-values/{motionValue<\d+>}", methods={"DELETE"}, name="motion-values.delete")
+		 * @IsGranted("ROLE_EDITOR")
+		 *
+		 * @param MotionValueTransformer $transformer
+		 * @param MotionValue            $motionValue
+		 *
+		 * @return Response
+		 */
+		public function delete(MotionValueTransformer $transformer, MotionValue $motionValue): Response {
+			return $this->doDelete($transformer, $motionValue);
 		}
 
 		/**

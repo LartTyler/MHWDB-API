@@ -16,3 +16,4 @@ services:
     App\Contrib\Transformers\ItemTransformer: ~
     App\Contrib\Transformers\LocationTransformer: ~
     App\Contrib\Transformers\MonsterTransformer: ~
+    App\Contrib\Transformers\MotionValueTransformer: ~
