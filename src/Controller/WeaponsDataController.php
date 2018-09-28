@@ -1,6 +1,7 @@
 <?php
 	namespace App\Controller;
 
+	use App\Contrib\Transformers\WeaponTransformer;
 	use App\Entity\CraftingMaterialCost;
 	use App\Entity\Weapon;
 	use App\Entity\WeaponElement;
@@ -10,6 +11,7 @@
 	use App\QueryDocument\Projection;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\Collection;
+	use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 	use Symfony\Component\HttpFoundation\Request;
 	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\Routing\Annotation\Route;
@@ -34,6 +36,19 @@
 		}
 
 		/**
+		 * @Route(path="/weapons", methods={"PUT"}, name="weapons.create")
+		 * @IsGranted("ROLE_EDITOR")
+		 *
+		 * @param WeaponTransformer $transformer
+		 * @param Request           $request
+		 *
+		 * @return Response
+		 */
+		public function create(WeaponTransformer $transformer, Request $request): Response {
+			return $this->doCreate($transformer, $request);
+		}
+
+		/**
 		 * @Route(path="/weapons/{weapon<\d+>}", methods={"GET"}, name="weapons.read")
 		 *
 		 * @param Weapon $weapon
@@ -42,6 +57,33 @@
 		 */
 		public function read(Weapon $weapon): Response {
 			return $this->respond($weapon);
+		}
+
+		/**
+		 * @Route(path="/weapons/{weapon<\d+>}", methods={"PATCH"}, name="weapons.update")
+		 * @IsGranted("ROLE_EDITOR")
+		 *
+		 * @param WeaponTransformer $transformer
+		 * @param Request           $request
+		 * @param Weapon            $weapon
+		 *
+		 * @return Response
+		 */
+		public function update(WeaponTransformer $transformer, Request $request, Weapon $weapon): Response {
+			return $this->doUpdate($transformer, $weapon, $request);
+		}
+
+		/**
+		 * @Route(path="/weapons/{weapon<\d+>}", methods={"DELETE"}, name="weapons.delete")
+		 * @IsGranted("ROLE_EDITOR")
+		 *
+		 * @param WeaponTransformer $transformer
+		 * @param Weapon            $weapon
+		 *
+		 * @return Response
+		 */
+		public function delete(WeaponTransformer $transformer, Weapon $weapon): Response {
+			return $this->doDelete($transformer, $weapon);
 		}
 
 		/**
