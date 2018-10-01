@@ -12,9 +12,8 @@
 	 *
 	 * @package App\Entity
 	 */
-	class Ailment implements EntityInterface, SluggableInterface {
+	class Ailment implements EntityInterface {
 		use EntityTrait;
-		use SluggableTrait;
 
 		/**
 		 * @ORM\Column(type="string", length=32, unique=true)
@@ -66,8 +65,6 @@
 
 			$this->recovery = new AilmentRecovery($this);
 			$this->protection = new AilmentProtection($this);
-
-			$this->setSlug($name);
 		}
 
 		/**
@@ -75,6 +72,17 @@
 		 */
 		public function getName(): string {
 			return $this->name;
+		}
+
+		/**
+		 * @param string $name
+		 *
+		 * @return $this
+		 */
+		public function setName(string $name) {
+			$this->name = $name;
+
+			return $this;
 		}
 
 		/**

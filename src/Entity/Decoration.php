@@ -9,16 +9,15 @@
 	use Doctrine\ORM\Mapping as ORM;
 
 	/**
-	 * @ORM\Entity()
+	 * @ORM\Entity(repositoryClass="App\Repository\DecorationRepository")
 	 * @ORM\Table(name="decorations")
 	 *
 	 * Class Decoration
 	 *
 	 * @package App\Entity
 	 */
-	class Decoration implements EntityInterface, SluggableInterface, LengthCachingEntityInterface {
+	class Decoration implements EntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
-		use SluggableTrait;
 
 		/**
 		 * @ORM\Column(type="string", length=64, unique=true)
@@ -69,8 +68,6 @@
 			$this->slot = $slot;
 			$this->rarity = $rarity;
 			$this->skills = new ArrayCollection();
-
-			$this->setSlug(StringUtil::toSlug($name));
 		}
 
 		/**
@@ -78,6 +75,17 @@
 		 */
 		public function getName(): string {
 			return $this->name;
+		}
+
+		/**
+		 * @param string $name
+		 *
+		 * @return $this
+		 */
+		public function setName(string $name) {
+			$this->name = $name;
+
+			return $this;
 		}
 
 		/**

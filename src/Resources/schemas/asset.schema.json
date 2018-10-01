@@ -1,0 +1,27 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://mhw-db.com/schemas/asset",
+	"title": "Asset",
+	"description": "An asset",
+	"type": ["object", "null"],
+	"properties": {
+		"primaryHash": {
+			"type": "string",
+			"description": "A SHA-1 hash, used in combination with the secondaryHash to enforce asset uniqueness"
+		},
+		"secondaryHash": {
+			"type": "string",
+			"description": "An MD5 hash, used in combination with the primaryHash to enforce asset uniqueness"
+		},
+		"uri": {
+			"type": "string",
+			"format": "uri",
+			"description": "The complete URI to the asset"
+		}
+	},
+	"required": [
+		"primaryHash",
+		"secondaryHash",
+		"uri"
+	]
+}

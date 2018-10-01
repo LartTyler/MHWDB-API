@@ -2,7 +2,6 @@
 	namespace App\Loaders\Loaders;
 
 	use App\Entity\Ailment;
-	use App\Entity\AilmentProtection;
 	use App\Entity\Item;
 	use App\Entity\Skill;
 	use App\Loaders\Schemas\AilmentSchema;

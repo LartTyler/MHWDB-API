@@ -1,0 +1,44 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://mhw-db.com/schemas/motion-value",
+	"title": "Motion Value",
+	"type": "object",
+	"properties": {
+		"name": {
+			"type": "string",
+			"description": "The name of the motion value"
+		},
+		"weaponType": {
+			"$ref": "https://mhw-db.com/schemas/weapon-type",
+			"description": "The weapon type that the motion value belongs to"
+		},
+		"damageType": {
+			"$ref": "https://mhw-db.com/schemas/damage-type",
+			"description": "The type of damage that the motion value deals"
+		},
+		"stun": {
+			"type": ["integer", "null"],
+			"description": "The amount of stun damage the motion value deals"
+		},
+		"exhaust": {
+			"type": ["integer", "null"],
+			"description": "The amount of exhaust damage the motion value deals"
+		},
+		"hits": {
+			"type": "array",
+			"description": "An array of hits and their damage percentage the motion value deals",
+			"items": {
+				"type": "integer",
+				"minimum": 1
+			}
+		}
+	},
+	"required": [
+		"name",
+		"weaponType",
+		"damageType",
+		"stun",
+		"exhaust",
+		"hits"
+	]
+}

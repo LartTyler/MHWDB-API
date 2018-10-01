@@ -60,6 +60,7 @@
 		 *
 		 * @param string $name
 		 * @param string $rank
+		 *
 		 * @see ArmorRank
 		 */
 		public function __construct(string $name, string $rank) {
@@ -77,10 +78,32 @@
 		}
 
 		/**
+		 * @param string $name
+		 *
+		 * @return $this
+		 */
+		public function setName(string $name) {
+			$this->name = $name;
+
+			return $this;
+		}
+
+		/**
 		 * @return string
 		 */
 		public function getRank(): string {
 			return $this->rank;
+		}
+
+		/**
+		 * @param string $rank
+		 *
+		 * @return $this
+		 */
+		public function setRank(string $rank) {
+			$this->rank = $rank;
+
+			return $this;
 		}
 
 		/**

@@ -1,6 +1,7 @@
 <?php
 	namespace App\Entity;
 
+	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\ORM\Mapping as ORM;
 
 	/**
@@ -10,7 +11,7 @@
 	 *
 	 * @package App\Entity
 	 */
-	class WeaponAttackValues {
+	class WeaponAttackValues implements EntityInterface {
 		/**
 		 * @ORM\Column(type="smallint", options={"unsigned": true})
 		 *
@@ -24,6 +25,13 @@
 		 * @var int
 		 */
 		private $raw = 0;
+
+		/**
+		 * @return null
+		 */
+		public function getId() {
+			return null;
+		}
 
 		/**
 		 * @return int

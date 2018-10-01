@@ -1,0 +1,81 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://mhw-db.com/schemas/charm",
+	"title": "Charm",
+	"description": "A charm",
+	"type": "object",
+	"properties": {
+		"name": {
+			"type": "string",
+			"description": "The name of the charm"
+		},
+		"ranks": {
+			"type": "array",
+			"description": "An array of charm ranks (different upgrade tiers)",
+			"items": {
+				"type": "object",
+				"properties": {
+					"crafting": {
+						"type": "object",
+						"description": "Crafting information for the charm rank",
+						"properties": {
+							"craftable": {
+								"type": "boolean",
+								"description": "If true, the charm rank is able to be crafted directly, instead of upgraded into"
+							},
+							"materials": {
+								"type": "array",
+								"description": "An array of material costs to either create the charm (if craftable = true), or upgrade into it",
+								"items": {
+									"$ref": "https://mhw-db.com/schemas/material-cost"
+								}
+							}
+						},
+						"required": [
+							"craftable",
+							"materials"
+						]
+					},
+					"level": {
+						"type": "integer",
+						"description": "The level of the charm (it's position in the charm rank progress path)",
+						"minimum": 1
+					},
+					"name": {
+						"type": "string",
+						"description": "The name of the charm"
+					},
+					"rarity": {
+						"type": "integer",
+						"description": "The rarity of the charm",
+						"minimum": 1,
+						"maximum": 8
+					},
+					"skills": {
+						"type": "array",
+						"description": "An array of skill ranks (in shorthand format) that the charm provides at this rank",
+						"items": {
+							"$ref": "https://mhw-db.com/schemas/skill-rank-shorthand"
+						}
+					}
+				},
+				"required": [
+					"crafting",
+					"level",
+					"name",
+					"rarity",
+					"skills"
+				]
+			}
+		},
+		"slug": {
+			"type": "string",
+			"description": "The charm's API slug"
+		}
+	},
+	"required": [
+		"name",
+		"ranks",
+		"slug"
+	]
+}

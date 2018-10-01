@@ -13,9 +13,8 @@
 	 *
 	 * @package App\Entity
 	 */
-	class SkillRank implements EntityInterface, SluggableInterface {
+	class SkillRank implements EntityInterface {
 		use EntityTrait;
-		use SluggableTrait;
 
 		/**
 		 * @ORM\ManyToOne(targetEntity="App\Entity\Skill", inversedBy="ranks")
@@ -57,8 +56,6 @@
 			$this->skill = $skill;
 			$this->level = $level;
 			$this->description = $description;
-
-			$this->updateSlug();
 		}
 
 		/**
@@ -73,19 +70,6 @@
 		 */
 		public function getLevel(): int {
 			return $this->level;
-		}
-
-		/**
-		 * @param int $level
-		 *
-		 * @return $this
-		 */
-		public function setLevel(int $level) {
-			$this->level = $level;
-
-			$this->updateSlug();
-
-			return $this;
 		}
 
 		/**
@@ -150,12 +134,5 @@
 				return $this->modifiers[$attribute];
 
 			return 0;
-		}
-
-		/**
-		 * @return void
-		 */
-		protected function updateSlug(): void {
-			$this->setSlug($this->getSkill()->getName() . '-rank-' . $this->getLevel());
 		}
 	}

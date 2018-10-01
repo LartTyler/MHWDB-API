@@ -68,6 +68,7 @@
 		 */
 		public function setUri($uri) {
 			$this->uri = $uri;
+
 			return $this;
 		}
 
@@ -79,9 +80,31 @@
 		}
 
 		/**
+		 * @param string $primaryHash
+		 *
+		 * @return $this
+		 */
+		public function setPrimaryHash(string $primaryHash) {
+			$this->primaryHash = $primaryHash;
+
+			return $this;
+		}
+
+		/**
 		 * @return string
 		 */
 		public function getSecondaryHash(): string {
 			return $this->secondaryHash;
+		}
+
+		/**
+		 * @param string $secondaryHash
+		 *
+		 * @return $this
+		 */
+		public function setSecondaryHash(string $secondaryHash) {
+			$this->secondaryHash = $secondaryHash;
+
+			return $this;
 		}
 	}

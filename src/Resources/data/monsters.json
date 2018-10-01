@@ -1,0 +1,50 @@
+[
+	{
+		"name": "Apceros",
+		"type": "small",
+		"species": "herbivore",
+		"elements": [],
+		"ailments": [],
+		"weaknesses": [
+			{
+				"element": "fire",
+				"magnitude": 1
+			},
+			{
+				"element": "thunder",
+				"magnitude": 1
+			}
+		],
+		"locations": [
+			"Wildspire Waste"
+		]
+	},
+	{
+		"name": "Aptonoth",
+		"type": "small",
+		"species": "herbivore",
+		"elements": [],
+		"ailments": [],
+		"weaknesses": [
+			{
+				"element": "fire",
+				"magnitude": 1
+			},
+			{
+				"element": "water",
+				"magnitude": 1
+			},
+			{
+				"element": "thunder",
+				"magnitude": 1
+			},
+			{
+				"element": "ice",
+				"magnitude": 1
+			}
+		],
+		"locations": [
+			"Ancient Forest"
+		]
+	}
+]

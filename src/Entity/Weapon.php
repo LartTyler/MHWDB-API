@@ -21,9 +21,8 @@
 	 *
 	 * @package App\Entity
 	 */
-	class Weapon implements EntityInterface, SluggableInterface, LengthCachingEntityInterface {
+	class Weapon implements EntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
-		use SluggableTrait;
 		use AttributableTrait;
 
 		/**
@@ -48,10 +47,9 @@
 		private $rarity;
 
 		/**
-		 * @ORM\ManyToMany(targetEntity="App\Entity\Slot", orphanRemoval=true, cascade={"all"})
-		 * @ORM\JoinTable(name="weapon_slots")
+		 * @ORM\OneToMany(targetEntity="App\Entity\WeaponSlot", mappedBy="weapon", orphanRemoval=true, cascade={"all"})
 		 *
-		 * @var Collection|Selectable|Slot[]
+		 * @var Collection|Selectable|WeaponSlot[]
 		 */
 		private $slots;
 
@@ -131,12 +129,12 @@
 			$this->name = $name;
 			$this->type = $type;
 			$this->rarity = $rarity;
-			$this->slots = new ArrayCollection();
+
 			$this->attack = new WeaponAttackValues();
+
+			$this->slots = new ArrayCollection();
 			$this->elements = new ArrayCollection();
 			$this->durability = new ArrayCollection();
-
-			$this->setSlug($name);
 		}
 
 		/**
@@ -154,8 +152,6 @@
 		public function setName($name) {
 			$this->name = $name;
 
-			$this->setSlug($name);
-
 			return $this;
 		}
 
@@ -164,6 +160,17 @@
 		 */
 		public function getType(): string {
 			return $this->type;
+		}
+
+		/**
+		 * @param string $type
+		 *
+		 * @return $this
+		 */
+		public function setType(string $type) {
+			$this->type = $type;
+
+			return $this;
 		}
 
 		/**
@@ -185,7 +192,7 @@
 		}
 
 		/**
-		 * @return Slot[]|Collection|Selectable
+		 * @return WeaponSlot[]|Collection|Selectable
 		 */
 		public function getSlots() {
 			return $this->slots;
@@ -241,8 +248,7 @@
 		 */
 		public function getElement(string $element): ?WeaponElement {
 			$matches = $this->getElements()->matching(
-				Criteria::create()->
-					where(Criteria::expr()->eq('type', strtolower($element)))
+				Criteria::create()->where(Criteria::expr()->eq('type', strtolower($element)))
 			);
 
 			if ($matches->count())

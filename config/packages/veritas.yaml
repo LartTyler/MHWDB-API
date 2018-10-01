@@ -1,0 +1,2 @@
+dbstudios_veritas:
+    secret: '%env(APP_SECRET)%'

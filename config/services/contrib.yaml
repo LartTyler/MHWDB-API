@@ -1,0 +1,22 @@
+services:
+    _defaults:
+        public: false
+        autowire: true
+        autoconfigure: true
+
+    App\Contrib\BucketManager:
+        bind:
+            $bucket: '%env(resolve:ASSETS_BUCKET_NAME)%'
+
+    App\Contrib\Transformers\AilmentTransformer: ~
+    App\Contrib\Transformers\ArmorTransformer: ~
+    App\Contrib\Transformers\ArmorSetTransformer: ~
+    App\Contrib\Transformers\ArmorSetBonusTransformer: ~
+    App\Contrib\Transformers\CharmTransformer: ~
+    App\Contrib\Transformers\DecorationTransformer: ~
+    App\Contrib\Transformers\ItemTransformer: ~
+    App\Contrib\Transformers\LocationTransformer: ~
+    App\Contrib\Transformers\MonsterTransformer: ~
+    App\Contrib\Transformers\MotionValueTransformer: ~
+    App\Contrib\Transformers\SkillTransformer: ~
+    App\Contrib\Transformers\WeaponTransformer: ~

@@ -2,9 +2,9 @@
 	namespace App\Command;
 
 	use App\Console\MultiProgressBar;
+	use App\Console\ProgressAwareInterface;
 	use App\Loaders\LoaderCollection;
 	use App\Loaders\LoaderInterface;
-	use App\Scraping\ProgressAwareInterface;
 	use Symfony\Component\Console\Command\Command;
 	use Symfony\Component\Console\Input\InputInterface;
 	use Symfony\Component\Console\Input\InputOption;

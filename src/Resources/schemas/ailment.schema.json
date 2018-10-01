@@ -1,0 +1,72 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://mhw-db.com/schemas/ailment",
+	"title": "Ailment",
+	"description": "An ailment (such as fireblight or blastblight)",
+	"type": "object",
+	"properties": {
+		"description": {
+			"type": "string",
+			"description": "A short description of the ailment"
+		},
+		"name": {
+			"type": "string",
+			"description": "The name of the ailment",
+			"maxLength": 32
+		},
+		"protection": {
+			"type": "object",
+			"description": "An object containing information on methods to protect against the ailment",
+			"properties": {
+				"items": {
+					"type": "array",
+					"description": "An array of entity references to items that will provide protection from the ailment",
+					"items": {
+						"$ref": "https://mhw-db.com/schemas/entity-reference"
+					}
+				},
+				"skills": {
+					"type": "array",
+					"description": "An array of entity references to skills that will provide protection from the ailment",
+					"items": {
+						"$ref": "https://mhw-db.com/schemas/entity-reference"
+					}
+				}
+			},
+			"required": [
+				"items",
+				"skills"
+			]
+		},
+		"recovery": {
+			"type": "object",
+			"description": "An object containing information on methods to recover from the ailment",
+			"properties": {
+				"actions": {
+					"type": "array",
+					"description": "An array of names describing actions that will allow recovery from the ailment",
+					"items": {
+						"type": "string",
+						"enum": ["dodge"]
+					}
+				},
+				"items": {
+					"type": "array",
+					"description": "An array of entity references to items that will allow recovery from the ailment",
+					"items": {
+						"$ref": "https://mhw-db.com/schemas/entity-reference"
+					}
+				}
+			},
+			"required": [
+				"actions",
+				"items"
+			]
+		}
+	},
+	"required": [
+		"name",
+		"protection",
+		"recovery"
+	]
+}

@@ -1,0 +1,21 @@
+parameters:
+    app.security.user_repository: App\Entity\User
+
+services:
+    _defaults:
+        public: false
+        autowire: true
+        autoconfigure: true
+
+    DaybreakStudios\VeritasBundle\Security\Core\User\JWTEntityUserProvider:
+        public: true
+        arguments:
+            - '@doctrine'
+            - '%app.security.user_repository%'
+
+    App\Security\AuthenticationExceptionListener:
+        tags:
+            -
+                name: kernel.event_listener
+                event: kernel.response
+                priority: 0

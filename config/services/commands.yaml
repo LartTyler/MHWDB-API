@@ -9,18 +9,6 @@ services:
         tags:
             - console.command
 
-    App\Command\ScraperRunCommand:
-        tags:
-            -
-                name: console.command
-                command: app:scrapers:run
-
-    App\Command\ScraperListCommand:
-        tags:
-            -
-                name: console.command
-                command: app:scrapers:list
-
     App\Command\LoaderRunCommand:
         tags:
             -
@@ -45,8 +33,8 @@ services:
                 name: console.command
                 command: app:entity:delete
 
-    App\Command\FixEmptyAffinityValuesCommand:
+    App\Command\UserCreateCommand:
         tags:
             -
                 name: console.command
-                command: app:fix:empty-affinity-values
+                command: app:user:create

@@ -8,7 +8,7 @@
 	use Doctrine\ORM\Mapping as ORM;
 
 	/**
-	 * @ORM\Entity()
+	 * @ORM\Entity(repositoryClass="App\Repository\AilmentProtectionRepository")
 	 * @ORM\Table(name="ailment_protection_methods")
 	 *
 	 * Class AilmentProtection

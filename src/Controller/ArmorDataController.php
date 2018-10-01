@@ -1,27 +1,87 @@
 <?php
 	namespace App\Controller;
 
+	use App\Contrib\Transformers\ArmorTransformer;
 	use App\Entity\Armor;
+	use App\Entity\ArmorSlot;
 	use App\Entity\Asset;
 	use App\Entity\CraftingMaterialCost;
 	use App\Entity\SkillRank;
-	use App\Entity\Slot;
 	use App\QueryDocument\Projection;
-	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use Symfony\Bridge\Doctrine\RegistryInterface;
-	use Symfony\Component\Routing\RouterInterface;
+	use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+	use Symfony\Component\HttpFoundation\Request;
+	use Symfony\Component\HttpFoundation\Response;
+	use Symfony\Component\Routing\Annotation\Route;
 
 	class ArmorDataController extends AbstractDataController {
 		/**
 		 * ArmorDataController constructor.
-		 *
-		 * @param RegistryInterface $doctrine
-		 * @param ResponderService  $responder
-		 * @param RouterInterface   $router
 		 */
-		public function __construct(RegistryInterface $doctrine, ResponderService $responder, RouterInterface $router) {
-			parent::__construct($doctrine, $responder, $router, Armor::class);
+		public function __construct() {
+			parent::__construct(Armor::class);
+		}
+
+		/**
+		 * @Route(path="/armor", methods={"GET"}, name="armor.list")
+		 *
+		 * @param Request $request
+		 *
+		 * @return Response
+		 */
+		public function list(Request $request): Response {
+			return parent::list($request);
+		}
+
+		/**
+		 * @Route(path="/armor", methods={"PUT"}, name="armor.create")
+		 * @IsGranted("ROLE_EDITOR")
+		 *
+		 * @param ArmorTransformer $transformer
+		 * @param Request          $request
+		 *
+		 * @return Response
+		 */
+		public function create(ArmorTransformer $transformer, Request $request): Response {
+			return $this->doCreate($transformer, $request);
+		}
+
+		/**
+		 * @Route(path="/armor/{armor<\d+>}", methods={"GET"}, name="armor.read")
+		 *
+		 * @param Armor $armor
+		 *
+		 * @return Response
+		 */
+		public function read(Armor $armor): Response {
+			return $this->respond($armor);
+		}
+
+		/**
+		 * @Route(path="/armor/{armor<\d+>}", methods={"PATCH"}, name="armor.update")
+		 * @IsGranted("ROLE_EDITOR")
+		 *
+		 * @param ArmorTransformer $transformer
+		 * @param Request          $request
+		 * @param Armor            $armor
+		 *
+		 * @return Response
+		 */
+		public function update(ArmorTransformer $transformer, Request $request, Armor $armor): Response {
+			return $this->doUpdate($transformer, $armor, $request);
+		}
+
+		/**
+		 * @Route(path="/armor/{armor<\d+>}", methods={"DELETE"}, name="armor.delete")
+		 * @IsGranted("ROLE_EDITOR")
+		 *
+		 * @param ArmorTransformer $transformer
+		 * @param Armor            $armor
+		 *
+		 * @return Response
+		 */
+		public function delete(ArmorTransformer $transformer, Armor $armor): Response {
+			return $this->doDelete($transformer, $armor);
 		}
 
 		/**
@@ -39,7 +99,6 @@
 
 			$output = [
 				'id' => $entity->getId(),
-				'slug' => $entity->getSlug(),
 				'name' => $entity->getName(),
 				'type' => $entity->getType(),
 				'rank' => $entity->getRank(),
@@ -62,35 +121,38 @@
 
 			// region Slots Fields
 			if ($projection->isAllowed('slots')) {
-				$output['slots'] = array_map(function(Slot $slot): array {
-					return [
-						'rank' => $slot->getRank(),
-					];
-				}, $entity->getSlots()->toArray());
+				$output['slots'] = array_map(
+					function(ArmorSlot $slot): array {
+						return [
+							'rank' => $slot->getRank(),
+						];
+					},
+					$entity->getSlots()->toArray()
+				);
 			}
 			// endregion
 
 			// region Skills Fields
 			if ($projection->isAllowed('skills')) {
-				$output['skills'] = array_map(function(SkillRank $rank) use ($projection): array {
-					$output = [
-						'id' => $rank->getId(),
-						'slug' => $rank->getSlug(),
-						'level' => $rank->getLevel(),
-						'description' => $rank->getDescription(),
-						'modifiers' => $rank->getModifiers() ?: new \stdClass(),
-						'skill' => $rank->getSkill()->getId(),
-						'skillName' => $rank->getSkill()->getName(),
-					];
+				$output['skills'] = array_map(
+					function(SkillRank $rank) use ($projection): array {
+						$output = [
+							'id' => $rank->getId(),
+							'level' => $rank->getLevel(),
+							'description' => $rank->getDescription(),
+							'modifiers' => $rank->getModifiers() ?: new \stdClass(),
+						];
 
-					if ($projection->isAllowed('skills.skill'))
-						$output['skill'] = $rank->getSkill()->getId();
+						if ($projection->isAllowed('skills.skill'))
+							$output['skill'] = $rank->getSkill()->getId();
 
-					if ($projection->isAllowed('skills.skillName'))
-						$output['skillName'] = $rank->getSkill()->getName();
+						if ($projection->isAllowed('skills.skillName'))
+							$output['skillName'] = $rank->getSkill()->getName();
 
-					return $output;
-				}, $entity->getSkills()->toArray());
+						return $output;
+					},
+					$entity->getSkills()->toArray()
+				);
 			}
 			// endregion
 
@@ -105,10 +167,17 @@
 						'rank' => $armorSet->getRank(),
 					];
 
-					if ($projection->isAllowed('armorSet.pieces'))
-						$output['armorSet']['pieces'] = array_map(function(Armor $armor): int {
-							return $armor->getId();
-						}, $armorSet->getPieces()->toArray());
+					if ($projection->isAllowed('armorSet.pieces')) {
+						$output['armorSet']['pieces'] = array_map(
+							function(Armor $armor): int {
+								return $armor->getId();
+							},
+							$armorSet->getPieces()->toArray()
+						);
+					}
+
+					if ($projection->isAllowed('armorSet.bonus'))
+						$output['armorSet']['bonus'] = $armorSet->getBonus()->getId();
 				} else
 					$output['armorSet'] = null;
 			}
@@ -167,13 +236,15 @@
 								// endregion
 
 								return $output;
-							}, $crafting->getMaterials()->toArray()
+							},
+							$crafting->getMaterials()->toArray()
 						);
 					}
 					// endregion
 				} else
 					$output['crafting'] = null;
 			}
+
 			// endregion
 
 			return $output;

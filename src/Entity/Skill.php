@@ -16,9 +16,8 @@
 	 *
 	 * @package App\Entity
 	 */
-	class Skill implements EntityInterface, SluggableInterface, LengthCachingEntityInterface {
+	class Skill implements EntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
-		use SluggableTrait;
 
 		/**
 		 * @ORM\Column(type="string", length=64, unique=true)
@@ -28,18 +27,18 @@
 		private $name;
 
 		/**
+		 * @ORM\Column(type="text")
+		 *
+		 * @var string
+		 */
+		private $description;
+
+		/**
 		 * @ORM\OneToMany(targetEntity="App\Entity\SkillRank", mappedBy="skill", orphanRemoval=true, cascade={"all"})
 		 *
 		 * @var Collection|Selectable|SkillRank[]
 		 */
 		private $ranks;
-
-		/**
-		 * @ORM\Column(type="text")
-		 *
-		 * @var string|null
-		 */
-		private $description = null;
 
 		/**
 		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
@@ -53,12 +52,13 @@
 		 * Skill constructor.
 		 *
 		 * @param string $name
+		 * @param string $description
 		 */
-		public function __construct(string $name) {
+		public function __construct(string $name, string $description) {
 			$this->name = $name;
-			$this->ranks = new ArrayCollection();
+			$this->description = $description;
 
-			$this->updateSlug();
+			$this->ranks = new ArrayCollection();
 		}
 
 		/**
@@ -75,8 +75,6 @@
 		 */
 		public function setName(string $name) {
 			$this->name = $name;
-
-			$this->updateSlug();
 
 			return $this;
 		}
@@ -107,26 +105,20 @@
 		}
 
 		/**
-		 * @return void
+		 * @return string
 		 */
-		protected function updateSlug(): void {
-			$this->setSlug($this->getName());
-		}
-
-		/**
-		 * @return null|string
-		 */
-		public function getDescription() {
+		public function getDescription(): string {
 			return $this->description;
 		}
 
 		/**
-		 * @param null|string $description
+		 * @param string $description
 		 *
 		 * @return $this
 		 */
-		public function setDescription(?string $description) {
+		public function setDescription(string $description) {
 			$this->description = $description;
+
 			return $this;
 		}
 

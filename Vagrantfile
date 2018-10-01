@@ -15,7 +15,7 @@ Vagrant.configure("2") do |config|
 		vb.memory = "2048"
 	end
 
-	config.vm.provision "shell", inline: <<-SHELL
+	config.vm.provision "bootstrap", type: "shell", inline: <<-SHELL
 		apt-get update -y
 		apt-get remove apache2 -y
 
@@ -47,11 +47,21 @@ Vagrant.configure("2") do |config|
 		mysql -e "GRANT ALL ON application.* TO 'application'@'%';"
 	SHELL
 
-	config.vm.provision "shell", privileged: false, inline: <<-SHELL
+	config.vm.provision "install", type: "shell", privileged: false, inline: <<-SHELL
 		echo "[client]" > ~/.my.cnf
 		echo "user=application" >> ~/.my.cnf
 		echo "database=application" >> ~/.my.cnf
 
+		cd /vagrant
+
+		openssl genrsa -out config/jwt/private.pem 4096
+		openssl rsa -pubout -in config/jwt/private.pem -out config/jwt/public.pem
+
+		composer install
+		composer db:reset
+	SHELL
+
+	config.vm.provision "run", type: "shell", run: "always", privileged: false, inline: <<-SHELL
 		echo
 		echo "Installed packages:"
 		echo "  -> PHP 7.2 (with extensions: mysqlnd, curl, zip, mbstring, xml, xdebug, memcached, gd)"

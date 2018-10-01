@@ -14,6 +14,12 @@
 		 */
 		protected $zone;
 
+		/**
+		 * CampSchema constructor.
+		 *
+		 * @param string $name
+		 * @param int    $zone
+		 */
 		protected function __construct(string $name, int $zone) {
 			$this->name = $name;
 			$this->zone = $zone;

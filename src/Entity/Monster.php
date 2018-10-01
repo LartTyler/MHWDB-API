@@ -11,7 +11,7 @@
 	use Doctrine\ORM\Mapping as ORM;
 
 	/**
-	 * @ORM\Entity()
+	 * @ORM\Entity(repositoryClass="App\Repository\MonsterRepository")
 	 * @ORM\Table(name="monsters")
 	 *
 	 * Class Monster
@@ -66,11 +66,23 @@
 		 *     mappedBy="monster",
 		 *     orphanRemoval=true,
 		 *     cascade={"all"}
-		 *	 )
+		 * )
 		 *
 		 * @var MonsterResistance[]|Collection|Selectable
 		 */
-		private $resistances = [];
+		private $resistances;
+
+		/**
+		 * @ORM\OneToMany(
+		 *     targetEntity="App\Entity\MonsterWeakness",
+		 *     mappedBy="monster",
+		 *     orphanRemoval=true,
+		 *     cascade={"all"}
+		 * )
+		 *
+		 * @var MonsterWeakness[]|Collection|Selectable
+		 */
+		private $weaknesses;
 
 		/**
 		 * @ORM\Column(type="text", nullable=true)
@@ -102,6 +114,7 @@
 			$this->ailments = new ArrayCollection();
 			$this->locations = new ArrayCollection();
 			$this->resistances = new ArrayCollection();
+			$this->weaknesses = new ArrayCollection();
 		}
 
 		/**
@@ -109,6 +122,17 @@
 		 */
 		public function getName(): string {
 			return $this->name;
+		}
+
+		/**
+		 * @param string $name
+		 *
+		 * @return $this
+		 */
+		public function setName(string $name) {
+			$this->name = $name;
+
+			return $this;
 		}
 
 		/**
@@ -202,5 +226,12 @@
 		 */
 		public function getResistances() {
 			return $this->resistances;
+		}
+
+		/**
+		 * @return MonsterWeakness[]|Collection|Selectable
+		 */
+		public function getWeaknesses() {
+			return $this->weaknesses;
 		}
 	}
