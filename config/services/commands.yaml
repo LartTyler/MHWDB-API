@@ -9,17 +9,17 @@ services:
         tags:
             - console.command
 
-    App\Command\ScrapeCommand:
+    App\Command\LoaderRunCommand:
         tags:
             -
                 name: console.command
-                command: app:scrape
+                command: app:loaders:run
 
-    App\Command\ScraperListCommand:
+    App\Command\LoaderListCommand:
         tags:
             -
                 name: console.command
-                command: app:scrape:list
+                command: app:loaders:list
 
     App\Command\SyncEntityLengthCachesCommand:
         tags:
@@ -33,8 +33,8 @@ services:
                 name: console.command
                 command: app:entity:delete
 
-    App\Command\FixEmptyAffinityValuesCommand:
+    App\Command\UserCreateCommand:
         tags:
             -
                 name: console.command
-                command: app:fix:empty-affinity-values
+                command: app:user:create

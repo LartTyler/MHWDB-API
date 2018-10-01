@@ -1,0 +1,41 @@
+security:
+    role_hierarchy:
+        ROLE_ADMIN: ROLE_EDITOR
+        ROLE_EDITOR: ROLE_USER
+
+    providers:
+        doctrine:
+            entity:
+                class: App\Entity\User
+                property: email
+
+    encoders:
+        App\Entity\User: bcrypt
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        auth_refresh:
+            pattern: ^/auth/refresh
+            stateless: true
+            guard:
+                authenticators:
+                    - lexik_jwt_authentication.jwt_token_authenticator
+
+        auth:
+            pattern: ^/auth
+            anonymous: true
+            stateless: true
+            json_login:
+                check_path: /auth
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+
+        main:
+            anonymous: true
+            stateless: true
+            guard:
+                authenticators:
+                    - lexik_jwt_authentication.jwt_token_authenticator

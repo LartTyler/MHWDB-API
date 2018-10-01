@@ -1,6 +1,7 @@
 <?php
 	namespace App\Entity;
 
+	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\ORM\Mapping as ORM;
 
 	/**
@@ -10,7 +11,7 @@
 	 *
 	 * @package App\Entity
 	 */
-	class ArmorDefenseValues implements \JsonSerializable {
+	class ArmorDefenseValues implements \JsonSerializable, EntityInterface {
 		/**
 		 * @ORM\Column(type="integer", options={"unsigned": true})
 		 *
@@ -31,6 +32,13 @@
 		 * @var int
 		 */
 		private $augmented = 0;
+
+		/**
+		 * @return null
+		 */
+		public function getId() {
+			return null;
+		}
 
 		/**
 		 * @return int

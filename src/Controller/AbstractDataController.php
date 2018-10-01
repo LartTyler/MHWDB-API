@@ -1,19 +1,22 @@
 <?php
 	namespace App\Controller;
 
-	use App\Entity\SluggableInterface;
+	use App\Contrib\ApiErrors\CreateError;
+	use App\Contrib\ApiErrors\InvalidPayloadError;
+	use App\Contrib\ApiErrors\UpdateError;
+	use App\Contrib\Exceptions\ContribException;
+	use App\Contrib\TransformerInterface;
 	use App\QueryDocument\ApiQueryManager;
 	use App\QueryDocument\Projection;
 	use App\Response\BadProjectionObjectError;
 	use App\Response\BadQueryObjectError;
 	use App\Response\EmptySearchParametersError;
+	use App\Response\NoContentResponse;
 	use App\Response\SearchError;
-	use App\Response\SlugNotSupportedError;
 	use DaybreakStudios\Doze\Errors\ApiErrorInterface;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use Doctrine\ORM\EntityManager;
-	use Symfony\Bridge\Doctrine\RegistryInterface;
+	use Doctrine\ORM\EntityManagerInterface;
 	use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 	use Symfony\Component\HttpFoundation\JsonResponse;
 	use Symfony\Component\HttpFoundation\Request;
@@ -22,9 +25,9 @@
 
 	abstract class AbstractDataController extends Controller {
 		/**
-		 * @var EntityManager
+		 * @var EntityManagerInterface
 		 */
-		protected $manager;
+		protected $entityManager;
 
 		/**
 		 * @var ResponderService
@@ -44,108 +47,166 @@
 		/**
 		 * AbstractCrudController constructor.
 		 *
-		 * @param RegistryInterface $doctrine
-		 * @param ResponderService  $responder
-		 * @param RouterInterface   $router
-		 * @param string            $entityClass
+		 * @param string $entityClass
 		 */
-		public function __construct(
-			RegistryInterface $doctrine,
-			ResponderService $responder,
-			RouterInterface $router,
-			string $entityClass
-		) {
-			$this->manager = $doctrine->getManager();
-			$this->responder = $responder;
-			$this->router = $router;
+		public function __construct(string $entityClass) {
 			$this->entityClass = $entityClass;
 		}
 
 		/**
-		 * @param Request $request
+		 * @required
 		 *
-		 * @return Response
+		 * @param EntityManagerInterface $entityManager
+		 *
+		 * @return void
 		 */
-		public function listAction(Request $request): Response {
-			return $this->respond($this->doListAction($request));
+		public function setEntityManager(EntityManagerInterface $entityManager): void {
+			$this->entityManager = $entityManager;
+		}
+
+		/**
+		 * @required
+		 *
+		 * @param ResponderService $responder
+		 *
+		 * @return void
+		 */
+		public function setResponder(ResponderService $responder): void {
+			$this->responder = $responder;
+		}
+
+		/**
+		 * @required
+		 *
+		 * @param RouterInterface $router
+		 *
+		 * @return void
+		 */
+		public function setRouter(RouterInterface $router): void {
+			$this->router = $router;
 		}
 
 		/**
 		 * @param Request $request
 		 *
-		 * @return EntityInterface[]|Response
+		 * @return Response
 		 */
-		protected function doListAction(Request $request) {
+		public function list(Request $request): Response {
 			if ($request->query->has('q')) {
-				$results = $this->getSearchResults($request->query->all());
+				$query = $request->query->all();
 
-				if ($results instanceof Response)
-					return $results;
+				if ($limit = ($query['limit'] ?? null))
+					unset($query['limit']);
 
-				return $results;
-			}
+				if ($offset = ($query['offset'] ?? null))
+					unset($query['offset']);
 
-			return $this->manager->getRepository($this->entityClass)->findAll();
+				if (!sizeof($query))
+					return $this->respond(new EmptySearchParametersError());
+
+				$queryBuilder = $this->entityManager->createQueryBuilder()
+					->from($this->entityClass, 'e')
+					->select('e')
+					->setMaxResults($limit)
+					->setFirstResult($offset);
+
+				$queryObject = $query['q'] ?? [];
+
+				if (is_string($queryObject)) {
+					$queryObject = json_decode($queryObject, true);
+
+					if (json_last_error() !== JSON_ERROR_NONE)
+						return $this->respond(new BadQueryObjectError());
+				}
+
+				if (!$queryObject)
+					return $this->respond(new EmptySearchParametersError());
+
+				try {
+					$this->get(ApiQueryManager::class)->apply($queryBuilder, $queryObject);
+				} catch (\Exception $e) {
+					return $this->respond(new SearchError($e->getMessage()));
+				}
+
+				$results = $queryBuilder->getQuery()->getResult();
+			} else
+				$results = $this->entityManager->getRepository($this->entityClass)->findAll();
+
+			return $this->respond($results);
 		}
 
 		/**
-		 * @param string $idOrSlug
+		 * @param TransformerInterface $transformer
+		 * @param Request              $request
 		 *
 		 * @return Response
 		 */
-		public function readAction(string $idOrSlug): Response {
-			return $this->respond($this->doReadAction($idOrSlug));
-		}
+		protected function doCreate(TransformerInterface $transformer, Request $request): Response {
+			$payload = json_decode($request->getContent());
 
-		/**
-		 * @param string $idOrSlug
-		 *
-		 * @return SlugNotSupportedError|EntityInterface|null
-		 */
-		protected function doReadAction(string $idOrSlug) {
-			return $this->getEntity($idOrSlug);
-		}
-
-		/**
-		 * @param array $query
-		 *
-		 * @return EntityInterface[]|Response
-		 */
-		protected function getSearchResults(array $query) {
-			if ($limit = ($query['limit'] ?? null))
-				unset($query['limit']);
-
-			if ($offset = ($query['offset'] ?? null))
-				unset($query['offset']);
-
-			if (!sizeof($query))
-				return $this->responder->createErrorResponse(new EmptySearchParametersError());
-
-			$queryBuilder = $this->manager->createQueryBuilder()
-				->from($this->entityClass, 'e')
-				->select('e')
-				->setMaxResults($limit)
-				->setFirstResult($offset);
-
-			$queryObject = $query['q'] ?? [];
-
-			if (is_string($queryObject)) {
-				$queryObject = json_decode($queryObject, true);
-
-				if (json_last_error() !== JSON_ERROR_NONE)
-					return $this->responder->createErrorResponse(new BadQueryObjectError());
-			}
-
-			if (!$queryObject)
-				return $this->responder->createErrorResponse(new EmptySearchParametersError());
+			if (json_last_error() !== JSON_ERROR_NONE)
+				return $this->respond(new InvalidPayloadError());
 
 			try {
-				$this->get(ApiQueryManager::class)->apply($queryBuilder, $queryObject);
-			} catch (\Exception $e) {
-				return $this->responder->createErrorResponse(new SearchError($e->getMessage()));
+				$entity = $transformer->create($payload);
+			} catch (ContribException $e) {
+				return $this->respond(new CreateError($e->getMessage()));
 			}
 
-			return $queryBuilder->getQuery()->getResult();
+			$this->entityManager->flush();
+
+			return $this->respond($entity);
+		}
+
+		/**
+		 * @param TransformerInterface $transformer
+		 * @param EntityInterface      $entity
+		 * @param Request              $request
+		 *
+		 * @return Response
+		 */
+		protected function doUpdate(
+			TransformerInterface $transformer,
+			EntityInterface $entity,
+			Request $request
+		): Response {
+			$payload = json_decode($request->getContent());
+
+			if (json_last_error() !== JSON_ERROR_NONE)
+				return $this->respond(new InvalidPayloadError());
+
+			try {
+				$transformer->update($entity, $payload);
+			} catch (ContribException $e) {
+				return $this->respond(new UpdateError($e->getMessage()));
+			}
+
+			$this->entityManager->flush();
+
+			return $this->respond($entity);
+		}
+
+		/**
+		 * @param TransformerInterface $transformer
+		 * @param EntityInterface      $entity
+		 *
+		 * @return Response
+		 */
+		protected function doDelete(TransformerInterface $transformer, EntityInterface $entity): Response {
+			$transformer->delete($entity);
+
+			$this->entityManager->flush();
+
+			return new NoContentResponse();
+		}
+
+		/**
+		 * @param int $id
+		 *
+		 * @return EntityInterface|null
+		 */
+		protected function getEntity(int $id): ?EntityInterface {
+			return $this->entityManager->getRepository($this->entityClass)->find($id);
 		}
 
 		/**
@@ -162,7 +223,7 @@
 
 			if ($fields) {
 				$fields = @json_decode($fields, true);
-				
+
 				if (json_last_error() !== JSON_ERROR_NONE)
 					return $this->responder->createErrorResponse(new BadProjectionObjectError());
 			}
@@ -190,30 +251,12 @@
 			else
 				$status = Response::HTTP_OK;
 
-			return new JsonResponse($data, $status, [
-				'Cache-Control' => 'public, max-age=14400',
-				'Content-Type' => 'application/json',
-			]);
-		}
-
-		/**
-		 * @param string $idOrSlug
-		 *
-		 * @return SlugNotSupportedError|EntityInterface|null
-		 */
-		protected function getEntity(string $idOrSlug) {
-			if (is_numeric($idOrSlug))
-				$item = $this->manager->getRepository($this->entityClass)->find((int)$idOrSlug);
-			else {
-				if (!is_a($this->entityClass, SluggableInterface::class, true))
-					return new SlugNotSupportedError();
-
-				$item = $this->manager->getRepository($this->entityClass)->findOneBy([
-					'slug' => $idOrSlug,
-				]);
-			}
-
-			return $item;
+			return new JsonResponse(
+				$data, $status, [
+					'Cache-Control' => 'public, max-age=14400',
+					'Content-Type' => 'application/json',
+				]
+			);
 		}
 
 		/**

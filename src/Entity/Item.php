@@ -71,6 +71,17 @@
 		}
 
 		/**
+		 * @param string $name
+		 *
+		 * @return $this
+		 */
+		public function setName(string $name) {
+			$this->name = $name;
+
+			return $this;
+		}
+
+		/**
 		 * @return string
 		 */
 		public function getDescription(): string {
@@ -84,6 +95,7 @@
 		 */
 		public function setDescription(string $description) {
 			$this->description = $description;
+
 			return $this;
 		}
 
@@ -101,6 +113,7 @@
 		 */
 		public function setRarity(int $rarity) {
 			$this->rarity = $rarity;
+
 			return $this;
 		}
 
@@ -136,6 +149,7 @@
 		 */
 		public function setCarryLimit(int $carryLimit) {
 			$this->carryLimit = $carryLimit;
+
 			return $this;
 		}
 	}

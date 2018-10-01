@@ -1,0 +1,13 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://mhw-db.com/schemas/status-element",
+	"title": "Status Element",
+	"description": "An element that's inflicted as a status effect",
+	"type": "string",
+	"enum": [
+		"blast",
+		"poison",
+		"sleep",
+		"paralysis"
+	]
+}

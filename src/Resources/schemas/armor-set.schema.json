@@ -1,0 +1,33 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://mhw-db.com/schemas/armor-set",
+	"title": "Armor Set",
+	"description": "An armor set",
+	"type": "object",
+	"properties": {
+		"name": {
+			"type": "string",
+			"description": "The name of the armor set"
+		},
+		"pieces": {
+			"type": "array",
+			"description": "An array of armor pieces that make up the set",
+			"items": {
+				"$ref": "https://mhw-db.com/schemas/entity-reference"
+			}
+		},
+		"rank": {
+			"type": "string",
+			"description": "The armor set's rank",
+			"enum": [
+				"low",
+				"high"
+			]
+		}
+	},
+	"required": [
+		"name",
+		"pieces",
+		"rank"
+	]
+}

@@ -1,9 +1,14 @@
-api._routes:
-    resource: 'routes/api'
-    type: directory
+app._annotations:
+    resource: '../src/Controller/'
+    type: annotation
+    defaults:
+        _format: json
 
 index:
     path: /
     controller: 'FrameworkBundle:Redirect:urlRedirect'
     defaults:
-        path: 'https://larttyler.github.io/MHWDB-Docs/'
+        path: 'https://docs.mhw-db.com/'
+
+auth.login:
+    path: /auth

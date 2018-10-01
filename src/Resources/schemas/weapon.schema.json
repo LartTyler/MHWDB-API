@@ -1,0 +1,193 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://mhw-db.com/schemas/weapon",
+	"title": "Weapon",
+	"description": "A weapon",
+	"type": "object",
+	"properties": {
+		"slug": {
+			"type": "string",
+			"description": "The weapon's unique slug"
+		},
+		"attributes": {
+			"type": "object",
+			"description": "A dictionary of attributes for the weapon"
+		},
+		"name": {
+			"type": "string",
+			"description": "The weapon's name"
+		},
+		"type": {
+			"$ref": "https://mhw-db.com/schemas/weapon-type",
+			"description": "The weapon's type"
+		},
+		"rarity": {
+			"type": "integer",
+			"description": "The weapon's rarity",
+			"minimum": 1,
+			"maximum": 8
+		},
+		"slots": {
+			"$ref": "https://mhw-db.com/schemas/slot",
+			"description": "The slots available on the weapon"
+		},
+		"durability": {
+			"type": "array",
+			"description": "An array of the weapon's sharpness values (in hits-per-tier) at each handicraft level, starting at 0 (no Handicraft applied). This array will always be empty for non-melee weapons.",
+			"items": {
+				"type": "object",
+				"title": "Weapon Sharpness",
+				"properties": {
+					"red": {
+						"type": "integer",
+						"minimum": 0
+					},
+					"orange": {
+						"type": "integer",
+						"description": "The number of normal (non-bounce) hits the weapon can land at orange sharpness before degrading",
+						"minimum": 0
+					},
+					"yellow": {
+						"type": "integer",
+						"description": "The number of normal (non-bounce) hits the weapon can land at yellow sharpness before degrading",
+						"minimum": 0
+					},
+					"green": {
+						"type": "integer",
+						"description": "The number of normal (non-bounce) hits the weapon can land at green sharpness before degrading",
+						"minimum": 0
+					},
+					"blue": {
+						"type": "integer",
+						"description": "The number of normal (non-bounce) hits the weapon can land at blue sharpness before degrading",
+						"minimum": 0
+					},
+					"white": {
+						"type": "integer",
+						"description": "The number of normal (non-bounce) hits the weapon can land at white sharpness before degrading",
+						"minimum": 0
+					}
+				},
+				"required": [
+					"red",
+					"orange",
+					"yellow",
+					"green",
+					"blue",
+					"white"
+				]
+			}
+		},
+		"elements": {
+			"type": "array",
+			"description": "An array of objects describing the elemental properties of the weapon",
+			"items": {
+				"type": "object",
+				"title": "Weapon Element",
+				"properties": {
+					"type": {
+						"$ref": "https://mhw-db.com/schemas/element",
+						"description": "The name of the element"
+					},
+					"damage": {
+						"type": "integer",
+						"description": "The display damage of the element",
+						"minimum": 1
+					},
+					"hidden": {
+						"type": "boolean",
+						"description": "Whether or not the element requires the \"Free Elem/Ammo Up\" skill to unlock"
+					}
+				},
+				"required": [
+					"type",
+					"damage",
+					"hidden"
+				]
+			}
+		},
+		"attack": {
+			"type": "object",
+			"description": "An object describing the attack damage values of the weapon",
+			"properties": {
+				"display": {
+					"type": "integer",
+					"description": "The weapon's damage as displayed in-game",
+					"minimum": 1
+				},
+				"raw": {
+					"type": "integer",
+					"description": "The weapon's true (raw) damage, calculated based on the weapon type's raw multiplier",
+					"minimum": 1
+				}
+			},
+			"required": [
+				"display",
+				"raw"
+			]
+		},
+		"crafting": {
+			"type": ["object", "null"],
+			"description": "If present, an object describing the various crafting info and requirements of the weapon",
+			"properties": {
+				"craftable": {
+					"type": "boolean",
+					"description": "Whether or not the object is directly craftable"
+				},
+				"previous": {
+					"$ref": "https://mhw-db.com/schemas/nullable-entity-reference",
+					"description": "An entity reference to the weapon that upgraded into the weapon, or null"
+				},
+				"branches": {
+					"type": "array",
+					"description": "An array of entity references to the weapon's that the weapon can be upgraded into, or an empty array if the weapon is the final form of it's tree",
+					"items": {
+						"$ref": "https://mhw-db.com/schemas/entity-reference"
+					}
+				},
+				"craftingMaterials": {
+					"$ref": "https://mhw-db.com/schemas/material-cost",
+					"description": "An array of materials required to craft this weapon; will be empty if \"craftable\" is false"
+				},
+				"upgradeMaterials": {
+					"$ref": "https://mhw-db.com/schemas/material-cost",
+					"description": "An array of materials required to upgrade the previous weapon into this one; will ne empty if \"previous\" is null"
+				}
+			},
+			"required": [
+				"craftable",
+				"previous",
+				"branches",
+				"craftingMaterials",
+				"upgradeMaterials"
+			]
+		},
+		"assets": {
+			"type": ["object", "null"],
+			"description": "If present, an object containing URLs to asset images",
+			"properties": {
+				"icon": {
+					"$ref": "https://mhw-db.com/schemas/asset",
+					"description": "If present, contains information for the weapon's icon asset"
+				},
+				"image": {
+					"$ref": "https://mhw-db.com/schemas/asset",
+					"description": "If present, contains information for the weapon's preview image asset"
+				}
+			}
+		}
+	},
+	"required": [
+		"slug",
+		"attributes",
+		"name",
+		"type",
+		"rarity",
+		"slots",
+		"durability",
+		"elements",
+		"attack",
+		"crafting",
+		"assets"
+	]
+}

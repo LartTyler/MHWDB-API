@@ -1,6 +1,7 @@
 <?php
 	namespace App\Entity;
 
+	use App\Game\DamageType;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\ORM\Mapping as ORM;
 
@@ -38,6 +39,7 @@
 		 * @ORM\Column(type="string", length=32, nullable=true)
 		 *
 		 * @var string
+		 * @see DamageType
 		 */
 		private $damageType = null;
 

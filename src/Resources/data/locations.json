@@ -1,0 +1,122 @@
+[
+	{
+		"name": "Ancient Forest",
+		"zoneCount": 16,
+		"camps": [
+			{
+				"name": "Southwest Camp",
+				"zone": 1
+			},
+			{
+				"name": "Northwest Camp",
+				"zone": 8
+			},
+			{
+				"name": "Northeast Camp",
+				"zone": 11
+			},
+			{
+				"name": "Ancient Forest Camp",
+				"zone": 17
+			}
+		]
+	},
+	{
+		"name": "Wildspire Waste",
+		"zoneCount": 15,
+		"camps": [
+			{
+				"name": "Southwest Camp",
+				"zone": 1
+			},
+			{
+				"name": "Central Camp",
+				"zone": 6
+			},
+			{
+				"name": "Eastern Camp",
+				"zone": 11
+			},
+			{
+				"name": "Northeast Camp",
+				"zone": 15
+			}
+		]
+	},
+	{
+		"name": "Coral Highlands",
+		"zoneCount": 15,
+		"camps": [
+			{
+				"name": "Southern Camp",
+				"zone": 1
+			},
+			{
+				"name": "Northeast Camp",
+				"zone": 12
+			}
+		]
+	},
+	{
+		"name": "Rotten Vale",
+		"zoneCount": 16,
+		"camps": [
+			{
+				"name": "Southeast Camp",
+				"zone": 1
+			},
+			{
+				"name": "Central Camp",
+				"zone": 11
+			}
+		]
+	},
+	{
+		"name": "Elder's Recess",
+		"zoneCount": 16,
+		"camps": [
+			{
+				"name": "Southern Camp",
+				"zone": 1
+			},
+			{
+				"name": "Eastern Camp",
+				"zone": 8
+			},
+			{
+				"name": "Northwest Camp",
+				"zone": 16
+			}
+		]
+	},
+	{
+		"name": "Great Ravine",
+		"zoneCount": 3,
+		"camps": []
+	},
+	{
+		"name": "Everstream",
+		"zoneCount": 1,
+		"camps": []
+	},
+	{
+		"name": "Confluence of Fates",
+		"zoneCount": 2,
+		"camps": [
+			{
+				"name": "Camp",
+				"zone": 1
+			}
+		]
+	},
+	{
+		"name": "Caverns of El Dorado",
+		"zoneCount": 2,
+		"camps": [
+			{
+				"name": "Camp",
+				"zone": 1
+			}
+		]
+	}
+]

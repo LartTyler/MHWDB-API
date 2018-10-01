@@ -1,0 +1,125 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://mhw-db.com/schemas/monster",
+	"title": "Monster",
+	"description": "A monster",
+	"type": "object",
+	"properties": {
+		"name": {
+			"type": "string",
+			"description": "The monster's name"
+		},
+		"type": {
+			"type": "string",
+			"description": "The monster's type",
+			"enum": [
+				"small",
+				"large"
+			]
+		},
+		"species": {
+			"type": "string",
+			"description": "The monster's species",
+			"enum": [
+				"bird wyvern",
+				"brute wyvern",
+				"fange wyvern",
+				"fish",
+				"flying wyvern",
+				"herbivore",
+				"lynian",
+				"neopteron",
+				"piscine wyvern",
+				"wingdrake",
+				"elder dragon"
+			]
+		},
+		"ailments": {
+			"type": "array",
+			"description": "An array of entity references to ailments the monster can apply",
+			"items": {
+				"$ref": "https://mhw-db.com/schemas/entity-reference"
+			}
+		},
+		"locations": {
+			"type": "array",
+			"description": "An array of entity references to locations where the monster can be found",
+			"items": {
+				"$ref": "https://mhw-db.com/schemas/entity-reference"
+			}
+		},
+		"resistances": {
+			"type": "array",
+			"description": "An array of objects describing what elements the monster is resistant to",
+			"items": {
+				"type": "object",
+				"title": "Monster Resistance",
+				"properties": {
+					"element": {
+						"$ref": "https://mhw-db.com/schemas/element",
+						"description": "The name of the element"
+					},
+					"condition": {
+						"type": ["string", "null"],
+						"description": "If provided, a string description of certain conditions the resistance becomes active (such as \"covered in mud\")"
+					}
+				},
+				"required": [
+					"element",
+					"condition"
+				]
+			}
+		},
+		"weaknesses": {
+			"type": "array",
+			"description": "An array of objects describing what elements the monster is weak to",
+			"items": {
+				"type": "object",
+				"title": "Monster Weakness",
+				"properties": {
+					"element": {
+						"$ref": "https://mhw-db.com/schemas/element",
+						"description": "The name of the element"
+					},
+					"stars": {
+						"type": "integer",
+						"description": "The magnitude of the monster's weakness to the element (represented in game by the number of stars)",
+						"minimum": 1,
+						"maximum": 3
+					},
+					"condition": {
+						"type": ["string", "null"],
+						"description": "If provided, a string description of certain conditions the weakness becomes active (such as \"covered in mud\")"
+					}
+				},
+				"required": [
+					"element",
+					"stars",
+					"condition"
+				]
+			}
+		},
+		"description": {
+			"type": "string",
+			"description": "A short description of the monster"
+		},
+		"elements": {
+			"type": "array",
+			"description": "An array of elements the monster is capable of inflicting as damage",
+			"items": {
+				"$ref": "https://mhw-db.com/schemas/damage-element"
+			}
+		}
+	},
+	"required": [
+		"name",
+		"type",
+		"species",
+		"ailments",
+		"locations",
+		"resistances",
+		"weaknesses",
+		"description",
+		"elements"
+	]
+}

@@ -5,7 +5,7 @@
 	use Doctrine\ORM\Mapping as ORM;
 
 	/**
-	 * @ORM\Entity()
+	 * @ORM\Entity(repositoryClass="App\Repository\ArmorSetBonusRankRepository")
 	 * @ORM\Table(name="armor_set_bonus_ranks")
 	 *
 	 * Class ArmorSetBonusRank

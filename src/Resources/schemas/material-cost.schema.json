@@ -1,0 +1,22 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://mhw-db.com/schemas/material-cost",
+	"title": "Material Cost",
+	"description": "The material cost as part of an item's crafting recipe",
+	"type": "object",
+	"properties": {
+		"item": {
+			"$ref": "https://mhw-db.com/schemas/entity-reference",
+			"description": "A reference to the item used in the craft"
+		},
+		"quantity": {
+			"type": "integer",
+			"description": "The required amount of the item for the craft",
+			"minimum": 1
+		}
+	},
+	"required": [
+		"item",
+		"quantity"
+	]
+}

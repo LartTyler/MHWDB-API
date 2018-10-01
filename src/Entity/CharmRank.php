@@ -8,7 +8,7 @@
 	use Doctrine\ORM\Mapping as ORM;
 
 	/**
-	 * @ORM\Entity()
+	 * @ORM\Entity(repositoryClass="App\Repository\CharmRankRepository")
 	 * @ORM\Table(name="charm_ranks")
 	 *
 	 * Class CharmRank

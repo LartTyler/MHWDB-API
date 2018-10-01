@@ -16,9 +16,8 @@
 	 *
 	 * @package App\Entity
 	 */
-	class Charm implements EntityInterface, SluggableInterface, LengthCachingEntityInterface {
+	class Charm implements EntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
-		use SluggableTrait;
 
 		/**
 		 * @ORM\Column(type="string", length=64, unique=true)
@@ -29,6 +28,7 @@
 
 		/**
 		 * @ORM\OneToMany(targetEntity="App\Entity\CharmRank", mappedBy="charm", orphanRemoval=true, cascade={"all"})
+		 * @ORM\OrderBy(value={"level": "ASC"})
 		 *
 		 * @var Collection|Selectable|CharmRank[]
 		 */
@@ -50,8 +50,6 @@
 		public function __construct(string $name) {
 			$this->name = $name;
 			$this->ranks = new ArrayCollection();
-
-			$this->setSlug($name);
 		}
 
 		/**
@@ -59,6 +57,17 @@
 		 */
 		public function getName(): string {
 			return $this->name;
+		}
+
+		/**
+		 * @param string $name
+		 *
+		 * @return $this
+		 */
+		public function setName(string $name) {
+			$this->name = $name;
+
+			return $this;
 		}
 
 		/**

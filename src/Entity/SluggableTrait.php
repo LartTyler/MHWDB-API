@@ -4,6 +4,13 @@
 	use App\Utility\StringUtil;
 	use Doctrine\ORM\Mapping as ORM;
 
+	/**
+	 * Trait SluggableTrait
+	 *
+	 * @package App\Entity
+	 *
+	 * @deprecated
+	 */
 	trait SluggableTrait {
 		/**
 		 * @ORM\Column(type="string", length=64, nullable=false, unique=true)
@@ -24,7 +31,7 @@
 		 *
 		 * @return $this
 		 */
-		protected function setSlug(string $slug) {
+		public function setSlug(string $slug) {
 			$this->slug = StringUtil::toSlug($slug);
 
 			return $this;
