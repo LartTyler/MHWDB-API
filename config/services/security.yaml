@@ -13,9 +13,21 @@ services:
             - '@doctrine'
             - '%app.security.user_repository%'
 
-    App\Security\AuthenticationExceptionListener:
+    App\Security\AuthenticationFailureListener:
         tags:
             -
                 name: kernel.event_listener
-                event: kernel.response
-                priority: 0
+                event: lexik_jwt_authentication.on_authentication_failure
+                method: onAuthenticationFailure
+            -
+                name: kernel.event_listener
+                event: lexik_jwt_authentication.on_jwt_invalid
+                method: onInvalidToken
+            -
+                name: kernel.event_listener
+                event: lexik_jwt_authentication.on_jwt_not_found
+                method: onTokenNotFound
+            -
+                name: kernel.event_listener
+                event: lexik_jwt_authentication.on_jwt_expired
+                method: onTokenExpired
