@@ -176,8 +176,11 @@
 						);
 					}
 
-					if ($projection->isAllowed('armorSet.bonus'))
-						$output['armorSet']['bonus'] = $armorSet->getBonus()->getId();
+					if ($projection->isAllowed('armorSet.bonus')) {
+						$bonus = $armorSet->getBonus();
+
+						$output['armorSet']['bonus'] = $bonus ? $bonus->getId() : null;
+					}
 				} else
 					$output['armorSet'] = null;
 			}
