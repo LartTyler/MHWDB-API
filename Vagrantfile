@@ -48,9 +48,16 @@ Vagrant.configure("2") do |config|
 	SHELL
 
 	config.vm.provision "install", type: "shell", privileged: false, inline: <<-SHELL
+		echo "----------------------------------------------"
+		echo "Configuring 'vagrant' user..."
+
 		echo "[client]" > ~/.my.cnf
 		echo "user=application" >> ~/.my.cnf
 		echo "database=application" >> ~/.my.cnf
+
+		echo '... Done!'
+
+		echo "Initializing project..."
 
 		cd /vagrant
 
@@ -62,19 +69,27 @@ Vagrant.configure("2") do |config|
 	SHELL
 
 	config.vm.provision "run", type: "shell", run: "always", privileged: false, inline: <<-SHELL
-		echo
+		echo ""
 		echo "Installed packages:"
 		echo "  -> PHP 7.2 (with extensions: mysqlnd, curl, zip, mbstring, xml, xdebug, memcached, gd)"
 		echo "  -> Composer"
 		echo "  -> MariaDB"
-		echo
+		echo ""
 		echo "Mapped Ports:"
 		echo "  -> VM:8000 > Host:8000"
 		echo "  -> VM:3306 > Host:3006"
-		echo
+		echo ""
 		echo "XDebug Configuration:"
 		echo "  -> IDE Key: application"
 		echo "  -> Remote Autostart: Yes"
 		echo "  -> Remote Connectback: Yes"
+		echo ""
+		echo "----------------------------------------------"
+		echo "Starting Symfony server at http://localhost:8000"
+		echo "If it doesn't come up, check the ~/symfony-server.log file for any error messages"
+
+		cd /vagrant
+
+		php bin/console server:start 0.0.0.0 &> ~/symfony-server.log &
 	SHELL
 end
