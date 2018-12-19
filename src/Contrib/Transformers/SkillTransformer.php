@@ -61,8 +61,8 @@
 					} else
 						$rank->setDescription($definition->description);
 
-					if (ObjectUtil::isset($data, 'modifiers'))
-						$rank->setModifiers($data->modifiers);
+					if (ObjectUtil::isset($definition, 'modifiers'))
+						$rank->setModifiers((array)$definition->modifiers);
 				}
 
 				if ($levels) {
