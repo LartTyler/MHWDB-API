@@ -1,12 +1,13 @@
 <?php
 	namespace App\Entity;
 
-	use App\Game\ArmorRank;
+	use App\Game\Rank;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\Common\Collections\Selectable;
 	use Doctrine\ORM\Mapping as ORM;
+	use Symfony\Component\Validator\Constraints as Assert;
 
 	/**
 	 * @ORM\Entity()
@@ -20,6 +21,8 @@
 		use EntityTrait;
 
 		/**
+		 * @Assert\NotBlank()
+		 *
 		 * @ORM\Column(type="string", length=64, unique=true)
 		 *
 		 * @var string
@@ -27,6 +30,8 @@
 		private $name;
 
 		/**
+		 * @Assert\Choice(callback={"App\Game\Rank", "all"})
+		 *
 		 * @ORM\Column(type="string", length=16)
 		 *
 		 * @var string
@@ -61,7 +66,7 @@
 		 * @param string $name
 		 * @param string $rank
 		 *
-		 * @see ArmorRank
+		 * @see Rank
 		 */
 		public function __construct(string $name, string $rank) {
 			$this->name = $name;

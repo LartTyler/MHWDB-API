@@ -3,6 +3,7 @@
 
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\ORM\Mapping as ORM;
+	use Symfony\Component\Validator\Constraints as Assert;
 
 	/**
 	 * @ORM\Entity()
@@ -16,6 +17,9 @@
 		use EntityTrait;
 
 		/**
+		 * @Assert\NotBlank()
+		 * @Assert\Length(max=32)
+		 *
 		 * @ORM\Column(type="string", length=32, unique=true)
 		 *
 		 * @var string

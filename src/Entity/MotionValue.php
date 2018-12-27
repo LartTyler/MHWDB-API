@@ -2,8 +2,10 @@
 	namespace App\Entity;
 
 	use App\Game\DamageType;
+	use App\Game\WeaponType;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\ORM\Mapping as ORM;
+	use Symfony\Component\Validator\Constraints as Assert;
 
 	/**
 	 * @ORM\Entity()
@@ -22,6 +24,8 @@
 		use EntityTrait;
 
 		/**
+		 * @Assert\NotBlank()
+		 *
 		 * @ORM\Column(type="string", length=64)
 		 *
 		 * @var string
@@ -29,13 +33,19 @@
 		private $name;
 
 		/**
+		 * @Assert\NotBlank()
+		 * @Assert\Choice(callback={"App\Game\WeaponType", "all"})
+		 *
 		 * @ORM\Column(type="string", length=32)
 		 *
 		 * @var string
+		 * @see WeaponType
 		 */
 		private $weaponType;
 
 		/**
+		 * @Assert\Choice(callback={"App\Game\DamageType", "all"})
+		 *
 		 * @ORM\Column(type="string", length=32, nullable=true)
 		 *
 		 * @var string
@@ -58,6 +68,10 @@
 		private $exhaust = null;
 
 		/**
+		 * @Assert\All(constraints={
+		 *     @Assert\Range(min=1)
+		 * })
+		 *
 		 * @ORM\Column(type="json")
 		 *
 		 * @var int[]

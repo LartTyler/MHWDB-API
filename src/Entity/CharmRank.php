@@ -6,6 +6,7 @@
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\Common\Collections\Selectable;
 	use Doctrine\ORM\Mapping as ORM;
+	use Symfony\Component\Validator\Constraints as Assert;
 
 	/**
 	 * @ORM\Entity(repositoryClass="App\Repository\CharmRankRepository")
@@ -27,6 +28,8 @@
 		private $charm;
 
 		/**
+		 * @Assert\NotBlank()
+		 *
 		 * @ORM\Column(type="string", length=64, unique=true)
 		 *
 		 * @var string
@@ -34,6 +37,9 @@
 		private $name;
 
 		/**
+		 * @Assert\NotBlank()
+		 * @Assert\Range(min=1)
+		 *
 		 * @ORM\Column(type="smallint", options={"unsigned": true})
 		 *
 		 * @var int
@@ -49,11 +55,14 @@
 		private $skills;
 
 		/**
+		 * @Assert\NotBlank()
+		 * @Assert\Range(min=1)
+		 *
 		 * @ORM\Column(type="smallint", options={"unsigned": true})
 		 *
 		 * @var int
 		 */
-		private $rarity = 0;
+		private $rarity = 1;
 
 		/**
 		 * @ORM\OneToOne(targetEntity="App\Entity\CharmRankCraftingInfo", orphanRemoval=true, cascade={"all"})

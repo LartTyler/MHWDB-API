@@ -7,6 +7,7 @@
 	use Doctrine\Common\Collections\Criteria;
 	use Doctrine\Common\Collections\Selectable;
 	use Doctrine\ORM\Mapping as ORM;
+	use Symfony\Component\Validator\Constraints as Assert;
 
 	/**
 	 * @ORM\Entity()
@@ -20,6 +21,8 @@
 		use EntityTrait;
 
 		/**
+		 * @Assert\NotBlank()
+		 *
 		 * @ORM\Column(type="string", length=64, unique=true)
 		 *
 		 * @var string

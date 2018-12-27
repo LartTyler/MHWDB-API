@@ -1,8 +1,10 @@
 <?php
 	namespace App\Entity;
 
+	use App\Game\Element;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\ORM\Mapping as ORM;
+	use Symfony\Component\Validator\Constraints as Assert;
 
 	/**
 	 * @ORM\Entity()
@@ -24,13 +26,19 @@
 		private $weapon;
 
 		/**
+		 * @Assert\NotBlank()
+		 * @Assert\Choice(callback={"App\Game\Element", "all"})
+		 *
 		 * @ORM\Column(type="string", length=16)
 		 *
 		 * @var string
+		 * @see Element
 		 */
 		private $type;
 
 		/**
+		 * @Assert\Range(min=1)
+		 *
 		 * @ORM\Column(type="smallint", options={"unsigned": true})
 		 *
 		 * @var int

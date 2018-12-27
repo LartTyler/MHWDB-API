@@ -8,6 +8,7 @@
 	interface SluggableInterface {
 		/**
 		 * @return string
+		 * @deprecated
 		 */
 		public function getSlug(): string;
 	}

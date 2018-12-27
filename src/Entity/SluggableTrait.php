@@ -21,6 +21,7 @@
 
 		/**
 		 * @return string
+		 * @deprecated
 		 */
 		public function getSlug(): string {
 			return $this->slug;
@@ -30,6 +31,7 @@
 		 * @param string $slug
 		 *
 		 * @return $this
+		 * @deprecated
 		 */
 		public function setSlug(string $slug) {
 			$this->slug = StringUtil::toSlug($slug);

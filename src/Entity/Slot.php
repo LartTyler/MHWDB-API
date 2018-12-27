@@ -3,6 +3,7 @@
 
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\ORM\Mapping as ORM;
+	use Symfony\Component\Validator\Constraints as Assert;
 
 	/**
 	 * @package App\Entity
@@ -11,6 +12,8 @@
 		use EntityTrait;
 
 		/**
+		 * @Assert\Range(min=1)
+		 *
 		 * @ORM\Column(type="smallint", options={"unsigned": true})
 		 *
 		 * @var int

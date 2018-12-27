@@ -7,6 +7,7 @@
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\Common\Collections\Selectable;
 	use Doctrine\ORM\Mapping as ORM;
+	use Symfony\Component\Validator\Constraints as Assert;
 
 	/**
 	 * @ORM\Entity(repositoryClass="App\Repository\DecorationRepository")
@@ -20,6 +21,8 @@
 		use EntityTrait;
 
 		/**
+		 * @Assert\NotBlank()
+		 *
 		 * @ORM\Column(type="string", length=64, unique=true)
 		 *
 		 * @var string
@@ -27,6 +30,9 @@
 		private $name;
 
 		/**
+		 * @Assert\NotBlank()
+		 * @Assert\Range(min=1, max=3)
+		 *
 		 * @ORM\Column(type="smallint", options={"unsigned": true})
 		 *
 		 * @var int
@@ -34,6 +40,9 @@
 		private $slot;
 
 		/**
+		 * @Assert\NotBlank()
+		 * @Assert\Range(min=1)
+		 *
 		 * @ORM\Column(type="smallint", options={"unsigned": true})
 		 *
 		 * @var int

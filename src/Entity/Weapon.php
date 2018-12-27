@@ -1,12 +1,14 @@
 <?php
 	namespace App\Entity;
 
+	use App\Game\WeaponType;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\Common\Collections\Criteria;
 	use Doctrine\Common\Collections\Selectable;
 	use Doctrine\ORM\Mapping as ORM;
+	use Symfony\Component\Validator\Constraints as Assert;
 
 	/**
 	 * @ORM\Entity()
@@ -26,6 +28,8 @@
 		use AttributableTrait;
 
 		/**
+		 * @Assert\NotBlank()
+		 *
 		 * @ORM\Column(type="string", length=64, unique=true)
 		 *
 		 * @var string
@@ -33,13 +37,19 @@
 		private $name;
 
 		/**
+		 * @Assert\NotBlank()
+		 * @Assert\Choice(callback={"App\Game\WeaponType", "all"})
+		 *
 		 * @ORM\Column(type="string", length=32)
 		 *
 		 * @var string
+		 * @see WeaponType
 		 */
 		private $type;
 
 		/**
+		 * @Assert\Range(min=1)
+		 *
 		 * @ORM\Column(type="smallint", options={"unsigned": true})
 		 *
 		 * @var int

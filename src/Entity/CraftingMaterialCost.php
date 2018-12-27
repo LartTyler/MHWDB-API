@@ -3,6 +3,7 @@
 
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\ORM\Mapping as ORM;
+	use Symfony\Component\Validator\Constraints as Assert;
 
 	/**
 	 * @ORM\Entity()
@@ -24,6 +25,9 @@
 		private $item;
 
 		/**
+		 * @Assert\NotBlank()
+		 * @Assert\Range(min=1)
+		 *
 		 * @ORM\Column(type="integer", options={"unsigned": true})
 		 *
 		 * @var int

@@ -3,6 +3,7 @@
 
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\ORM\Mapping as ORM;
+	use Symfony\Component\Validator\Constraints as Assert;
 
 	/**
 	 * @ORM\Entity()
@@ -16,6 +17,8 @@
 		use EntityTrait;
 
 		/**
+		 * @Assert\Range(min=0)
+		 *
 		 * @ORM\Column(type="integer", options={"unsigned": true})
 		 *
 		 * @var int
@@ -23,6 +26,8 @@
 		private $red = 0;
 
 		/**
+		 * @Assert\Range(min=0)
+		 *
 		 * @ORM\Column(type="integer", options={"unsigned": true})
 		 *
 		 * @var int
@@ -30,6 +35,8 @@
 		private $orange = 0;
 
 		/**
+		 * @Assert\Range(min=0)
+		 *
 		 * @ORM\Column(type="integer", options={"unsigned": true})
 		 *
 		 * @var int
@@ -37,6 +44,8 @@
 		private $yellow = 0;
 
 		/**
+		 * @Assert\Range(min=0)
+		 *
 		 * @ORM\Column(type="integer", options={"unsigned": true})
 		 *
 		 * @var int
@@ -44,6 +53,8 @@
 		private $green = 0;
 
 		/**
+		 * @Assert\Range(min=0)
+		 *
 		 * @ORM\Column(type="integer", options={"unsigned": true})
 		 *
 		 * @var int
@@ -51,6 +62,8 @@
 		private $blue = 0;
 
 		/**
+		 * @Assert\Range(min=0)
+		 *
 		 * @ORM\Column(type="integer", options={"unsigned": true})
 		 *
 		 * @var int

@@ -46,6 +46,13 @@
 		}
 
 		/**
+		 * @return array
+		 */
+		public static function all(): array {
+			return self::ALL;
+		}
+
+		/**
 		 * @param string $string
 		 *
 		 * @return bool

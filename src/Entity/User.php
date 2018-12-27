@@ -9,6 +9,7 @@
 	use Doctrine\Common\Collections\Selectable;
 	use Doctrine\ORM\Mapping as ORM;
 	use Symfony\Component\Security\Core\User\UserInterface;
+	use Symfony\Component\Validator\Constraints as Assert;
 
 	/**
 	 * @ORM\Entity()
@@ -21,12 +22,18 @@
 		use EntityTrait;
 
 		/**
+		 * @Assert\NotBlank()
+		 * @Assert\Email()
+		 *
 		 * @ORM\Column(type="string", length=254, unique=true)
 		 * @var string
 		 */
 		private $email;
 
 		/**
+		 * @Assert\NotBlank()
+		 * @Assert\Length(min=3)
+		 *
 		 * @ORM\Column(type="string", length=32, unique=true)
 		 * @var string
 		 */

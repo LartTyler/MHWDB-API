@@ -6,6 +6,7 @@
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\Common\Collections\Selectable;
 	use Doctrine\ORM\Mapping as ORM;
+	use Symfony\Component\Validator\Constraints as Assert;
 
 	/**
 	 * @ORM\Entity(repositoryClass="App\Repository\ArmorRepository")
@@ -25,6 +26,9 @@
 		use AttributableTrait;
 
 		/**
+		 * @Assert\NotBlank()
+		 * @Assert\Length(max="64")
+		 *
 		 * @ORM\Column(type="string", length=64, unique=true)
 		 *
 		 * @var string
@@ -32,6 +36,9 @@
 		private $name;
 
 		/**
+		 * @Assert\NotBlank()
+		 * @Assert\Choice(callback={"App\Game\WeaponType", "all"})
+		 *
 		 * @ORM\Column(type="string", length=32)
 		 *
 		 * @var string
@@ -39,6 +46,9 @@
 		private $type;
 
 		/**
+		 * @Assert\NotBlank()
+		 * @Assert\Choice(callback={"App\Game\Rank", "all"})
+		 *
 		 * @ORM\Column(type="string", length=16)
 		 *
 		 * @var string
@@ -46,6 +56,9 @@
 		private $rank;
 
 		/**
+		 * @Assert\NotBlank()
+		 * @Assert\Range(min=1)
+		 *
 		 * @ORM\Column(type="smallint", options={"unsigned": true})
 		 *
 		 * @var int

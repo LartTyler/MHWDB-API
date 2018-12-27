@@ -1,8 +1,10 @@
 <?php
 	namespace App\Entity;
 
+	use App\Game\Element;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\ORM\Mapping as ORM;
+	use Symfony\Component\Validator\Constraints as Assert;
 
 	/**
 	 * @ORM\Entity(readOnly=true)
@@ -24,9 +26,13 @@
 		private $monster;
 
 		/**
+		 * @Assert\NotBlank()
+		 * @Assert\Choice(callback={"App\Game\Element", "all"})
+		 *
 		 * @ORM\Column(type="string", length=32)
 		 *
 		 * @var string
+		 * @see Element
 		 */
 		private $element;
 
