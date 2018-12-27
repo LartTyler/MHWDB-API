@@ -8,6 +8,7 @@
 	use App\QueryDocument\Projection;
 	use App\Response\BadProjectionObjectError;
 	use App\Response\BadQueryObjectError;
+	use App\Response\ConstraintViolationError;
 	use App\Response\EmptySearchParametersError;
 	use App\Response\NoContentResponse;
 	use App\Response\SearchError;
@@ -15,6 +16,7 @@
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\EntityTransformers\EntityTransformerInterface;
+	use DaybreakStudios\Utility\EntityTransformers\Exceptions\ConstraintViolationException;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
 	use Doctrine\ORM\EntityManagerInterface;
 	use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -149,8 +151,11 @@
 
 			try {
 				$entity = $transformer->create($payload);
-			} catch (EntityTransformerException $e) {
-				return $this->respond(new CreateError($e->getMessage()));
+			} catch (EntityTransformerException $exception) {
+				if ($exception instanceof ConstraintViolationException)
+					return $this->respond(new ConstraintViolationError($exception->getErrors()));
+
+				return $this->respond(new CreateError($exception->getMessage()));
 			}
 
 			$this->entityManager->flush();
@@ -177,8 +182,11 @@
 
 			try {
 				$transformer->update($entity, $payload);
-			} catch (EntityTransformerException $e) {
-				return $this->respond(new UpdateError($e->getMessage()));
+			} catch (EntityTransformerException $exception) {
+				if ($exception instanceof ConstraintViolationException)
+					return $this->respond(new ConstraintViolationError($exception->getErrors()));
+
+				return $this->respond(new UpdateError($exception->getMessage()));
 			}
 
 			$this->entityManager->flush();
