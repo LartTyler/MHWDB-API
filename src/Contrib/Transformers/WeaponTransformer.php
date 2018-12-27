@@ -1,28 +1,75 @@
 <?php
 	namespace App\Contrib\Transformers;
 
-	use App\Contrib\Exceptions\IntegrityException;
-	use App\Contrib\Exceptions\ValidationException;
 	use App\Entity\Weapon;
 	use App\Entity\WeaponCraftingInfo;
 	use App\Entity\WeaponElement;
 	use App\Entity\WeaponSharpness;
 	use App\Entity\WeaponSlot;
 	use App\Game\RawDamageMultiplier;
-	use App\Utility\ObjectUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
+	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
+	use DaybreakStudios\Utility\EntityTransformers\Exceptions\IntegrityException;
+	use DaybreakStudios\Utility\EntityTransformers\Exceptions\ValidationException;
+	use DaybreakStudios\Utility\EntityTransformers\Utility\ObjectUtil;
 	use Doctrine\Common\Collections\Criteria;
 
-	class WeaponTransformer extends AbstractTransformer {
+	class WeaponTransformer extends BaseTransformer {
+		/**
+		 * @param object $data
+		 *
+		 * @return EntityInterface
+		 */
+		public function doCreate(object $data): EntityInterface {
+			$missing = ObjectUtil::getMissingProperties(
+				$data,
+				[
+					'name',
+					'type',
+					'rarity',
+				]
+			);
+
+			if ($missing)
+				throw ValidationException::missingFields($missing);
+
+			return new Weapon($data->name, $data->type, $data->rarity);
+		}
+
+		/**
+		 * @param EntityInterface $entity
+		 *
+		 * @return void
+		 */
+		public function doDelete(EntityInterface $entity): void {
+			if (!($entity instanceof Weapon))
+				throw EntityTransformerException::subjectNotSupported($entity);
+
+			if ($crafting = $entity->getCrafting()) {
+				if (($count = $crafting->getBranches()->count()) > 0) {
+					throw new IntegrityException(
+						sprintf(
+							'This weapon is referenced by %d other weapon(s) as the previous weapon in their ' .
+							'crafting tree. Remove those references, then try again.',
+							$count
+						)
+					);
+				}
+
+				if ($previous = $crafting->getPrevious())
+					$previous->getCrafting()->getBranches()->removeElement($entity);
+			}
+		}
+
 		/**
 		 * @param EntityInterface $entity
 		 * @param object          $data
 		 *
 		 * @return void
 		 */
-		public function update(EntityInterface $entity, object $data): void {
+		public function doUpdate(EntityInterface $entity, object $data): void {
 			if (!($entity instanceof Weapon))
-				throw $this->createEntityNotSupportedException(get_class($entity));
+				throw EntityTransformerException::subjectNotSupported($entity);
 
 			if (ObjectUtil::isset($data, 'name'))
 				$entity->setName($data->name);
@@ -41,7 +88,7 @@
 
 				foreach ($data->slots as $index => $definition) {
 					if (!ObjectUtil::isset($definition, 'rank'))
-						throw $this->createMissingArrayFieldsException('slots', $index, ['rank']);
+						throw ValidationException::missingNestedFields('slots', $index, ['rank']);
 
 					$entity->getSlots()->add(new WeaponSlot($entity, $definition->rank));
 				}
@@ -64,7 +111,7 @@
 					);
 
 					if ($missing)
-						throw $this->createMissingArrayFieldsException('durability', $index, $missing);
+						throw ValidationException::missingNestedFields('durability', $index, $missing);
 
 					$durability = new WeaponSharpness();
 					$durability
@@ -92,7 +139,7 @@
 					);
 
 					if ($missing)
-						throw $this->createMissingArrayFieldsException('elements', $index, $missing);
+						throw ValidationException::missingNestedFields('elements', $index, $missing);
 
 					$elements[] = $definition->type;
 
@@ -202,51 +249,5 @@
 
 			if (ObjectUtil::isset($data, 'assets'))
 				throw ValidationException::fieldNotSupported('assets');
-		}
-
-		/**
-		 * @param object $data
-		 *
-		 * @return EntityInterface
-		 */
-		protected function doCreate(object $data): EntityInterface {
-			$missing = ObjectUtil::getMissingProperties(
-				$data,
-				[
-					'name',
-					'type',
-					'rarity',
-				]
-			);
-
-			if ($missing)
-				throw ValidationException::missingFields($missing);
-
-			return new Weapon($data->name, $data->type, $data->rarity);
-		}
-
-		/**
-		 * @param EntityInterface $entity
-		 *
-		 * @return void
-		 */
-		protected function doDelete(EntityInterface $entity): void {
-			if (!($entity instanceof Weapon))
-				throw $this->createEntityNotSupportedException(get_class($entity));
-
-			if ($crafting = $entity->getCrafting()) {
-				if (($count = $crafting->getBranches()->count()) > 0) {
-					throw new IntegrityException(
-						sprintf(
-							'This weapon is referenced by %d other weapon(s) as the previous weapon in their ' .
-							'crafting tree. Remove those references, then try again.',
-							$count
-						)
-					);
-				}
-
-				if ($previous = $crafting->getPrevious())
-					$previous->getCrafting()->getBranches()->removeElement($entity);
-			}
 		}
 	}

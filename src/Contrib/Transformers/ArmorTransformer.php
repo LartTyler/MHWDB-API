@@ -1,26 +1,62 @@
 <?php
 	namespace App\Contrib\Transformers;
 
-	use App\Contrib\Exceptions\IntegrityException;
-	use App\Contrib\Exceptions\ValidationException;
 	use App\Entity\Armor;
 	use App\Entity\ArmorCraftingInfo;
 	use App\Entity\ArmorSet;
 	use App\Entity\ArmorSlot;
 	use App\Game\Element;
-	use App\Utility\ObjectUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
+	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
+	use DaybreakStudios\Utility\EntityTransformers\Exceptions\IntegrityException;
+	use DaybreakStudios\Utility\EntityTransformers\Exceptions\ValidationException;
+	use DaybreakStudios\Utility\EntityTransformers\Utility\ObjectUtil;
 
-	class ArmorTransformer extends AbstractTransformer {
+	class ArmorTransformer extends BaseTransformer {
+		/**
+		 * @param object $data
+		 *
+		 * @return EntityInterface
+		 */
+		public function doCreate(object $data): EntityInterface {
+			$missing = ObjectUtil::getMissingProperties(
+				$data,
+				[
+					'name',
+					'type',
+					'rank',
+					'rarity',
+				]
+			);
+
+			if ($missing)
+				throw ValidationException::missingFields($missing);
+
+			return new Armor($data->name, $data->type, $data->rank, $data->rarity);
+		}
+
+		/**
+		 * @param EntityInterface $entity
+		 *
+		 * @return void
+		 */
+		public function doDelete(EntityInterface $entity): void {
+			if (!($entity instanceof Armor))
+				throw EntityTransformerException::subjectNotSupported($entity);
+
+			if ($set = $entity->getArmorSet())
+				$set->getPieces()->removeElement($entity);
+		}
+
 		/**
 		 * @param EntityInterface $entity
 		 * @param object          $data
 		 *
 		 * @return void
 		 */
-		public function update(EntityInterface $entity, object $data): void {
+		public function doUpdate(EntityInterface $entity, object $data): void {
 			if (!($entity instanceof Armor))
-				throw $this->createEntityNotSupportedException(get_class($entity));
+				throw EntityTransformerException::subjectNotSupported($entity);
 
 			if (ObjectUtil::isset($data, 'name'))
 				$entity->setName($data->name);
@@ -105,40 +141,5 @@
 
 			if (ObjectUtil::isset($data, 'assets'))
 				throw ValidationException::fieldNotSupported('assets');
-		}
-
-		/**
-		 * @param object $data
-		 *
-		 * @return EntityInterface
-		 */
-		protected function doCreate(object $data): EntityInterface {
-			$missing = ObjectUtil::getMissingProperties(
-				$data,
-				[
-					'name',
-					'type',
-					'rank',
-					'rarity',
-				]
-			);
-
-			if ($missing)
-				throw ValidationException::missingFields($missing);
-
-			return new Armor($data->name, $data->type, $data->rank, $data->rarity);
-		}
-
-		/**
-		 * @param EntityInterface $entity
-		 *
-		 * @return void
-		 */
-		protected function doDelete(EntityInterface $entity): void {
-			if (!($entity instanceof Armor))
-				throw $this->createEntityNotSupportedException(get_class($entity));
-
-			if ($set = $entity->getArmorSet())
-				$set->getPieces()->removeElement($entity);
 		}
 	}

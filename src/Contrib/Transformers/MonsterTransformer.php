@@ -1,25 +1,56 @@
 <?php
 	namespace App\Contrib\Transformers;
 
-	use App\Contrib\Exceptions\ValidationException;
 	use App\Entity\Ailment;
 	use App\Entity\Location;
 	use App\Entity\Monster;
 	use App\Entity\MonsterResistance;
 	use App\Entity\MonsterWeakness;
-	use App\Utility\ObjectUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
+	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
+	use DaybreakStudios\Utility\EntityTransformers\Exceptions\ValidationException;
+	use DaybreakStudios\Utility\EntityTransformers\Utility\ObjectUtil;
 
-	class MonsterTransformer extends AbstractTransformer {
+	class MonsterTransformer extends BaseTransformer {
+		/**
+		 * @param object $data
+		 *
+		 * @return EntityInterface
+		 */
+		public function doCreate(object $data): EntityInterface {
+			$missing = ObjectUtil::getMissingProperties(
+				$data,
+				[
+					'name',
+					'type',
+					'species',
+				]
+			);
+
+			if ($missing)
+				throw ValidationException::missingFields($missing);
+
+			return new Monster($data->name, $data->type, $data->species);
+		}
+
+		/**
+		 * @param EntityInterface $entity
+		 *
+		 * @return void
+		 */
+		public function doDelete(EntityInterface $entity): void {
+			// noop
+		}
+
 		/**
 		 * @param EntityInterface $entity
 		 * @param object          $data
 		 *
 		 * @return void
 		 */
-		public function update(EntityInterface $entity, object $data): void {
+		public function doUpdate(EntityInterface $entity, object $data): void {
 			if (!($entity instanceof Monster))
-				throw $this->createEntityNotSupportedException(get_class($entity));
+				throw EntityTransformerException::subjectNotSupported($entity);
 
 			if (ObjectUtil::isset($data, 'name'))
 				$entity->setName($data->name);
@@ -70,7 +101,7 @@
 					);
 
 					if ($missing)
-						throw $this->createMissingArrayFieldsException('weaknesses', $index, $missing);
+						throw ValidationException::missingNestedFields('weaknesses', $index, $missing);
 
 					$weakness = new MonsterWeakness($entity, $definition->element, $definition->stars);
 					$entity->getWeaknesses()->add($weakness);
@@ -79,35 +110,5 @@
 						$weakness->setCondition($definition->condition);
 				}
 			}
-		}
-
-		/**
-		 * @param object $data
-		 *
-		 * @return EntityInterface
-		 */
-		protected function doCreate(object $data): EntityInterface {
-			$missing = ObjectUtil::getMissingProperties(
-				$data,
-				[
-					'name',
-					'type',
-					'species',
-				]
-			);
-
-			if ($missing)
-				throw ValidationException::missingFields($missing);
-
-			return new Monster($data->name, $data->type, $data->species);
-		}
-
-		/**
-		 * @param EntityInterface $entity
-		 *
-		 * @return void
-		 */
-		protected function doDelete(EntityInterface $entity): void {
-			// noop
 		}
 	}

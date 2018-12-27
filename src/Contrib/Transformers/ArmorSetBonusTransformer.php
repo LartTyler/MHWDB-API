@@ -1,23 +1,56 @@
 <?php
 	namespace App\Contrib\Transformers;
 
-	use App\Contrib\Exceptions\ValidationException;
 	use App\Entity\ArmorSet;
 	use App\Entity\ArmorSetBonus;
 	use App\Entity\ArmorSetBonusRank;
-	use App\Utility\ObjectUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
+	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
+	use DaybreakStudios\Utility\EntityTransformers\Exceptions\ValidationException;
+	use DaybreakStudios\Utility\EntityTransformers\Utility\ObjectUtil;
 
-	class ArmorSetBonusTransformer extends AbstractTransformer {
+	class ArmorSetBonusTransformer extends BaseTransformer {
+		/**
+		 * @param object $data
+		 *
+		 * @return EntityInterface
+		 */
+		public function doCreate(object $data): EntityInterface {
+			if (!ObjectUtil::isset($data, 'name'))
+				throw ValidationException::missingFields(['name']);
+
+			return new ArmorSetBonus($data->name);
+		}
+
+		/**
+		 * @param EntityInterface $entity
+		 *
+		 * @return void
+		 */
+		public function doDelete(EntityInterface $entity): void {
+			if (!($entity instanceof ArmorSetBonus))
+				throw EntityTransformerException::subjectNotSupported($entity);
+
+			/** @var ArmorSet[] $sets */
+			$sets = $this->entityManager->getRepository(ArmorSet::class)->findBy(
+				[
+					'bonus' => $entity,
+				]
+			);
+
+			foreach ($sets as $set)
+				$set->setBonus(null);
+		}
+
 		/**
 		 * @param EntityInterface $entity
 		 * @param object          $data
 		 *
 		 * @return void
 		 */
-		public function update(EntityInterface $entity, object $data): void {
+		public function doUpdate(EntityInterface $entity, object $data): void {
 			if (!($entity instanceof ArmorSetBonus))
-				throw $this->createEntityNotSupportedException(get_class($entity));
+				throw EntityTransformerException::subjectNotSupported($entity);
 
 			if (ObjectUtil::isset($data, 'name'))
 				$entity->setName($data->name);
@@ -35,7 +68,7 @@
 					);
 
 					if ($missing)
-						throw $this->createMissingArrayFieldsException('ranks', $index, $missing);
+						throw ValidationException::missingNestedFields('ranks', $index, $missing);
 
 					$rank = new ArmorSetBonusRank(
 						$entity,
@@ -49,36 +82,5 @@
 					$entity->getRanks()->add($rank);
 				}
 			}
-		}
-
-		/**
-		 * @param object $data
-		 *
-		 * @return EntityInterface
-		 */
-		protected function doCreate(object $data): EntityInterface {
-			if (!ObjectUtil::isset($data, 'name'))
-				throw ValidationException::missingFields(['name']);
-
-			return new ArmorSetBonus($data->name);
-		}
-
-		/**
-		 * @param EntityInterface $entity
-		 *
-		 * @return void
-		 */
-		protected function doDelete(EntityInterface $entity): void {
-			if (!($entity instanceof ArmorSetBonus))
-				throw $this->createEntityNotSupportedException(get_class($entity));
-
-			$sets = $this->entityManager->getRepository(ArmorSet::class)->findBy(
-				[
-					'bonus' => $entity,
-				]
-			);
-
-			foreach ($sets as $set)
-				$set->setBonus(null);
 		}
 	}

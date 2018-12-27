@@ -17,6 +17,9 @@
     "dbstudios/doze-bundle": {
         "version": "1.4.0"
     },
+    "dbstudios/entity-transformers": {
+        "version": "dev-feature/validation"
+    },
     "dbstudios/veritas": {
         "version": "0.5.0"
     },
@@ -170,6 +173,9 @@
     "psr/simple-cache": {
         "version": "1.0.0"
     },
+    "ralouphie/getallheaders": {
+        "version": "2.0.5"
+    },
     "roave/security-advisories": {
         "version": "dev-master"
     },
@@ -199,6 +205,9 @@
             "version": "3.3",
             "ref": "c646e4b71af082e94b5014daca36ef6812bad076"
         }
+    },
+    "symfony/contracts": {
+        "version": "v1.0.2"
     },
     "symfony/css-selector": {
         "version": "v4.0.4"
@@ -287,9 +296,6 @@
             "ref": "cda8b550123383d25827705d05a42acf6819fe4e"
         }
     },
-    "symfony/security": {
-        "version": "v4.1.4"
-    },
     "symfony/security-bundle": {
         "version": "3.3",
         "recipe": {
@@ -298,6 +304,18 @@
             "version": "3.3",
             "ref": "f8a63faa0d9521526499c0a8f403c9964ecb0527"
         }
+    },
+    "symfony/security-core": {
+        "version": "v4.2.1"
+    },
+    "symfony/security-csrf": {
+        "version": "v4.2.1"
+    },
+    "symfony/security-guard": {
+        "version": "v4.2.1"
+    },
+    "symfony/security-http": {
+        "version": "v4.2.1"
     },
     "symfony/serializer": {
         "version": "v3.4.4"
@@ -317,8 +335,20 @@
             "ref": "369b5b29dc52b2c190002825ae7ec24ab6f962dd"
         }
     },
+    "symfony/validator": {
+        "version": "4.1",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "4.1",
+            "ref": "0cdc982334f45d554957a6167e030482795bf9d7"
+        }
+    },
     "symfony/var-dumper": {
         "version": "v4.1.4"
+    },
+    "symfony/var-exporter": {
+        "version": "v4.2.1"
     },
     "symfony/web-profiler-bundle": {
         "version": "3.3",

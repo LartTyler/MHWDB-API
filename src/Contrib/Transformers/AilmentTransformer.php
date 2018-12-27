@@ -1,24 +1,57 @@
 <?php
 	namespace App\Contrib\Transformers;
 
-	use App\Contrib\Exceptions\ValidationException;
 	use App\Entity\Ailment;
 	use App\Entity\Item;
 	use App\Entity\Monster;
 	use App\Entity\Skill;
 	use App\Utility\ObjectUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
+	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
+	use DaybreakStudios\Utility\EntityTransformers\Exceptions\ValidationException;
 
-	class AilmentTransformer extends AbstractTransformer {
+	class AilmentTransformer extends BaseTransformer {
+		/**
+		 * @param object $data
+		 *
+		 * @return EntityInterface
+		 */
+		public function doCreate(object $data): EntityInterface {
+			$missing = ObjectUtil::getMissingProperties($data, [
+				'name',
+				'description',
+			]);
+
+			if ($missing)
+				throw ValidationException::missingFields($missing);
+
+			return new Ailment($data->name, $data->description);
+		}
+
+		/**
+		 * @param EntityInterface $entity
+		 *
+		 * @return void
+		 */
+		public function doDelete(EntityInterface $entity): void {
+			if (!($entity instanceof Ailment))
+				throw EntityTransformerException::subjectNotSupported($entity);
+
+			$monsters = $this->entityManager->getRepository(Monster::class)->findByAilment($entity);
+
+			foreach ($monsters as $monster)
+				$monster->getAilments()->removeElement($entity);
+		}
+
 		/**
 		 * @param EntityInterface $entity
 		 * @param object          $data
 		 *
 		 * @return void
 		 */
-		public function update(EntityInterface $entity, object $data): void {
+		public function doUpdate(EntityInterface $entity, object $data): void {
 			if (!($entity instanceof Ailment))
-				throw $this->createEntityNotSupportedException(get_class($entity));
+				throw EntityTransformerException::subjectNotSupported($entity);
 
 			if (ObjectUtil::isset($data, 'name'))
 				$entity->setName($data->name);
@@ -65,37 +98,5 @@
 					);
 				}
 			}
-		}
-
-		/**
-		 * @param object $data
-		 *
-		 * @return EntityInterface
-		 */
-		protected function doCreate(object $data): EntityInterface {
-			$missing = ObjectUtil::getMissingProperties($data, [
-				'name',
-				'description',
-			]);
-
-			if ($missing)
-				throw ValidationException::missingFields($missing);
-
-			return new Ailment($data->name, $data->description);
-		}
-
-		/**
-		 * @param EntityInterface $entity
-		 *
-		 * @return void
-		 */
-		protected function doDelete(EntityInterface $entity): void {
-			if (!($entity instanceof Ailment))
-				throw $this->createEntityNotSupportedException(get_class($entity));
-
-			$monsters = $this->entityManager->getRepository(Monster::class)->findByAilment($entity);
-
-			foreach ($monsters as $monster)
-				$monster->getAilments()->removeElement($entity);
 		}
 	}

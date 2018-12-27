@@ -4,8 +4,6 @@
 	use App\Contrib\ApiErrors\CreateError;
 	use App\Contrib\ApiErrors\InvalidPayloadError;
 	use App\Contrib\ApiErrors\UpdateError;
-	use App\Contrib\Exceptions\ContribException;
-	use App\Contrib\TransformerInterface;
 	use App\QueryDocument\ApiQueryManager;
 	use App\QueryDocument\Projection;
 	use App\Response\BadProjectionObjectError;
@@ -16,6 +14,8 @@
 	use DaybreakStudios\Doze\Errors\ApiErrorInterface;
 	use DaybreakStudios\DozeBundle\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
+	use DaybreakStudios\Utility\EntityTransformers\EntityTransformerInterface;
+	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
 	use Doctrine\ORM\EntityManagerInterface;
 	use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 	use Symfony\Component\HttpFoundation\JsonResponse;
@@ -136,12 +136,12 @@
 		}
 
 		/**
-		 * @param TransformerInterface $transformer
-		 * @param Request              $request
+		 * @param EntityTransformerInterface $transformer
+		 * @param Request                    $request
 		 *
 		 * @return Response
 		 */
-		protected function doCreate(TransformerInterface $transformer, Request $request): Response {
+		protected function doCreate(EntityTransformerInterface $transformer, Request $request): Response {
 			$payload = json_decode($request->getContent());
 
 			if (json_last_error() !== JSON_ERROR_NONE)
@@ -149,7 +149,7 @@
 
 			try {
 				$entity = $transformer->create($payload);
-			} catch (ContribException $e) {
+			} catch (EntityTransformerException $e) {
 				return $this->respond(new CreateError($e->getMessage()));
 			}
 
@@ -159,14 +159,14 @@
 		}
 
 		/**
-		 * @param TransformerInterface $transformer
-		 * @param EntityInterface      $entity
-		 * @param Request              $request
+		 * @param EntityTransformerInterface $transformer
+		 * @param EntityInterface            $entity
+		 * @param Request                    $request
 		 *
 		 * @return Response
 		 */
 		protected function doUpdate(
-			TransformerInterface $transformer,
+			EntityTransformerInterface $transformer,
 			EntityInterface $entity,
 			Request $request
 		): Response {
@@ -177,7 +177,7 @@
 
 			try {
 				$transformer->update($entity, $payload);
-			} catch (ContribException $e) {
+			} catch (EntityTransformerException $e) {
 				return $this->respond(new UpdateError($e->getMessage()));
 			}
 
@@ -187,12 +187,12 @@
 		}
 
 		/**
-		 * @param TransformerInterface $transformer
-		 * @param EntityInterface      $entity
+		 * @param EntityTransformerInterface $transformer
+		 * @param EntityInterface            $entity
 		 *
 		 * @return Response
 		 */
-		protected function doDelete(TransformerInterface $transformer, EntityInterface $entity): Response {
+		protected function doDelete(EntityTransformerInterface $transformer, EntityInterface $entity): Response {
 			$transformer->delete($entity);
 
 			$this->entityManager->flush();

@@ -1,8 +1,6 @@
 <?php
 	namespace App\Contrib\Transformers;
 
-	use App\Contrib\Exceptions\IntegrityException;
-	use App\Contrib\Exceptions\ValidationException;
 	use App\Entity\AilmentProtection;
 	use App\Entity\Armor;
 	use App\Entity\ArmorSetBonus;
@@ -12,22 +10,80 @@
 	use App\Entity\Decoration;
 	use App\Entity\Skill;
 	use App\Entity\SkillRank;
-	use App\Utility\ObjectUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
+	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
+	use DaybreakStudios\Utility\EntityTransformers\Exceptions\IntegrityException;
+	use DaybreakStudios\Utility\EntityTransformers\Exceptions\ValidationException;
+	use DaybreakStudios\Utility\EntityTransformers\Utility\ObjectUtil;
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\Common\Collections\Criteria;
 	use Doctrine\Common\Collections\Selectable;
 
-	class SkillTransformer extends AbstractTransformer {
+	class SkillTransformer extends BaseTransformer {
+		/**
+		 * @param object $data
+		 *
+		 * @return EntityInterface
+		 */
+		public function doCreate(object $data): EntityInterface {
+			$missing = ObjectUtil::getMissingProperties(
+				$data,
+				[
+					'name',
+					'description',
+				]
+			);
+
+			if ($missing)
+				throw ValidationException::missingFields($missing);
+
+			return new Skill($data->name, $data->description);
+		}
+
+		/**
+		 * @param EntityInterface $entity
+		 *
+		 * @return void
+		 */
+		public function doDelete(EntityInterface $entity): void {
+			if (!($entity instanceof Skill))
+				throw EntityTransformerException::subjectNotSupported($entity);
+
+			$results = $this->entityManager->getRepository(AilmentProtection::class)->findBySkill($entity);
+
+			foreach ($results as $result)
+				$result->getSkills()->removeElement($entity);
+
+			$results = $this->entityManager->getRepository(Armor::class)->findBySkill($entity);
+
+			foreach ($results as $result)
+				$this->removeFromRanksCollection($result->getSkills(), $entity);
+
+			$results = $this->entityManager->getRepository(ArmorSetBonusRank::class)->findBySkill($entity);
+
+			foreach ($results as $result)
+				$this->entityManager->remove($result);
+
+			$results = $this->entityManager->getRepository(CharmRank::class)->findBySkill($entity);
+
+			foreach ($results as $result)
+				$this->removeFromRanksCollection($result->getSkills(), $entity);
+
+			$results = $this->entityManager->getRepository(Decoration::class)->findBySkill($entity);
+
+			foreach ($results as $result)
+				$this->removeFromRanksCollection($result->getSkills(), $entity);
+		}
+
 		/**
 		 * @param EntityInterface $entity
 		 * @param object          $data
 		 *
 		 * @return void
 		 */
-		public function update(EntityInterface $entity, object $data): void {
+		public function doUpdate(EntityInterface $entity, object $data): void {
 			if (!($entity instanceof Skill))
-				throw $this->createEntityNotSupportedException(get_class($entity));
+				throw EntityTransformerException::subjectNotSupported($entity);
 
 			if (ObjectUtil::isset($data, 'name'))
 				$entity->setName($data->name);
@@ -48,7 +104,7 @@
 					);
 
 					if ($missing)
-						throw $this->createMissingArrayFieldsException('ranks', $index, $missing);
+						throw ValidationException::missingNestedFields('ranks', $index, $missing);
 
 					$levels[] = $definition->level;
 
@@ -101,61 +157,6 @@
 					$entity->getRanks()->removeElement($rank);
 				}
 			}
-		}
-
-		/**
-		 * @param object $data
-		 *
-		 * @return EntityInterface
-		 */
-		protected function doCreate(object $data): EntityInterface {
-			$missing = ObjectUtil::getMissingProperties(
-				$data,
-				[
-					'name',
-					'description',
-				]
-			);
-
-			if ($missing)
-				throw ValidationException::missingFields($missing);
-
-			return new Skill($data->name, $data->description);
-		}
-
-		/**
-		 * @param EntityInterface $entity
-		 *
-		 * @return void
-		 */
-		protected function doDelete(EntityInterface $entity): void {
-			if (!($entity instanceof Skill))
-				throw $this->createEntityNotSupportedException(get_class($entity));
-
-			$results = $this->entityManager->getRepository(AilmentProtection::class)->findBySkill($entity);
-
-			foreach ($results as $result)
-				$result->getSkills()->removeElement($entity);
-
-			$results = $this->entityManager->getRepository(Armor::class)->findBySkill($entity);
-
-			foreach ($results as $result)
-				$this->removeFromRanksCollection($result->getSkills(), $entity);
-
-			$results = $this->entityManager->getRepository(ArmorSetBonusRank::class)->findBySkill($entity);
-
-			foreach ($results as $result)
-				$this->entityManager->remove($result);
-
-			$results = $this->entityManager->getRepository(CharmRank::class)->findBySkill($entity);
-
-			foreach ($results as $result)
-				$this->removeFromRanksCollection($result->getSkills(), $entity);
-
-			$results = $this->entityManager->getRepository(Decoration::class)->findBySkill($entity);
-
-			foreach ($results as $result)
-				$this->removeFromRanksCollection($result->getSkills(), $entity);
 		}
 
 		/**

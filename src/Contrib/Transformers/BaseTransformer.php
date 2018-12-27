@@ -1,19 +1,19 @@
 <?php
 	namespace App\Contrib\Transformers;
 
-	use App\Contrib\Exceptions\IntegrityException;
-	use App\Contrib\Exceptions\ValidationException;
-	use App\Contrib\TransformerInterface;
 	use App\Entity\CraftingMaterialCost;
 	use App\Entity\Item;
 	use App\Entity\Skill;
 	use App\Entity\SkillRank;
-	use App\Utility\ObjectUtil;
-	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
+	use DaybreakStudios\Utility\EntityTransformers\AbstractEntityTransformer;
+	use DaybreakStudios\Utility\EntityTransformers\Exceptions\IntegrityException;
+	use DaybreakStudios\Utility\EntityTransformers\Exceptions\ValidationException;
+	use DaybreakStudios\Utility\EntityTransformers\Utility\ObjectUtil;
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\ORM\EntityManagerInterface;
+	use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-	abstract class AbstractTransformer implements TransformerInterface {
+	abstract class BaseTransformer extends AbstractEntityTransformer {
 		/**
 		 * @var EntityManagerInterface
 		 */
@@ -22,55 +22,18 @@
 		/**
 		 * AbstractTransformer constructor.
 		 *
-		 * @param EntityManagerInterface $entityManager
+		 * @param EntityManagerInterface  $entityManager
+		 * @param ValidatorInterface|null $validator
 		 */
-		public function __construct(EntityManagerInterface $entityManager) {
-			$this->entityManager = $entityManager;
+		public function __construct(EntityManagerInterface $entityManager, ValidatorInterface $validator = null) {
+			parent::__construct($entityManager, $validator);
 		}
-
-		/**
-		 * @param object $data
-		 *
-		 * @return EntityInterface
-		 */
-		public function create(object $data): EntityInterface {
-			$entity = $this->doCreate($data);
-			$this->update($entity, $data);
-
-			$this->entityManager->persist($entity);
-
-			return $entity;
-		}
-
-		/**
-		 * @param EntityInterface $entity
-		 *
-		 * @return void
-		 */
-		public function delete(EntityInterface $entity): void {
-			$this->doDelete($entity);
-
-			$this->entityManager->remove($entity);
-		}
-
-		/**
-		 * @param object $data
-		 *
-		 * @return EntityInterface
-		 */
-		protected abstract function doCreate(object $data): EntityInterface;
-
-		/**
-		 * @param EntityInterface $entity
-		 *
-		 * @return void
-		 */
-		protected abstract function doDelete(EntityInterface $entity): void;
 
 		/**
 		 * @param string $class
 		 *
 		 * @return \InvalidArgumentException
+		 * @deprecated
 		 */
 		protected function createEntityNotSupportedException(string $class): \InvalidArgumentException {
 			return new \InvalidArgumentException('This transformer does not support transforming ' . $class);
@@ -82,6 +45,7 @@
 		 * @param string[] $keys
 		 *
 		 * @return ValidationException
+		 * @deprecated
 		 */
 		protected function createMissingArrayFieldsException(
 			string $prefix,
@@ -96,30 +60,6 @@
 					$keys
 				)
 			);
-		}
-
-		/**
-		 * @param string     $path
-		 * @param Collection $collection
-		 * @param string     $class
-		 * @param int[]      $ids
-		 *
-		 * @return void
-		 */
-		protected function populateFromIdArray(string $path, Collection $collection, string $class, array $ids): void {
-			$collection->clear();
-
-			foreach ($ids as $index => $id) {
-				$value = $this->entityManager->getRepository($class)->find($id);
-
-				if (!$value) {
-					$name = substr($class, strrpos($class, '\\') + 1);
-
-					throw IntegrityException::missingReference($path . '[' . $index . ']', $name);
-				}
-
-				$collection->add($value);
-			}
 		}
 
 		/**
@@ -198,7 +138,7 @@
 				);
 
 				if ($missing)
-					throw $this->createMissingArrayFieldsException($path, $index, $missing);
+					throw ValidationException::missingNestedFields($path, $index, $missing);
 
 				$item = $this->entityManager->getRepository(Item::class)->find($cost->item);
 
