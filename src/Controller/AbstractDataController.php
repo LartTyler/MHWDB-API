@@ -260,8 +260,9 @@
 				$status = Response::HTTP_OK;
 
 			return new JsonResponse(
-				$data, $status, [
-					'Cache-Control' => 'public, max-age=14400',
+				$data,
+				$status,
+				[
 					'Content-Type' => 'application/json',
 				]
 			);
