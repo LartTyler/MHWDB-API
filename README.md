@@ -1,7 +1,8 @@
 > **Please note:** This is the source code for the _Monster Hunter World_ API. If you're interested in using the API itself, please [check out the docs](https://docs.mhw-db.com/).
 
 # Getting Started
-Check out the  [contributing guide](.github/CONTRIBUTING.md) for information on contributing to the project.
+Check out the  [contributing guide](.github/CONTRIBUTING.md) for information on contributing to the project. Feel free
+to drop into the project's [Gitter](https://gitter.im/mhw-db/general) chat and leave some suggestions!
 
 ```sh
 $ git clone https://github.com/LartTyler/MHWDB-API.git
