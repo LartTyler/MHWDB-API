@@ -19,13 +19,13 @@
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\ConstraintViolationException;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
 	use Doctrine\ORM\EntityManagerInterface;
-	use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+	use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 	use Symfony\Component\HttpFoundation\JsonResponse;
 	use Symfony\Component\HttpFoundation\Request;
 	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\Routing\RouterInterface;
 
-	abstract class AbstractDataController extends Controller {
+	abstract class AbstractDataController extends AbstractController {
 		/**
 		 * @var EntityManagerInterface
 		 */

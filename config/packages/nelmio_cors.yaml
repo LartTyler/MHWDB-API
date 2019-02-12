@@ -5,4 +5,7 @@ nelmio_cors:
         allow_headers: ['Content-Type', 'Authorization']
         max_age: 3600
     paths:
+        '^/auth':
+            origin_regex: true
+            allow_origin: ['%env(CONTRIB_DOMAIN)%']
         '^/': ~
