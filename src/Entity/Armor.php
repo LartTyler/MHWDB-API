@@ -37,7 +37,7 @@
 
 		/**
 		 * @Assert\NotBlank()
-		 * @Assert\Choice(callback={"App\Game\WeaponType", "all"})
+		 * @Assert\Choice(callback={"App\Game\ArmorType", "all"})
 		 *
 		 * @ORM\Column(type="string", length=32)
 		 *

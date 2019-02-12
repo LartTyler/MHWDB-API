@@ -8,13 +8,10 @@
 		const WAIST = 'waist';
 		const LEGS = 'legs';
 
-		const ALL = [
-			self::HEAD,
-			self::CHEST,
-			self::GLOVES,
-			self::WAIST,
-			self::LEGS,
-		];
+		/**
+		 * @var string[]|null
+		 */
+		private static $types = null;
 
 		/**
 		 * ArmorType constructor.
@@ -23,11 +20,21 @@
 		}
 
 		/**
+		 * @return string[]
+		 */
+		public static function all(): array {
+			if (self::$types === null)
+				self::$types = (new \ReflectionClass(self::class))->getConstants();
+
+			return self::$types;
+		}
+
+		/**
 		 * @param string $value
 		 *
 		 * @return bool
 		 */
 		public static function isValid(string $value): bool {
-			return in_array($value, self::ALL);
+			return in_array($value, self::all());
 		}
 	}
