@@ -68,6 +68,10 @@ Vagrant.configure("2") do |config|
 		composer db:reset
 	SHELL
 
+	config.vm.provision "admin-run", type: "shell", run: "always", inline: <<-SHELL
+		ntpd -gq > /dev/null
+	SHELL
+
 	config.vm.provision "run", type: "shell", run: "always", privileged: false, inline: <<-SHELL
 		echo ""
 		echo "Installed packages:"
