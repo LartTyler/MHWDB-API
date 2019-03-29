@@ -79,13 +79,17 @@
 			}
 
 			if (ObjectUtil::isset($data, 'bonus')) {
-				/** @var ArmorSetBonus|null $bonus */
-				$bonus = $this->entityManager->getRepository(ArmorSetBonus::class)->find($data->bonus);
+				if ($data->bonus === null) {
+					$entity->setBonus(null);
+				} else {
+					/** @var ArmorSetBonus|null $bonus */
+					$bonus = $this->entityManager->getRepository(ArmorSetBonus::class)->find($data->bonus);
 
-				if (!$bonus)
-					throw IntegrityException::missingReference('bonus', 'ArmorSetBonus');
+					if (!$bonus)
+						throw IntegrityException::missingReference('bonus', 'ArmorSetBonus');
 
-				$entity->setBonus($bonus);
+					$entity->setBonus($bonus);
+				}
 			}
 		}
 	}
