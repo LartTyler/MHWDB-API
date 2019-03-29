@@ -232,6 +232,9 @@
 						);
 					}
 
+					if ($crafting->getPrevious())
+						$crafting->getPrevious()->getCrafting()->getBranches()->removeElement($entity);
+
 					$crafting->setPrevious($previous);
 
 					if (!$previous->getCrafting()->getBranches()->contains($entity))
