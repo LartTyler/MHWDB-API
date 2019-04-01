@@ -21,7 +21,7 @@ Vagrant.configure("2") do |config|
 
 		add-apt-repository -y ppa:ondrej/php
 
-		apt-get install -y build-essential software-properties-common php7.2 php7.2-mysqlnd php7.2-curl \
+		apt-get install -y ntp build-essential software-properties-common php7.2 php7.2-mysqlnd php7.2-curl \
 			php7.2-zip php7.2-mbstring php7.2-xml php7.2-xdebug php7.2-memcached php7.2-gd
 		apt-get install -y composer
 
@@ -69,7 +69,9 @@ Vagrant.configure("2") do |config|
 	SHELL
 
 	config.vm.provision "admin-run", type: "shell", run: "always", inline: <<-SHELL
+		systemctl stop ntp
 		ntpd -gq > /dev/null
+		systemctl start ntp
 	SHELL
 
 	config.vm.provision "run", type: "shell", run: "always", privileged: false, inline: <<-SHELL
@@ -94,6 +96,8 @@ Vagrant.configure("2") do |config|
 
 		cd /vagrant
 
+
+		php bin/console server:stop > /dev/null
 		php bin/console server:start 0.0.0.0 &> ~/symfony-server.log &
 	SHELL
 end
