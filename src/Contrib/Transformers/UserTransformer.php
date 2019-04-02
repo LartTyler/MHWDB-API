@@ -110,30 +110,64 @@
 
 		/**
 		 * @param User   $user
-		 * @param string $activationUrl
-		 * @param bool   $resetActivationCode
+		 * @param string $url
+		 * @param bool   $resetCode
 		 *
 		 * @return void
 		 */
-		public function sendActivationEmail(User $user, string $activationUrl, bool $resetActivationCode = true): void {
-			if ($resetActivationCode || !$user->getActivationCode())
+		public function sendActivationEmail(User $user, string $url, bool $resetCode = true): void {
+			if ($resetCode || !$user->getActivationCode())
 				$user->setActivationCode(bin2hex(random_bytes(32)));
 
-			$activationUrl = StringUtil::interpolate(
-				$activationUrl,
+			$url = StringUtil::interpolate(
+				$url,
 				[
 					'code' => $user->getActivationCode(),
 				]
 			);
 
-			$message = (new \Swift_Message('Welcome to MHW DB!'))
-				->setFrom('no-reply@mail.mhw-db.com', 'MHW DB')
+			$message = (new \Swift_Message('Activate Your Account'))
+				->setFrom('no-reply@mail.mhw-db.com', 'MHWDB Contrib')
 				->setTo($user->getEmail())
 				->setBody(
 					$this->templater->render(
 						'activation-email.html.twig',
 						[
-							'activationUrl' => $activationUrl,
+							'activationUrl' => $url,
+						]
+					),
+					'text/html'
+				);
+
+			$this->mailer->send($message);
+		}
+
+		/**
+		 * @param User   $user
+		 * @param string $url
+		 * @param bool   $resetCode
+		 *
+		 * @return void
+		 */
+		public function sendPasswordResetEmail(User $user, string $url, bool $resetCode = true): void {
+			if ($resetCode || !$user->getPasswordResetCode())
+				$user->setPasswordResetCode(bin2hex(random_bytes(32)));
+
+			$url = StringUtil::interpolate(
+				$url,
+				[
+					'code' => $user->getPasswordResetCode(),
+				]
+			);
+
+			$message = (new \Swift_Message('Password Resest Request'))
+				->setFrom('no-reply@mail.mhw-db.com', 'MHWDB Contrib')
+				->setTo($user->getEmail())
+				->setBody(
+					$this->templater->render(
+						'password-reset-email.html.twig',
+						[
+							'passwordResetUrl' => $url,
 						]
 					),
 					'text/html'

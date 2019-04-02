@@ -76,6 +76,13 @@
 		private $activationCode = null;
 
 		/**
+		 * @ORM\Column(type="string", length=64, nullable=true)
+		 *
+		 * @var string|null
+		 */
+		private $passwordResetCode = null;
+
+		/**
 		 * User constructor.
 		 *
 		 * @param string $email
@@ -292,6 +299,24 @@
 		 */
 		public function setActivationCode(?string $activationCode) {
 			$this->activationCode = $activationCode;
+
+			return $this;
+		}
+
+		/**
+		 * @return string|null
+		 */
+		public function getPasswordResetCode(): ?string {
+			return $this->passwordResetCode;
+		}
+
+		/**
+		 * @param string|null $passwordResetCode
+		 *
+		 * @return $this
+		 */
+		public function setPasswordResetCode(?string $passwordResetCode) {
+			$this->passwordResetCode = $passwordResetCode;
 
 			return $this;
 		}

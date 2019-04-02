@@ -8,6 +8,7 @@
 	use App\Entity\User;
 	use App\Entity\UserRole;
 	use App\QueryDocument\Projection;
+	use App\Response\NoContentResponse;
 	use App\Utility\ObjectUtil;
 	use DaybreakStudios\Doze\Errors\NotFoundError;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -128,6 +129,89 @@
 			$this->entityManager->flush();
 
 			return $this->respond($user);
+		}
+
+		/**
+		 * @Route(path="/users/password-reset", methods={"POST"}, name="users.password-reset.send-code")
+		 *
+		 * @param UserTransformer $transformer
+		 * @param Request         $request
+		 *
+		 * @return Response
+		 */
+		public function sendPasswordResetCode(UserTransformer $transformer, Request $request): Response {
+			$payload = json_decode($request->getContent());
+
+			if (json_last_error() !== JSON_ERROR_NONE)
+				return $this->respond(new InvalidPayloadError());
+
+			$missing = ObjectUtil::getMissingProperties(
+				$payload,
+				[
+					'email',
+					'passwordResetUrl',
+				]
+			);
+
+			if ($missing)
+				return $this->respond(new MissingRequiredFieldsError($missing));
+
+			/** @var User|null $user */
+			$user = $this->entityManager->getRepository(User::class)->findOneBy(
+				[
+					'email' => $payload->email,
+				]
+			);
+
+			if (!$user)
+				return new NoContentResponse();
+
+			$transformer->sendPasswordResetEmail($user, $payload->passwordResetUrl);
+
+			$this->entityManager->flush();
+
+			return new NoContentResponse();
+		}
+
+		/**
+		 * @Route(path="/users/password-reset/{code}", methods={"POST"}, name="users.password-reset.reset")
+		 *
+		 * @param string                       $code
+		 * @param Request                      $request
+		 * @param UserPasswordEncoderInterface $encoder
+		 *
+		 * @return Response
+		 */
+		public function resetPassword(string $code, Request $request, UserPasswordEncoderInterface $encoder): Response {
+			$payload = json_decode($request->getContent());
+
+			if (json_last_error() !== JSON_ERROR_NONE)
+				return $this->respond(new InvalidPayloadError());
+			else if (!ObjectUtil::isset($payload, 'password'))
+				return $this->respond(new MissingRequiredFieldsError(['password']));
+
+			$password = $payload->password;
+
+			if (strlen($password) < 5)
+				return $this->respond(new InvalidParameterError('password', 'at least 5 characters long'));
+
+			/** @var User|null $user */
+			$user = $this->entityManager->getRepository(User::class)->findOneBy(
+				[
+					'passwordResetCode' => $code,
+				]
+			);
+
+			if (!$user)
+				return $this->respond(new NotFoundError());
+
+			$user
+				->setPasswordResetCode(null)
+				->setPassword($encoder->encodePassword($user, $password));
+
+			$this->entityManager->flush();
+
+			return new NoContentResponse();
 		}
 
 		/**
