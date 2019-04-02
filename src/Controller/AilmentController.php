@@ -12,7 +12,7 @@
 	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\Routing\Annotation\Route;
 
-	class AilmentDataController extends AbstractDataController {
+	class AilmentController extends AbstractController {
 		/**
 		 * AilmentDataController constructor.
 		 */

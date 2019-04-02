@@ -17,7 +17,7 @@
 	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\Routing\Annotation\Route;
 
-	class ArmorSetsDataController extends AbstractDataController {
+	class ArmorSetsController extends AbstractController {
 		/**
 		 * ArmorSetsDataController constructor.
 		 */

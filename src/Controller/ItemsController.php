@@ -10,7 +10,7 @@
 	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\Routing\Annotation\Route;
 
-	class ItemsDataController extends AbstractDataController {
+	class ItemsController extends AbstractController {
 		/**
 		 * ItemsDataController constructor.
 		 */

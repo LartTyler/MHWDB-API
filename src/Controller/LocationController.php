@@ -11,7 +11,7 @@
 	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\Routing\Annotation\Route;
 
-	class LocationDataController extends AbstractDataController {
+	class LocationController extends AbstractController {
 		/**
 		 * LocationDataController constructor.
 		 */

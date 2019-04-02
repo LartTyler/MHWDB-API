@@ -11,7 +11,7 @@
 	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\Routing\Annotation\Route;
 
-	class DecorationsDataController extends AbstractDataController {
+	class DecorationsController extends AbstractController {
 		/**
 		 * DecorationsDataController constructor.
 		 */

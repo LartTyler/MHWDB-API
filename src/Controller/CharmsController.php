@@ -13,7 +13,7 @@
 	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\Routing\Annotation\Route;
 
-	class CharmsDataController extends AbstractDataController {
+	class CharmsController extends AbstractController {
 		/**
 		 * CharmsDataController constructor.
 		 */

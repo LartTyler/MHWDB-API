@@ -11,7 +11,7 @@
 	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\Routing\Annotation\Route;
 
-	class SkillsDataController extends AbstractDataController {
+	class SkillsController extends AbstractController {
 		/**
 		 * SkillsCrudController constructor.
 		 */

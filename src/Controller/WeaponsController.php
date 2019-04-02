@@ -16,7 +16,7 @@
 	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\Routing\Annotation\Route;
 
-	class WeaponsDataController extends AbstractDataController {
+	class WeaponsController extends AbstractController {
 		/**
 		 * WeaponsDataController constructor.
 		 */

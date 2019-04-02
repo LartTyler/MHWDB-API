@@ -12,7 +12,7 @@
 	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\Routing\Annotation\Route;
 
-	class MotionValuesDataController extends AbstractDataController {
+	class MotionValuesController extends AbstractController {
 		/**
 		 * MotionValuesDataController constructor.
 		 */
