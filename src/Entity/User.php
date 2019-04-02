@@ -52,7 +52,8 @@
 		private $roles;
 
 		/**
-		 * @ORM\Column(type="string", length=64)
+		 * @ORM\Column(type="string", length=64, nullable=true)
+		 *
 		 * @var string|null
 		 */
 		private $password = null;
