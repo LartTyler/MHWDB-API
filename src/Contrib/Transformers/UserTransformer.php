@@ -2,7 +2,6 @@
 	namespace App\Contrib\Transformers;
 
 	use App\Entity\User;
-	use App\Security\Role;
 	use App\Utility\ObjectUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\EntityTransformers\AbstractEntityTransformer;
