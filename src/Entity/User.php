@@ -1,6 +1,7 @@
 <?php
 	namespace App\Entity;
 
+	use App\Security\Role;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\VeritasBundle\Security\Core\User\VeritasUserInterface;
 	use Doctrine\Common\Collections\ArrayCollection;
@@ -40,6 +41,10 @@
 		private $displayName;
 
 		/**
+		 * @Assert\All(
+		 *     @Assert\Choice(callback={"App\Security\Role", "all"})
+		 * )
+		 *
 		 * @ORM\OneToMany(targetEntity="App\Entity\UserRole", mappedBy="user", orphanRemoval=true, cascade={"all"})
 		 *
 		 * @var UserRole[]|Collection|Selectable
