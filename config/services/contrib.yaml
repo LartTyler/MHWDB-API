@@ -19,4 +19,5 @@ services:
     App\Contrib\Transformers\MonsterTransformer: ~
     App\Contrib\Transformers\MotionValueTransformer: ~
     App\Contrib\Transformers\SkillTransformer: ~
+    App\Contrib\Transformers\UserTransformer: ~
     App\Contrib\Transformers\WeaponTransformer: ~
