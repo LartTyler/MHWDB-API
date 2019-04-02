@@ -86,6 +86,17 @@
 		}
 
 		/**
+		 * @param string $email
+		 *
+		 * @return $this
+		 */
+		public function setEmail(string $email) {
+			$this->email = $email;
+
+			return $this;
+		}
+
+		/**
 		 * Returns the identifier of the user.
 		 *
 		 * This method's name is completely misleading, but it has to be called this to work with Symfony's security
@@ -141,6 +152,24 @@
 		}
 
 		/**
+		 * @param string[] $roles
+		 *
+		 * @return $this
+		 * @see Role
+		 */
+		public function setRoles(array $roles) {
+			foreach ($this->getRoles() as $role) {
+				if (!in_array($role, $roles))
+					$this->revokeRole($role);
+			}
+
+			foreach ($roles as $role)
+				$this->grantRole($role);
+
+			return $this;
+		}
+
+		/**
 		 * @param string $name
 		 *
 		 * @return bool
@@ -178,6 +207,20 @@
 		}
 
 		/**
+		 * @return null
+		 */
+		public function getSalt() {
+			return null;
+		}
+
+		/**
+		 * @return void
+		 */
+		public function eraseCredentials() {
+			// noop
+		}
+
+		/**
 		 * @param string $name
 		 *
 		 * @return UserRole|null
@@ -192,19 +235,5 @@
 				return null;
 
 			return $match->first();
-		}
-
-		/**
-		 * @return null
-		 */
-		public function getSalt() {
-			return null;
-		}
-
-		/**
-		 * @return void
-		 */
-		public function eraseCredentials() {
-			// noop
 		}
 	}
