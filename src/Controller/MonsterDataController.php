@@ -109,6 +109,7 @@
 				$output['ailments'] = array_map(
 					function(Ailment $ailment) use ($projection): array {
 						$output = [
+							'id' => $ailment->getId(),
 							'name' => $ailment->getName(),
 							'description' => $ailment->getDescription(),
 						];
