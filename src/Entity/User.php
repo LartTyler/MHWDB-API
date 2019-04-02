@@ -41,6 +41,13 @@
 		private $displayName;
 
 		/**
+		 * @ORM\Column(type="datetime_immutable")
+		 *
+		 * @var \DateTimeImmutable
+		 */
+		private $createdDate;
+
+		/**
 		 * @Assert\All(
 		 *     @Assert\Choice(callback={"App\Security\Role", "all"})
 		 * )
@@ -50,6 +57,13 @@
 		 * @var UserRole[]|Collection|Selectable
 		 */
 		private $roles;
+
+		/**
+		 * @ORM\Column(type="boolean")
+		 *
+		 * @var bool
+		 */
+		private $disabled = false;
 
 		/**
 		 * @ORM\Column(type="string", length=64, nullable=true)
@@ -68,6 +82,7 @@
 			$this->email = $email;
 			$this->displayName = $displayName;
 
+			$this->createdDate = new \DateTimeImmutable();
 			$this->roles = new ArrayCollection();
 		}
 
@@ -122,6 +137,31 @@
 		 */
 		public function setDisplayName(string $displayName) {
 			$this->displayName = $displayName;
+
+			return $this;
+		}
+
+		/**
+		 * @return \DateTimeImmutable
+		 */
+		public function getCreatedDate(): \DateTimeImmutable {
+			return $this->createdDate;
+		}
+
+		/**
+		 * @return bool
+		 */
+		public function isDisabled(): bool {
+			return $this->disabled;
+		}
+
+		/**
+		 * @param bool $disabled
+		 *
+		 * @return $this
+		 */
+		public function setDisabled(bool $disabled) {
+			$this->disabled = $disabled;
 
 			return $this;
 		}

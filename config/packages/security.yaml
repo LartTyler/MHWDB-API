@@ -20,6 +20,7 @@ security:
         auth_refresh:
             pattern: ^/auth/refresh
             stateless: true
+            user_checker: App\Security\DisabledUserChecker
             guard:
                 authenticators:
                     - lexik_jwt_authentication.jwt_token_authenticator
@@ -28,6 +29,7 @@ security:
             pattern: ^/auth
             anonymous: true
             stateless: true
+            user_checker: App\Security\DisabledUserChecker
             json_login:
                 check_path: /auth
                 success_handler: lexik_jwt_authentication.handler.authentication_success
@@ -36,6 +38,7 @@ security:
         main:
             anonymous: true
             stateless: true
+            user_checker: App\Security\DisabledUserChecker
             guard:
                 authenticators:
                     - lexik_jwt_authentication.jwt_token_authenticator

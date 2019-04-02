@@ -31,3 +31,5 @@ services:
                 name: kernel.event_listener
                 event: lexik_jwt_authentication.on_jwt_expired
                 method: onTokenExpired
+
+    App\Security\DisabledUserChecker: ~

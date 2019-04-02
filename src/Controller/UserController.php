@@ -95,6 +95,8 @@
 
 			$output = [
 				'id' => $entity->getId(),
+				'createdDate' => $entity->getCreatedDate()->format(\DateTime::ISO8601),
+				'disabled' => $entity->isDisabled(),
 				'displayName' => $entity->getDisplayName(),
 				'email' => $entity->getEmail(),
 			];
