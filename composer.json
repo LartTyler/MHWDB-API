@@ -41,7 +41,10 @@
 		"symfony/expression-language": "^4.0",
 		"symfony/flex": "^1.0",
 		"symfony/framework-bundle": "^4.0",
+		"symfony/profiler-pack": "^1.0",
 		"symfony/security-bundle": "^4.0",
+		"symfony/swiftmailer-bundle": "^3.2",
+		"symfony/templating": "^4.1",
 		"symfony/validator": "^4.0",
 		"symfony/yaml": "^4.0",
 		"syslogic/doctrine-json-functions": "^2.1"
@@ -49,7 +52,6 @@
 	"require-dev": {
 		"aws/aws-sdk-php": "^3.54",
 		"roave/security-advisories": "dev-master",
-		"symfony/profiler-pack": "^1.0",
 		"symfony/web-server-bundle": "^4.0"
 	},
 	"config": {

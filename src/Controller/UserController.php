@@ -1,15 +1,21 @@
 <?php
 	namespace App\Controller;
 
+	use App\Contrib\ApiErrors\InvalidParameterError;
+	use App\Contrib\ApiErrors\InvalidPayloadError;
+	use App\Contrib\ApiErrors\MissingRequiredFieldsError;
 	use App\Contrib\Transformers\UserTransformer;
 	use App\Entity\User;
 	use App\Entity\UserRole;
 	use App\QueryDocument\Projection;
+	use App\Utility\ObjectUtil;
+	use DaybreakStudios\Doze\Errors\NotFoundError;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 	use Symfony\Component\HttpFoundation\Request;
 	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\Routing\Annotation\Route;
+	use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 	class UserController extends AbstractController {
 		/**
@@ -81,6 +87,47 @@
 		 */
 		public function delete(User $user, UserTransformer $transformer) {
 			return $this->doDelete($transformer, $user);
+		}
+
+		/**
+		 * @Route(path="/users/activate/{code}", methods={"POST"}, name="users.activate")
+		 *
+		 * @param string                       $code
+		 * @param Request                      $request
+		 * @param UserPasswordEncoderInterface $encoder
+		 *
+		 * @return Response
+		 */
+		public function activate(string $code, Request $request, UserPasswordEncoderInterface $encoder): Response {
+			$payload = json_decode($request->getContent());
+
+			if (json_last_error() !== JSON_ERROR_NONE)
+				return $this->respond(new InvalidPayloadError());
+			else if (!ObjectUtil::isset($payload, 'password'))
+				return $this->respond(new MissingRequiredFieldsError(['password']));
+
+			$password = $payload->password;
+
+			if (strlen($password) < 5)
+				return $this->respond(new InvalidParameterError('password', 'at least 5 characters long'));
+
+			/** @var User|null $user */
+			$user = $this->entityManager->getRepository(User::class)->findOneBy(
+				[
+					'activationCode' => $code,
+				]
+			);
+
+			if (!$user)
+				return $this->respond(new NotFoundError());
+
+			$user
+				->setActivationCode(null)
+				->setPassword($encoder->encodePassword($user, $password));
+
+			$this->entityManager->flush();
+
+			return $this->respond($user);
 		}
 
 		/**

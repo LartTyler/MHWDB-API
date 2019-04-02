@@ -4,6 +4,9 @@
 	use App\Contrib\ApiErrors\CreateError;
 	use App\Contrib\ApiErrors\InvalidPayloadError;
 	use App\Contrib\ApiErrors\UpdateError;
+	use App\Event\Events\ApiEntityCreateEvent;
+	use App\Event\Events\ApiEntityDeleteEvent;
+	use App\Event\Events\ApiEntityUpdateEvent;
 	use App\QueryDocument\ApiQueryManager;
 	use App\QueryDocument\Projection;
 	use App\Response\BadProjectionObjectError;
@@ -20,10 +23,10 @@
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
 	use Doctrine\ORM\EntityManagerInterface;
 	use Symfony\Bundle\FrameworkBundle\Controller\AbstractController as BaseAbstractController;
+	use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 	use Symfony\Component\HttpFoundation\JsonResponse;
 	use Symfony\Component\HttpFoundation\Request;
 	use Symfony\Component\HttpFoundation\Response;
-	use Symfony\Component\Routing\RouterInterface;
 
 	abstract class AbstractController extends BaseAbstractController {
 		/**
@@ -37,9 +40,9 @@
 		protected $responder;
 
 		/**
-		 * @var RouterInterface
+		 * @var EventDispatcherInterface
 		 */
-		protected $router;
+		protected $eventDispatcher;
 
 		/**
 		 * @var string
@@ -80,12 +83,12 @@
 		/**
 		 * @required
 		 *
-		 * @param RouterInterface $router
+		 * @param EventDispatcherInterface $eventDispatcher
 		 *
 		 * @return void
 		 */
-		public function setRouter(RouterInterface $router): void {
-			$this->router = $router;
+		public function setEventDispatcher(EventDispatcherInterface $eventDispatcher): void {
+			$this->eventDispatcher = $eventDispatcher;
 		}
 
 		/**
@@ -158,6 +161,8 @@
 				return $this->respond(new CreateError($exception->getMessage()));
 			}
 
+			$this->eventDispatcher->dispatch(ApiEntityCreateEvent::NAME, new ApiEntityCreateEvent($entity, $payload));
+
 			$this->entityManager->flush();
 
 			return $this->respond($entity);
@@ -189,6 +194,8 @@
 				return $this->respond(new UpdateError($exception->getMessage()));
 			}
 
+			$this->eventDispatcher->dispatch(ApiEntityUpdateEvent::NAME, new ApiEntityUpdateEvent($entity, $payload));
+
 			$this->entityManager->flush();
 
 			return $this->respond($entity);
@@ -203,18 +210,11 @@
 		protected function doDelete(EntityTransformerInterface $transformer, EntityInterface $entity): Response {
 			$transformer->delete($entity);
 
+			$this->eventDispatcher->dispatch(ApiEntityDeleteEvent::NAME, new ApiEntityDeleteEvent($entity));
+
 			$this->entityManager->flush();
 
 			return new NoContentResponse();
-		}
-
-		/**
-		 * @param int $id
-		 *
-		 * @return EntityInterface|null
-		 */
-		protected function getEntity(int $id): ?EntityInterface {
-			return $this->entityManager->getRepository($this->entityClass)->find($id);
 		}
 
 		/**

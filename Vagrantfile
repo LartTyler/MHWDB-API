@@ -16,6 +16,16 @@ Vagrant.configure("2") do |config|
 	end
 
 	config.vm.provision "bootstrap", type: "shell", inline: <<-SHELL
+		fallocate -l 4G /swapfile
+		chmod 600 /swapfile
+
+		mkswap /swapfile
+		swapon /swapfile
+
+		if grep -Fqvx "^/swapfile" /etc/fstab; then
+			echo -e '/swapfile\tnone\tswap\tsw\t0\t0' >> /etc/fstab
+		fi
+
 		apt-get update -y
 		apt-get remove apache2 -y
 

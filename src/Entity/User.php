@@ -48,10 +48,6 @@
 		private $createdDate;
 
 		/**
-		 * @Assert\All(
-		 *     @Assert\Choice(callback={"App\Security\Role", "all"})
-		 * )
-		 *
 		 * @ORM\OneToMany(targetEntity="App\Entity\UserRole", mappedBy="user", orphanRemoval=true, cascade={"all"})
 		 *
 		 * @var UserRole[]|Collection|Selectable
@@ -71,6 +67,13 @@
 		 * @var string|null
 		 */
 		private $password = null;
+
+		/**
+		 * @ORM\Column(type="string", length=64, nullable=true)
+		 *
+		 * @var string|null
+		 */
+		private $activationCode = null;
 
 		/**
 		 * User constructor.
@@ -185,7 +188,7 @@
 		}
 
 		/**
-		 * @return array
+		 * @return UserRole[]
 		 */
 		public function getRoles(): array {
 			return $this->roles->toArray();
@@ -207,6 +210,21 @@
 				$this->grantRole($role);
 
 			return $this;
+		}
+
+		/**
+		 * @Assert\All(
+		 *     @Assert\Choice(callback={"App\Security\Role", "all"})
+		 * )
+		 *
+		 * @return string[]
+		 */
+		public function getRoleNames(): array {
+			return $this->roles->map(
+				function(UserRole $role): string {
+					return $role->getRole();
+				}
+			)->toArray();
 		}
 
 		/**
@@ -258,6 +276,24 @@
 		 */
 		public function eraseCredentials() {
 			// noop
+		}
+
+		/**
+		 * @return string|null
+		 */
+		public function getActivationCode(): ?string {
+			return $this->activationCode;
+		}
+
+		/**
+		 * @param string|null $activationCode
+		 *
+		 * @return $this
+		 */
+		public function setActivationCode(?string $activationCode) {
+			$this->activationCode = $activationCode;
+
+			return $this;
 		}
 
 		/**

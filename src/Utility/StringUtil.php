@@ -123,4 +123,17 @@
 
 			return 'a';
 		}
+
+		/**
+		 * @param string $string
+		 * @param array  $values
+		 *
+		 * @return string
+		 */
+		public static function interpolate(string $string, array $values): string {
+			foreach ($values as $key => $value)
+				$string = str_replace(':' . $key, $value, $string);
+
+			return $string;
+		}
 	}
