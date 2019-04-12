@@ -1,6 +1,7 @@
 <?php
 	namespace App\Command;
 
+	use App\Contrib\Transformers\UserTransformer;
 	use App\Entity\User;
 	use App\Security\Role;
 	use Doctrine\ORM\EntityManagerInterface;
@@ -30,19 +31,27 @@
 		protected $passwordEncoder;
 
 		/**
+		 * @var UserTransformer
+		 */
+		protected $userTransformer;
+
+		/**
 		 * UserCreateCommand constructor.
 		 *
 		 * @param EntityManagerInterface       $entityManager
 		 * @param UserPasswordEncoderInterface $passwordEncoder
+		 * @param UserTransformer              $userTransformer
 		 */
 		public function __construct(
 			EntityManagerInterface $entityManager,
-			UserPasswordEncoderInterface $passwordEncoder
+			UserPasswordEncoderInterface $passwordEncoder,
+			UserTransformer $userTransformer
 		) {
 			parent::__construct();
 
 			$this->entityManager = $entityManager;
 			$this->passwordEncoder = $passwordEncoder;
+			$this->userTransformer = $userTransformer;
 		}
 
 		/**
@@ -54,7 +63,14 @@
 				->addArgument('email', InputArgument::REQUIRED)
 				->addArgument('displayName', InputArgument::REQUIRED)
 				->addOption('password', 'p', InputOption::VALUE_REQUIRED)
-				->addOption('role', 'r', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY);
+				->addOption('role', 'r', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY)
+				->addOption(
+					'activation-url',
+					null,
+					InputOption::VALUE_REQUIRED,
+					'',
+					'https://contrib.mhw-db.com/activate/:code'
+				);
 		}
 
 		/**
@@ -79,8 +95,12 @@
 				$input->setOption('role', $io->askQuestion($question));
 			}
 
-			if (!$input->getOption('password'))
-				$input->setOption('password', $io->askHidden('Enter a password (leave blank to send registration email)'));
+			if (!$input->getOption('password')) {
+				$input->setOption(
+					'password',
+					$io->askHidden('Enter a password (leave blank to send registration email)')
+				);
+			}
 		}
 
 		/**
@@ -100,8 +120,10 @@
 			if (strlen($displayName = $input->getArgument('displayName')) < 3)
 				$errors[] = 'A displayName must contain at least 3 characters';
 
-			if (strlen($password = $input->getOption('password')) < 5)
-				$errors[] = 'A password must contain at least 5 characters (activation email not yet supported, sorry)';
+			if ($password = $input->getOption('password')) {
+				if (strlen($password) <= 5)
+					$errors[] = 'A password must contain at least 5 characters';
+			}
 
 			if ($errors) {
 				$io->error('Could not create user. Please correct the following error(s), then try again.');
@@ -120,7 +142,7 @@
 				->setParameter('displayName', $displayName)
 				->setMaxResults(1)
 				->getQuery()
-					->getOneOrNullResult();
+				->getOneOrNullResult();
 
 			if ($user) {
 				$matched = [];
@@ -137,7 +159,11 @@
 			}
 
 			$user = new User($email, $displayName);
-			$user->setPassword($this->passwordEncoder->encodePassword($user, $password));
+
+			if ($password)
+				$user->setPassword($this->passwordEncoder->encodePassword($user, $password));
+			else
+				$this->userTransformer->sendActivationEmail($user, $input->getOption('activation-url'));
 
 			foreach ($input->getOption('role') as $role)
 				$user->grantRole($role);
