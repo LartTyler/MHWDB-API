@@ -1,37 +1,60 @@
 <?php
 	namespace App\Entity;
 
-	use App\Game\ArmorRank;
+	use App\Game\Rank;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\Common\Collections\Selectable;
+	use Doctrine\ORM\Mapping as ORM;
+	use Symfony\Component\Validator\Constraints as Assert;
 
+	/**
+	 * @ORM\Entity()
+	 * @ORM\Table(name="armor_sets")
+	 *
+	 * Class ArmorSet
+	 *
+	 * @package App\Entity
+	 */
 	class ArmorSet implements EntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
 
 		/**
+		 * @Assert\NotBlank()
+		 *
+		 * @ORM\Column(type="string", length=64, unique=true)
+		 *
 		 * @var string
 		 */
 		private $name;
 
 		/**
+		 * @Assert\Choice(callback={"App\Game\Rank", "all"})
+		 *
+		 * @ORM\Column(type="string", length=16)
+		 *
 		 * @var string
 		 */
 		private $rank;
 
 		/**
+		 * @ORM\OneToMany(targetEntity="App\Entity\Armor", mappedBy="armorSet")
+		 *
 		 * @var Collection|Selectable|Armor[]
 		 */
 		private $pieces;
 
 		/**
+		 * @ORM\ManyToOne(targetEntity="App\Entity\ArmorSetBonus")
+		 *
 		 * @var ArmorSetBonus
 		 */
 		private $bonus = null;
 
 		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
+		 *
 		 * @var int
 		 * @internal Used to allow API queries against "pieces.length"
 		 */
@@ -42,7 +65,8 @@
 		 *
 		 * @param string $name
 		 * @param string $rank
-		 * @see ArmorRank
+		 *
+		 * @see Rank
 		 */
 		public function __construct(string $name, string $rank) {
 			$this->name = $name;
@@ -59,10 +83,32 @@
 		}
 
 		/**
+		 * @param string $name
+		 *
+		 * @return $this
+		 */
+		public function setName(string $name) {
+			$this->name = $name;
+
+			return $this;
+		}
+
+		/**
 		 * @return string
 		 */
 		public function getRank(): string {
 			return $this->rank;
+		}
+
+		/**
+		 * @param string $rank
+		 *
+		 * @return $this
+		 */
+		public function setRank(string $rank) {
+			$this->rank = $rank;
+
+			return $this;
 		}
 
 		/**

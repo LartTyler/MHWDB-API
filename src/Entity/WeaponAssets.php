@@ -2,17 +2,29 @@
 	namespace App\Entity;
 
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
+	use Doctrine\ORM\Mapping as ORM;
 
+	/**
+	 * @ORM\Entity()
+	 * @ORM\Table(name="weapon_assets")
+	 *
+	 * Class WeaponAssets
+	 *
+	 * @package App\Entity
+	 */
 	class WeaponAssets implements EntityInterface {
 		use EntityTrait;
 
 		/**
+		 * @ORM\ManyToOne(targetEntity="App\Entity\Asset", cascade={"persist"})
+		 *
 		 * @var Asset|null
 		 */
 		private $icon;
 
 		/**
+		 * @ORM\ManyToOne(targetEntity="App\Entity\Asset", cascade={"persist"})
+		 *
 		 * @var Asset|null
 		 */
 		private $image;

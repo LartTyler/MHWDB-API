@@ -1,0 +1,44 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://mhw-db.com/schemas/location",
+	"title": "Location",
+	"description": "A hunting location",
+	"type": "object",
+	"properties": {
+		"name": {
+			"type": "string",
+			"description": "The location's name"
+		},
+		"zoneCount": {
+			"type": "integer",
+			"description": "The number of zones in the location"
+		},
+		"camps": {
+			"type": "array",
+			"description": "An array of camps available in the location",
+			"items": {
+				"type": "object",
+				"title": "Camp",
+				"properties": {
+					"name": {
+						"type": "string",
+						"description": "The name of the camp"
+					},
+					"zone": {
+						"type": "integer",
+						"description": "The zone where the camp is located"
+					}
+				},
+				"required": [
+					"name",
+					"zone"
+				]
+			}
+		}
+	},
+	"required": [
+		"name",
+		"zoneCount",
+		"camps"
+	]
+}

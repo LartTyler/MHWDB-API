@@ -2,15 +2,23 @@
 	namespace App\Entity;
 
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
+	use Doctrine\ORM\Mapping as ORM;
+	use Symfony\Component\Validator\Constraints as Assert;
 
-	class Slot implements EntityInterface {
+	/**
+	 * @package App\Entity
+	 */
+	abstract class Slot implements EntityInterface {
 		use EntityTrait;
 
 		/**
+		 * @Assert\Range(min=1)
+		 *
+		 * @ORM\Column(type="smallint", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
-		private $rank;
+		protected $rank;
 
 		/**
 		 * Slot constructor.

@@ -2,34 +2,61 @@
 	namespace App\Entity;
 
 	use App\Game\Element;
+	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
+	use Doctrine\ORM\Mapping as ORM;
 
-	class Resistances implements \JsonSerializable {
+	/**
+	 * @ORM\Embeddable()
+	 *
+	 * Class Resistances
+	 *
+	 * @package App\Entity
+	 */
+	class Resistances implements \JsonSerializable, EntityInterface {
 		/**
+		 * @ORM\Column(type="integer")
+		 *
 		 * @var int
 		 */
 		protected $fire = 0;
 
 		/**
+		 * @ORM\Column(type="integer")
+		 *
 		 * @var int
 		 */
 		protected $water = 0;
 
 		/**
+		 * @ORM\Column(type="integer")
+		 *
 		 * @var int
 		 */
 		protected $ice = 0;
 
 		/**
+		 * @ORM\Column(type="integer")
+		 *
 		 * @var int
 		 */
 		protected $thunder = 0;
 
 		/**
+		 * @ORM\Column(type="integer")
+		 *
 		 * @var int
 		 */
 		protected $dragon = 0;
 
 		/**
+		 * @return null
+		 */
+		public function getId() {
+			return null;
+		}
+
+		/**
+		 *
 		 * @return int
 		 */
 		public function getFire(): int {

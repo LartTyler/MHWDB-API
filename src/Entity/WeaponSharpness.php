@@ -2,37 +2,70 @@
 	namespace App\Entity;
 
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
+	use Doctrine\ORM\Mapping as ORM;
+	use Symfony\Component\Validator\Constraints as Assert;
 
+	/**
+	 * @ORM\Entity()
+	 * @ORM\Table(name="weapon_sharpnesses")
+	 *
+	 * Class WeaponSharpness
+	 *
+	 * @package App\Entity
+	 */
 	class WeaponSharpness implements EntityInterface {
 		use EntityTrait;
 
 		/**
+		 * @Assert\Range(min=0)
+		 *
+		 * @ORM\Column(type="integer", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $red = 0;
 
 		/**
+		 * @Assert\Range(min=0)
+		 *
+		 * @ORM\Column(type="integer", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $orange = 0;
 
 		/**
+		 * @Assert\Range(min=0)
+		 *
+		 * @ORM\Column(type="integer", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $yellow = 0;
 
 		/**
+		 * @Assert\Range(min=0)
+		 *
+		 * @ORM\Column(type="integer", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $green = 0;
 
 		/**
+		 * @Assert\Range(min=0)
+		 *
+		 * @ORM\Column(type="integer", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $blue = 0;
 
 		/**
+		 * @Assert\Range(min=0)
+		 *
+		 * @ORM\Column(type="integer", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $white = 0;

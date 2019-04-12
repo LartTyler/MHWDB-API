@@ -2,17 +2,34 @@
 	namespace App\Entity;
 
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
+	use Doctrine\ORM\Mapping as ORM;
+	use Symfony\Component\Validator\Constraints as Assert;
 
+	/**
+	 * @ORM\Entity()
+	 * @ORM\Table(name="crafting_material_costs")
+	 *
+	 * Class CraftingMaterialCost
+	 *
+	 * @package App\Entity
+	 */
 	class CraftingMaterialCost implements EntityInterface {
 		use EntityTrait;
 
 		/**
+		 * @ORM\ManyToOne(targetEntity="App\Entity\Item")
+		 * @ORM\JoinColumn(nullable=false)
+		 *
 		 * @var Item
 		 */
 		private $item;
 
 		/**
+		 * @Assert\NotBlank()
+		 * @Assert\Range(min=1)
+		 *
+		 * @ORM\Column(type="integer", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $quantity;

@@ -1,0 +1,227 @@
+[
+	{
+		"name": "Blastblight",
+		"description": "Blastblight will cause a damaging explosion after a certain amount of time has passed, or upon sustaining a heavy impact.",
+		"recovery": [
+			{
+				"type": "action",
+				"name": "dodge"
+			}
+		],
+		"protection": [
+			{
+				"type": "skill",
+				"name": "Blast Resistance"
+			}
+		]
+	},
+	{
+		"name": "Bleeding",
+		"description": "Bleeding causes damage when performing certain actions, such as running, dodging, or attacking.",
+		"recovery": [
+			{
+				"type": "item",
+				"name": "Astera Jerky"
+			},
+			{
+				"type": "item",
+				"name": "Well-done Steak"
+			},
+			{
+				"type": "item",
+				"name": "Sushifish Scale"
+			},
+			{
+				"type": "action",
+				"name": "crouch"
+			}
+		],
+		"protection": [
+			{
+				"type": "skill",
+				"name": "Bleeding Resistance"
+			}
+		]
+	},
+	{
+		"name": "Dragonblight",
+		"description": "Dragonblight causes your weapon's elemental properties are nullified.",
+		"recovery": [
+			{
+				"type": "item",
+				"name": "Nulberry"
+			}
+		],
+		"protection": []
+	},
+	{
+		"name": "Effluvial Buildup",
+		"description": "Effluvial buildup causes damage over time, and eventually cuts your maximum health in half if ignored for too long.",
+		"recovery": [
+			{
+				"type": "item",
+				"name": "Nulberry"
+			}
+		],
+		"protection": [
+			{
+				"type": "skill",
+				"name": "Effluvial Expert"
+			},
+			{
+				"type": "skill",
+				"name": "Effluvia Resistance"
+			}
+		]
+	},
+	{
+		"name": "Fireblight",
+		"description": "Fireblight causes damage over time, and negates regular health recovery.",
+		"recovery": [
+			{
+				"type": "action",
+				"name": "dodge"
+			},
+			{
+				"type": "item",
+				"name": "Nulberry"
+			}
+		],
+		"protection": []
+	},
+	{
+		"name": "Heat",
+		"description": "The monster heats the air around it, causing damage over time unless a cool drink is consumed.",
+		"recovery": [],
+		"protection": [
+			{
+				"type": "item",
+				"name": "Cool Drink"
+			}
+		]
+	},
+	{
+		"name": "Iceblight",
+		"description": "Iceblight causes staming usage to increase when performing actions",
+		"recovery": [
+			{
+				"type": "item",
+				"name": "Nulberry"
+			}
+		],
+		"protection": []
+	},
+	{
+		"name": "Paralysis",
+		"description": "Paralysis renders the hunter or monster immobilized and susceptible to increased damage for the duration. Hunters can unparalyzed if they are hit.",
+		"recovery": [
+			{
+				"type": "action",
+				"name": "hit"
+			}
+		],
+		"protection": [
+			{
+				"type": "skill",
+				"name": "Paralysis Resistance"
+			}
+		]
+	},
+	{
+		"name": "Poison",
+		"description": "Poison slowly drains the target's health.",
+		"recovery": [
+			{
+				"type": "item",
+				"name": "Antidote"
+			}
+		],
+		"protection": [
+			{
+				"type": "skill",
+				"name": "Poison Resistance"
+			}
+		]
+	},
+	{
+		"name": "Sleep",
+		"description": "Sleep renders the hunter or monster inactive and susceptible to increased damage, but only for the first hit, as it will then wake them up.",
+		"recovery": [
+			{
+				"type": "action",
+				"name": "hit"
+			}
+		],
+		"protection": [
+			{
+				"type": "item",
+				"name": "Energy Drink"
+			},
+			{
+				"type": "skill",
+				"name": "Sleep Resistance"
+			}
+		]
+	},
+	{
+		"name": "Stun",
+		"description": "Stun renders the target inactive, and sometimes causes them to fall over.",
+		"recovery": [
+			{
+				"type": "action",
+				"name": "hit"
+			},
+			{
+				"type": "action",
+				"name": "movement"
+			}
+		],
+		"protection": [
+			{
+				"type": "skill",
+				"name": "Stun Resistance"
+			}
+		]
+	},
+	{
+		"name": "Thunderblight",
+		"description": "Thunderblight increases the chance of being stunned.",
+		"recovery": [
+			{
+				"type": "action",
+				"name": "dodge"
+			},
+			{
+				"type": "item",
+				"name": "Nulberry"
+			}
+		],
+		"protection": []
+	},
+	{
+		"name": "Waterblight",
+		"description": "Waterblight slows down stamina recovery rate.",
+		"recovery": [
+			{
+				"type": "item",
+				"name": "Nulberry"
+			}
+		],
+		"protection": []
+	},
+	{
+		"name": "Wind Pressure",
+		"description": "Wind pressure causes the hunter to brace against powerful winds, causing temporarily imobility.",
+		"recovery": [],
+		"protection": [
+			{
+				"type": "skill",
+				"name": "Windproof"
+			},
+			{
+				"type": "skill",
+				"name": "Nullify Wind Pressure"
+			}
+		]
+	}
+]

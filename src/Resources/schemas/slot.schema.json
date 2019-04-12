@@ -1,0 +1,18 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://mhw-db.com/schemas/slot",
+	"title": "Slot",
+	"description": "A decoration slot",
+	"type": "object",
+	"properties": {
+		"rank": {
+			"type": "integer",
+			"description": "The maximum decoration rank that can be fitted in the slot",
+			"minimum": 1,
+			"maximum": 3
+		}
+	},
+	"required": [
+		"rank"
+	]
+}

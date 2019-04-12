@@ -3,28 +3,47 @@
 
 	use App\Game\Attribute;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
+	use Doctrine\ORM\Mapping as ORM;
+	use Symfony\Component\Validator\Constraints as Assert;
 
-	class SkillRank implements EntityInterface, SluggableInterface {
+	/**
+	 * @ORM\Entity()
+	 * @ORM\Table(name="skill_ranks")
+	 *
+	 * Class SkillRank
+	 *
+	 * @package App\Entity
+	 */
+	class SkillRank implements EntityInterface {
 		use EntityTrait;
-		use SluggableTrait;
 
 		/**
+		 * @ORM\ManyToOne(targetEntity="App\Entity\Skill", inversedBy="ranks")
+		 * @ORM\JoinColumn(nullable=false)
+		 *
 		 * @var Skill
 		 */
 		private $skill;
 
 		/**
+		 * @Assert\Range(min=1)
+		 *
+		 * @ORM\Column(type="smallint", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $level;
 
 		/**
+		 * @ORM\Column(type="text")
+		 *
 		 * @var string
 		 */
 		private $description;
 
 		/**
+		 * @ORM\Column(type="json")
+		 *
 		 * @var array
 		 */
 		private $modifiers = [];
@@ -40,8 +59,6 @@
 			$this->skill = $skill;
 			$this->level = $level;
 			$this->description = $description;
-
-			$this->updateSlug();
 		}
 
 		/**
@@ -56,19 +73,6 @@
 		 */
 		public function getLevel(): int {
 			return $this->level;
-		}
-
-		/**
-		 * @param int $level
-		 *
-		 * @return $this
-		 */
-		public function setLevel(int $level) {
-			$this->level = $level;
-
-			$this->updateSlug();
-
-			return $this;
 		}
 
 		/**
@@ -133,12 +137,5 @@
 				return $this->modifiers[$attribute];
 
 			return 0;
-		}
-
-		/**
-		 * @return void
-		 */
-		protected function updateSlug(): void {
-			$this->setSlug($this->getSkill()->getName() . '-rank-' . $this->getLevel());
 		}
 	}

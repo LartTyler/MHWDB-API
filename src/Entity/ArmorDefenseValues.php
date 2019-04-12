@@ -1,21 +1,51 @@
 <?php
 	namespace App\Entity;
 
-	class ArmorDefenseValues implements \JsonSerializable {
+	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
+	use Doctrine\ORM\Mapping as ORM;
+	use Symfony\Component\Validator\Constraints as Assert;
+
+	/**
+	 * @ORM\Embeddable()
+	 *
+	 * Class ArmorDefenseValues
+	 *
+	 * @package App\Entity
+	 */
+	class ArmorDefenseValues implements \JsonSerializable, EntityInterface {
 		/**
+		 * @Assert\Range(min=0)
+		 *
+		 * @ORM\Column(type="integer", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $base = 0;
 
 		/**
+		 * @Assert\Range(min=0)
+		 *
+		 * @ORM\Column(type="integer", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $max = 0;
 
 		/**
+		 * @Assert\Range(min=0)
+		 *
+		 * @ORM\Column(type="integer", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $augmented = 0;
+
+		/**
+		 * @return null
+		 */
+		public function getId() {
+			return null;
+		}
 
 		/**
 		 * @return int

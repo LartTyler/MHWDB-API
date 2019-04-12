@@ -2,27 +2,44 @@
 	namespace App\Entity;
 
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\Common\Collections\Criteria;
 	use Doctrine\Common\Collections\Selectable;
+	use Doctrine\ORM\Mapping as ORM;
+	use Symfony\Component\Validator\Constraints as Assert;
 
-	class Charm implements EntityInterface, SluggableInterface, LengthCachingEntityInterface {
+	/**
+	 * @ORM\Entity()
+	 * @ORM\Table(name="charms")
+	 *
+	 * Class Charm
+	 *
+	 * @package App\Entity
+	 */
+	class Charm implements EntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
-		use SluggableTrait;
 
 		/**
+		 * @Assert\NotBlank()
+		 *
+		 * @ORM\Column(type="string", length=64, unique=true)
+		 *
 		 * @var string
 		 */
 		private $name;
 
 		/**
+		 * @ORM\OneToMany(targetEntity="App\Entity\CharmRank", mappedBy="charm", orphanRemoval=true, cascade={"all"})
+		 * @ORM\OrderBy(value={"level": "ASC"})
+		 *
 		 * @var Collection|Selectable|CharmRank[]
 		 */
 		private $ranks;
 
 		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
+		 *
 		 * @var int
 		 * @internal Used to allow API queries against "ranks.length"
 		 */
@@ -36,8 +53,6 @@
 		public function __construct(string $name) {
 			$this->name = $name;
 			$this->ranks = new ArrayCollection();
-
-			$this->setSlug($name);
 		}
 
 		/**
@@ -45,6 +60,17 @@
 		 */
 		public function getName(): string {
 			return $this->name;
+		}
+
+		/**
+		 * @param string $name
+		 *
+		 * @return $this
+		 */
+		public function setName(string $name) {
+			$this->name = $name;
+
+			return $this;
 		}
 
 		/**

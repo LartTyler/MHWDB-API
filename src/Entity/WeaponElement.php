@@ -1,28 +1,53 @@
 <?php
 	namespace App\Entity;
 
+	use App\Game\Element;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
+	use Doctrine\ORM\Mapping as ORM;
+	use Symfony\Component\Validator\Constraints as Assert;
 
+	/**
+	 * @ORM\Entity()
+	 * @ORM\Table(name="weapon_elements")
+	 *
+	 * Class WeaponElement
+	 *
+	 * @package App\Entity
+	 */
 	class WeaponElement implements EntityInterface {
 		use EntityTrait;
 
 		/**
+		 * @ORM\ManyToOne(targetEntity="App\Entity\Weapon", inversedBy="elements")
+		 * @ORM\JoinColumn(nullable=false)
+		 *
 		 * @var Weapon
 		 */
 		private $weapon;
 
 		/**
+		 * @Assert\NotBlank()
+		 * @Assert\Choice(callback={"App\Game\Element", "all"})
+		 *
+		 * @ORM\Column(type="string", length=16)
+		 *
 		 * @var string
+		 * @see Element
 		 */
 		private $type;
 
 		/**
+		 * @Assert\Range(min=1)
+		 *
+		 * @ORM\Column(type="smallint", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $damage;
 
 		/**
+		 * @ORM\Column(type="boolean")
+		 *
 		 * @var bool
 		 */
 		private $hidden;

@@ -2,22 +2,41 @@
 	namespace App\Entity;
 
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
+	use Doctrine\ORM\Mapping as ORM;
+	use Symfony\Component\Validator\Constraints as Assert;
 
+	/**
+	 * @ORM\Entity(repositoryClass="App\Repository\ArmorSetBonusRankRepository")
+	 * @ORM\Table(name="armor_set_bonus_ranks")
+	 *
+	 * Class ArmorSetBonusRank
+	 *
+	 * @package App\Entity
+	 */
 	class ArmorSetBonusRank implements EntityInterface {
 		use EntityTrait;
 
 		/**
+		 * @ORM\ManyToOne(targetEntity="App\Entity\ArmorSetBonus", inversedBy="ranks")
+		 * @ORM\JoinColumn(nullable=false)
+		 *
 		 * @var ArmorSetBonus
 		 */
 		private $bonus;
 
 		/**
+		 * @Assert\Range(min=1)
+		 *
+		 * @ORM\Column(type="smallint", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $pieces;
 
 		/**
+		 * @ORM\ManyToOne(targetEntity="App\Entity\SkillRank")
+		 * @ORM\JoinColumn(nullable=false)
+		 *
 		 * @var SkillRank
 		 */
 		private $skill;

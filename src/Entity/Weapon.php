@@ -1,84 +1,130 @@
 <?php
 	namespace App\Entity;
 
-	use App\Game\Attribute;
+	use App\Game\WeaponType;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\Common\Collections\Criteria;
 	use Doctrine\Common\Collections\Selectable;
+	use Doctrine\ORM\Mapping as ORM;
+	use Symfony\Component\Validator\Constraints as Assert;
 
-	class Weapon implements EntityInterface, SluggableInterface, LengthCachingEntityInterface {
+	/**
+	 * @ORM\Entity()
+	 * @ORM\Table(
+	 *     name="weapons",
+	 *     indexes={
+	 *         @ORM\Index(columns={"type"})
+	 *     }
+	 * )
+	 *
+	 * Class Weapon
+	 *
+	 * @package App\Entity
+	 */
+	class Weapon implements EntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
-		use SluggableTrait;
 		use AttributableTrait;
 
 		/**
+		 * @Assert\NotBlank()
+		 *
+		 * @ORM\Column(type="string", length=64, unique=true)
+		 *
 		 * @var string
 		 */
 		private $name;
 
 		/**
+		 * @Assert\NotBlank()
+		 * @Assert\Choice(callback={"App\Game\WeaponType", "all"})
+		 *
+		 * @ORM\Column(type="string", length=32)
+		 *
 		 * @var string
+		 * @see WeaponType
 		 */
 		private $type;
 
 		/**
+		 * @Assert\Range(min=1)
+		 *
+		 * @ORM\Column(type="smallint", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $rarity;
 
 		/**
-		 * @var Collection|Selectable|Slot[]
+		 * @ORM\OneToMany(targetEntity="App\Entity\WeaponSlot", mappedBy="weapon", orphanRemoval=true, cascade={"all"})
+		 *
+		 * @var Collection|Selectable|WeaponSlot[]
 		 */
 		private $slots;
 
 		/**
-		 * @var WeaponSharpness
-		 * @deprecated Will be removed on 2018-08-25
-		 */
-		private $sharpness;
-
-		/**
+		 * @ORM\ManyToMany(targetEntity="App\Entity\WeaponSharpness", orphanRemoval=true, cascade={"all"})
+		 * @ORM\JoinTable(name="weapon_durability")
+		 *
 		 * @var Collection|Selectable|WeaponSharpness[]
 		 */
 		private $durability;
 
 		/**
+		 * @ORM\OneToMany(
+		 *     targetEntity="App\Entity\WeaponElement",
+		 *     mappedBy="weapon",
+		 *     orphanRemoval=true,
+		 *     cascade={"all"}
+		 * )
+		 *
 		 * @var Collection|Selectable|WeaponElement[]
 		 */
 		private $elements;
 
 		/**
+		 * @ORM\Embedded(class="App\Entity\WeaponAttackValues", columnPrefix="attack_")
+		 *
 		 * @var WeaponAttackValues
 		 */
 		private $attack;
 
 		/**
+		 * @ORM\OneToOne(targetEntity="App\Entity\WeaponCraftingInfo", orphanRemoval=true, cascade={"all"})
+		 *
 		 * @var WeaponCraftingInfo|null
 		 */
 		private $crafting = null;
 
 		/**
+		 * @ORM\OneToOne(targetEntity="App\Entity\WeaponAssets", orphanRemoval=true, cascade={"all"})
+		 *
 		 * @var WeaponAssets|null
 		 */
 		private $assets = null;
 
 		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
+		 *
 		 * @var int
 		 * @internal Used to allow API queries against "elements.length"
 		 */
 		private $elementsLength = 0;
 
 		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
+		 *
 		 * @var int
 		 * @internal Used to allow API queries against "slots.length"
 		 */
 		private $slotsLength = 0;
 
 		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
+		 *
 		 * @var int
+		 * @internal Used to allow API queries against "durability.length"
 		 */
 		private $durabilityLength = 0;
 
@@ -93,13 +139,12 @@
 			$this->name = $name;
 			$this->type = $type;
 			$this->rarity = $rarity;
-			$this->slots = new ArrayCollection();
-			$this->sharpness = new WeaponSharpness();
+
 			$this->attack = new WeaponAttackValues();
+
+			$this->slots = new ArrayCollection();
 			$this->elements = new ArrayCollection();
 			$this->durability = new ArrayCollection();
-
-			$this->setSlug($name);
 		}
 
 		/**
@@ -117,8 +162,6 @@
 		public function setName($name) {
 			$this->name = $name;
 
-			$this->setSlug($name);
-
 			return $this;
 		}
 
@@ -127,6 +170,17 @@
 		 */
 		public function getType(): string {
 			return $this->type;
+		}
+
+		/**
+		 * @param string $type
+		 *
+		 * @return $this
+		 */
+		public function setType(string $type) {
+			$this->type = $type;
+
+			return $this;
 		}
 
 		/**
@@ -148,7 +202,7 @@
 		}
 
 		/**
-		 * @return Slot[]|Collection|Selectable
+		 * @return WeaponSlot[]|Collection|Selectable
 		 */
 		public function getSlots() {
 			return $this->slots;
@@ -191,13 +245,6 @@
 		}
 
 		/**
-		 * @return WeaponSharpness
-		 */
-		public function getSharpness(): WeaponSharpness {
-			return $this->sharpness;
-		}
-
-		/**
 		 * @return WeaponElement[]|Collection|Selectable
 		 */
 		public function getElements() {
@@ -211,8 +258,7 @@
 		 */
 		public function getElement(string $element): ?WeaponElement {
 			$matches = $this->getElements()->matching(
-				Criteria::create()->
-					where(Criteria::expr()->eq('type', strtolower($element)))
+				Criteria::create()->where(Criteria::expr()->eq('type', strtolower($element)))
 			);
 
 			if ($matches->count())

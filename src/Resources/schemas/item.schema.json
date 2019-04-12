@@ -1,0 +1,40 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://mhw-db.com/schemas/item",
+	"title": "Item",
+	"description": "An item",
+	"type": "object",
+	"properties": {
+		"carryLimit": {
+			"type": "integer",
+			"description": "The maximum item pouch stack size of the item",
+			"minimum": 0
+		},
+		"description": {
+			"type": "string",
+			"description": "A short description of the item"
+		},
+		"name": {
+			"type": "string",
+			"description": "The name of the item"
+		},
+		"rarity": {
+			"type": "integer",
+			"description": "The item's rarity",
+			"minimum": 1,
+			"maximum": 8
+		},
+		"value": {
+			"type": "integer",
+			"description": "The zenny value of the item; zero indicates the value is not known",
+			"minimum": 0
+		}
+	},
+	"required": [
+		"carryLimit",
+		"description",
+		"name",
+		"rarity",
+		"value"
+	]
+}

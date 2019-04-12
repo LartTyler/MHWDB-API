@@ -15,13 +15,23 @@ Vagrant.configure("2") do |config|
 		vb.memory = "2048"
 	end
 
-	config.vm.provision "shell", inline: <<-SHELL
+	config.vm.provision "bootstrap", type: "shell", inline: <<-SHELL
+		fallocate -l 4G /swapfile
+		chmod 600 /swapfile
+
+		mkswap /swapfile
+		swapon /swapfile
+
+		if grep -Fqvx "^/swapfile" /etc/fstab; then
+			echo -e '/swapfile\tnone\tswap\tsw\t0\t0' >> /etc/fstab
+		fi
+
 		apt-get update -y
 		apt-get remove apache2 -y
 
 		add-apt-repository -y ppa:ondrej/php
 
-		apt-get install -y build-essential software-properties-common php7.2 php7.2-mysqlnd php7.2-curl \
+		apt-get install -y ntp build-essential software-properties-common php7.2 php7.2-mysqlnd php7.2-curl \
 			php7.2-zip php7.2-mbstring php7.2-xml php7.2-xdebug php7.2-memcached php7.2-gd
 		apt-get install -y composer
 
@@ -47,24 +57,57 @@ Vagrant.configure("2") do |config|
 		mysql -e "GRANT ALL ON application.* TO 'application'@'%';"
 	SHELL
 
-	config.vm.provision "shell", privileged: false, inline: <<-SHELL
+	config.vm.provision "install", type: "shell", privileged: false, inline: <<-SHELL
+		echo "----------------------------------------------"
+		echo "Configuring 'vagrant' user..."
+
 		echo "[client]" > ~/.my.cnf
 		echo "user=application" >> ~/.my.cnf
 		echo "database=application" >> ~/.my.cnf
 
-		echo
+		echo '... Done!'
+
+		echo "Initializing project..."
+
+		cd /vagrant
+
+		openssl genrsa -out config/jwt/private.pem 4096
+		openssl rsa -pubout -in config/jwt/private.pem -out config/jwt/public.pem
+
+		composer install
+		composer db:reset
+	SHELL
+
+	config.vm.provision "admin-run", type: "shell", run: "always", inline: <<-SHELL
+		systemctl stop ntp
+		ntpd -gq > /dev/null
+		systemctl start ntp
+	SHELL
+
+	config.vm.provision "run", type: "shell", run: "always", privileged: false, inline: <<-SHELL
+		echo ""
 		echo "Installed packages:"
 		echo "  -> PHP 7.2 (with extensions: mysqlnd, curl, zip, mbstring, xml, xdebug, memcached, gd)"
 		echo "  -> Composer"
 		echo "  -> MariaDB"
-		echo
+		echo ""
 		echo "Mapped Ports:"
 		echo "  -> VM:8000 > Host:8000"
 		echo "  -> VM:3306 > Host:3006"
-		echo
+		echo ""
 		echo "XDebug Configuration:"
 		echo "  -> IDE Key: application"
 		echo "  -> Remote Autostart: Yes"
 		echo "  -> Remote Connectback: Yes"
+		echo ""
+		echo "----------------------------------------------"
+		echo "Starting Symfony server at http://localhost:8000"
+		echo "If it doesn't come up, check the ~/symfony-server.log file for any error messages"
+
+		cd /vagrant
+
+
+		php bin/console server:stop > /dev/null
+		php bin/console server:start 0.0.0.0 &> ~/symfony-server.log &
 	SHELL
 end

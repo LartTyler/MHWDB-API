@@ -1,43 +1,86 @@
 <?php
 	namespace App\Entity;
 
+	use App\Game\DamageType;
+	use App\Game\WeaponType;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
+	use Doctrine\ORM\Mapping as ORM;
+	use Symfony\Component\Validator\Constraints as Assert;
 
+	/**
+	 * @ORM\Entity()
+	 * @ORM\Table(
+	 *     name="motion_values",
+	 *     uniqueConstraints={
+	 *         @ORM\UniqueConstraint(columns={"weapon_type", "name"})
+	 *     }
+	 * )
+	 *
+	 * Class MotionValue
+	 *
+	 * @package App\Entity
+	 */
 	class MotionValue implements EntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
 
 		/**
+		 * @Assert\NotBlank()
+		 *
+		 * @ORM\Column(type="string", length=64)
+		 *
 		 * @var string
 		 */
 		private $name;
 
 		/**
+		 * @Assert\NotBlank()
+		 * @Assert\Choice(callback={"App\Game\WeaponType", "all"})
+		 *
+		 * @ORM\Column(type="string", length=32)
+		 *
 		 * @var string
+		 * @see WeaponType
 		 */
 		private $weaponType;
 
 		/**
+		 * @Assert\Choice(callback={"App\Game\DamageType", "all"})
+		 *
+		 * @ORM\Column(type="string", length=32, nullable=true)
+		 *
 		 * @var string
+		 * @see DamageType
 		 */
 		private $damageType = null;
 
 		/**
+		 * @ORM\Column(type="smallint", options={"unsigned": true}, name="stun_potency", nullable=true)
+		 *
 		 * @var int|null
 		 */
 		private $stun = null;
 
 		/**
+		 * @ORM\Column(type="smallint", options={"unsigned": true}, name="exhaust_potency", nullable=true)
+		 *
 		 * @var int|null
 		 */
 		private $exhaust = null;
 
 		/**
+		 * @Assert\All(constraints={
+		 *     @Assert\Range(min=1)
+		 * })
+		 *
+		 * @ORM\Column(type="json")
+		 *
 		 * @var int[]
 		 */
 		private $hits = [];
 
 		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
+		 *
 		 * @var int
 		 * @internal Used to allow API queries against "hits.length"
 		 */

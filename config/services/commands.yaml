@@ -9,53 +9,17 @@ services:
         tags:
             - console.command
 
-    App\Command\ScrapeCommand:
+    App\Command\LoaderRunCommand:
         tags:
             -
                 name: console.command
-                command: app:scrape
+                command: app:loaders:run
 
-    App\Command\ScraperListCommand:
+    App\Command\LoaderListCommand:
         tags:
             -
                 name: console.command
-                command: app:scrape:list
-
-    App\Command\KiranicoFixWeaponNamesCommand:
-        tags:
-            -
-                name: console.command
-                command: app:kiranico:fix-weapon-names
-
-    App\Command\KiranicoFixArmorNamesCommand:
-        tags:
-            -
-                name: console.command
-                command: app:kiranico:fix-armor-names
-
-    App\Command\MigrateSlotAttributesCommand:
-        tags:
-            -
-                name: console.command
-                command: app:migrate:slot-attributes
-
-    App\Command\MigrateResistAttributesCommand:
-        tags:
-            -
-                name: console.command
-                command: app:migrate:resist-attributes
-
-    App\Command\MigrateArmorDefenseAttributeCommand:
-        tags:
-            -
-                name: console.command
-                command: app:migrate:armor-defense-attribute
-
-    App\Command\MigrateElementAttributesCommand:
-        tags:
-            -
-                name: console.command
-                command: app:migrate:weapon-element-attributes
+                command: app:loaders:list
 
     App\Command\SyncEntityLengthCachesCommand:
         tags:
@@ -63,20 +27,14 @@ services:
                 name: console.command
                 command: app:util:sync-entity-length-caches
 
-    App\Command\MHWGSyncSharpnessValues:
-        tags:
-            -
-                name: console.command
-                command: app:fix:sync-mhwg-sharpness-values
-
     App\Command\EntityDeleteCommand:
         tags:
             -
                 name: console.command
                 command: app:entity:delete
 
-    App\Command\FixEmptyAffinityValuesCommand:
+    App\Command\UserCreateCommand:
         tags:
             -
                 name: console.command
-                command: app:fix:empty-affinity-values
+                command: app:user:create

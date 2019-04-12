@@ -2,32 +2,50 @@
 	namespace App\Entity;
 
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\Common\Collections\Criteria;
 	use Doctrine\Common\Collections\Selectable;
+	use Doctrine\ORM\Mapping as ORM;
+	use Symfony\Component\Validator\Constraints as Assert;
 
-	class Skill implements EntityInterface, SluggableInterface, LengthCachingEntityInterface {
+	/**
+	 * @ORM\Entity()
+	 * @ORM\Table(name="skills")
+	 *
+	 * Class Skill
+	 *
+	 * @package App\Entity
+	 */
+	class Skill implements EntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
-		use SluggableTrait;
 
 		/**
+		 * @Assert\NotBlank()
+		 *
+		 * @ORM\Column(type="string", length=64, unique=true)
+		 *
 		 * @var string
 		 */
 		private $name;
 
 		/**
+		 * @ORM\Column(type="text")
+		 *
+		 * @var string
+		 */
+		private $description;
+
+		/**
+		 * @ORM\OneToMany(targetEntity="App\Entity\SkillRank", mappedBy="skill", orphanRemoval=true, cascade={"all"})
+		 *
 		 * @var Collection|Selectable|SkillRank[]
 		 */
 		private $ranks;
 
 		/**
-		 * @var string|null
-		 */
-		private $description = null;
-
-		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
+		 *
 		 * @var int
 		 * @internal Used to allow API queries against "ranks.length"
 		 */
@@ -37,12 +55,13 @@
 		 * Skill constructor.
 		 *
 		 * @param string $name
+		 * @param string $description
 		 */
-		public function __construct($name) {
+		public function __construct(string $name, string $description) {
 			$this->name = $name;
-			$this->ranks = new ArrayCollection();
+			$this->description = $description;
 
-			$this->updateSlug();
+			$this->ranks = new ArrayCollection();
 		}
 
 		/**
@@ -59,8 +78,6 @@
 		 */
 		public function setName(string $name) {
 			$this->name = $name;
-
-			$this->updateSlug();
 
 			return $this;
 		}
@@ -91,26 +108,20 @@
 		}
 
 		/**
-		 * @return void
+		 * @return string
 		 */
-		protected function updateSlug(): void {
-			$this->setSlug($this->getName());
-		}
-
-		/**
-		 * @return null|string
-		 */
-		public function getDescription() {
+		public function getDescription(): string {
 			return $this->description;
 		}
 
 		/**
-		 * @param null|string $description
+		 * @param string $description
 		 *
 		 * @return $this
 		 */
-		public function setDescription(?string $description) {
+		public function setDescription(string $description) {
 			$this->description = $description;
+
 			return $this;
 		}
 

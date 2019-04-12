@@ -1,0 +1,64 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://mhw-db.com/schemas/skill",
+	"title": "Skill",
+	"type": "object",
+	"properties": {
+		"slug": {
+			"type": "string",
+			"description": "The skill's unique slug"
+		},
+		"name": {
+			"type": "string",
+			"description": "The name of the skill"
+		},
+		"description": {
+			"type": "string",
+			"description": "A short description of the skill"
+		},
+		"ranks": {
+			"type": "array",
+			"description": "An array of the different ranks of the skill",
+			"items": {
+				"type": "object",
+				"title": "Skill Rank",
+				"properties": {
+					"slug": {
+						"type": "string",
+						"description": "The skill rank's unique slug"
+					},
+					"name": {
+						"type": "string",
+						"description": "The name of the skill rank (usually in the format \"<Skill Name> <Level>\")"
+					},
+					"level": {
+						"type": "integer",
+						"description": "The skill rank's level",
+						"minimum": 1
+					},
+					"description": {
+						"type": "string",
+						"description": "A short description of the skill rank"
+					},
+					"modifiers": {
+						"type": "object",
+						"description": "A dictionary of attribute modifiers provided by the skill at this rank"
+					}
+				},
+				"required": [
+					"slug",
+					"name",
+					"level",
+					"description",
+					"modifiers"
+				]
+			}
+		}
+	},
+	"required": [
+		"slug",
+		"name",
+		"description",
+		"ranks"
+	]
+}

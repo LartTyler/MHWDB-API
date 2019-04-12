@@ -14,15 +14,21 @@
 		 * @return string
 		 */
 		public static function toSlug(string $string): string {
-			return strtolower(str_replace([
-				' ',
-				'\'',
-				'"',
-			], [
-				'-',
-				'',
-				'',
-			], $string));
+			return strtolower(
+				str_replace(
+					[
+						' ',
+						'\'',
+						'"',
+					],
+					[
+						'-',
+						'',
+						'',
+					],
+					$string
+				)
+			);
 		}
 
 		/**
@@ -102,5 +108,32 @@
 		 */
 		public static function classify(string $string): string {
 			return str_replace(' ', '', ucwords(strtr($string, '_-', '  ')));
+		}
+
+		/**
+		 * @param string $string
+		 *
+		 * @return string
+		 */
+		public static function getIndefinateArticle(string $string): string {
+			$char = trim($string)[0];
+
+			if (in_array($char, ['a', 'e', 'i', 'o', 'u']))
+				return 'an';
+
+			return 'a';
+		}
+
+		/**
+		 * @param string $string
+		 * @param array  $values
+		 *
+		 * @return string
+		 */
+		public static function interpolate(string $string, array $values): string {
+			foreach ($values as $key => $value)
+				$string = str_replace(':' . $key, $value, $string);
+
+			return $string;
 		}
 	}

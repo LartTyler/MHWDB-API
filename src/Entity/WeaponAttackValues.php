@@ -1,16 +1,42 @@
 <?php
 	namespace App\Entity;
 
-	class WeaponAttackValues {
+	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
+	use Doctrine\ORM\Mapping as ORM;
+	use Symfony\Component\Validator\Constraints as Assert;
+
+	/**
+	 * @ORM\Embeddable()
+	 *
+	 * Class WeaponAttackValues
+	 *
+	 * @package App\Entity
+	 */
+	class WeaponAttackValues implements EntityInterface {
 		/**
+		 * @Assert\Range(min=1)
+		 *
+		 * @ORM\Column(type="smallint", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $display = 0;
 
 		/**
+		 * @Assert\Range(min=1)
+		 *
+		 * @ORM\Column(type="smallint", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $raw = 0;
+
+		/**
+		 * @return null
+		 */
+		public function getId() {
+			return null;
+		}
 
 		/**
 		 * @return int

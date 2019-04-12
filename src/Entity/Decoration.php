@@ -3,36 +3,63 @@
 
 	use App\Utility\StringUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use DaybreakStudios\Utility\DoctrineEntities\EntityTrait;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\Common\Collections\Selectable;
+	use Doctrine\ORM\Mapping as ORM;
+	use Symfony\Component\Validator\Constraints as Assert;
 
-	class Decoration implements EntityInterface, SluggableInterface, LengthCachingEntityInterface {
+	/**
+	 * @ORM\Entity(repositoryClass="App\Repository\DecorationRepository")
+	 * @ORM\Table(name="decorations")
+	 *
+	 * Class Decoration
+	 *
+	 * @package App\Entity
+	 */
+	class Decoration implements EntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
-		use SluggableTrait;
 
 		/**
+		 * @Assert\NotBlank()
+		 *
+		 * @ORM\Column(type="string", length=64, unique=true)
+		 *
 		 * @var string
 		 */
 		private $name;
 
 		/**
+		 * @Assert\NotBlank()
+		 * @Assert\Range(min=1, max=3)
+		 *
+		 * @ORM\Column(type="smallint", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $slot;
 
 		/**
+		 * @Assert\NotBlank()
+		 * @Assert\Range(min=1)
+		 *
+		 * @ORM\Column(type="smallint", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $rarity;
 
 		/**
+		 * @ORM\ManyToMany(targetEntity="App\Entity\SkillRank")
+		 * @ORM\JoinTable(name="decorations_skill_ranks")
+		 *
 		 * @var Collection|Selectable|SkillRank[]
 		 */
 		private $skills;
 
 		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true})
+		 *
 		 * @var int
 		 * @internal Used to allow API queries against "skills.length"
 		 */
@@ -50,8 +77,6 @@
 			$this->slot = $slot;
 			$this->rarity = $rarity;
 			$this->skills = new ArrayCollection();
-
-			$this->setSlug(StringUtil::toSlug($name));
 		}
 
 		/**
@@ -59,6 +84,17 @@
 		 */
 		public function getName(): string {
 			return $this->name;
+		}
+
+		/**
+		 * @param string $name
+		 *
+		 * @return $this
+		 */
+		public function setName(string $name) {
+			$this->name = $name;
+
+			return $this;
 		}
 
 		/**
