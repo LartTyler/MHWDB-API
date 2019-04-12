@@ -160,7 +160,7 @@
 				]
 			);
 
-			$message = (new \Swift_Message('Password Resest Request'))
+			$message = (new \Swift_Message('Password Reset Request'))
 				->setFrom('no-reply@mail.mhw-db.com', 'MHWDB Contrib')
 				->setTo($user->getEmail())
 				->setBody(
