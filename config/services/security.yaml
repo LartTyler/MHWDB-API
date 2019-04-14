@@ -32,4 +32,11 @@ services:
                 event: lexik_jwt_authentication.on_jwt_expired
                 method: onTokenExpired
 
+    App\Security\CustomizePayloadListener:
+        tags:
+            -
+                name: kernel.event_listener
+                event: lexik_jwt_authentication.on_jwt_created
+                method: onJwtCreate
+
     App\Security\DisabledUserChecker: ~
