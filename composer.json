@@ -18,7 +18,7 @@
 		"ext-openssl": "*",
 		"ext-pdo": "*",
 		"dbstudios/doctrine-entities": "^1.0",
-		"dbstudios/doctrine-query-document": "^0.2",
+		"dbstudios/doctrine-query-document": "^1.0",
 		"dbstudios/doze-bundle": "^1.4",
 		"dbstudios/entity-transformers": "^1.2",
 		"dbstudios/veritas-bundle": "^0.6.0",

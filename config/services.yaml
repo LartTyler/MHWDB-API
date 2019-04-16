@@ -34,3 +34,5 @@ services:
             -
                 name: doctrine.event_listener
                 event: preUpdate
+
+    App\WorldEvent\WorldEventReader: ~
