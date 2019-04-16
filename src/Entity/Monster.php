@@ -19,7 +19,7 @@
 	 *
 	 * @package App\Entity
 	 */
-	class Monster implements EntityInterface {
+	class Monster implements EntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
 
 		/**
@@ -107,6 +107,30 @@
 		 * @see Element::DAMAGE
 		 */
 		private $elements = [];
+
+		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
+		 *
+		 * @var int
+		 * @internal Used to allow API queries against "ailments.length"
+		 */
+		private $ailmentsLength = 0;
+
+		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
+		 *
+		 * @var int
+		 * @internal Used to allow API queries against "locations.length"
+		 */
+		private $locationsLength = 0;
+
+		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
+		 *
+		 * @var int
+		 * @internal Used to allow API queries against "elements.length"
+		 */
+		private $elementsLength = 0;
 
 		/**
 		 * Monster constructor.
@@ -242,5 +266,14 @@
 		 */
 		public function getWeaknesses() {
 			return $this->weaknesses;
+		}
+
+		/**
+		 * {@inheritdoc}
+		 */
+		public function syncLengthFields(): void {
+			$this->ailmentsLength = $this->ailments->count();
+			$this->locationsLength = $this->locations->count();
+			$this->elementsLength = sizeof($this->elements);
 		}
 	}

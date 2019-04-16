@@ -11,6 +11,8 @@
 	use App\Entity\CharmRankCraftingInfo;
 	use App\Entity\Decoration;
 	use App\Entity\LengthCachingEntityInterface;
+	use App\Entity\Location;
+	use App\Entity\Monster;
 	use App\Entity\MotionValue;
 	use App\Entity\Skill;
 	use App\Entity\Weapon;
@@ -31,6 +33,8 @@
 			CharmRank::class,
 			CharmRankCraftingInfo::class,
 			Decoration::class,
+			Location::class,
+			Monster::class,
 			MotionValue::class,
 			Skill::class,
 			Weapon::class,
