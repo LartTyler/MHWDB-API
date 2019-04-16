@@ -1,6 +1,8 @@
 <?php
 	namespace App\Entity;
 
+	use App\Game\PlatformExclusivityType;
+	use App\Game\PlatformType;
 	use App\Game\WorldEventType;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\ORM\Mapping as ORM;
@@ -11,7 +13,7 @@
 	 * @ORM\Table(
 	 *     name="world_events",
 	 *     uniqueConstraints={
-	 *     		@ORM\UniqueConstraint(columns={"name", "startTimestamp"})
+	 *     		@ORM\UniqueConstraint(columns={"platform", "name", "start_timestamp"})
 	 *     }
 	 * )
 	 */
@@ -39,6 +41,17 @@
 		private $type;
 
 		/**
+		 * @Assert\NotBlank()
+		 * @Assert\Choice(callback={"App\Game\PlatformType", "all"})
+		 *
+		 * @ORM\Column(type="string", length=16)
+		 *
+		 * @var string
+		 * @see PlatformType
+		 */
+		private $platform;
+
+		/**
 		 * @ORM\Column(type="datetime_immutable")
 		 *
 		 * @var \DateTimeImmutable
@@ -59,6 +72,16 @@
 		 * @var Location
 		 */
 		private $location;
+
+		/**
+		 * @Assert\NotBlank()
+		 * @Assert\GreaterThanOrEqual(1)
+		 *
+		 * @ORM\Column(type="smallint", options={"unsigned": true})
+		 *
+		 * @var int
+		 */
+		private $questRank;
 
 		/**
 		 * @ORM\Column(type="text", nullable=true)
@@ -82,26 +105,42 @@
 		private $successConditions = null;
 
 		/**
+		 * @Assert\Choice(callback={"App\Game\PlatformExclusivityType", "all"})
+		 *
+		 * @ORM\Column(type="string", length=16, nullable=true)
+		 *
+		 * @var string|null
+		 * @see PlatformExclusivityType
+		 */
+		private $exclusive = null;
+
+		/**
 		 * WorldEvent constructor.
 		 *
 		 * @param string             $name
 		 * @param string             $type
+		 * @param string             $platform
 		 * @param \DateTimeImmutable $startTimestamp
 		 * @param \DateTimeImmutable $endTimestamp
 		 * @param Location           $location
+		 * @param int                $questRank
 		 */
 		public function __construct(
 			string $name,
 			string $type,
+			string $platform,
 			\DateTimeImmutable $startTimestamp,
 			\DateTimeImmutable $endTimestamp,
-			Location $location
+			Location $location,
+			int $questRank
 		) {
 			$this->name = $name;
 			$this->type = $type;
+			$this->platform = $platform;
 			$this->startTimestamp = $startTimestamp;
 			$this->endTimestamp = $endTimestamp;
 			$this->location = $location;
+			$this->questRank = $questRank;
 		}
 
 		/**
@@ -116,6 +155,13 @@
 		 */
 		public function getType(): string {
 			return $this->type;
+		}
+
+		/**
+		 * @return string
+		 */
+		public function getPlatform(): string {
+			return $this->platform;
 		}
 
 		/**
@@ -137,6 +183,13 @@
 		 */
 		public function getLocation(): Location {
 			return $this->location;
+		}
+
+		/**
+		 * @return int
+		 */
+		public function getQuestRank(): int {
+			return $this->questRank;
 		}
 
 		/**
@@ -189,6 +242,24 @@
 		 */
 		public function setSuccessConditions(?string $successConditions) {
 			$this->successConditions = $successConditions;
+
+			return $this;
+		}
+
+		/**
+		 * @return string|null
+		 */
+		public function getExclusive(): ?string {
+			return $this->exclusive;
+		}
+
+		/**
+		 * @param string|null $exclusive
+		 *
+		 * @return $this
+		 */
+		public function setExclusive(?string $exclusive) {
+			$this->exclusive = $exclusive;
 
 			return $this;
 		}
