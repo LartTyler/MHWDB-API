@@ -32,3 +32,9 @@ services:
             -
                 name: console.command
                 command: app:events:sync
+
+    App\Command\UserSetPasswordCommand:
+        tags:
+            -
+                name: console.command
+                command: app:user:set-password
