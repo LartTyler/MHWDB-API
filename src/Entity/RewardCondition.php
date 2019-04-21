@@ -22,7 +22,7 @@
 		 *
 		 * @var string
 		 */
-		protected $type;
+		private $type;
 
 		/**
 		 * @Assert\NotBlank()
@@ -32,7 +32,7 @@
 		 *
 		 * @var string
 		 */
-		protected $rank;
+		private $rank;
 
 		/**
 		 * @Assert\NotBlank()
@@ -42,7 +42,7 @@
 		 *
 		 * @var int
 		 */
-		protected $stackSize;
+		private $stackSize;
 
 		/**
 		 * @Assert\NotBlank()
@@ -52,7 +52,7 @@
 		 *
 		 * @var int
 		 */
-		protected $chance;
+		private $chance;
 
 		/**
 		 * @Assert\Length(max=128)
@@ -61,7 +61,7 @@
 		 *
 		 * @var string|null
 		 */
-		protected $subtype = null;
+		private $subtype = null;
 
 		/**
 		 * RewardCondition constructor.

@@ -22,7 +22,7 @@
 		 *
 		 * @var Monster
 		 */
-		protected $monster;
+		private $monster;
 
 		/**
 		 * @ORM\ManyToOne(targetEntity="App\Entity\Item")
@@ -30,7 +30,7 @@
 		 *
 		 * @var Item
 		 */
-		protected $item;
+		private $item;
 
 		/**
 		 * @ORM\ManyToMany(targetEntity="App\Entity\RewardCondition")
@@ -38,7 +38,7 @@
 		 *
 		 * @var Collection|Selectable|RewardCondition[]
 		 */
-		protected $conditions;
+		private $conditions;
 
 		/**
 		 * MonsterReward constructor.
