@@ -94,6 +94,13 @@
 		private $weaknesses;
 
 		/**
+		 * @ORM\OneToMany(targetEntity="App\Entity\MonsterReward", mappedBy="monster")
+		 *
+		 * @var Collection|Selectable|MonsterReward[]
+		 */
+		private $rewards;
+
+		/**
 		 * @ORM\Column(type="text", nullable=true)
 		 *
 		 * @var string|null
@@ -133,6 +140,14 @@
 		private $elementsLength = 0;
 
 		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
+		 *
+		 * @var int
+		 * @internal Used to allow API queries against "rewards.length"
+		 */
+		private $rewardsLength = 0;
+
+		/**
 		 * Monster constructor.
 		 *
 		 * @param string $name
@@ -148,6 +163,7 @@
 			$this->locations = new ArrayCollection();
 			$this->resistances = new ArrayCollection();
 			$this->weaknesses = new ArrayCollection();
+			$this->rewards = new ArrayCollection();
 		}
 
 		/**
@@ -269,11 +285,19 @@
 		}
 
 		/**
+		 * @return MonsterReward[]|Collection|Selectable
+		 */
+		public function getRewards() {
+			return $this->rewards;
+		}
+
+		/**
 		 * {@inheritdoc}
 		 */
 		public function syncLengthFields(): void {
 			$this->ailmentsLength = $this->ailments->count();
 			$this->locationsLength = $this->locations->count();
 			$this->elementsLength = sizeof($this->elements);
+			$this->rewardsLength = $this->rewards->count();
 		}
 	}
