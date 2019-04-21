@@ -33,7 +33,7 @@
 		private $item;
 
 		/**
-		 * @ORM\ManyToMany(targetEntity="App\Entity\RewardCondition")
+		 * @ORM\ManyToMany(targetEntity="App\Entity\RewardCondition", cascade={"all"}, orphanRemoval=true)
 		 * @ORM\JoinTable(name="monster_reward_conditions")
 		 *
 		 * @var Collection|Selectable|RewardCondition[]

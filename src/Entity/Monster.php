@@ -94,7 +94,12 @@
 		private $weaknesses;
 
 		/**
-		 * @ORM\OneToMany(targetEntity="App\Entity\MonsterReward", mappedBy="monster")
+		 * @ORM\OneToMany(
+		 *     targetEntity="App\Entity\MonsterReward",
+		 *     mappedBy="monster",
+		 *     cascade={"all"},
+		 *     orphanRemoval=true
+		 * )
 		 *
 		 * @var Collection|Selectable|MonsterReward[]
 		 */
