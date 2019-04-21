@@ -2,12 +2,16 @@
 	namespace App\Contrib\Transformers;
 
 	use App\Entity\Ailment;
+	use App\Entity\Item;
 	use App\Entity\Location;
 	use App\Entity\Monster;
 	use App\Entity\MonsterResistance;
+	use App\Entity\MonsterReward;
 	use App\Entity\MonsterWeakness;
+	use App\Entity\RewardCondition;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
+	use DaybreakStudios\Utility\EntityTransformers\Exceptions\IntegrityException;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\ValidationException;
 	use DaybreakStudios\Utility\EntityTransformers\Utility\ObjectUtil;
 
@@ -108,6 +112,65 @@
 
 					if (ObjectUtil::isset($definition, 'condition'))
 						$weakness->setCondition($definition->condition);
+				}
+			}
+
+			if (ObjectUtil::isset($data, 'rewards')) {
+				$entity->getRewards()->clear();
+
+				foreach ($data->rewards as $rewardIndex => $rewardDefinition) {
+					$missing = ObjectUtil::getMissingProperties(
+						$rewardDefinition,
+						[
+							'item',
+							'conditions',
+						]
+					);
+
+					if ($missing)
+						throw ValidationException::missingNestedFields('rewards', $rewardIndex, $missing);
+
+					/** @var Item|null $item */
+					$item = $this->entityManager->getRepository(Item::class)->find($rewardDefinition->item);
+
+					if (!$item)
+						throw IntegrityException::missingReference('item', 'Item');
+
+					$reward = new MonsterReward($entity, $item);
+
+					$entity->getRewards()->add($reward);
+
+					foreach ($rewardDefinition->conditions as $index => $definition) {
+						$missing = ObjectUtil::getMissingProperties(
+							$definition,
+							[
+								'type',
+								'rank',
+								'stackSize',
+								'chance',
+							]
+						);
+
+						if ($missing) {
+							throw ValidationException::missingNestedFields(
+								'rewards[' . $rewardIndex . '].conditions',
+								$index,
+								$missing
+							);
+						}
+
+						$condition = new RewardCondition(
+							$definition->type,
+							$definition->rank,
+							$definition->stackSize,
+							$definition->chance
+						);
+
+						$reward->getConditions()->add($condition);
+
+						if (ObjectUtil::isset($definition, 'subtype'))
+							$condition->setSubtype($definition->subtype);
+					}
 				}
 			}
 		}
