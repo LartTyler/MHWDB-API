@@ -249,7 +249,7 @@
 										'type' => $condition->getType(),
 										'subtype' => $condition->getSubtype(),
 										'rank' => $condition->getRank(),
-										'stackSize' => $condition->getStackSize(),
+										'quantity' => $condition->getQuantity(),
 										'chance' => $condition->getChance(),
 									];
 								}

@@ -42,7 +42,7 @@
 		 *
 		 * @var int
 		 */
-		private $stackSize;
+		private $quantity;
 
 		/**
 		 * @Assert\NotBlank()
@@ -68,13 +68,13 @@
 		 *
 		 * @param string $type
 		 * @param string $rank
-		 * @param int    $stackSize
+		 * @param int    $quantity
 		 * @param int    $chance
 		 */
-		public function __construct(string $type, string $rank, int $stackSize, int $chance) {
+		public function __construct(string $type, string $rank, int $quantity, int $chance) {
 			$this->type = $type;
 			$this->rank = $rank;
-			$this->stackSize = $stackSize;
+			$this->quantity = $quantity;
 			$this->chance = $chance;
 		}
 
@@ -117,17 +117,17 @@
 		/**
 		 * @return int
 		 */
-		public function getStackSize(): int {
-			return $this->stackSize;
+		public function getQuantity(): int {
+			return $this->quantity;
 		}
 
 		/**
-		 * @param int $stackSize
+		 * @param int $quantity
 		 *
 		 * @return $this
 		 */
-		public function setStackSize(int $stackSize) {
-			$this->stackSize = $stackSize;
+		public function setQuantity(int $quantity) {
+			$this->quantity = $quantity;
 
 			return $this;
 		}
