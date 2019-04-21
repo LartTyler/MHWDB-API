@@ -39,6 +39,9 @@
 		private $item;
 
 		/**
+		 * @Assert\Valid()
+		 * @Assert\Count(min=1)
+		 *
 		 * @ORM\ManyToMany(targetEntity="App\Entity\RewardCondition", cascade={"all"}, orphanRemoval=true)
 		 * @ORM\JoinTable(name="monster_reward_conditions")
 		 *

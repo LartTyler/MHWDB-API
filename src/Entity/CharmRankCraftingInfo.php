@@ -6,6 +6,7 @@
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\Common\Collections\Selectable;
 	use Doctrine\ORM\Mapping as ORM;
+	use Symfony\Component\Validator\Constraints as Assert;
 
 	/**
 	 * @ORM\Entity()
@@ -26,6 +27,8 @@
 		private $craftable;
 
 		/**
+		 * @Assert\Valid()
+		 *
 		 * @ORM\ManyToMany(targetEntity="App\Entity\CraftingMaterialCost", orphanRemoval=true, cascade={"all"})
 		 * @ORM\JoinTable(name="charm_rank_crafting_info_crafting_material_costs")
 		 *

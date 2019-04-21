@@ -6,6 +6,7 @@
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\Common\Collections\Selectable;
 	use Doctrine\ORM\Mapping as ORM;
+	use Symfony\Component\Validator\Constraints as Assert;
 
 	/**
 	 * @ORM\Entity()
@@ -19,6 +20,8 @@
 		use EntityTrait;
 
 		/**
+		 * @Assert\Valid()
+		 *
 		 * @ORM\ManyToMany(targetEntity="App\Entity\CraftingMaterialCost", orphanRemoval=true, cascade={"all"})
 		 * @ORM\JoinTable(
 		 *     name="armor_crafting_material_costs",
@@ -26,6 +29,7 @@
 		 *         @ORM\JoinColumn(unique=true)
 		 *     }
 		 * )
+		 *
 		 * @var Collection|Selectable|CraftingMaterialCost[]
 		 */
 		private $materials;

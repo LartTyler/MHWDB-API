@@ -73,6 +73,8 @@
 		private $resistances;
 
 		/**
+		 * @Assert\Valid()
+		 *
 		 * @ORM\Embedded(class="App\Entity\ArmorDefenseValues", columnPrefix="defense_")
 		 *
 		 * @var ArmorDefenseValues
@@ -88,6 +90,8 @@
 		private $skills;
 
 		/**
+		 * @Assert\Valid()
+		 *
 		 * @ORM\OneToMany(targetEntity="App\Entity\ArmorSlot", mappedBy="armor", orphanRemoval=true, cascade={"all"})
 		 *
 		 * @var Collection|Selectable|ArmorSlot[]
@@ -102,6 +106,8 @@
 		private $armorSet = null;
 
 		/**
+		 * @Assert\Valid()
+		 *
 		 * @ORM\OneToOne(targetEntity="App\Entity\ArmorAssets", orphanRemoval=true, cascade={"all"})
 		 *
 		 * @var ArmorAssets|null
@@ -109,6 +115,8 @@
 		private $assets = null;
 
 		/**
+		 * @Assert\Valid()
+		 *
 		 * @ORM\OneToOne(targetEntity="App\Entity\ArmorCraftingInfo", orphanRemoval=true, cascade={"all"})
 		 *
 		 * @var ArmorCraftingInfo|null

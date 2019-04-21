@@ -71,6 +71,8 @@
 		private $locations;
 
 		/**
+		 * @Assert\Valid()
+		 *
 		 * @ORM\OneToMany(
 		 *     targetEntity="App\Entity\MonsterResistance",
 		 *     mappedBy="monster",
@@ -83,6 +85,8 @@
 		private $resistances;
 
 		/**
+		 * @Assert\Valid()
+		 *
 		 * @ORM\OneToMany(
 		 *     targetEntity="App\Entity\MonsterWeakness",
 		 *     mappedBy="monster",
@@ -95,6 +99,8 @@
 		private $weaknesses;
 
 		/**
+		 * @Assert\Valid()
+		 *
 		 * @ORM\OneToMany(
 		 *     targetEntity="App\Entity\MonsterReward",
 		 *     mappedBy="monster",

@@ -65,6 +65,8 @@
 		private $rarity = 1;
 
 		/**
+		 * @Assert\Valid()
+		 *
 		 * @ORM\OneToOne(targetEntity="App\Entity\CharmRankCraftingInfo", orphanRemoval=true, cascade={"all"})
 		 *
 		 * @var CharmRankCraftingInfo|null

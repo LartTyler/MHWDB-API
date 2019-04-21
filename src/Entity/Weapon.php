@@ -57,6 +57,8 @@
 		private $rarity;
 
 		/**
+		 * @Assert\Valid()
+		 *
 		 * @ORM\OneToMany(targetEntity="App\Entity\WeaponSlot", mappedBy="weapon", orphanRemoval=true, cascade={"all"})
 		 *
 		 * @var Collection|Selectable|WeaponSlot[]
@@ -64,6 +66,8 @@
 		private $slots;
 
 		/**
+		 * @Assert\Valid()
+		 *
 		 * @ORM\ManyToMany(targetEntity="App\Entity\WeaponSharpness", orphanRemoval=true, cascade={"all"})
 		 * @ORM\JoinTable(name="weapon_durability")
 		 *
@@ -72,6 +76,8 @@
 		private $durability;
 
 		/**
+		 * @Assert\Valid()
+		 *
 		 * @ORM\OneToMany(
 		 *     targetEntity="App\Entity\WeaponElement",
 		 *     mappedBy="weapon",
@@ -84,6 +90,8 @@
 		private $elements;
 
 		/**
+		 * @Assert\Valid()
+		 *
 		 * @ORM\Embedded(class="App\Entity\WeaponAttackValues", columnPrefix="attack_")
 		 *
 		 * @var WeaponAttackValues
@@ -91,6 +99,8 @@
 		private $attack;
 
 		/**
+		 * @Assert\Valid()
+		 *
 		 * @ORM\OneToOne(targetEntity="App\Entity\WeaponCraftingInfo", orphanRemoval=true, cascade={"all"})
 		 *
 		 * @var WeaponCraftingInfo|null
@@ -98,6 +108,8 @@
 		private $crafting = null;
 
 		/**
+		 * @Assert\Valid()
+		 *
 		 * @ORM\OneToOne(targetEntity="App\Entity\WeaponAssets", orphanRemoval=true, cascade={"all"})
 		 *
 		 * @var WeaponAssets|null

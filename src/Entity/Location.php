@@ -40,6 +40,8 @@
 		private $zoneCount;
 
 		/**
+		 * @Assert\Valid()
+		 *
 		 * @ORM\OneToMany(targetEntity="App\Entity\Camp", mappedBy="location", orphanRemoval=true, cascade={"all"})
 		 *
 		 * @var Camp[]|Collection|Selectable
