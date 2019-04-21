@@ -116,7 +116,7 @@
 			}
 
 			if (ObjectUtil::isset($data, 'rewards')) {
-				$entity->getRewards()->clear();
+				$itemIds = [];
 
 				foreach ($data->rewards as $rewardIndex => $rewardDefinition) {
 					$missing = ObjectUtil::getMissingProperties(
@@ -136,9 +136,13 @@
 					if (!$item)
 						throw IntegrityException::missingReference('item', 'Item');
 
-					$reward = new MonsterReward($entity, $item);
+					$itemIds[] = $item->getId();
+					$reward = $entity->getRewardForItem($item);
 
-					$entity->getRewards()->add($reward);
+					if (!$reward)
+						$entity->getRewards()->add($reward = new MonsterReward($entity, $item));
+
+					$reward->getConditions()->clear();
 
 					foreach ($rewardDefinition->conditions as $index => $definition) {
 						$missing = ObjectUtil::getMissingProperties(
@@ -171,6 +175,11 @@
 						if (ObjectUtil::isset($definition, 'subtype'))
 							$condition->setSubtype($definition->subtype);
 					}
+				}
+
+				foreach ($entity->getRewards() as $reward) {
+					if (!in_array($reward->getItem()->getId(), $itemIds))
+						$entity->getRewards()->removeElement($reward);
 				}
 			}
 		}

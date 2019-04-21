@@ -6,10 +6,16 @@
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\Common\Collections\Selectable;
 	use Doctrine\ORM\Mapping as ORM;
+	use Symfony\Component\Validator\Constraints as Assert;
 
 	/**
 	 * @ORM\Entity()
-	 * @ORM\Table(name="monster_rewards")
+	 * @ORM\Table(
+	 *     name="monster_rewards",
+	 *     uniqueConstraints={
+	 *         @ORM\UniqueConstraint(columns={"monster_id", "item_id"})
+	 *     }
+	 * )
 	 *
 	 * @package App\Entity
 	 */
