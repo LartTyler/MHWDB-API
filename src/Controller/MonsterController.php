@@ -253,7 +253,7 @@
 										'chance' => $condition->getChance(),
 									];
 								}
-							);
+							)->toArray();
 						}
 
 						return $output;
