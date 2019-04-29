@@ -150,7 +150,7 @@
 							[
 								'type',
 								'rank',
-								'stackSize',
+								'quantity',
 								'chance',
 							]
 						);
@@ -166,7 +166,7 @@
 						$condition = new RewardCondition(
 							$definition->type,
 							$definition->rank,
-							$definition->stackSize,
+							$definition->quantity,
 							$definition->chance
 						);
 
