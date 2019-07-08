@@ -20,9 +20,9 @@
 		];
 
 		public const TABLE_TYPE_MAP = [
-			WorldEventType::KULVE_TAROTH,
-			WorldEventType::EVENT_QUEST,
-			WorldEventType::CHALLENGE_QUEST,
+			'table1' => WorldEventType::KULVE_TAROTH,
+			'table2' => WorldEventType::EVENT_QUEST,
+			'table3' => WorldEventType::CHALLENGE_QUEST,
 		];
 
 		/**
@@ -141,7 +141,7 @@
 
 						$event = new WorldEvent(
 							$name,
-							static::TABLE_TYPE_MAP[$tableIndex],
+							static::TABLE_TYPE_MAP[$tables->eq($tableIndex)->attr('class')],
 							$platform,
 							$term[0],
 							$term[1],
