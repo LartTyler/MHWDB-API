@@ -4,6 +4,7 @@
 	final class MonsterSpecies {
 		public const BIRD_WYVERN = 'bird wyvern';
 		public const BRUTE_WYVERN = 'brute wyvern';
+		public const ELDER_DRAGON = 'elder dragon';
 		public const FANGED_WYVERN = 'fanged wyvern';
 		public const FISH = 'fish';
 		public const FLYING_WYVERN = 'flying wyvern';
@@ -11,8 +12,8 @@
 		public const LYNIAN = 'lynian';
 		public const NEOPTERON = 'neopteron';
 		public const PISCINE_WYVERN = 'piscine wyvern';
+		public const RELICT = 'relict';
 		public const WINGDRAKE = 'wingdrake';
-		public const ELDER_DRAGON = 'elder dragon';
 
 		/**
 		 * @var string[]|null
