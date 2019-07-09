@@ -1,6 +1,7 @@
 <?php
 	namespace App\Entity;
 
+	use App\Game\RewardConditionType;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\ORM\Mapping as ORM;
 	use Symfony\Component\Validator\Constraints as Assert;
@@ -21,6 +22,7 @@
 		 * @ORM\Column(type="string", length=32)
 		 *
 		 * @var string
+		 * @see RewardConditionType
 		 */
 		private $type;
 

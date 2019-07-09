@@ -2,7 +2,7 @@
 	namespace App\Game;
 
 	final class WorldEventType {
-		public const KULVE_TAROTH = 'kulve taroth seige';
+		public const KULVE_TAROTH = 'kulve taroth siege';
 		public const EVENT_QUEST = 'event quest';
 		public const CHALLENGE_QUEST = 'challenge quest';
 
