@@ -56,6 +56,21 @@
 		}
 
 		/**
+		 * @return array
+		 */
+		public static function getAllowedWeaponElements() {
+			return array_merge(
+				self::DAMAGE,
+				[
+					self::BLAST,
+					self::POISON,
+					self::SLEEP,
+					self::PARALYSIS,
+				]
+			);
+		}
+
+		/**
 		 * @param string $string
 		 *
 		 * @return bool
