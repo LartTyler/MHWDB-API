@@ -10,6 +10,7 @@
 		const BLAST = 'blast';
 		const POISON = 'poison';
 		const SLEEP = 'sleep';
+		const STUN = 'stun';
 		const PARALYSIS = 'paralysis';
 
 		const ALL = [
@@ -21,6 +22,7 @@
 			self::BLAST,
 			self::POISON,
 			self::SLEEP,
+			self::STUN,
 			self::PARALYSIS,
 		];
 
@@ -36,6 +38,7 @@
 			self::BLAST,
 			self::POISON,
 			self::SLEEP,
+			self::STUN,
 			self::PARALYSIS,
 		];
 
