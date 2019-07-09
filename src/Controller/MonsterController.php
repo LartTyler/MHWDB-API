@@ -7,7 +7,9 @@
 	use App\Entity\Location;
 	use App\Entity\Monster;
 	use App\Entity\MonsterResistance;
+	use App\Entity\MonsterReward;
 	use App\Entity\MonsterWeakness;
+	use App\Entity\RewardCondition;
 	use App\Entity\Skill;
 	use App\QueryDocument\Projection;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -218,6 +220,45 @@
 					},
 					$entity->getWeaknesses()->toArray()
 				);
+			}
+
+			if ($projection->isAllowed('rewards')) {
+				$output['rewards'] = $entity->getRewards()->map(
+					function(MonsterReward $reward) use ($projection): array {
+						$output = [
+							'id' => $reward->getId(),
+						];
+
+						if ($projection->isAllowed('rewards.item')) {
+							$item = $reward->getItem();
+
+							$output['item'] = [
+								'id' => $item->getId(),
+								'name' => $item->getName(),
+								'description' => $item->getDescription(),
+								'rarity' => $item->getRarity(),
+								'carryLimit' => $item->getCarryLimit(),
+								'value' => $item->getValue(),
+							];
+						}
+
+						if ($projection->isAllowed('rewards.condition')) {
+							$output['conditions'] = $reward->getConditions()->map(
+								function(RewardCondition $condition): array {
+									return [
+										'type' => $condition->getType(),
+										'subtype' => $condition->getSubtype(),
+										'rank' => $condition->getRank(),
+										'quantity' => $condition->getQuantity(),
+										'chance' => $condition->getChance(),
+									];
+								}
+							)->toArray();
+						}
+
+						return $output;
+					}
+				)->toArray();
 			}
 
 			return $output;

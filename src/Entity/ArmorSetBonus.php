@@ -30,6 +30,8 @@
 		private $name;
 
 		/**
+		 * @Assert\Valid()
+		 *
 		 * @ORM\OneToMany(
 		 *     targetEntity="App\Entity\ArmorSetBonusRank",
 		 *     mappedBy="bonus",

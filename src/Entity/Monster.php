@@ -7,6 +7,7 @@
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
+	use Doctrine\Common\Collections\Criteria;
 	use Doctrine\Common\Collections\Selectable;
 	use Doctrine\ORM\Mapping as ORM;
 	use Symfony\Component\Validator\Constraints as Assert;
@@ -70,6 +71,8 @@
 		private $locations;
 
 		/**
+		 * @Assert\Valid()
+		 *
 		 * @ORM\OneToMany(
 		 *     targetEntity="App\Entity\MonsterResistance",
 		 *     mappedBy="monster",
@@ -82,6 +85,8 @@
 		private $resistances;
 
 		/**
+		 * @Assert\Valid()
+		 *
 		 * @ORM\OneToMany(
 		 *     targetEntity="App\Entity\MonsterWeakness",
 		 *     mappedBy="monster",
@@ -92,6 +97,20 @@
 		 * @var MonsterWeakness[]|Collection|Selectable
 		 */
 		private $weaknesses;
+
+		/**
+		 * @Assert\Valid()
+		 *
+		 * @ORM\OneToMany(
+		 *     targetEntity="App\Entity\MonsterReward",
+		 *     mappedBy="monster",
+		 *     cascade={"all"},
+		 *     orphanRemoval=true
+		 * )
+		 *
+		 * @var Collection|Selectable|MonsterReward[]
+		 */
+		private $rewards;
 
 		/**
 		 * @ORM\Column(type="text", nullable=true)
@@ -133,6 +152,14 @@
 		private $elementsLength = 0;
 
 		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
+		 *
+		 * @var int
+		 * @internal Used to allow API queries against "rewards.length"
+		 */
+		private $rewardsLength = 0;
+
+		/**
 		 * Monster constructor.
 		 *
 		 * @param string $name
@@ -148,6 +175,7 @@
 			$this->locations = new ArrayCollection();
 			$this->resistances = new ArrayCollection();
 			$this->weaknesses = new ArrayCollection();
+			$this->rewards = new ArrayCollection();
 		}
 
 		/**
@@ -269,11 +297,34 @@
 		}
 
 		/**
+		 * @return MonsterReward[]|Collection|Selectable
+		 */
+		public function getRewards() {
+			return $this->rewards;
+		}
+
+		/**
+		 * @param Item $item
+		 *
+		 * @return MonsterReward|null
+		 */
+		public function getRewardForItem(Item $item): ?MonsterReward {
+			$criteria = Criteria::create()
+				->where(Criteria::expr()->eq('item', $item))
+				->setMaxResults(1);
+
+			$matched = $this->getRewards()->matching($criteria);
+
+			return $matched->count() ? $matched->first() : null;
+		}
+
+		/**
 		 * {@inheritdoc}
 		 */
 		public function syncLengthFields(): void {
 			$this->ailmentsLength = $this->ailments->count();
 			$this->locationsLength = $this->locations->count();
 			$this->elementsLength = sizeof($this->elements);
+			$this->rewardsLength = $this->rewards->count();
 		}
 	}

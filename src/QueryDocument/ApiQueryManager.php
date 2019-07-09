@@ -65,6 +65,7 @@
 						'ailments.length' => 'ailmentsLength',
 						'locations.length' => 'locationsLength',
 						'elements.length' => 'elementsLength',
+						'rewards.length' => 'rewardsLength',
 					],
 					MotionValue::class => [
 						'hits.length' => 'hitsLength',
