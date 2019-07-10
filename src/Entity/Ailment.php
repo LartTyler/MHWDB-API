@@ -34,6 +34,8 @@
 		private $description;
 
 		/**
+		 * @Assert\Valid()
+		 *
 		 * @ORM\OneToOne(
 		 *     targetEntity="App\Entity\AilmentRecovery",
 		 *     mappedBy="ailment",
@@ -46,6 +48,8 @@
 		private $recovery;
 
 		/**
+		 * @Assert\Valid()
+		 *
 		 * @ORM\OneToOne(
 		 *     targetEntity="App\Entity\AilmentProtection",
 		 *     mappedBy="ailment",

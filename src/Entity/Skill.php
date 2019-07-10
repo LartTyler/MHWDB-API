@@ -37,6 +37,8 @@
 		private $description;
 
 		/**
+		 * @Assert\Valid()
+		 *
 		 * @ORM\OneToMany(targetEntity="App\Entity\SkillRank", mappedBy="skill", orphanRemoval=true, cascade={"all"})
 		 *
 		 * @var Collection|Selectable|SkillRank[]

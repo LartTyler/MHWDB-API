@@ -9,18 +9,6 @@ services:
         tags:
             - console.command
 
-    App\Command\LoaderRunCommand:
-        tags:
-            -
-                name: console.command
-                command: app:loaders:run
-
-    App\Command\LoaderListCommand:
-        tags:
-            -
-                name: console.command
-                command: app:loaders:list
-
     App\Command\SyncEntityLengthCachesCommand:
         tags:
             -
@@ -38,3 +26,15 @@ services:
             -
                 name: console.command
                 command: app:user:create
+
+    App\Command\WorldEventSyncCommand:
+        tags:
+            -
+                name: console.command
+                command: app:events:sync
+
+    App\Command\UserSetPasswordCommand:
+        tags:
+            -
+                name: console.command
+                command: app:user:set-password

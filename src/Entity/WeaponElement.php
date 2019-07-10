@@ -27,7 +27,7 @@
 
 		/**
 		 * @Assert\NotBlank()
-		 * @Assert\Choice(callback={"App\Game\Element", "all"})
+		 * @Assert\Choice(callback={"App\Game\Element", "getAllowedWeaponElements"})
 		 *
 		 * @ORM\Column(type="string", length=16)
 		 *

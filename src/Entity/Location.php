@@ -17,7 +17,7 @@
 	 *
 	 * @package App\Entity
 	 */
-	class Location implements EntityInterface {
+	class Location implements EntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
 
 		/**
@@ -40,11 +40,21 @@
 		private $zoneCount;
 
 		/**
+		 * @Assert\Valid()
+		 *
 		 * @ORM\OneToMany(targetEntity="App\Entity\Camp", mappedBy="location", orphanRemoval=true, cascade={"all"})
 		 *
 		 * @var Camp[]|Collection|Selectable
 		 */
 		private $camps;
+
+		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
+		 *
+		 * @var int
+		 * @internal Used to allow API queries against "camps.length"
+		 */
+		private $campsLength = 0;
 
 		/**
 		 * Location constructor.
@@ -118,5 +128,12 @@
 				return null;
 
 			return $matching->first();
+		}
+
+		/**
+		 * {@inheritdoc}
+		 */
+		public function syncLengthFields(): void {
+			$this->campsLength = $this->camps->count();
 		}
 	}
