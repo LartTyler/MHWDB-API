@@ -1,6 +1,7 @@
 <?php
 	namespace App\Entity;
 
+	use App\Game\Elderseal;
 	use App\Game\WeaponType;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\ArrayCollection;
@@ -97,6 +98,16 @@
 		 * @var WeaponAttackValues
 		 */
 		private $attack;
+
+		/**
+		 * @Assert\Choice(choices=App\Game\Elderseal::ALL)
+		 *
+		 * @ORM\Column(type="string", length=16, nullable=true)
+		 *
+		 * @var string|null
+		 * @see Elderseal
+		 */
+		private $elderseal = null;
 
 		/**
 		 * @Assert\Valid()
@@ -209,6 +220,24 @@
 		 */
 		public function setRarity(int $rarity): Weapon {
 			$this->rarity = $rarity;
+
+			return $this;
+		}
+
+		/**
+		 * @return string|null
+		 */
+		public function getElderseal(): ?string {
+			return $this->elderseal;
+		}
+
+		/**
+		 * @param string|null $elderseal
+		 *
+		 * @return $this
+		 */
+		public function setElderseal(?string $elderseal) {
+			$this->elderseal = $elderseal;
 
 			return $this;
 		}

@@ -6,6 +6,7 @@
 	use App\Entity\WeaponElement;
 	use App\Entity\WeaponSharpness;
 	use App\Entity\WeaponSlot;
+	use App\Game\Attribute;
 	use App\Game\RawDamageMultiplier;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
@@ -82,6 +83,13 @@
 
 			if (ObjectUtil::isset($data, 'attributes'))
 				$entity->setAttributes((array)$data->attributes);
+
+			if (ObjectUtil::isset($data, 'elderseal')) {
+				$entity->setElderseal($data->elderseal);
+
+				// TODO Preserves BC for 1.15.0, will be removed in 1.17.0
+				$entity->setAttribute(Attribute::ELDERSEAL, $data->elderseal);
+			}
 
 			if (ObjectUtil::isset($data, 'slots')) {
 				$entity->getSlots()->clear();
