@@ -83,6 +83,9 @@
 			if (ObjectUtil::isset($data, 'attributes'))
 				$entity->setAttributes((array)$data->attributes);
 
+			if (ObjectUtil::isset($data, 'elderseal'))
+				$entity->setElderseal($data->elderseal);
+
 			if (ObjectUtil::isset($data, 'slots')) {
 				$entity->getSlots()->clear();
 
