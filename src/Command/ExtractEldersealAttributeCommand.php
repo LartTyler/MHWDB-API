@@ -6,6 +6,7 @@
 	use Doctrine\ORM\EntityManagerInterface;
 	use Symfony\Component\Console\Command\Command;
 	use Symfony\Component\Console\Input\InputInterface;
+	use Symfony\Component\Console\Input\InputOption;
 	use Symfony\Component\Console\Output\OutputInterface;
 	use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -31,8 +32,17 @@
 			$this->entityManager = $entityManager;
 		}
 
+		protected function configure() {
+			$this->addOption(
+				'delete-attribute',
+				null,
+				InputOption::VALUE_NONE,
+				'If set, deletes old elderseal attributes during processing'
+			);
+		}
+
 		/**
-		 * @param InputInterface  $input
+		 * @param InputInterface $input
 		 * @param OutputInterface $output
 		 *
 		 * @return void
@@ -48,7 +58,9 @@
 
 				if ($elderseal = $weapon->getAttribute(Attribute::ELDERSEAL)) {
 					$weapon->setElderseal($elderseal);
-					$weapon->removeAttribute(Attribute::ELDERSEAL);
+
+					if ($input->getOption('delete-attribute'))
+						$weapon->removeAttribute(Attribute::ELDERSEAL);
 				}
 			}
 
