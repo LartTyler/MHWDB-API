@@ -87,9 +87,10 @@
 			"./bin/console --ansi doctrine:migrations:diff"
 		],
 		"db:migrate": "./bin/console --ansi doctrine:migrations:migrate",
-		"db:reset": [
-			"./db-reset.sh latest",
-			"@db:migrate"
+		"deploy": [
+			"git pull",
+			"composer install",
+			"composer db:migrate"
 		]
 	},
 	"conflict": {
