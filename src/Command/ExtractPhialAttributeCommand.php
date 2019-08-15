@@ -4,6 +4,7 @@
 	use App\Entity\Phial;
 	use App\Entity\Weapon;
 	use App\Game\Attribute;
+	use App\Game\WeaponType;
 	use Doctrine\ORM\EntityManagerInterface;
 	use Symfony\Component\Console\Command\Command;
 	use Symfony\Component\Console\Input\InputInterface;
@@ -54,7 +55,14 @@
 		 * {@inheritdoc}
 		 */
 		protected function execute(InputInterface $input, OutputInterface $output): void {
-			$weapons = $this->entityManager->getRepository(Weapon::class)->findAll();
+			$weapons = $this->entityManager->getRepository(Weapon::class)->findBy(
+				[
+					'type' => [
+						WeaponType::CHARGE_BLADE,
+						WeaponType::SWITCH_AXE,
+					],
+				]
+			);
 
 			$io = new SymfonyStyle($input, $output);
 			$io->progressStart(sizeof($weapons));
