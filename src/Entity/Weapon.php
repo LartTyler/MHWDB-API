@@ -100,6 +100,20 @@
 		private $attack;
 
 		/**
+		 * @Assert\Valid()
+		 *
+		 * @ORM\OneToMany(
+		 *     targetEntity="Ammo",
+		 *     mappedBy="weapon",
+		 *     cascade={"all"},
+		 *     orphanRemoval=true
+		 * )
+		 *
+		 * @var Collection|Selectable|Ammo[]
+		 */
+		private $ammo;
+
+		/**
 		 * @Assert\Choice(choices=App\Game\Elderseal::ALL)
 		 *
 		 * @ORM\Column(type="string", length=16, nullable=true)
@@ -112,7 +126,7 @@
 		/**
 		 * @Assert\Valid()
 		 *
-		 * @ORM\OneToOne(targetEntity="App\Entity\Phial", inversedBy="weapon", cascade={"all"})
+		 * @ORM\OneToOne(targetEntity="App\Entity\Phial", inversedBy="weapon", cascade={"all"}, orphanRemoval=true)
 		 * @ORM\JoinColumn()
 		 *
 		 * @var Phial|null
@@ -178,6 +192,7 @@
 			$this->slots = new ArrayCollection();
 			$this->elements = new ArrayCollection();
 			$this->durability = new ArrayCollection();
+			$this->ammo = new ArrayCollection();
 		}
 
 		/**
@@ -368,6 +383,30 @@
 			$this->phial = $phial;
 
 			return $this;
+		}
+
+		/**
+		 * @return Ammo[]|Collection|Selectable
+		 */
+		public function getAmmo() {
+			return $this->ammo;
+		}
+
+		/**
+		 * @param string $type
+		 *
+		 * @return Ammo|null
+		 */
+		public function getAmmoByType(string $type): ?Ammo {
+			$criteria = Criteria::create()
+				->where(Criteria::expr()->eq('type', $type));
+
+			$matched = $this->getAmmo()->matching($criteria);
+
+			if (!$matched->count())
+				return null;
+
+			return $matched->first();
 		}
 
 		/**
