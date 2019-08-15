@@ -32,7 +32,10 @@
 			$this->entityManager = $entityManager;
 		}
 
-		protected function configure() {
+		/**
+		 * @return void
+		 */
+		protected function configure(): void {
 			$this->addOption(
 				'delete-attribute',
 				null,
@@ -47,7 +50,7 @@
 		 *
 		 * @return void
 		 */
-		protected function execute(InputInterface $input, OutputInterface $output) {
+		protected function execute(InputInterface $input, OutputInterface $output): void {
 			$weapons = $this->entityManager->getRepository(Weapon::class)->findAll();
 
 			$io = new SymfonyStyle($input, $output);

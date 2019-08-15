@@ -110,6 +110,7 @@
 				'attributes' => $entity->getAttributes() ?: new \stdClass(),
 			];
 
+			// region Durability Fields
 			if (WeaponType::isMelee($entity->getType()) && $projection->isAllowed('durability')) {
 				$durability = $entity->getDurability();
 
@@ -128,6 +129,15 @@
 				);
 			}
 			// endregion
+
+			// region Phial Fields
+			if (WeaponType::hasPhialType($entity->getType()) && $projection->isAllowed('phial')) {
+				$output['phial'] = [
+					'type' => $entity->getPhial()->getType(),
+					'damage' => $entity->getPhial()->getDamage(),
+				];
+			}
+			//endregion
 
 			// region Slots Fields
 			if ($projection->isAllowed('slots')) {

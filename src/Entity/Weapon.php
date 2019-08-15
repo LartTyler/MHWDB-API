@@ -112,6 +112,16 @@
 		/**
 		 * @Assert\Valid()
 		 *
+		 * @ORM\OneToOne(targetEntity="App\Entity\Phial", inversedBy="weapon", cascade={"all"})
+		 * @ORM\JoinColumn()
+		 *
+		 * @var Phial|null
+		 */
+		private $phial = null;
+
+		/**
+		 * @Assert\Valid()
+		 *
 		 * @ORM\OneToOne(targetEntity="App\Entity\WeaponCraftingInfo", orphanRemoval=true, cascade={"all"})
 		 *
 		 * @var WeaponCraftingInfo|null
@@ -340,6 +350,24 @@
 		 */
 		public function getDurability() {
 			return $this->durability;
+		}
+
+		/**
+		 * @return Phial|null
+		 */
+		public function getPhial(): ?Phial {
+			return $this->phial;
+		}
+
+		/**
+		 * @param Phial|null $phial
+		 *
+		 * @return $this
+		 */
+		public function setPhial(?Phial $phial) {
+			$this->phial = $phial;
+
+			return $this;
 		}
 
 		/**
