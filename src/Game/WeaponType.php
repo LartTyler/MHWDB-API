@@ -57,6 +57,15 @@
 		}
 
 		/**
+		 * @param string $type
+		 *
+		 * @return bool
+		 */
+		public static function hasPhialType(string $type): bool {
+			return $type === self::CHARGE_BLADE || $type === self::SWITCH_AXE;
+		}
+
+		/**
 		 * @return string[]
 		 */
 		public static function all(): array {
