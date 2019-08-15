@@ -1,6 +1,8 @@
 <?php
 	namespace App\Contrib\Transformers;
 
+	use App\Entity\Ammo;
+	use App\Entity\Phial;
 	use App\Entity\Weapon;
 	use App\Entity\WeaponCraftingInfo;
 	use App\Entity\WeaponElement;
@@ -89,6 +91,31 @@
 
 				// TODO Preserves BC for 1.15.0, will be removed in 1.17.0
 				$entity->setAttribute(Attribute::ELDERSEAL, $data->elderseal);
+			}
+
+			if (ObjectUtil::isset($data, 'phial')) {
+				if (!$data->phial) {
+					$entity->setPhial(null);
+
+					// TODO Preserves BC for 1.15.0, will be removed in 1.17.0
+					$entity->removeAttribute(Attribute::PHIAL_TYPE);
+				} else {
+					if (!isset($data->phial->type))
+						throw ValidationException::missingFields(['phial.type']);
+
+					$phial = $entity->getPhial();
+
+					if (!$phial)
+						$entity->setPhial($phial = new Phial($entity, $data->phial->type));
+
+					if (isset($data->phial->damage))
+						$phial->setDamage($data->phial->damage);
+					else
+						$phial->setDamage(null);
+
+					// TODO Preserves BC for 1.15.0, will be removed in 1.17.0
+					$entity->setAttribute(Attribute::PHIAL_TYPE, trim($phial->getType() . ' ' . $phial->getDamage()));
+				}
 			}
 
 			if (ObjectUtil::isset($data, 'slots')) {
