@@ -72,6 +72,9 @@
 						if (!$ammo->isEmpty())
 							$weapon->getAmmo()->add($ammo);
 					}
+
+					if ($input->getOption('delete-attribute'))
+						$weapon->removeAttribute(Attribute::AMMO_CAPACITIES);
 				}
 			}
 
