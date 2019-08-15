@@ -187,6 +187,47 @@
 					$attack->setRaw($definition->raw);
 			}
 
+			if (ObjectUtil::isset($data, 'ammo')) {
+				$types = [];
+
+				foreach ($data->ammo as $index => $definition) {
+					$missing = ObjectUtil::getMissingProperties(
+						$definition,
+						[
+							'type',
+							'capacities',
+						]
+					);
+
+					if ($missing)
+						throw ValidationException::missingNestedFields('ammo', $index, $missing);
+
+					$types[] = $definition->type;
+					$ammo = $entity->getAmmoByType($definition->type);
+
+					if (!$ammo)
+						$entity->getAmmo()->add($ammo = new Ammo($entity, $definition->type));
+
+					$ammo->setCapacities($definition->capacities);
+				}
+
+				foreach ($entity->getAmmo() as $ammo) {
+					if ($ammo->isEmpty() || !in_array($ammo->getType(), $types))
+						$entity->getAmmo()->removeElement($ammo);
+				}
+
+				// TODO Preserves BC for 1.15.0, will be removed in 1.17.0
+				if ($entity->getAmmo()->count() > 0) {
+					$capacities = [];
+
+					foreach ($entity->getAmmo() as $ammo)
+						$capacities[$ammo->getType()] = $ammo->getCapacities();
+
+					$entity->setAttribute(Attribute::AMMO_CAPACITIES, $capacities);
+				} else
+					$entity->removeAttribute(Attribute::AMMO_CAPACITIES);
+			}
+
 			if (ObjectUtil::isset($data, 'crafting')) {
 				$crafting = $entity->getCrafting();
 				$definition = $data->crafting;

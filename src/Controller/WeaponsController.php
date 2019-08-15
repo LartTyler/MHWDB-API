@@ -2,6 +2,7 @@
 	namespace App\Controller;
 
 	use App\Contrib\Transformers\WeaponTransformer;
+	use App\Entity\Ammo;
 	use App\Entity\CraftingMaterialCost;
 	use App\Entity\Weapon;
 	use App\Entity\WeaponElement;
@@ -127,6 +128,24 @@
 					},
 					$durability->toArray()
 				);
+			}
+			// endregion
+
+			// region Ammo Capacity Fields
+			if (WeaponType::isBowgun($entity->getType()) && $projection->isAllowed('ammo')) {
+				$normalized = [];
+
+				foreach ($entity->getAmmo() as $ammo) {
+					if ($ammo->isEmpty())
+						continue;
+
+					$normalized[] = [
+						'type' => $ammo->getType(),
+						'capacities' => $ammo->getCapacities(),
+					];
+				}
+
+				$output['ammo'] = $normalized;
 			}
 			// endregion
 
