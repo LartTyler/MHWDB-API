@@ -15,7 +15,7 @@
 				'Migration can only be executed safely on \'mysql\'.'
 			);
 
-			$this->addSql('ALTER TABLE weapons ADD coatings LONGTEXT NOT NULL COMMENT \'(DC2Type:json)\'');
+			$this->addSql('ALTER TABLE weapons ADD coatings LONGTEXT NOT NULL DEFAULT "[]" COMMENT \'(DC2Type:json)\'');
 		}
 
 		public function down(Schema $schema): void {
