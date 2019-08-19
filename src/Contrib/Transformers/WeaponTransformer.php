@@ -255,6 +255,16 @@
 					$entity->removeAttribute(Attribute::AMMO_CAPACITIES);
 			}
 
+			if (ObjectUtil::isset($data, 'coatings')) {
+				$entity->setCoatings($data->coatings);
+
+				// TODO Preserves BC for 1.15.0, will be removed in 1.17.0
+				if ($data->coatings)
+					$entity->setAttribute(Attribute::COATINGS, $data->coatings);
+				else
+					$entity->removeAttribute(Attribute::COATINGS);
+			}
+
 			if (ObjectUtil::isset($data, 'crafting')) {
 				$crafting = $entity->getCrafting();
 				$definition = $data->crafting;

@@ -149,6 +149,11 @@
 			}
 			// endregion
 
+			// region Bow Coatings
+			if ($entity->getType() === WeaponType::BOW)
+				$output['coatings'] = $entity->getCoatings();
+			// endregion
+
 			// region Phial Fields
 			if (WeaponType::hasPhialType($entity->getType()) && $projection->isAllowed('phial')) {
 				$output['phial'] = [
