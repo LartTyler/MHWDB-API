@@ -156,10 +156,10 @@
 
 			// region Phial Fields
 			if (WeaponType::hasPhialType($entity->getType()) && $projection->isAllowed('phial')) {
-				$output['phial'] = [
+				$output['phial'] = $entity->getPhial() ? [
 					'type' => $entity->getPhial()->getType(),
 					'damage' => $entity->getPhial()->getDamage(),
-				];
+				] : null;
 			}
 			//endregion
 
