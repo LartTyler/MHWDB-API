@@ -1,6 +1,7 @@
 <?php
 	namespace App\Entity;
 
+	use App\Game\BowCoatingType;
 	use App\Game\Elderseal;
 	use App\Game\WeaponType;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -132,6 +133,18 @@
 		 * @var Phial|null
 		 */
 		private $phial = null;
+
+		/**
+		 * @Assert\All({
+		 *     @Assert\Choice(callback={"App\Game\BowCoatingType", "all"})
+		 * })
+		 *
+		 * @ORM\Column(type="json")
+		 *
+		 * @var string[]
+		 * @see BowCoatingType
+		 */
+		private $coatings = [];
 
 		/**
 		 * @Assert\Valid()
@@ -407,6 +420,26 @@
 				return null;
 
 			return $matched->first();
+		}
+
+		/**
+		 * @return string[]
+		 * @see BowCoatingType
+		 */
+		public function getCoatings(): array {
+			return $this->coatings;
+		}
+
+		/**
+		 * @param string[] $coatings
+		 *
+		 * @return $this
+		 * @see BowCoatingType
+		 */
+		public function setCoatings(array $coatings) {
+			$this->coatings = $coatings;
+
+			return $this;
 		}
 
 		/**
