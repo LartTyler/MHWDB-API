@@ -15,7 +15,7 @@
 	 *     }
 	 * )
 	 */
-	class Ammo implements EntityInterface {
+	class Ammo implements EntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
 
 		/**
@@ -49,6 +49,14 @@
 		 * @var int[]
 		 */
 		protected $capacities = [];
+
+		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
+		 *
+		 * @var int
+		 * @internal Used to allow API queries against "capacities.length"
+		 */
+		protected $capacitiesLength = 0;
 
 		/**
 		 * AbstractAmmoCapacity constructor.
@@ -99,5 +107,12 @@
 		 */
 		public function isEmpty(): bool {
 			return sizeof($this->capacities) === 0 || sizeof(array_filter($this->capacities)) === 0;
+		}
+
+		/**
+		 * {@inheritdoc}
+		 */
+		public function syncLengthFields(): void {
+			$this->capacitiesLength = sizeof($this->capacities);
 		}
 	}

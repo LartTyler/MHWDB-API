@@ -189,6 +189,22 @@
 		private $durabilityLength = 0;
 
 		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
+		 *
+		 * @var int
+		 * @internal Used to allow API queries against "ammo.length"
+		 */
+		private $ammoLength = 0;
+
+		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
+		 *
+		 * @var int
+		 * @internal Used to allow API queries against "coatings.length"
+		 */
+		private $coatingsLength = 0;
+
+		/**
 		 * Weapon constructor.
 		 *
 		 * @param string $name
@@ -449,5 +465,7 @@
 			$this->elementsLength = $this->elements->count();
 			$this->slotsLength = $this->slots->count();
 			$this->durabilityLength = $this->durability->count();
+			$this->ammoLength = $this->ammo->count();
+			$this->coatingsLength = sizeof($this->coatings);
 		}
 	}

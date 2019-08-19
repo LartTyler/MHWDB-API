@@ -1,6 +1,7 @@
 <?php
 	namespace App\QueryDocument;
 
+	use App\Entity\Ammo;
 	use App\Entity\Armor;
 	use App\Entity\ArmorAssets;
 	use App\Entity\ArmorCraftingInfo;
@@ -29,6 +30,9 @@
 
 			$this->setAllMappedFields(
 				[
+					Ammo::class => [
+						'capacities.length' => 'capacitiesLength',
+					],
 					Armor::class => [
 						'skills.length' => 'skillsLength',
 						'slots.length' => 'slotsLength',
@@ -80,6 +84,8 @@
 						'elements.length' => 'elementsLength',
 						'slots.length' => 'slotsLength',
 						'durability.length' => 'durabilityLength',
+						'ammo.length' => 'ammoLength',
+						'coatings.length' => 'coatingsLength',
 					],
 					WeaponCraftingInfo::class => [
 						'branches.length' => 'branchesLength',
