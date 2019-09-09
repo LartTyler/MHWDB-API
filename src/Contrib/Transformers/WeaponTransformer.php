@@ -307,24 +307,29 @@
 
 				if (ObjectUtil::isset($definition, 'previous')) {
 					/** @var Weapon|null $previous */
-					$previous = $this->entityManager->getRepository(Weapon::class)->find($definition->previous);
+					if ($definition->previous) {
+						$previous = $this->entityManager->getRepository(Weapon::class)->find($definition->previous);
 
-					if (!$previous)
-						throw IntegrityException::missingReference('crafting.previous', 'Weapon');
-					else if (!$previous->getCrafting()) {
-						throw new IntegrityException(
-							'The previous weapon in the crafting tree that you specified has no associated crafting ' .
-							'data. Fix that, then try again.'
-						);
+						if (!$previous)
+							throw IntegrityException::missingReference('crafting.previous', 'Weapon');
+						else if (!$previous->getCrafting()) {
+							throw new IntegrityException(
+								'The previous weapon in the crafting tree that you specified has no associated ' .
+								'crafting data. Fix that, then try again.'
+							);
+						}
+					} else
+						$previous = null;
+
+					if ($crafting->getPrevious() !== $previous) {
+						if ($crafting->getPrevious())
+							$crafting->getPrevious()->getCrafting()->getBranches()->removeElement($entity);
+
+						$crafting->setPrevious($previous);
+
+						if ($previous)
+							$previous->getCrafting()->getBranches()->add($entity);
 					}
-
-					if ($crafting->getPrevious())
-						$crafting->getPrevious()->getCrafting()->getBranches()->removeElement($entity);
-
-					$crafting->setPrevious($previous);
-
-					if (!$previous->getCrafting()->getBranches()->contains($entity))
-						$previous->getCrafting()->getBranches()->add($entity);
 				}
 
 				if ($crafting->getPrevious() && $crafting->getUpgradeMaterials()->count() === 0) {
