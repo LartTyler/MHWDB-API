@@ -112,15 +112,23 @@
 
 			if (ObjectUtil::isset($data, 'armorSet')) {
 				/** @var ArmorSet|null $armorSet */
-				$armorSet = $this->entityManager->getRepository(ArmorSet::class)->find($data->armorSet);
+				if ($data->armorSet) {
+					$armorSet = $this->entityManager->getRepository(ArmorSet::class)->find($data->armorSet);
 
-				if (!$armorSet)
-					throw IntegrityException::missingReference('armorSet', 'ArmorSet');
+					if (!$armorSet)
+						throw IntegrityException::missingReference('armorSet', 'ArmorSet');
+				} else
+					$armorSet = null;
 
-				$entity->setArmorSet($armorSet);
+				if ($entity->getArmorSet() !== $armorSet) {
+					if ($entity->getArmorSet())
+						$entity->getArmorSet()->getPieces()->removeElement($entity);
 
-				if (!$armorSet->getPieces()->contains($entity))
-					$armorSet->getPieces()->add($entity);
+					$entity->setArmorSet($armorSet);
+
+					if ($armorSet)
+						$armorSet->getPieces()->add($entity);
+				}
 			}
 
 			if (ObjectUtil::isset($data, 'crafting')) {
