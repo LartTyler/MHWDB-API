@@ -4,6 +4,7 @@
 	final class Rank {
 		const LOW = 'low';
 		const HIGH = 'high';
+		const MASTER = 'master';
 
 		/**
 		 * @var string[]|null
