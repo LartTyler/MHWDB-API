@@ -2,7 +2,6 @@
 	namespace App\Controller;
 
 	use App\Contrib\Transformers\WeaponTransformer;
-	use App\Entity\Ammo;
 	use App\Entity\CraftingMaterialCost;
 	use App\Entity\Weapon;
 	use App\Entity\WeaponElement;
@@ -131,25 +130,29 @@
 			}
 			// endregion
 
-			// region Ammo Capacity Fields
-			if (WeaponType::isBowgun($entity->getType()) && $projection->isAllowed('ammo')) {
-				$normalized = [];
+			// region Bowgun Fields
+			if (WeaponType::isBowgun($entity->getType())) {
+				$output['specialAmmo'] = $entity->getSpecialAmmo();
 
-				foreach ($entity->getAmmo() as $ammo) {
-					if ($ammo->isEmpty())
-						continue;
+				if ($projection->isAllowed('ammo')) {
+					$normalized = [];
 
-					$normalized[] = [
-						'type' => $ammo->getType(),
-						'capacities' => $ammo->getCapacities(),
-					];
+					foreach ($entity->getAmmo() as $ammo) {
+						if ($ammo->isEmpty())
+							continue;
+
+						$normalized[] = [
+							'type' => $ammo->getType(),
+							'capacities' => $ammo->getCapacities(),
+						];
+					}
+
+					$output['ammo'] = $normalized;
 				}
-
-				$output['ammo'] = $normalized;
 			}
 			// endregion
 
-			// region Bow Coatings
+			// region Bow Fields
 			if ($entity->getType() === WeaponType::BOW)
 				$output['coatings'] = $entity->getCoatings();
 			// endregion

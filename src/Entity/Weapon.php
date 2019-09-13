@@ -2,6 +2,7 @@
 	namespace App\Entity;
 
 	use App\Game\BowCoatingType;
+	use App\Game\BowgunSpecialAmmo;
 	use App\Game\Elderseal;
 	use App\Game\WeaponType;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -145,6 +146,16 @@
 		 * @see BowCoatingType
 		 */
 		private $coatings = [];
+
+		/**
+		 * @Assert\Choice(callback={"App\Game\BowgunSpecialAmmo", "all"})
+		 *
+		 * @ORM\Column(type="string", length=32, nullable=true)
+		 *
+		 * @var string|null
+		 * @see BowgunSpecialAmmo
+		 */
+		private $specialAmmo = null;
 
 		/**
 		 * @Assert\Valid()
@@ -454,6 +465,24 @@
 		 */
 		public function setCoatings(array $coatings) {
 			$this->coatings = $coatings;
+
+			return $this;
+		}
+
+		/**
+		 * @return string|null
+		 */
+		public function getSpecialAmmo(): ?string {
+			return $this->specialAmmo;
+		}
+
+		/**
+		 * @param string|null $specialAmmo
+		 *
+		 * @return $this
+		 */
+		public function setSpecialAmmo(?string $specialAmmo) {
+			$this->specialAmmo = $specialAmmo;
 
 			return $this;
 		}
