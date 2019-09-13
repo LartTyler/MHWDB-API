@@ -93,6 +93,16 @@
 				$entity->setAttribute(Attribute::ELDERSEAL, $data->elderseal);
 			}
 
+			if (ObjectUtil::isset($data, 'specialAmmo')) {
+				$entity->setSpecialAmmo($data->specialAmmo);
+
+				// TODO Preserves BC for 1.15.0, will be removed in 1.17.0
+				if ($data->specialAmmo !== null)
+					$entity->setAttribute(Attribute::SPECIAL_AMMO, $data->specialAmmo);
+				else
+					$entity->removeAttribute($data->specialAmmo);
+			}
+
 			if (ObjectUtil::isset($data, 'phial')) {
 				if (!$data->phial) {
 					$entity->setPhial(null);
