@@ -4,6 +4,7 @@
 	use App\Game\BowCoatingType;
 	use App\Game\BowgunDeviation;
 	use App\Game\BowgunSpecialAmmo;
+	use App\Game\DamageType;
 	use App\Game\Elderseal;
 	use App\Game\InsectGlaiveBoostType;
 	use App\Game\WeaponType;
@@ -178,6 +179,17 @@
 		 * @see InsectGlaiveBoostType
 		 */
 		private $boostType = null;
+
+		/**
+		 * @Assert\NotNull()
+		 * @Assert\Choice(callback={"App\Game\DamageType", "all"})
+		 *
+		 * @ORM\Column(type="string", length=32, nullable=true)
+		 *
+		 * @var string|null
+		 * @see DamageType
+		 */
+		private $damageType = null;
 
 		/**
 		 * @Assert\Valid()
@@ -541,6 +553,24 @@
 		 */
 		public function setBoostType(?string $boostType) {
 			$this->boostType = $boostType;
+
+			return $this;
+		}
+
+		/**
+		 * @return string|null
+		 */
+		public function getDamageType(): ?string {
+			return $this->damageType;
+		}
+
+		/**
+		 * @param string|null $damageType
+		 *
+		 * @return $this
+		 */
+		public function setDamageType(?string $damageType) {
+			$this->damageType = $damageType;
 
 			return $this;
 		}

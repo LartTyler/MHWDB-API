@@ -123,6 +123,16 @@
 					$entity->removeAttribute(Attribute::IG_BOOST_TYPE);
 			}
 
+			if (ObjectUtil::isset($data, 'damageType')) {
+				$entity->setDamageType($data->damageType);
+
+				// TODO Preserves BC for 1.15.0, will be removed in 1.17.0
+				if ($entity->getDamageType())
+					$entity->setAttribute(Attribute::DAMAGE_TYPE, $entity->getDamageType());
+				else
+					$entity->removeAttribute(Attribute::DAMAGE_TYPE);
+			}
+
 			if (ObjectUtil::isset($data, 'phial')) {
 				if (!$data->phial) {
 					$entity->setPhial(null);

@@ -108,6 +108,7 @@
 				'elderseal' => $entity->getElderseal(),
 				// default to \stdClass to fix an empty array being returned instead of an empty object
 				'attributes' => $entity->getAttributes() ?: new \stdClass(),
+				'damageType' => $entity->getDamageType(),
 			];
 
 			// region Durability Fields
