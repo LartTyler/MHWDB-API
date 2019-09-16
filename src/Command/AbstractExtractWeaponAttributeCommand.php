@@ -114,7 +114,8 @@
 		 *
 		 * @return void
 		 */
-		protected abstract function addQueryBuilderClauses(QueryBuilder $queryBuilder): void;
+		protected function addQueryBuilderClauses(QueryBuilder $queryBuilder): void {
+		}
 
 		/**
 		 * @param Weapon $weapon

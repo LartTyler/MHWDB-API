@@ -8,6 +8,8 @@
 	use Doctrine\ORM\QueryBuilder;
 
 	class ExtractShellingTypeAttributeCommand extends AbstractExtractWeaponAttributeCommand {
+		protected static $defaultName = 'app:tools:extract-shelling-type-attributes';
+
 		/**
 		 * {@inheritdoc}
 		 */
