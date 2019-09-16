@@ -194,6 +194,15 @@
 		/**
 		 * @Assert\Valid()
 		 *
+		 * @ORM\OneToOne(targetEntity="App\Entity\Shelling", mappedBy="weapon", orphanRemoval=true, cascade={"all"})
+		 *
+		 * @var Shelling|null
+		 */
+		private $shelling = null;
+
+		/**
+		 * @Assert\Valid()
+		 *
 		 * @ORM\OneToOne(targetEntity="App\Entity\WeaponCraftingInfo", orphanRemoval=true, cascade={"all"})
 		 *
 		 * @var WeaponCraftingInfo|null
@@ -571,6 +580,24 @@
 		 */
 		public function setDamageType(?string $damageType) {
 			$this->damageType = $damageType;
+
+			return $this;
+		}
+
+		/**
+		 * @return Shelling|null
+		 */
+		public function getShelling(): ?Shelling {
+			return $this->shelling;
+		}
+
+		/**
+		 * @param Shelling|null $shelling
+		 *
+		 * @return $this
+		 */
+		public function setShelling(?Shelling $shelling) {
+			$this->shelling = $shelling;
 
 			return $this;
 		}

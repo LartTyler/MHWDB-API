@@ -111,6 +111,16 @@
 				'damageType' => $entity->getDamageType(),
 			];
 
+			if ($entity->getType() === WeaponType::GUNLANCE && $projection->isAllowed('shelling')) {
+				if ($shelling = $entity->getShelling()) {
+					$output['shelling'] = [
+						'type' => $shelling->getType(),
+						'level' => $shelling->getLevel(),
+					];
+				} else
+					$output['shelling'] = null;
+			}
+
 			// region Durability Fields
 			if (WeaponType::isMelee($entity->getType()) && $projection->isAllowed('durability')) {
 				$durability = $entity->getDurability();
