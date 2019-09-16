@@ -103,6 +103,15 @@
 					$entity->removeAttribute($data->specialAmmo);
 			}
 
+			if (ObjectUtil::isset($data, 'deviation')) {
+				$entity->setDeviation($data->deviation);
+
+				if ($entity->getDeviation())
+					$entity->setAttribute(Attribute::DEVIATION, $entity->getDeviation());
+				else
+					$entity->removeAttribute(Attribute::DEVIATION);
+			}
+
 			if (ObjectUtil::isset($data, 'phial')) {
 				if (!$data->phial) {
 					$entity->setPhial(null);

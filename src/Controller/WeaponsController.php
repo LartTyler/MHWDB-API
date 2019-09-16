@@ -133,6 +133,7 @@
 			// region Bowgun Fields
 			if (WeaponType::isBowgun($entity->getType())) {
 				$output['specialAmmo'] = $entity->getSpecialAmmo();
+				$output['deviation'] = $entity->getDeviation();
 
 				if ($projection->isAllowed('ammo')) {
 					$normalized = [];

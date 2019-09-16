@@ -2,6 +2,7 @@
 	namespace App\Entity;
 
 	use App\Game\BowCoatingType;
+	use App\Game\BowgunDeviation;
 	use App\Game\BowgunSpecialAmmo;
 	use App\Game\Elderseal;
 	use App\Game\WeaponType;
@@ -156,6 +157,16 @@
 		 * @see BowgunSpecialAmmo
 		 */
 		private $specialAmmo = null;
+
+		/**
+		 * @Assert\Choice(callback={"App\Game\BowgunDeviation", "all"})
+		 *
+		 * @ORM\Column(type="string", length=32, nullable=true)
+		 *
+		 * @var string|null
+		 * @see BowgunDeviation
+		 */
+		private $deviation = null;
 
 		/**
 		 * @Assert\Valid()
@@ -483,6 +494,24 @@
 		 */
 		public function setSpecialAmmo(?string $specialAmmo) {
 			$this->specialAmmo = $specialAmmo;
+
+			return $this;
+		}
+
+		/**
+		 * @return string|null
+		 */
+		public function getDeviation(): ?string {
+			return $this->deviation;
+		}
+
+		/**
+		 * @param string|null $deviation
+		 *
+		 * @return $this
+		 */
+		public function setDeviation(?string $deviation) {
+			$this->deviation = $deviation;
 
 			return $this;
 		}
