@@ -3,6 +3,7 @@
 
 	use App\Entity\Ammo;
 	use App\Entity\Phial;
+	use App\Entity\Shelling;
 	use App\Entity\Weapon;
 	use App\Entity\WeaponCraftingInfo;
 	use App\Entity\WeaponElement;
@@ -106,10 +107,31 @@
 			if (ObjectUtil::isset($data, 'deviation')) {
 				$entity->setDeviation($data->deviation);
 
+				// TODO Preserves BC for 1.15.0, will be removed in 1.17.0
 				if ($entity->getDeviation())
 					$entity->setAttribute(Attribute::DEVIATION, $entity->getDeviation());
 				else
 					$entity->removeAttribute(Attribute::DEVIATION);
+			}
+
+			if (ObjectUtil::isset($data, 'boostType')) {
+				$entity->setBoostType($data->boostType);
+
+				// TODO Preserves BC for 1.15.0, will be removed in 1.17.0
+				if ($entity->getBoostType())
+					$entity->setAttribute(Attribute::IG_BOOST_TYPE, $entity->getBoostType());
+				else
+					$entity->removeAttribute(Attribute::IG_BOOST_TYPE);
+			}
+
+			if (ObjectUtil::isset($data, 'damageType')) {
+				$entity->setDamageType($data->damageType);
+
+				// TODO Preserves BC for 1.15.0, will be removed in 1.17.0
+				if ($entity->getDamageType())
+					$entity->setAttribute(Attribute::DAMAGE_TYPE, $entity->getDamageType());
+				else
+					$entity->removeAttribute(Attribute::DAMAGE_TYPE);
 			}
 
 			if (ObjectUtil::isset($data, 'phial')) {
@@ -131,6 +153,43 @@
 
 					// TODO Preserves BC for 1.15.0, will be removed in 1.17.0
 					$entity->setAttribute(Attribute::PHIAL_TYPE, trim($phial->getType() . ' ' . $phial->getDamage()));
+				}
+			}
+
+			if (ObjectUtil::isset($data, 'shelling')) {
+				if (!$data->shelling) {
+					$entity->setShelling(null);
+
+					// TODO Preserves BC for 1.15.0, will be removed in 1.17.0
+					$entity->removeAttribute(Attribute::GL_SHELLING_TYPE);
+				} else {
+					$missing = ObjectUtil::getMissingProperties(
+						$data->shelling,
+						[
+							'type',
+							'level',
+						]
+					);
+
+					if ($missing) {
+						throw ValidationException::missingFields(
+							array_map(
+								function(string $item): string {
+									return 'shelling.' . $item;
+								},
+								$missing
+							)
+						);
+					}
+
+					$shelling = new Shelling($entity, $data->shelling->type, $data->shelling->level);
+					$entity->setShelling($shelling);
+
+					// TODO Preserves BC for 1.15.0, will be removed in 1.17.0
+					$entity->setAttribute(
+						Attribute::GL_SHELLING_TYPE,
+						sprintf('%s Lv%d', $shelling->getType(), $shelling->getLevel())
+					);
 				}
 			}
 

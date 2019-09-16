@@ -108,7 +108,18 @@
 				'elderseal' => $entity->getElderseal(),
 				// default to \stdClass to fix an empty array being returned instead of an empty object
 				'attributes' => $entity->getAttributes() ?: new \stdClass(),
+				'damageType' => $entity->getDamageType(),
 			];
+
+			if ($entity->getType() === WeaponType::GUNLANCE && $projection->isAllowed('shelling')) {
+				if ($shelling = $entity->getShelling()) {
+					$output['shelling'] = [
+						'type' => $shelling->getType(),
+						'level' => $shelling->getLevel(),
+					];
+				} else
+					$output['shelling'] = null;
+			}
 
 			// region Durability Fields
 			if (WeaponType::isMelee($entity->getType()) && $projection->isAllowed('durability')) {
@@ -156,6 +167,11 @@
 			// region Bow Fields
 			if ($entity->getType() === WeaponType::BOW)
 				$output['coatings'] = $entity->getCoatings();
+			// endregion
+
+			// region Insect Glaive Fields
+			if ($entity->getType() === WeaponType::INSECT_GLAIVE)
+				$output['boostType'] = $entity->getBoostType();
 			// endregion
 
 			// region Phial Fields

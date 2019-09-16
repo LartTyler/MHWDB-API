@@ -4,7 +4,9 @@
 	use App\Game\BowCoatingType;
 	use App\Game\BowgunDeviation;
 	use App\Game\BowgunSpecialAmmo;
+	use App\Game\DamageType;
 	use App\Game\Elderseal;
+	use App\Game\InsectGlaiveBoostType;
 	use App\Game\WeaponType;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\ArrayCollection;
@@ -167,6 +169,36 @@
 		 * @see BowgunDeviation
 		 */
 		private $deviation = null;
+
+		/**
+		 * @Assert\Choice(callback={"App\Game\InsectGlaiveBoostType", "all"})
+		 *
+		 * @ORM\Column(type="string", length=32, nullable=true)
+		 *
+		 * @var string|null
+		 * @see InsectGlaiveBoostType
+		 */
+		private $boostType = null;
+
+		/**
+		 * @Assert\NotNull()
+		 * @Assert\Choice(callback={"App\Game\DamageType", "all"})
+		 *
+		 * @ORM\Column(type="string", length=32, nullable=true)
+		 *
+		 * @var string|null
+		 * @see DamageType
+		 */
+		private $damageType = null;
+
+		/**
+		 * @Assert\Valid()
+		 *
+		 * @ORM\OneToOne(targetEntity="App\Entity\Shelling", mappedBy="weapon", orphanRemoval=true, cascade={"all"})
+		 *
+		 * @var Shelling|null
+		 */
+		private $shelling = null;
 
 		/**
 		 * @Assert\Valid()
@@ -512,6 +544,60 @@
 		 */
 		public function setDeviation(?string $deviation) {
 			$this->deviation = $deviation;
+
+			return $this;
+		}
+
+		/**
+		 * @return string|null
+		 */
+		public function getBoostType(): ?string {
+			return $this->boostType;
+		}
+
+		/**
+		 * @param string|null $boostType
+		 *
+		 * @return $this
+		 */
+		public function setBoostType(?string $boostType) {
+			$this->boostType = $boostType;
+
+			return $this;
+		}
+
+		/**
+		 * @return string|null
+		 */
+		public function getDamageType(): ?string {
+			return $this->damageType;
+		}
+
+		/**
+		 * @param string|null $damageType
+		 *
+		 * @return $this
+		 */
+		public function setDamageType(?string $damageType) {
+			$this->damageType = $damageType;
+
+			return $this;
+		}
+
+		/**
+		 * @return Shelling|null
+		 */
+		public function getShelling(): ?Shelling {
+			return $this->shelling;
+		}
+
+		/**
+		 * @param Shelling|null $shelling
+		 *
+		 * @return $this
+		 */
+		public function setShelling(?Shelling $shelling) {
+			$this->shelling = $shelling;
 
 			return $this;
 		}
