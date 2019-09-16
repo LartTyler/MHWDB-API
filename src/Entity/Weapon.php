@@ -171,7 +171,7 @@
 		private $deviation = null;
 
 		/**
-		 * @Assert\Choice(callback={"All\Game\InsectGlaiveBoostType", "all"})
+		 * @Assert\Choice(callback={"App\Game\InsectGlaiveBoostType", "all"})
 		 *
 		 * @ORM\Column(type="string", length=32, nullable=true)
 		 *
