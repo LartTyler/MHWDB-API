@@ -106,10 +106,21 @@
 			if (ObjectUtil::isset($data, 'deviation')) {
 				$entity->setDeviation($data->deviation);
 
+				// TODO Preserves BC for 1.15.0, will be removed in 1.17.0
 				if ($entity->getDeviation())
 					$entity->setAttribute(Attribute::DEVIATION, $entity->getDeviation());
 				else
 					$entity->removeAttribute(Attribute::DEVIATION);
+			}
+
+			if (ObjectUtil::isset($data, 'boostType')) {
+				$entity->setBoostType($data->boostType);
+
+				// TODO Preserves BC for 1.15.0, will be removed in 1.17.0
+				if ($entity->getBoostType())
+					$entity->setAttribute(Attribute::IG_BOOST_TYPE, $entity->getBoostType());
+				else
+					$entity->removeAttribute(Attribute::IG_BOOST_TYPE);
 			}
 
 			if (ObjectUtil::isset($data, 'phial')) {

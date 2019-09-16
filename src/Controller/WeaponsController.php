@@ -158,6 +158,11 @@
 				$output['coatings'] = $entity->getCoatings();
 			// endregion
 
+			// region Insect Glaive Fields
+			if ($entity->getType() === WeaponType::INSECT_GLAIVE)
+				$output['boostType'] = $entity->getBoostType();
+			// endregion
+
 			// region Phial Fields
 			if (WeaponType::hasPhialType($entity->getType()) && $projection->isAllowed('phial')) {
 				$output['phial'] = $entity->getPhial() ? [

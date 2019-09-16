@@ -5,6 +5,7 @@
 	use App\Game\BowgunDeviation;
 	use App\Game\BowgunSpecialAmmo;
 	use App\Game\Elderseal;
+	use App\Game\InsectGlaiveBoostType;
 	use App\Game\WeaponType;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\ArrayCollection;
@@ -167,6 +168,16 @@
 		 * @see BowgunDeviation
 		 */
 		private $deviation = null;
+
+		/**
+		 * @Assert\Choice(callback={"All\Game\InsectGlaiveBoostType", "all"})
+		 *
+		 * @ORM\Column(type="string", length=32, nullable=true)
+		 *
+		 * @var string|null
+		 * @see InsectGlaiveBoostType
+		 */
+		private $boostType = null;
 
 		/**
 		 * @Assert\Valid()
@@ -512,6 +523,24 @@
 		 */
 		public function setDeviation(?string $deviation) {
 			$this->deviation = $deviation;
+
+			return $this;
+		}
+
+		/**
+		 * @return string|null
+		 */
+		public function getBoostType(): ?string {
+			return $this->boostType;
+		}
+
+		/**
+		 * @param string|null $boostType
+		 *
+		 * @return $this
+		 */
+		public function setBoostType(?string $boostType) {
+			$this->boostType = $boostType;
 
 			return $this;
 		}
