@@ -6,6 +6,7 @@
 	use App\Game\Attribute;
 	use App\Game\WeaponType;
 	use Doctrine\ORM\QueryBuilder;
+	use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 	class ExtractShellingTypeAttributeCommand extends AbstractExtractWeaponAttributeCommand {
 		protected static $defaultName = 'app:tools:extract-shelling-type-attributes';
@@ -41,5 +42,12 @@
 
 			if ($deleteAttribute)
 				$weapon->removeAttribute(Attribute::GL_SHELLING_TYPE);
+		}
+
+		/**
+		 * {@inheritdoc}
+		 */
+		protected function validate(Weapon $weapon): ?ConstraintViolationListInterface {
+			return $this->validator->validateProperty($weapon, 'shelling');
 		}
 	}
