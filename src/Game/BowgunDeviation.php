@@ -7,12 +7,10 @@
 		const AVERAGE = 'average';
 		const HIGH = 'high';
 
-		const ALL = [
-			self::NONE,
-			self::LOW,
-			self::AVERAGE,
-			self::HIGH,
-		];
+		/**
+		 * @var string[]|null
+		 */
+		private static $values = null;
 
 		/**
 		 * Deviation constructor.
@@ -21,11 +19,21 @@
 		}
 
 		/**
+		 * @return string[]
+		 */
+		public static function all() {
+			if (self::$values === null)
+				self::$values = array_values((new \ReflectionClass(self::class))->getConstants());
+
+			return self::$values;
+		}
+
+		/**
 		 * @param string $value
 		 *
 		 * @return bool
 		 */
 		public static function isValid(string $value): bool {
-			return in_array($value, self::ALL);
+			return in_array($value, self::all());
 		}
 	}
