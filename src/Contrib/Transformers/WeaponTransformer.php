@@ -182,8 +182,14 @@
 						);
 					}
 
-					$shelling = new Shelling($entity, $data->shelling->type, $data->shelling->level);
-					$entity->setShelling($shelling);
+					if ($shelling = $entity->getShelling()) {
+						$shelling
+							->setType($data->shelling->type)
+							->setLevel($data->shelling->level);
+					} else {
+						$shelling = new Shelling($entity, $data->shelling->type, $data->shelling->level);
+						$entity->setShelling($shelling);
+					}
 
 					// TODO Preserves BC for 1.15.0, will be removed in 1.17.0
 					$entity->setAttribute(

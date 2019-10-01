@@ -7,7 +7,7 @@
 	use Symfony\Component\Validator\Constraints as Assert;
 
 	/**
-	 * @ORM\Entity(readOnly=true)
+	 * @ORM\Entity()
 	 * @ORM\Table(name="weapon_shelling")
 	 */
 	class Shelling implements EntityInterface {

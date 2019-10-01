@@ -37,8 +37,17 @@
 				);
 			}
 
-			$shelling = new Shelling($weapon, strtolower($parts[0]), (int)substr($parts[1], 2));
-			$weapon->setShelling($shelling);
+			$type = strtolower($parts[0]);
+			$level = (int)substr($parts[1], 2);
+
+			if ($shelling = $weapon->getShelling()) {
+				$shelling
+					->setLevel($level)
+					->setType($type);
+			} else {
+				$shelling = new Shelling($weapon, strtolower($parts[0]), (int)substr($parts[1], 2));
+				$weapon->setShelling($shelling);
+			}
 
 			if ($deleteAttribute)
 				$weapon->removeAttribute(Attribute::GL_SHELLING_TYPE);
