@@ -35,6 +35,7 @@
 		 * @ORM\Column(type="string", length=16)
 		 *
 		 * @var string
+		 * @see Rank
 		 */
 		private $rank;
 

@@ -1,11 +1,15 @@
 <?php
 	namespace App\Contrib\Transformers;
 
+	use App\Entity\Ammo;
+	use App\Entity\Phial;
+	use App\Entity\Shelling;
 	use App\Entity\Weapon;
 	use App\Entity\WeaponCraftingInfo;
 	use App\Entity\WeaponElement;
 	use App\Entity\WeaponSharpness;
 	use App\Entity\WeaponSlot;
+	use App\Game\Attribute;
 	use App\Game\RawDamageMultiplier;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
@@ -82,6 +86,118 @@
 
 			if (ObjectUtil::isset($data, 'attributes'))
 				$entity->setAttributes((array)$data->attributes);
+
+			if (ObjectUtil::isset($data, 'elderseal')) {
+				$entity->setElderseal($data->elderseal);
+
+				// TODO Preserves BC for 1.15.0, will be removed in 1.17.0
+				$entity->setAttribute(Attribute::ELDERSEAL, $data->elderseal);
+			}
+
+			if (ObjectUtil::isset($data, 'specialAmmo')) {
+				$entity->setSpecialAmmo($data->specialAmmo);
+
+				// TODO Preserves BC for 1.15.0, will be removed in 1.17.0
+				if ($data->specialAmmo !== null)
+					$entity->setAttribute(Attribute::SPECIAL_AMMO, $data->specialAmmo);
+				else
+					$entity->removeAttribute($data->specialAmmo);
+			}
+
+			if (ObjectUtil::isset($data, 'deviation')) {
+				$entity->setDeviation($data->deviation);
+
+				// TODO Preserves BC for 1.15.0, will be removed in 1.17.0
+				if ($entity->getDeviation())
+					$entity->setAttribute(Attribute::DEVIATION, $entity->getDeviation());
+				else
+					$entity->removeAttribute(Attribute::DEVIATION);
+			}
+
+			if (ObjectUtil::isset($data, 'boostType')) {
+				$entity->setBoostType($data->boostType);
+
+				// TODO Preserves BC for 1.15.0, will be removed in 1.17.0
+				if ($entity->getBoostType())
+					$entity->setAttribute(Attribute::IG_BOOST_TYPE, $entity->getBoostType());
+				else
+					$entity->removeAttribute(Attribute::IG_BOOST_TYPE);
+			}
+
+			if (ObjectUtil::isset($data, 'damageType')) {
+				$entity->setDamageType($data->damageType);
+
+				// TODO Preserves BC for 1.15.0, will be removed in 1.17.0
+				if ($entity->getDamageType())
+					$entity->setAttribute(Attribute::DAMAGE_TYPE, $entity->getDamageType());
+				else
+					$entity->removeAttribute(Attribute::DAMAGE_TYPE);
+			}
+
+			if (ObjectUtil::isset($data, 'phial')) {
+				if (!$data->phial) {
+					$entity->setPhial(null);
+
+					// TODO Preserves BC for 1.15.0, will be removed in 1.17.0
+					$entity->removeAttribute(Attribute::PHIAL_TYPE);
+				} else {
+					if (!isset($data->phial->type))
+						throw ValidationException::missingFields(['phial.type']);
+
+					$phial = new Phial($entity, $data->phial->type);
+
+					if (isset($data->phial->damage))
+						$phial->setDamage($data->phial->damage);
+
+					$entity->setPhial($phial);
+
+					// TODO Preserves BC for 1.15.0, will be removed in 1.17.0
+					$entity->setAttribute(Attribute::PHIAL_TYPE, trim($phial->getType() . ' ' . $phial->getDamage()));
+				}
+			}
+
+			if (ObjectUtil::isset($data, 'shelling')) {
+				if (!$data->shelling) {
+					$entity->setShelling(null);
+
+					// TODO Preserves BC for 1.15.0, will be removed in 1.17.0
+					$entity->removeAttribute(Attribute::GL_SHELLING_TYPE);
+				} else {
+					$missing = ObjectUtil::getMissingProperties(
+						$data->shelling,
+						[
+							'type',
+							'level',
+						]
+					);
+
+					if ($missing) {
+						throw ValidationException::missingFields(
+							array_map(
+								function(string $item): string {
+									return 'shelling.' . $item;
+								},
+								$missing
+							)
+						);
+					}
+
+					if ($shelling = $entity->getShelling()) {
+						$shelling
+							->setType($data->shelling->type)
+							->setLevel($data->shelling->level);
+					} else {
+						$shelling = new Shelling($entity, $data->shelling->type, $data->shelling->level);
+						$entity->setShelling($shelling);
+					}
+
+					// TODO Preserves BC for 1.15.0, will be removed in 1.17.0
+					$entity->setAttribute(
+						Attribute::GL_SHELLING_TYPE,
+						sprintf('%s Lv%d', $shelling->getType(), $shelling->getLevel())
+					);
+				}
+			}
 
 			if (ObjectUtil::isset($data, 'slots')) {
 				$entity->getSlots()->clear();
@@ -179,6 +295,57 @@
 					$attack->setRaw($definition->raw);
 			}
 
+			if (ObjectUtil::isset($data, 'ammo')) {
+				$types = [];
+
+				foreach ($data->ammo as $index => $definition) {
+					$missing = ObjectUtil::getMissingProperties(
+						$definition,
+						[
+							'type',
+							'capacities',
+						]
+					);
+
+					if ($missing)
+						throw ValidationException::missingNestedFields('ammo', $index, $missing);
+
+					$types[] = $definition->type;
+					$ammo = $entity->getAmmoByType($definition->type);
+
+					if (!$ammo)
+						$entity->getAmmo()->add($ammo = new Ammo($entity, $definition->type));
+
+					$ammo->setCapacities($definition->capacities);
+				}
+
+				foreach ($entity->getAmmo() as $ammo) {
+					if ($ammo->isEmpty() || !in_array($ammo->getType(), $types))
+						$entity->getAmmo()->removeElement($ammo);
+				}
+
+				// TODO Preserves BC for 1.15.0, will be removed in 1.17.0
+				if ($entity->getAmmo()->count() > 0) {
+					$capacities = [];
+
+					foreach ($entity->getAmmo() as $ammo)
+						$capacities[$ammo->getType()] = $ammo->getCapacities();
+
+					$entity->setAttribute(Attribute::AMMO_CAPACITIES, $capacities);
+				} else
+					$entity->removeAttribute(Attribute::AMMO_CAPACITIES);
+			}
+
+			if (ObjectUtil::isset($data, 'coatings')) {
+				$entity->setCoatings($data->coatings);
+
+				// TODO Preserves BC for 1.15.0, will be removed in 1.17.0
+				if ($data->coatings)
+					$entity->setAttribute(Attribute::COATINGS, $data->coatings);
+				else
+					$entity->removeAttribute(Attribute::COATINGS);
+			}
+
 			if (ObjectUtil::isset($data, 'crafting')) {
 				$crafting = $entity->getCrafting();
 				$definition = $data->crafting;
@@ -221,24 +388,29 @@
 
 				if (ObjectUtil::isset($definition, 'previous')) {
 					/** @var Weapon|null $previous */
-					$previous = $this->entityManager->getRepository(Weapon::class)->find($definition->previous);
+					if ($definition->previous) {
+						$previous = $this->entityManager->getRepository(Weapon::class)->find($definition->previous);
 
-					if (!$previous)
-						throw IntegrityException::missingReference('crafting.previous', 'Weapon');
-					else if (!$previous->getCrafting()) {
-						throw new IntegrityException(
-							'The previous weapon in the crafting tree that you specified has no associated crafting ' .
-							'data. Fix that, then try again.'
-						);
+						if (!$previous)
+							throw IntegrityException::missingReference('crafting.previous', 'Weapon');
+						else if (!$previous->getCrafting()) {
+							throw new IntegrityException(
+								'The previous weapon in the crafting tree that you specified has no associated ' .
+								'crafting data. Fix that, then try again.'
+							);
+						}
+					} else
+						$previous = null;
+
+					if ($crafting->getPrevious() !== $previous) {
+						if ($crafting->getPrevious())
+							$crafting->getPrevious()->getCrafting()->getBranches()->removeElement($entity);
+
+						$crafting->setPrevious($previous);
+
+						if ($previous)
+							$previous->getCrafting()->getBranches()->add($entity);
 					}
-
-					if ($crafting->getPrevious())
-						$crafting->getPrevious()->getCrafting()->getBranches()->removeElement($entity);
-
-					$crafting->setPrevious($previous);
-
-					if (!$previous->getCrafting()->getBranches()->contains($entity))
-						$previous->getCrafting()->getBranches()->add($entity);
 				}
 
 				if ($crafting->getPrevious() && $crafting->getUpgradeMaterials()->count() === 0) {

@@ -6,11 +6,10 @@
 		const WYVERNHEART = 'wyvernheart';
 		const WYVERNSNIPE = 'wyvernsnipe';
 
-		const ALL = [
-			self::WYVERNBLAST,
-			self::WYVERNHEART,
-			self::WYVERNSNIPE,
-		];
+		/**
+		 * @var string[]|null
+		 */
+		private static $types = null;
 
 		/**
 		 * SpecialAmmo constructor.
@@ -24,6 +23,16 @@
 		 * @return bool
 		 */
 		public static function isValid(string $value): bool {
-			return in_array($value, self::ALL);
+			return in_array($value, self::all());
+		}
+
+		/**
+		 * @return string[]
+		 */
+		public static function all() {
+			if (self::$types === null)
+				self::$types = array_values((new \ReflectionClass(self::class))->getConstants());
+
+			return self::$types;
 		}
 	}

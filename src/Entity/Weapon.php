@@ -1,6 +1,12 @@
 <?php
 	namespace App\Entity;
 
+	use App\Game\BowCoatingType;
+	use App\Game\BowgunDeviation;
+	use App\Game\BowgunSpecialAmmo;
+	use App\Game\DamageType;
+	use App\Game\Elderseal;
+	use App\Game\InsectGlaiveBoostType;
 	use App\Game\WeaponType;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\ArrayCollection;
@@ -101,6 +107,102 @@
 		/**
 		 * @Assert\Valid()
 		 *
+		 * @ORM\OneToMany(
+		 *     targetEntity="Ammo",
+		 *     mappedBy="weapon",
+		 *     cascade={"all"},
+		 *     orphanRemoval=true
+		 * )
+		 *
+		 * @var Collection|Selectable|Ammo[]
+		 */
+		private $ammo;
+
+		/**
+		 * @Assert\Choice(choices=App\Game\Elderseal::ALL)
+		 *
+		 * @ORM\Column(type="string", length=16, nullable=true)
+		 *
+		 * @var string|null
+		 * @see Elderseal
+		 */
+		private $elderseal = null;
+
+		/**
+		 * @Assert\Valid()
+		 *
+		 * @ORM\OneToOne(targetEntity="App\Entity\Phial", inversedBy="weapon", cascade={"all"}, orphanRemoval=true)
+		 * @ORM\JoinColumn()
+		 *
+		 * @var Phial|null
+		 */
+		private $phial = null;
+
+		/**
+		 * @Assert\All({
+		 *     @Assert\Choice(callback={"App\Game\BowCoatingType", "all"})
+		 * })
+		 *
+		 * @ORM\Column(type="json")
+		 *
+		 * @var string[]
+		 * @see BowCoatingType
+		 */
+		private $coatings = [];
+
+		/**
+		 * @Assert\Choice(callback={"App\Game\BowgunSpecialAmmo", "all"})
+		 *
+		 * @ORM\Column(type="string", length=32, nullable=true)
+		 *
+		 * @var string|null
+		 * @see BowgunSpecialAmmo
+		 */
+		private $specialAmmo = null;
+
+		/**
+		 * @Assert\Choice(callback={"App\Game\BowgunDeviation", "all"})
+		 *
+		 * @ORM\Column(type="string", length=32, nullable=true)
+		 *
+		 * @var string|null
+		 * @see BowgunDeviation
+		 */
+		private $deviation = null;
+
+		/**
+		 * @Assert\Choice(callback={"App\Game\InsectGlaiveBoostType", "all"})
+		 *
+		 * @ORM\Column(type="string", length=32, nullable=true)
+		 *
+		 * @var string|null
+		 * @see InsectGlaiveBoostType
+		 */
+		private $boostType = null;
+
+		/**
+		 * @Assert\NotNull()
+		 * @Assert\Choice(callback={"App\Game\DamageType", "all"})
+		 *
+		 * @ORM\Column(type="string", length=32, nullable=true)
+		 *
+		 * @var string|null
+		 * @see DamageType
+		 */
+		private $damageType = null;
+
+		/**
+		 * @Assert\Valid()
+		 *
+		 * @ORM\OneToOne(targetEntity="App\Entity\Shelling", mappedBy="weapon", orphanRemoval=true, cascade={"all"})
+		 *
+		 * @var Shelling|null
+		 */
+		private $shelling = null;
+
+		/**
+		 * @Assert\Valid()
+		 *
 		 * @ORM\OneToOne(targetEntity="App\Entity\WeaponCraftingInfo", orphanRemoval=true, cascade={"all"})
 		 *
 		 * @var WeaponCraftingInfo|null
@@ -141,6 +243,22 @@
 		private $durabilityLength = 0;
 
 		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
+		 *
+		 * @var int
+		 * @internal Used to allow API queries against "ammo.length"
+		 */
+		private $ammoLength = 0;
+
+		/**
+		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
+		 *
+		 * @var int
+		 * @internal Used to allow API queries against "coatings.length"
+		 */
+		private $coatingsLength = 0;
+
+		/**
 		 * Weapon constructor.
 		 *
 		 * @param string $name
@@ -157,6 +275,7 @@
 			$this->slots = new ArrayCollection();
 			$this->elements = new ArrayCollection();
 			$this->durability = new ArrayCollection();
+			$this->ammo = new ArrayCollection();
 		}
 
 		/**
@@ -209,6 +328,24 @@
 		 */
 		public function setRarity(int $rarity): Weapon {
 			$this->rarity = $rarity;
+
+			return $this;
+		}
+
+		/**
+		 * @return string|null
+		 */
+		public function getElderseal(): ?string {
+			return $this->elderseal;
+		}
+
+		/**
+		 * @param string|null $elderseal
+		 *
+		 * @return $this
+		 */
+		public function setElderseal(?string $elderseal) {
+			$this->elderseal = $elderseal;
 
 			return $this;
 		}
@@ -314,11 +451,165 @@
 		}
 
 		/**
+		 * @return Phial|null
+		 */
+		public function getPhial(): ?Phial {
+			return $this->phial;
+		}
+
+		/**
+		 * @param Phial|null $phial
+		 *
+		 * @return $this
+		 */
+		public function setPhial(?Phial $phial) {
+			$this->phial = $phial;
+
+			return $this;
+		}
+
+		/**
+		 * @return Ammo[]|Collection|Selectable
+		 */
+		public function getAmmo() {
+			return $this->ammo;
+		}
+
+		/**
+		 * @param string $type
+		 *
+		 * @return Ammo|null
+		 */
+		public function getAmmoByType(string $type): ?Ammo {
+			$criteria = Criteria::create()
+				->where(Criteria::expr()->eq('type', $type));
+
+			$matched = $this->getAmmo()->matching($criteria);
+
+			if (!$matched->count())
+				return null;
+
+			return $matched->first();
+		}
+
+		/**
+		 * @return string[]
+		 * @see BowCoatingType
+		 */
+		public function getCoatings(): array {
+			return $this->coatings;
+		}
+
+		/**
+		 * @param string[] $coatings
+		 *
+		 * @return $this
+		 * @see BowCoatingType
+		 */
+		public function setCoatings(array $coatings) {
+			$this->coatings = $coatings;
+
+			return $this;
+		}
+
+		/**
+		 * @return string|null
+		 */
+		public function getSpecialAmmo(): ?string {
+			return $this->specialAmmo;
+		}
+
+		/**
+		 * @param string|null $specialAmmo
+		 *
+		 * @return $this
+		 */
+		public function setSpecialAmmo(?string $specialAmmo) {
+			$this->specialAmmo = $specialAmmo;
+
+			return $this;
+		}
+
+		/**
+		 * @return string|null
+		 */
+		public function getDeviation(): ?string {
+			return $this->deviation;
+		}
+
+		/**
+		 * @param string|null $deviation
+		 *
+		 * @return $this
+		 */
+		public function setDeviation(?string $deviation) {
+			$this->deviation = $deviation;
+
+			return $this;
+		}
+
+		/**
+		 * @return string|null
+		 */
+		public function getBoostType(): ?string {
+			return $this->boostType;
+		}
+
+		/**
+		 * @param string|null $boostType
+		 *
+		 * @return $this
+		 */
+		public function setBoostType(?string $boostType) {
+			$this->boostType = $boostType;
+
+			return $this;
+		}
+
+		/**
+		 * @return string|null
+		 */
+		public function getDamageType(): ?string {
+			return $this->damageType;
+		}
+
+		/**
+		 * @param string|null $damageType
+		 *
+		 * @return $this
+		 */
+		public function setDamageType(?string $damageType) {
+			$this->damageType = $damageType;
+
+			return $this;
+		}
+
+		/**
+		 * @return Shelling|null
+		 */
+		public function getShelling(): ?Shelling {
+			return $this->shelling;
+		}
+
+		/**
+		 * @param Shelling|null $shelling
+		 *
+		 * @return $this
+		 */
+		public function setShelling(?Shelling $shelling) {
+			$this->shelling = $shelling;
+
+			return $this;
+		}
+
+		/**
 		 * {@inheritdoc}
 		 */
 		public function syncLengthFields(): void {
 			$this->elementsLength = $this->elements->count();
 			$this->slotsLength = $this->slots->count();
 			$this->durabilityLength = $this->durability->count();
+			$this->ammoLength = $this->ammo->count();
+			$this->coatingsLength = sizeof($this->coatings);
 		}
 	}

@@ -105,10 +105,23 @@
 					'display' => $entity->getAttack()->getDisplay(),
 					'raw' => $entity->getAttack()->getRaw(),
 				],
+				'elderseal' => $entity->getElderseal(),
 				// default to \stdClass to fix an empty array being returned instead of an empty object
 				'attributes' => $entity->getAttributes() ?: new \stdClass(),
+				'damageType' => $entity->getDamageType(),
 			];
 
+			if ($entity->getType() === WeaponType::GUNLANCE && $projection->isAllowed('shelling')) {
+				if ($shelling = $entity->getShelling()) {
+					$output['shelling'] = [
+						'type' => $shelling->getType(),
+						'level' => $shelling->getLevel(),
+					];
+				} else
+					$output['shelling'] = null;
+			}
+
+			// region Durability Fields
 			if (WeaponType::isMelee($entity->getType()) && $projection->isAllowed('durability')) {
 				$durability = $entity->getDurability();
 
@@ -127,6 +140,48 @@
 				);
 			}
 			// endregion
+
+			// region Bowgun Fields
+			if (WeaponType::isBowgun($entity->getType())) {
+				$output['specialAmmo'] = $entity->getSpecialAmmo();
+				$output['deviation'] = $entity->getDeviation();
+
+				if ($projection->isAllowed('ammo')) {
+					$normalized = [];
+
+					foreach ($entity->getAmmo() as $ammo) {
+						if ($ammo->isEmpty())
+							continue;
+
+						$normalized[] = [
+							'type' => $ammo->getType(),
+							'capacities' => $ammo->getCapacities(),
+						];
+					}
+
+					$output['ammo'] = $normalized;
+				}
+			}
+			// endregion
+
+			// region Bow Fields
+			if ($entity->getType() === WeaponType::BOW)
+				$output['coatings'] = $entity->getCoatings();
+			// endregion
+
+			// region Insect Glaive Fields
+			if ($entity->getType() === WeaponType::INSECT_GLAIVE)
+				$output['boostType'] = $entity->getBoostType();
+			// endregion
+
+			// region Phial Fields
+			if (WeaponType::hasPhialType($entity->getType()) && $projection->isAllowed('phial')) {
+				$output['phial'] = $entity->getPhial() ? [
+					'type' => $entity->getPhial()->getType(),
+					'damage' => $entity->getPhial()->getDamage(),
+				] : null;
+			}
+			//endregion
 
 			// region Slots Fields
 			if ($projection->isAllowed('slots')) {

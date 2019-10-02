@@ -1,6 +1,7 @@
 <?php
 	namespace App\Entity;
 
+	use App\Game\Rank;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
@@ -52,6 +53,7 @@
 		 * @ORM\Column(type="string", length=16)
 		 *
 		 * @var string
+		 * @see Rank
 		 */
 		private $rank;
 
@@ -266,6 +268,7 @@
 		 */
 		public function setRarity(int $rarity) {
 			$this->rarity = $rarity;
+
 			return $this;
 		}
 

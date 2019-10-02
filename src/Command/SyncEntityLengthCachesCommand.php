@@ -2,6 +2,7 @@
 	namespace App\Command;
 
 	use App\Console\MultiProgressBar;
+	use App\Entity\Ammo;
 	use App\Entity\Armor;
 	use App\Entity\ArmorCraftingInfo;
 	use App\Entity\ArmorSet;
@@ -24,7 +25,13 @@
 	use Symfony\Component\Console\Output\OutputInterface;
 
 	class SyncEntityLengthCachesCommand extends Command {
-		private const CLASSES = [
+		/**
+		 * @var string
+		 */
+		public static $defaultName = 'app:tools:sync-length-caches';
+
+		protected const CLASSES = [
+			Ammo::class,
 			Armor::class,
 			ArmorCraftingInfo::class,
 			ArmorSet::class,
@@ -61,9 +68,7 @@
 		 * {@inheritdoc}
 		 */
 		protected function configure(): void {
-			$this
-				->setName('app:util:sync-entity-length-caches')
-				->addOption('entity', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY);
+			$this->addOption('entity', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY);
 		}
 
 		/**

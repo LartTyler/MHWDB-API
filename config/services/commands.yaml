@@ -9,12 +9,6 @@ services:
         tags:
             - console.command
 
-    App\Command\SyncEntityLengthCachesCommand:
-        tags:
-            -
-                name: console.command
-                command: app:util:sync-entity-length-caches
-
     App\Command\EntityDeleteCommand:
         tags:
             -

@@ -172,8 +172,14 @@
 
 						$reward->getConditions()->add($condition);
 
-						if (ObjectUtil::isset($definition, 'subtype'))
-							$condition->setSubtype($definition->subtype);
+						if (ObjectUtil::isset($definition, 'subtype')) {
+							$subtype = $definition->subtype;
+
+							if (is_string($subtype))
+								$subtype = strtolower($subtype);
+
+							$condition->setSubtype($subtype);
+						}
 					}
 				}
 
