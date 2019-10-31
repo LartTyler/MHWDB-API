@@ -55,8 +55,15 @@
 		 */
 		public function read(string $platform): \Generator {
 			$crawler = new Crawler(file_get_contents(static::PLATFORM_TYPE_MAP[$platform]));
+			$timezoneOffsetNode = $crawler->filter('label[for=zoneSelect]');
 
-			$timezoneOffset = (int)$crawler->filter('label[for=zoonSelect]')->attr('data-zone');
+			// Pre-Iceborne events page contained a typo in the `for` attribute of the timezone selector. Until the PC
+			// event page is updated to the Iceborne layout, we'll need to fall back on the old `for` value.
+			if ($timezoneOffsetNode->count() === 0)
+				$timezoneOffsetNode = $crawler->filter('label[for=zoonSelect]');
+
+			$timezoneOffset = (int)$timezoneOffsetNode->attr('data-zone');
+
 			$offsetInterval = new \DateInterval(
 				'PT' . abs($timezoneOffset) . 'H'
 			);
