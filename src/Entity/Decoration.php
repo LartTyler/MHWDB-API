@@ -31,7 +31,7 @@
 
 		/**
 		 * @Assert\NotBlank()
-		 * @Assert\Range(min=1, max=3)
+		 * @Assert\Range(min=1, max=4)
 		 *
 		 * @ORM\Column(type="smallint", options={"unsigned": true})
 		 *
