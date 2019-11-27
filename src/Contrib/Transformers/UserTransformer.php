@@ -10,8 +10,8 @@
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\IntegrityException;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\ValidationException;
 	use Doctrine\ORM\EntityManagerInterface;
-	use Symfony\Component\Templating\EngineInterface;
 	use Symfony\Component\Validator\Validator\ValidatorInterface;
+	use Twig\Environment;
 
 	class UserTransformer extends AbstractEntityTransformer {
 		/**
@@ -20,7 +20,7 @@
 		protected $mailer;
 
 		/**
-		 * @var EngineInterface
+		 * @var Environment
 		 */
 		protected $templater;
 
@@ -30,13 +30,13 @@
 		 * @param EntityManagerInterface $entityManager
 		 * @param ValidatorInterface     $validator
 		 * @param \Swift_Mailer          $mailer
-		 * @param EngineInterface        $templater
+		 * @param Environment            $templater
 		 */
 		public function __construct(
 			EntityManagerInterface $entityManager,
 			ValidatorInterface $validator,
 			\Swift_Mailer $mailer,
-			EngineInterface $templater
+			Environment $templater
 		) {
 			parent::__construct($entityManager, $validator);
 

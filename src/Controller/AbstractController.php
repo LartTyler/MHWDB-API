@@ -9,14 +9,15 @@
 	use App\Event\Events\ApiEntityUpdateEvent;
 	use App\QueryDocument\ApiQueryManager;
 	use App\QueryDocument\Projection;
-	use App\Response\BadProjectionObjectError;
-	use App\Response\BadQueryObjectError;
-	use App\Response\ConstraintViolationError;
-	use App\Response\EmptySearchParametersError;
 	use App\Response\NoContentResponse;
 	use App\Response\SearchError;
-	use DaybreakStudios\Doze\Errors\ApiErrorInterface;
-	use DaybreakStudios\DozeBundle\ResponderService;
+	use DaybreakStudios\RestApiCommon\Error\ApiErrorInterface;
+	use DaybreakStudios\RestApiCommon\Error\Errors\DoctrineQueryDocument\EmptyQueryError;
+	use DaybreakStudios\RestApiCommon\Error\Errors\DoctrineQueryDocument\ProjectionSyntaxError;
+	use DaybreakStudios\RestApiCommon\Error\Errors\DoctrineQueryDocument\QuerySyntaxError;
+	use DaybreakStudios\RestApiCommon\Error\Errors\NotFoundError;
+	use DaybreakStudios\RestApiCommon\Error\Errors\Validation\ValidationFailedError;
+	use DaybreakStudios\RestApiCommon\ResponderService;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\EntityTransformers\EntityTransformerInterface;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\ConstraintViolationException;
@@ -107,7 +108,7 @@
 					unset($query['offset']);
 
 				if (!sizeof($query))
-					return $this->respond(new EmptySearchParametersError());
+					return $this->respond(new EmptyQueryError());
 
 				$queryBuilder = $this->entityManager->createQueryBuilder()
 					->from($this->entityClass, 'e')
@@ -121,11 +122,11 @@
 					$queryObject = json_decode($queryObject, true);
 
 					if (json_last_error() !== JSON_ERROR_NONE)
-						return $this->respond(new BadQueryObjectError());
+						return $this->respond(new QuerySyntaxError());
 				}
 
 				if (!$queryObject)
-					return $this->respond(new EmptySearchParametersError());
+					return $this->respond(new EmptyQueryError());
 
 				try {
 					$this->get(ApiQueryManager::class)->apply($queryBuilder, $queryObject);
@@ -156,11 +157,13 @@
 				$entity = $transformer->create($payload);
 			} catch (EntityTransformerException $exception) {
 				if ($exception instanceof ConstraintViolationException)
-					return $this->respond(new ConstraintViolationError($exception->getErrors()));
+					return $this->respond(new ValidationFailedError($exception->getErrors()));
 
 				return $this->respond(new CreateError($exception->getMessage()));
 			}
 
+			/** @noinspection PhpParamsInspection */
+			/** @noinspection PhpMethodParametersCountMismatchInspection */
 			$this->eventDispatcher->dispatch(ApiEntityCreateEvent::NAME, new ApiEntityCreateEvent($entity, $payload));
 
 			$this->entityManager->flush();
@@ -189,11 +192,13 @@
 				$transformer->update($entity, $payload);
 			} catch (EntityTransformerException $exception) {
 				if ($exception instanceof ConstraintViolationException)
-					return $this->respond(new ConstraintViolationError($exception->getErrors()));
+					return $this->respond(new ValidationFailedError($exception->getErrors()));
 
 				return $this->respond(new UpdateError($exception->getMessage()));
 			}
 
+			/** @noinspection PhpParamsInspection */
+			/** @noinspection PhpMethodParametersCountMismatchInspection */
 			$this->eventDispatcher->dispatch(ApiEntityUpdateEvent::NAME, new ApiEntityUpdateEvent($entity, $payload));
 
 			$this->entityManager->flush();
@@ -210,6 +215,8 @@
 		protected function doDelete(EntityTransformerInterface $transformer, EntityInterface $entity): Response {
 			$transformer->delete($entity);
 
+			/** @noinspection PhpParamsInspection */
+			/** @noinspection PhpMethodParametersCountMismatchInspection */
 			$this->eventDispatcher->dispatch(ApiEntityDeleteEvent::NAME, new ApiEntityDeleteEvent($entity));
 
 			$this->entityManager->flush();
@@ -233,7 +240,7 @@
 				$fields = @json_decode($fields, true);
 
 				if (json_last_error() !== JSON_ERROR_NONE)
-					return $this->responder->createErrorResponse(new BadProjectionObjectError());
+					return $this->responder->createErrorResponse(new ProjectionSyntaxError());
 			}
 
 			try {
@@ -247,7 +254,7 @@
 			else if ($data instanceof Response)
 				return $data;
 			else if ($data === null)
-				return $this->responder->createNotFoundResponse();
+				return $this->responder->createErrorResponse(new NotFoundError());
 
 			if (is_array($data))
 				$data = $this->normalizeMany($data, $projection);
