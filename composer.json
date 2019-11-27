@@ -51,8 +51,7 @@
 	},
 	"require-dev": {
 		"aws/aws-sdk-php": "^3.54",
-		"roave/security-advisories": "dev-master",
-		"symfony/web-server-bundle": "^4.0"
+		"roave/security-advisories": "dev-master"
 	},
 	"config": {
 		"preferred-install": {

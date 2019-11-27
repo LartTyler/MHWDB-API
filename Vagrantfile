@@ -55,6 +55,9 @@ Vagrant.configure("2") do |config|
 		mysql -e "CREATE SCHEMA application;"
 		mysql -e "CREATE USER 'application'@'%';"
 		mysql -e "GRANT ALL ON application.* TO 'application'@'%';"
+
+		wget https://get.symfony.com/cli/installer -O - | bash
+		mv /root/.symfony/bin/symfony /usr/local/bin/symfony
 	SHELL
 
 	config.vm.provision "install", type: "shell", privileged: false, inline: <<-SHELL
@@ -106,7 +109,7 @@ Vagrant.configure("2") do |config|
 		cd /vagrant
 
 
-		php bin/console server:stop > /dev/null
-		php bin/console server:start 0.0.0.0 &> ~/symfony-server.log &
+		symfony server:stop > /dev/null 2>&1
+		symfony server:start -d --no-tls
 	SHELL
 end
