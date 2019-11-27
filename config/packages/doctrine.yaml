@@ -27,8 +27,8 @@ doctrine:
         query_cache_driver: '%doctrine_memcached_config%'
         dql:
             string_functions:
-                JSON_EXTRACT: Syslogic\DoctrineJsonFunctions\Query\AST\Functions\Mysql\JsonExtract
-                JSON_UNQUOTE: Syslogic\DoctrineJsonFunctions\Query\AST\Functions\Mysql\JsonUnquote
+                JSON_EXTRACT: Scienta\DoctrineJsonFunctions\Query\AST\Functions\Mysql\JsonExtract
+                JSON_UNQUOTE: Scienta\DoctrineJsonFunctions\Query\AST\Functions\Mysql\JsonUnquote
         mappings:
             App:
                 is_bundle: false

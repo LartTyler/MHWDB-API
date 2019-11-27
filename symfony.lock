@@ -176,6 +176,9 @@
     "roave/security-advisories": {
         "version": "dev-master"
     },
+    "scienta/doctrine-json-functions": {
+        "version": "4.0.2"
+    },
     "sensio/framework-extra-bundle": {
         "version": "v3.0.29"
     },
@@ -391,9 +394,6 @@
     },
     "symfony/yaml": {
         "version": "v4.0.4"
-    },
-    "syslogic/doctrine-json-functions": {
-        "version": "2.1.0"
     },
     "twig/twig": {
         "version": "v2.5.0"
