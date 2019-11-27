@@ -5,7 +5,9 @@
 	use Doctrine\ORM\Mapping as ORM;
 
 	trait EntityTrait {
-		use BaseEntityTrait;
+		use BaseEntityTrait {
+			__toString as __baseToString;
+		}
 
 		/**
 		 * @ORM\Id()
@@ -32,5 +34,12 @@
 			$this->id = $id;
 
 			return $this;
+		}
+
+		/**
+		 * {@inheritdoc}
+		 */
+		public function __toString(): string {
+			return $this->__baseToString();
 		}
 	}
