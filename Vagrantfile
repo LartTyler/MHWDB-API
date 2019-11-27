@@ -104,10 +104,8 @@ Vagrant.configure("2") do |config|
 		echo ""
 		echo "----------------------------------------------"
 		echo "Starting Symfony server at http://localhost:8000"
-		echo "If it doesn't come up, check the ~/symfony-server.log file for any error messages"
 
 		cd /vagrant
-
 
 		symfony server:stop > /dev/null 2>&1
 		symfony server:start -d --no-tls
