@@ -1,5 +1,4 @@
 <?php
-
 	namespace App\WorldEvent;
 
 	use App\Entity\Location;
@@ -126,12 +125,21 @@
 					foreach (explode("\n", $termText) as $item) {
 						$text = trim($item);
 
-						$terms[] = [
-							(new \DateTimeImmutable(substr($text, 0, 10), new \DateTimeZone('UTC')))
-								->sub($offsetInterval),
-							(new \DateTimeImmutable(substr($text, 15), new \DateTimeZone('UTC')))
-								->sub($offsetInterval),
-						];
+						$start = (new \DateTimeImmutable(substr($text, 0, 10), new \DateTimeZone('UTC')))
+							->sub($offsetInterval);
+
+						$end = (new \DateTimeImmutable(substr($text, 15), new \DateTimeZone('UTC')))
+							->sub($offsetInterval);
+
+						if ((int)$end->format('m') < (int)$start->format('m')) {
+							$end = $end->setDate(
+								(int)$end->format('Y') + 1,
+								(int)$end->format('m'),
+								(int)$end->format('d')
+							);
+						}
+
+						$terms[] = [$start, $end];
 					}
 
 					foreach ($terms as $term) {
