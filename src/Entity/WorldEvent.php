@@ -1,6 +1,7 @@
 <?php
 	namespace App\Entity;
 
+	use App\Game\Expansion;
 	use App\Game\PlatformExclusivityType;
 	use App\Game\PlatformType;
 	use App\Game\WorldEventType;
@@ -13,7 +14,7 @@
 	 * @ORM\Table(
 	 *     name="world_events",
 	 *     uniqueConstraints={
-	 *     		@ORM\UniqueConstraint(columns={"platform", "name", "start_timestamp"})
+	 *     		@ORM\UniqueConstraint(columns={"platform", "name", "expansion", "start_timestamp"})
 	 *     }
 	 * )
 	 */
@@ -82,6 +83,16 @@
 		 * @var int
 		 */
 		private $questRank;
+
+		/**
+		 * @Assert\Choice(callback={"App\Game\Expansion", "values"})
+		 *
+		 * @ORM\Column(type="string", length=32, nullable=true)
+		 *
+		 * @var string|null
+		 * @see Expansion
+		 */
+		private $expansion = null;
 
 		/**
 		 * @ORM\Column(type="text", nullable=true)
@@ -260,6 +271,26 @@
 		 */
 		public function setExclusive(?string $exclusive) {
 			$this->exclusive = $exclusive;
+
+			return $this;
+		}
+
+		/**
+		 * @return string|null
+		 * @see Expansion
+		 */
+		public function getExpansion(): ?string {
+			return $this->expansion;
+		}
+
+		/**
+		 * @param string|null $expansion
+		 *
+		 * @return $this
+		 * @see Expansion
+		 */
+		public function setExpansion(?string $expansion) {
+			$this->expansion = $expansion;
 
 			return $this;
 		}

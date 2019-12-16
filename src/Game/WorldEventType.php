@@ -3,6 +3,7 @@
 
 	final class WorldEventType {
 		public const KULVE_TAROTH = 'kulve taroth siege';
+		public const SAFI_JIIVA = 'safi\'jiiva seige';
 		public const EVENT_QUEST = 'event quest';
 		public const CHALLENGE_QUEST = 'challenge quest';
 
