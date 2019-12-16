@@ -108,7 +108,7 @@
 						throw new \Exception('Unrecognized location: ' . $locName);
 
 					$name = trim($questInfo->filter('.title > span')->text());
-					$rank = (int)substr(trim($row->filter('.level')->text()), 0, 1);
+					$rank = (int)preg_replace('/\D/', '', $row->filter('.level')->text());
 
 					$description = str_replace("\r\n", "\n", trim($questInfo->filter('.txt')->text()));
 					$successConditions = trim($popupItems->eq(2)->text());
@@ -185,6 +185,8 @@
 							$location,
 							$rank
 						);
+
+						$event->setMasterRank($expansion === Expansion::ICEBORNE);
 
 						if ($description)
 							$event->setDescription($description);

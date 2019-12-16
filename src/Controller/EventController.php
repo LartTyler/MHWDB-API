@@ -59,6 +59,7 @@
 				'description' => $entity->getDescription(),
 				'requirements' => $entity->getRequirements(),
 				'questRank' => $entity->getQuestRank(),
+				'masterRank' => $entity->isMasterRank(),
 				'successConditions' => $entity->getSuccessConditions(),
 				'startTimestamp' => $entity->getStartTimestamp()->format(\DateTime::ISO8601),
 				'endTimestamp' => $entity->getEndTimestamp()->format(\DateTime::ISO8601),

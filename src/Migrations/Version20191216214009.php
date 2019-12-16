@@ -22,7 +22,7 @@
 			);
 
 			$this->addSql('DROP INDEX UNIQ_C3B92A093952D0CB5E237E066D1E9DF8 ON world_events');
-			$this->addSql('ALTER TABLE world_events ADD expansion VARCHAR(32) NOT NULL DEFAULT "base"');
+			$this->addSql('ALTER TABLE world_events ADD expansion VARCHAR(32) NOT NULL DEFAULT "base", ADD master_rank TINYINT(1) NOT NULL DEFAULT "0"');
 			$this->addSql('CREATE UNIQUE INDEX UNIQ_C3B92A093952D0CB5E237E06F0695B726D1E9DF8 ON world_events (platform, name, expansion, start_timestamp)');
 		}
 

@@ -127,6 +127,13 @@
 		private $exclusive = null;
 
 		/**
+		 * @ORM\Column(type="boolean")
+		 *
+		 * @var bool
+		 */
+		private $masterRank = false;
+
+		/**
 		 * WorldEvent constructor.
 		 *
 		 * @param string             $name
@@ -283,6 +290,24 @@
 		 */
 		public function setExclusive(?string $exclusive) {
 			$this->exclusive = $exclusive;
+
+			return $this;
+		}
+
+		/**
+		 * @return bool
+		 */
+		public function isMasterRank(): bool {
+			return $this->masterRank;
+		}
+
+		/**
+		 * @param bool $masterRank
+		 *
+		 * @return $this
+		 */
+		public function setMasterRank(bool $masterRank) {
+			$this->masterRank = $masterRank;
 
 			return $this;
 		}
