@@ -43,6 +43,17 @@
 
 		/**
 		 * @Assert\NotBlank()
+		 * @Assert\Choice(callback={"App\Game\Expansion", "values"})
+		 *
+		 * @ORM\Column(type="string", length=32)
+		 *
+		 * @var string
+		 * @see Expansion
+		 */
+		private $expansion;
+
+		/**
+		 * @Assert\NotBlank()
 		 * @Assert\Choice(callback={"App\Game\PlatformType", "all"})
 		 *
 		 * @ORM\Column(type="string", length=16)
@@ -85,16 +96,6 @@
 		private $questRank;
 
 		/**
-		 * @Assert\Choice(callback={"App\Game\Expansion", "values"})
-		 *
-		 * @ORM\Column(type="string", length=32, nullable=true)
-		 *
-		 * @var string|null
-		 * @see Expansion
-		 */
-		private $expansion = null;
-
-		/**
 		 * @ORM\Column(type="text", nullable=true)
 		 *
 		 * @var string|null
@@ -130,6 +131,7 @@
 		 *
 		 * @param string             $name
 		 * @param string             $type
+		 * @param string             $expansion
 		 * @param string             $platform
 		 * @param \DateTimeImmutable $startTimestamp
 		 * @param \DateTimeImmutable $endTimestamp
@@ -139,6 +141,7 @@
 		public function __construct(
 			string $name,
 			string $type,
+			string $expansion,
 			string $platform,
 			\DateTimeImmutable $startTimestamp,
 			\DateTimeImmutable $endTimestamp,
@@ -147,6 +150,7 @@
 		) {
 			$this->name = $name;
 			$this->type = $type;
+			$this->expansion = $expansion;
 			$this->platform = $platform;
 			$this->startTimestamp = $startTimestamp;
 			$this->endTimestamp = $endTimestamp;
@@ -166,6 +170,14 @@
 		 */
 		public function getType(): string {
 			return $this->type;
+		}
+
+		/**
+		 * @return string
+		 * @see Expansion
+		 */
+		public function getExpansion(): string {
+			return $this->expansion;
 		}
 
 		/**
@@ -271,26 +283,6 @@
 		 */
 		public function setExclusive(?string $exclusive) {
 			$this->exclusive = $exclusive;
-
-			return $this;
-		}
-
-		/**
-		 * @return string|null
-		 * @see Expansion
-		 */
-		public function getExpansion(): ?string {
-			return $this->expansion;
-		}
-
-		/**
-		 * @param string|null $expansion
-		 *
-		 * @return $this
-		 * @see Expansion
-		 */
-		public function setExpansion(?string $expansion) {
-			$this->expansion = $expansion;
 
 			return $this;
 		}

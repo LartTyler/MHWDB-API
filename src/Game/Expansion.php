@@ -6,6 +6,6 @@
 	final class Expansion {
 		use ConstantsClassTrait;
 
-		public const BASE = null;
+		public const BASE = 'base';
 		public const ICEBORNE = 'iceborne';
 	}

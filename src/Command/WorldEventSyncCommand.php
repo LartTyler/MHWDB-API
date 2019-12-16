@@ -2,6 +2,7 @@
 	namespace App\Command;
 
 	use App\Entity\WorldEvent;
+	use App\Game\Expansion;
 	use App\WorldEvent\WorldEventReader;
 	use Doctrine\ORM\EntityManagerInterface;
 	use Symfony\Component\Console\Command\Command;
@@ -39,7 +40,7 @@
 		 */
 		protected function configure(): void {
 			$this->addArgument('platform', InputArgument::REQUIRED);
-			$this->addArgument('expansion', InputArgument::OPTIONAL);
+			$this->addArgument('expansion', InputArgument::OPTIONAL, '', Expansion::BASE);
 		}
 
 		/**

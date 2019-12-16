@@ -54,12 +54,12 @@
 		}
 
 		/**
-		 * @param string      $platform
-		 * @param string|null $expansion
+		 * @param string $platform
+		 * @param string $expansion
 		 *
 		 * @return \Generator|WorldEvent[]
 		 */
-		public function read(string $platform, ?string $expansion): \Generator {
+		public function read(string $platform, string $expansion): \Generator {
 			$url = static::PLATFORM_TYPE_MAP[$platform][$expansion] ?? null;
 
 			if (!$url) {
@@ -178,15 +178,13 @@
 						$event = new WorldEvent(
 							$name,
 							$type,
+							$expansion,
 							$platform,
 							$term[0],
 							$term[1],
 							$location,
 							$rank
 						);
-
-						if ($expansion)
-							$event->setExpansion($expansion);
 
 						if ($description)
 							$event->setDescription($description);
