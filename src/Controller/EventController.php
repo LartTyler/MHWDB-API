@@ -55,6 +55,7 @@
 				'platform' => $entity->getPlatform(),
 				'exclusive' => $entity->getExclusive(),
 				'type' => $entity->getType(),
+				'expansion' => $entity->getExpansion(),
 				'description' => $entity->getDescription(),
 				'requirements' => $entity->getRequirements(),
 				'questRank' => $entity->getQuestRank(),
