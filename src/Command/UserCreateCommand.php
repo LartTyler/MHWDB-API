@@ -104,12 +104,9 @@
 		}
 
 		/**
-		 * @param InputInterface  $input
-		 * @param OutputInterface $output
-		 *
-		 * @return void
+		 * {@inheritdoc}
 		 */
-		protected function execute(InputInterface $input, OutputInterface $output): void {
+		protected function execute(InputInterface $input, OutputInterface $output): int {
 			$io = new SymfonyStyle($input, $output);
 
 			$errors = [];
@@ -129,7 +126,7 @@
 				$io->error('Could not create user. Please correct the following error(s), then try again.');
 				$io->listing($errors);
 
-				return;
+				return 1;
 			}
 
 			/** @var User|null $user */
@@ -155,7 +152,7 @@
 
 				$io->error('A user already exists with that ' . implode(' and ', $matched));
 
-				return;
+				return 1;
 			}
 
 			$user = new User($email, $displayName);
@@ -172,5 +169,7 @@
 			$this->entityManager->flush();
 
 			$io->success('Done!');
+
+			return 0;
 		}
 	}

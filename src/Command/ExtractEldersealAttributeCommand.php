@@ -45,12 +45,9 @@
 		}
 
 		/**
-		 * @param InputInterface $input
-		 * @param OutputInterface $output
-		 *
-		 * @return void
+		 * {@inheritdoc}
 		 */
-		protected function execute(InputInterface $input, OutputInterface $output): void {
+		protected function execute(InputInterface $input, OutputInterface $output): int {
 			$weapons = $this->entityManager->getRepository(Weapon::class)->findAll();
 
 			$io = new SymfonyStyle($input, $output);
@@ -71,5 +68,7 @@
 
 			$io->progressFinish();
 			$io->success('Done!');
+
+			return 0;
 		}
 	}

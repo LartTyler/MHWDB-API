@@ -55,9 +55,10 @@
 		/**
 		 * {@inheritdoc}
 		 */
-		protected function execute(InputInterface $input, OutputInterface $output): void {
+		protected function execute(InputInterface $input, OutputInterface $output): int {
 			$io = new SymfonyStyle($input, $output);
 
+			/** @var User|null $user */
 			$user = $this->entityManager->getRepository(User::class)->findOneBy(
 				[
 					'email' => $input->getArgument('email'),
@@ -67,7 +68,7 @@
 			if (!$user) {
 				$io->error('Could not find a user with the email address ' . $input->getArgument('email') . '.');
 
-				return;
+				return 1;
 			}
 
 			$password = $input->getArgument('password');
@@ -75,7 +76,7 @@
 			if (strlen($password) === 0) {
 				$io->error('You must provide a password.');
 
-				return;
+				return 1;
 			}
 
 			$user->setPassword($this->encoder->encodePassword($user, $password));
@@ -83,5 +84,7 @@
 			$this->entityManager->flush();
 
 			$io->success('Password updated.');
+
+			return 0;
 		}
 	}

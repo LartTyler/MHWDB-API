@@ -76,7 +76,7 @@
 		 *
 		 * @return void
 		 */
-		protected function execute(InputInterface $input, OutputInterface $output): void {
+		protected function execute(InputInterface $input, OutputInterface $output): int {
 			$classes = array_map(
 				function(string $class): string {
 					return strpos($class, '\\') !== false ? $class : 'App\\Entity\\' . $class;
@@ -103,5 +103,7 @@
 
 				$progress->advance();
 			}
+
+			return 0;
 		}
 	}

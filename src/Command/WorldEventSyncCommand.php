@@ -45,9 +45,9 @@
 		 * @param InputInterface  $input
 		 * @param OutputInterface $output
 		 *
-		 * @return void
+		 * @return int
 		 */
-		protected function execute(InputInterface $input, OutputInterface $output): void {
+		protected function execute(InputInterface $input, OutputInterface $output): int {
 			$added = 0;
 
 			foreach ($this->eventReader->read($input->getArgument('platform')) as $event) {
@@ -78,5 +78,7 @@
 					sizeof($expired) !== 1 ? 's' : ''
 				)
 			);
+
+			return 0;
 		}
 	}
