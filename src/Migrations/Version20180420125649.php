@@ -2,14 +2,14 @@
 
 	namespace DoctrineMigrations;
 
-	use Doctrine\DBAL\Migrations\AbstractMigration;
+	use Doctrine\Migrations\AbstractMigration;
 	use Doctrine\DBAL\Schema\Schema;
 
 	/**
 	 * Auto-generated Migration: Please modify to your needs!
 	 */
 	class Version20180420125649 extends AbstractMigration {
-		public function up(Schema $schema) {
+		public function up(Schema $schema): void {
 			// this up() migration is auto-generated, please modify it to your needs
 			$this->abortIf($this->connection->getDatabasePlatform()->getName() !==
 				'mysql', 'Migration can only be executed safely on \'mysql\'.');
@@ -20,7 +20,7 @@
 			$this->addSql('ALTER TABLE armor_slots ADD CONSTRAINT FK_24FFC0B859E5119C FOREIGN KEY (slot_id) REFERENCES slots (id)');
 		}
 
-		public function down(Schema $schema) {
+		public function down(Schema $schema): void {
 			// this down() migration is auto-generated, please modify it to your needs
 			$this->abortIf($this->connection->getDatabasePlatform()->getName() !==
 				'mysql', 'Migration can only be executed safely on \'mysql\'.');

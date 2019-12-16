@@ -79,10 +79,7 @@
 		"post-update-cmd": [
 			"@auto-scripts"
 		],
-		"db:diff": [
-			"./bin/console --ansi doctrine:cache:clear doctrine.orm.default_metadata_cache",
-			"./bin/console --ansi doctrine:migrations:diff"
-		],
+		"db:diff": "./bin/console --ansi doctrine:migrations:diff",
 		"db:migrate": "./bin/console --ansi doctrine:migrations:migrate",
 		"deploy": [
 			"git pull",

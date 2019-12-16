@@ -185,16 +185,16 @@
         },
         {
             "name": "dbstudios/php-api-common",
-            "version": "1.3.0",
+            "version": "1.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/LartTyler/php-api-common.git",
-                "reference": "865872571c9d30717e2d0c2ed0b00eeeb2549fbc"
+                "reference": "11434f6d6a1e74cef588046c6d18ed04f6f661ed"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/LartTyler/php-api-common/zipball/865872571c9d30717e2d0c2ed0b00eeeb2549fbc",
-                "reference": "865872571c9d30717e2d0c2ed0b00eeeb2549fbc",
+                "url": "https://api.github.com/repos/LartTyler/php-api-common/zipball/11434f6d6a1e74cef588046c6d18ed04f6f661ed",
+                "reference": "11434f6d6a1e74cef588046c6d18ed04f6f661ed",
                 "shasum": ""
             },
             "require": {
@@ -240,7 +240,7 @@
                 }
             ],
             "description": "Contains common code for building PHP REST APIs",
-            "time": "2019-12-03T20:38:58+00:00"
+            "time": "2019-12-16T21:21:46+00:00"
         },
         {
             "name": "doctrine/annotations",

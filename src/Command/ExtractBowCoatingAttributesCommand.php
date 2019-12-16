@@ -46,7 +46,7 @@
 		/**
 		 * {@inheritdoc}
 		 */
-		protected function execute(InputInterface $input, OutputInterface $output): void {
+		protected function execute(InputInterface $input, OutputInterface $output): int {
 			$weapons = $this->entityManager->getRepository(Weapon::class)->findBy(
 				[
 					'type' => WeaponType::BOW,
@@ -71,5 +71,7 @@
 
 			$io->progressFinish();
 			$io->success('Done!');
+
+			return 0;
 		}
 	}

@@ -58,7 +58,7 @@
 		/**
 		 * {@inheritdoc}
 		 */
-		protected function execute(InputInterface $input, OutputInterface $output) {
+		protected function execute(InputInterface $input, OutputInterface $output): int {
 			$qb = $this->entityManager->createQueryBuilder()
 				->from(Weapon::class, 'w')
 				->select('w');
@@ -99,7 +99,7 @@
 
 					$io->error($message);
 
-					return;
+					return 1;
 				}
 			}
 
@@ -107,6 +107,8 @@
 
 			$io->progressFinish();
 			$io->success('Done!');
+
+			return 0;
 		}
 
 		/**

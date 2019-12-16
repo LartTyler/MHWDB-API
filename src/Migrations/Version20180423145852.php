@@ -2,14 +2,14 @@
 
 	namespace DoctrineMigrations;
 
-	use Doctrine\DBAL\Migrations\AbstractMigration;
+	use Doctrine\Migrations\AbstractMigration;
 	use Doctrine\DBAL\Schema\Schema;
 
 	/**
 	 * Auto-generated Migration: Please modify to your needs!
 	 */
 	class Version20180423145852 extends AbstractMigration {
-		public function up(Schema $schema) {
+		public function up(Schema $schema): void {
 			// this up() migration is auto-generated, please modify it to your needs
 			$this->abortIf($this->connection->getDatabasePlatform()->getName() !==
 				'mysql', 'Migration can only be executed safely on \'mysql\'.');
@@ -20,7 +20,7 @@
 			$this->addSql('CREATE UNIQUE INDEX UNIQ_520EBBE1537ED785 ON weapons (sharpness_id)');
 		}
 
-		public function postUp(Schema $schema) {
+		public function postUp(Schema $schema): void {
 			$this->write('     <comment>-></comment> Adding empty sharpness entries for weapons');
 
 			$stmt = $this->connection->createQueryBuilder()
@@ -61,7 +61,7 @@
 			$this->connection->exec('ALTER TABLE weapons CHANGE sharpness_id sharpness_id INT UNSIGNED NOT NULL');
 		}
 
-		public function down(Schema $schema) {
+		public function down(Schema $schema): void {
 			// this down() migration is auto-generated, please modify it to your needs
 			$this->abortIf($this->connection->getDatabasePlatform()->getName() !==
 				'mysql', 'Migration can only be executed safely on \'mysql\'.');
