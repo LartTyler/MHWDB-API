@@ -18,18 +18,13 @@
 	use App\Entity\Skill;
 	use App\Entity\Weapon;
 	use App\Entity\WeaponCraftingInfo;
-	use Doctrine\Common\Persistence\ObjectManager;
+	use Doctrine\ORM\EntityManagerInterface;
 	use Symfony\Component\Console\Command\Command;
 	use Symfony\Component\Console\Input\InputInterface;
 	use Symfony\Component\Console\Input\InputOption;
 	use Symfony\Component\Console\Output\OutputInterface;
 
 	class SyncEntityLengthCachesCommand extends Command {
-		/**
-		 * @var string
-		 */
-		public static $defaultName = 'app:tools:sync-length-caches';
-
 		protected const CLASSES = [
 			Ammo::class,
 			Armor::class,
@@ -49,16 +44,21 @@
 		];
 
 		/**
-		 * @var ObjectManager
+		 * @var string
+		 */
+		public static $defaultName = 'app:tools:sync-length-caches';
+
+		/**
+		 * @var EntityManagerInterface
 		 */
 		protected $manager;
 
 		/**
 		 * SyncEntityLengthCachesCommand constructor.
 		 *
-		 * @param ObjectManager $manager
+		 * @param EntityManagerInterface $manager
 		 */
-		public function __construct(ObjectManager $manager) {
+		public function __construct(EntityManagerInterface $manager) {
 			parent::__construct();
 
 			$this->manager = $manager;
@@ -77,9 +77,12 @@
 		 * @return void
 		 */
 		protected function execute(InputInterface $input, OutputInterface $output): void {
-			$classes = array_map(function(string $class): string {
-				return strpos($class, '\\') !== false ? $class : 'App\\Entity\\' . $class;
-			}, $input->getOption('entity'));
+			$classes = array_map(
+				function(string $class): string {
+					return strpos($class, '\\') !== false ? $class : 'App\\Entity\\' . $class;
+				},
+				$input->getOption('entity')
+			);
 
 			$progress = new MultiProgressBar($output);
 			$progress->append($classes ? sizeof($classes) : sizeof(self::CLASSES));

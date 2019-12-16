@@ -4,8 +4,9 @@
 	use App\Contrib\Transformers\MotionValueTransformer;
 	use App\Entity\MotionValue;
 	use App\Game\WeaponType;
-	use App\QueryDocument\Projection;
 	use App\Response\UnknownWeaponTypeError;
+	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
+	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 	use Symfony\Component\HttpFoundation\Request;
@@ -15,9 +16,11 @@
 	class MotionValuesController extends AbstractController {
 		/**
 		 * MotionValuesDataController constructor.
+		 *
+		 * @param QueryManagerInterface $queryManager
 		 */
-		public function __construct() {
-			parent::__construct(MotionValue::class);
+		public function __construct(QueryManagerInterface $queryManager) {
+			parent::__construct($queryManager, MotionValue::class);
 		}
 
 		/**
@@ -28,25 +31,31 @@
 		 * @return Response
 		 */
 		public function list(Request $request): Response {
-			return parent::list($request);
+			return $this->doList($request);
 		}
 
 		/**
 		 * @Route(path="/motion-values/{type<[A-Za-z-]+>}", methods={"GET"}, name="motion-values.list-by-type")
 		 *
-		 * @param string $type
+		 * @param Request $request
+		 * @param string  $type
 		 *
 		 * @return Response
 		 */
-		public function listByType(string $type) {
+		public function listByType(Request $request, string $type) {
 			$type = strtolower($type);
 
 			if (!WeaponType::isValid($type))
-				return $this->respond(new UnknownWeaponTypeError($type));
+				return $this->respond($request, new UnknownWeaponTypeError($type));
 
-			return $this->respond($this->entityManager->getRepository(MotionValue::class)->findBy([
-				'weaponType' => $type,
-			]));
+			return $this->respond(
+				$request,
+				$this->entityManager->getRepository(MotionValue::class)->findBy(
+					[
+						'weaponType' => $type,
+					]
+				)
+			);
 		}
 
 		/**
@@ -65,12 +74,13 @@
 		/**
 		 * @Route(path="/motion-values/{motionValue<\d+>}", methods={"GET"}, name="motion-values.read")
 		 *
+		 * @param Request     $request
 		 * @param MotionValue $motionValue
 		 *
 		 * @return Response
 		 */
-		public function read(MotionValue $motionValue): Response {
-			return $this->respond($motionValue);
+		public function read(Request $request, MotionValue $motionValue): Response {
+			return $this->respond($request, $motionValue);
 		}
 
 		/**
@@ -105,14 +115,10 @@
 		}
 
 		/**
-		 * @param EntityInterface|MotionValue|null $entity
-		 * @param Projection                       $projection
-		 *
-		 * @return array|null
+		 * {@inheritdoc}
 		 */
-		protected function normalizeOne(?EntityInterface $entity, Projection $projection): ?array {
-			if (!$entity)
-				return null;
+		protected function normalizeOne(EntityInterface $entity, Projection $projection): array {
+			assert($entity instanceof MotionValue);
 
 			return [
 				'id' => $entity->getId(),

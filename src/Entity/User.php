@@ -3,7 +3,6 @@
 
 	use App\Security\Role;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use DaybreakStudios\VeritasBundle\Security\Core\User\VeritasUserInterface;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\Common\Collections\Criteria;
@@ -19,7 +18,7 @@
 	 *
 	 * @package App\Entity
 	 */
-	class User implements EntityInterface, UserInterface, VeritasUserInterface {
+	class User implements EntityInterface, UserInterface {
 		use EntityTrait;
 
 		/**
@@ -94,13 +93,6 @@
 
 			$this->createdDate = new \DateTimeImmutable();
 			$this->roles = new ArrayCollection();
-		}
-
-		/**
-		 * @return int|null
-		 */
-		public function getSubjectIdentifier(): ?int {
-			return $this->getId();
 		}
 
 		/**
@@ -195,10 +187,14 @@
 		}
 
 		/**
-		 * @return UserRole[]
+		 * @return string[]
 		 */
 		public function getRoles(): array {
-			return $this->roles->toArray();
+			return $this->roles->map(
+				function(UserRole $role) {
+					return $role->getRole();
+				}
+			)->toArray();
 		}
 
 		/**

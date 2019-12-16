@@ -1,36 +1,12 @@
-parameters:
-    app.security.user_repository: App\Entity\User
-
 services:
     _defaults:
         public: false
         autowire: true
         autoconfigure: true
 
-    DaybreakStudios\VeritasBundle\Security\Core\User\JWTEntityUserProvider:
-        public: true
-        arguments:
-            - '@doctrine'
-            - '%app.security.user_repository%'
-
-    App\Security\AuthenticationFailureListener:
+    DaybreakStudios\RestApiCommon\Event\Listeners\LexikJwtAuthenticationFailureSubscriber:
         tags:
-            -
-                name: kernel.event_listener
-                event: lexik_jwt_authentication.on_authentication_failure
-                method: onAuthenticationFailure
-            -
-                name: kernel.event_listener
-                event: lexik_jwt_authentication.on_jwt_invalid
-                method: onInvalidToken
-            -
-                name: kernel.event_listener
-                event: lexik_jwt_authentication.on_jwt_not_found
-                method: onTokenNotFound
-            -
-                name: kernel.event_listener
-                event: lexik_jwt_authentication.on_jwt_expired
-                method: onTokenExpired
+            - kernel.event_subscriber
 
     App\Security\CustomizePayloadListener:
         tags:

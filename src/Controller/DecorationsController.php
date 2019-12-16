@@ -4,7 +4,8 @@
 	use App\Contrib\Transformers\DecorationTransformer;
 	use App\Entity\Decoration;
 	use App\Entity\SkillRank;
-	use App\QueryDocument\Projection;
+	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
+	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 	use Symfony\Component\HttpFoundation\Request;
@@ -14,9 +15,11 @@
 	class DecorationsController extends AbstractController {
 		/**
 		 * DecorationsDataController constructor.
+		 *
+		 * @param QueryManagerInterface $queryManager
 		 */
-		public function __construct() {
-			parent::__construct(Decoration::class);
+		public function __construct(QueryManagerInterface $queryManager) {
+			parent::__construct($queryManager, Decoration::class);
 		}
 
 		/**
@@ -27,7 +30,7 @@
 		 * @return Response
 		 */
 		public function list(Request $request): Response {
-			return parent::list($request);
+			return $this->doList($request);
 		}
 
 		/**
@@ -46,12 +49,13 @@
 		/**
 		 * @Route(path="/decorations/{decoration<\d+>}", methods={"GET"}, name="decorations.read")
 		 *
+		 * @param Request    $request
 		 * @param Decoration $decoration
 		 *
 		 * @return Response
 		 */
-		public function read(Decoration $decoration): Response {
-			return $this->respond($decoration);
+		public function read(Request $request, Decoration $decoration): Response {
+			return $this->respond($request, $decoration);
 		}
 
 		/**
@@ -82,14 +86,10 @@
 		}
 
 		/**
-		 * @param EntityInterface|Decoration|null $entity
-		 * @param Projection                      $projection
-		 *
-		 * @return array|null
+		 * {@inheritdoc}
 		 */
-		protected function normalizeOne(?EntityInterface $entity, Projection $projection): ?array {
-			if (!$entity)
-				return null;
+		protected function normalizeOne(EntityInterface $entity, Projection $projection): array {
+			assert($entity instanceof Decoration);
 
 			$output = [
 				'id' => $entity->getId(),
@@ -100,24 +100,26 @@
 
 			// region SkillRank Fields
 			if ($projection->isAllowed('skills')) {
-				$output['skills'] = array_map(function(SkillRank $rank) use ($projection): array {
-					$output = [
-						'id' => $rank->getId(),
-						'description' => $rank->getDescription(),
-						'level' => $rank->getLevel(),
-						'modifiers' => $rank->getModifiers(),
-					];
+				$output['skills'] = array_map(
+					function(SkillRank $rank) use ($projection): array {
+						$output = [
+							'id' => $rank->getId(),
+							'description' => $rank->getDescription(),
+							'level' => $rank->getLevel(),
+							'modifiers' => $rank->getModifiers(),
+						];
 
-					if ($projection->isAllowed('skills.skill'))
-						$output['skill'] = $rank->getSkill()->getId();
+						if ($projection->isAllowed('skills.skill'))
+							$output['skill'] = $rank->getSkill()->getId();
 
-					if ($projection->isAllowed('skills.skillName'))
-						$output['skillName'] = $rank->getSkill()->getName();
+						if ($projection->isAllowed('skills.skillName'))
+							$output['skillName'] = $rank->getSkill()->getName();
 
-					return $output;
-				}, $entity->getSkills()->toArray());
+						return $output;
+					},
+					$entity->getSkills()->toArray()
+				);
 			}
-
 			// endregion
 
 			return $output;

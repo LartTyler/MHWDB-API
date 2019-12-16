@@ -5,7 +5,7 @@ services:
         public: false
 
     App\Command\:
-        resource: '%kernel.root_dir%/Command'
+        resource: '%kernel.project_dir%/src/Command'
         tags:
             - console.command
 

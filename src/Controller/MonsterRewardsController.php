@@ -3,7 +3,8 @@
 
 	use App\Entity\MonsterReward;
 	use App\Entity\RewardCondition;
-	use App\QueryDocument\Projection;
+	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
+	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Symfony\Component\HttpFoundation\Request;
 	use Symfony\Component\HttpFoundation\Response;
@@ -12,9 +13,11 @@
 	class MonsterRewardsController extends AbstractController {
 		/**
 		 * MonsterRewardsController constructor.
+		 *
+		 * @param QueryManagerInterface $queryManager
 		 */
-		public function __construct() {
-			parent::__construct(MonsterReward::class);
+		public function __construct(QueryManagerInterface $queryManager) {
+			parent::__construct($queryManager, MonsterReward::class);
 		}
 
 		/**
@@ -25,29 +28,26 @@
 		 * @return Response
 		 */
 		public function list(Request $request): Response {
-			return parent::list($request);
+			return $this->doList($request);
 		}
 
 		/**
 		 * @Route(path="/monsters/rewards/{reward<\d+>}", methods={"GET"}, name="monsters.rewards.read")
 		 *
+		 * @param Request       $request
 		 * @param MonsterReward $reward
 		 *
 		 * @return Response
 		 */
-		public function read(MonsterReward $reward): Response {
-			return $this->respond($reward);
+		public function read(Request $request, MonsterReward $reward): Response {
+			return $this->respond($request, $reward);
 		}
 
 		/**
-		 * @param EntityInterface|MonsterReward|null $entity
-		 * @param Projection                         $projection
-		 *
-		 * @return array|null
+		 * {@inheritdoc}
 		 */
-		protected function normalizeOne(?EntityInterface $entity, Projection $projection): ?array {
-			if (!$entity)
-				return null;
+		protected function normalizeOne(EntityInterface $entity, Projection $projection): array {
+			assert($entity instanceof MonsterReward);
 
 			$output = [
 				'id' => $entity->getId(),
