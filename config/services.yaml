@@ -20,6 +20,8 @@ services:
         arguments:
             - '@doctrine.orm.entity_manager'
 
+    DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface: '@App\QueryDocument\ApiQueryManager'
+
     Aws\Sdk:
         arguments:
             -

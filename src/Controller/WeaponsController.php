@@ -8,7 +8,8 @@
 	use App\Entity\WeaponSharpness;
 	use App\Entity\WeaponSlot;
 	use App\Game\WeaponType;
-	use App\QueryDocument\Projection;
+	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
+	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\Collection;
 	use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -19,9 +20,11 @@
 	class WeaponsController extends AbstractController {
 		/**
 		 * WeaponsDataController constructor.
+		 *
+		 * @param QueryManagerInterface $queryManager
 		 */
-		public function __construct() {
-			parent::__construct(Weapon::class);
+		public function __construct(QueryManagerInterface $queryManager) {
+			parent::__construct($queryManager, Weapon::class);
 		}
 
 		/**
@@ -32,7 +35,7 @@
 		 * @return Response
 		 */
 		public function list(Request $request): Response {
-			return parent::list($request);
+			return $this->doList($request);
 		}
 
 		/**
@@ -51,12 +54,13 @@
 		/**
 		 * @Route(path="/weapons/{weapon<\d+>}", methods={"GET"}, name="weapons.read")
 		 *
-		 * @param Weapon $weapon
+		 * @param Request $request
+		 * @param Weapon  $weapon
 		 *
 		 * @return Response
 		 */
-		public function read(Weapon $weapon): Response {
-			return $this->respond($weapon);
+		public function read(Request $request, Weapon $weapon): Response {
+			return $this->respond($request, $weapon);
 		}
 
 		/**
@@ -87,14 +91,10 @@
 		}
 
 		/**
-		 * @param EntityInterface|Weapon|null $entity
-		 * @param Projection                  $projection
-		 *
-		 * @return array|null
+		 * {@inheritdoc}
 		 */
-		protected function normalizeOne(?EntityInterface $entity, Projection $projection): ?array {
-			if (!$entity)
-				return null;
+		protected function normalizeOne(EntityInterface $entity, Projection $projection): array {
+			assert($entity instanceof Weapon);
 
 			$output = [
 				'id' => $entity->getId(),
@@ -323,7 +323,6 @@
 				} else
 					$output['assets'] = null;
 			}
-
 			// endregion
 
 			return $output;

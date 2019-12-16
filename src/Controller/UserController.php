@@ -2,15 +2,16 @@
 	namespace App\Controller;
 
 	use App\Contrib\ApiErrors\InvalidParameterError;
-	use App\Contrib\ApiErrors\InvalidPayloadError;
 	use App\Contrib\ApiErrors\MissingRequiredFieldsError;
 	use App\Contrib\Transformers\UserTransformer;
 	use App\Entity\User;
 	use App\Entity\UserRole;
-	use App\QueryDocument\Projection;
 	use App\Response\NoContentResponse;
 	use App\Utility\ObjectUtil;
-	use DaybreakStudios\Doze\Errors\NotFoundError;
+	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
+	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
+	use DaybreakStudios\RestApiCommon\Error\Errors\ApiController\InvalidPayloadError;
+	use DaybreakStudios\RestApiCommon\Error\Errors\NotFoundError;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 	use Symfony\Component\HttpFoundation\Request;
@@ -21,9 +22,11 @@
 	class UserController extends AbstractController {
 		/**
 		 * UserController constructor.
+		 *
+		 * @param QueryManagerInterface $queryManager
 		 */
-		public function __construct() {
-			parent::__construct(User::class);
+		public function __construct(QueryManagerInterface $queryManager) {
+			parent::__construct($queryManager, User::class);
 		}
 
 		/**
@@ -35,7 +38,7 @@
 		 * @return Response
 		 */
 		public function list(Request $request): Response {
-			return parent::list($request);
+			return $this->doList($request);
 		}
 
 		/**
@@ -55,12 +58,13 @@
 		 * @Route(path="/users/{user<\d+>}", methods={"GET"}, name="users.read")
 		 * @IsGranted("ROLE_ADMIN")
 		 *
-		 * @param User $user
+		 * @param Request $request
+		 * @param User    $user
 		 *
 		 * @return Response
 		 */
-		public function read(User $user): Response {
-			return $this->respond($user);
+		public function read(Request $request, User $user): Response {
+			return $this->respond($request, $user);
 		}
 
 		/**
@@ -100,17 +104,17 @@
 		 * @return Response
 		 */
 		public function activate(string $code, Request $request, UserPasswordEncoderInterface $encoder): Response {
-			$payload = json_decode($request->getContent());
+			$payload = @json_decode($request->getContent());
 
 			if (json_last_error() !== JSON_ERROR_NONE)
-				return $this->respond(new InvalidPayloadError());
+				return $this->respond($request, new InvalidPayloadError());
 			else if (!ObjectUtil::isset($payload, 'password'))
-				return $this->respond(new MissingRequiredFieldsError(['password']));
+				return $this->respond($request, new MissingRequiredFieldsError(['password']));
 
 			$password = $payload->password;
 
 			if (strlen($password) < 5)
-				return $this->respond(new InvalidParameterError('password', 'at least 5 characters long'));
+				return $this->respond($request, new InvalidParameterError('password', 'at least 5 characters long'));
 
 			/** @var User|null $user */
 			$user = $this->entityManager->getRepository(User::class)->findOneBy(
@@ -120,7 +124,7 @@
 			);
 
 			if (!$user)
-				return $this->respond(new NotFoundError());
+				return $this->respond($request, new NotFoundError());
 
 			$user
 				->setActivationCode(null)
@@ -128,7 +132,7 @@
 
 			$this->entityManager->flush();
 
-			return $this->respond($user);
+			return $this->respond($request, $user);
 		}
 
 		/**
@@ -143,7 +147,7 @@
 			$payload = json_decode($request->getContent());
 
 			if (json_last_error() !== JSON_ERROR_NONE)
-				return $this->respond(new InvalidPayloadError());
+				return $this->respond($request, new InvalidPayloadError());
 
 			$missing = ObjectUtil::getMissingProperties(
 				$payload,
@@ -154,7 +158,7 @@
 			);
 
 			if ($missing)
-				return $this->respond(new MissingRequiredFieldsError($missing));
+				return $this->respond($request, new MissingRequiredFieldsError($missing));
 
 			/** @var User|null $user */
 			$user = $this->entityManager->getRepository(User::class)->findOneBy(
@@ -183,17 +187,17 @@
 		 * @return Response
 		 */
 		public function resetPassword(string $code, Request $request, UserPasswordEncoderInterface $encoder): Response {
-			$payload = json_decode($request->getContent());
+			$payload = @json_decode($request->getContent());
 
 			if (json_last_error() !== JSON_ERROR_NONE)
-				return $this->respond(new InvalidPayloadError());
+				return $this->respond($request, new InvalidPayloadError());
 			else if (!ObjectUtil::isset($payload, 'password'))
-				return $this->respond(new MissingRequiredFieldsError(['password']));
+				return $this->respond($request, new MissingRequiredFieldsError(['password']));
 
 			$password = $payload->password;
 
 			if (strlen($password) < 5)
-				return $this->respond(new InvalidParameterError('password', 'at least 5 characters long'));
+				return $this->respond($request, new InvalidParameterError('password', 'at least 5 characters long'));
 
 			/** @var User|null $user */
 			$user = $this->entityManager->getRepository(User::class)->findOneBy(
@@ -203,7 +207,7 @@
 			);
 
 			if (!$user)
-				return $this->respond(new NotFoundError());
+				return $this->respond($request, new NotFoundError());
 
 			$user
 				->setPasswordResetCode(null)
@@ -215,14 +219,10 @@
 		}
 
 		/**
-		 * @param User|EntityInterface|null $entity
-		 * @param Projection                $projection
-		 *
-		 * @return array|null
+		 * {@inheritdoc}
 		 */
-		protected function normalizeOne(?EntityInterface $entity, Projection $projection): ?array {
-			if (!$entity)
-				return null;
+		protected function normalizeOne(EntityInterface $entity, Projection $projection): array {
+			assert($entity instanceof User);
 
 			$output = [
 				'id' => $entity->getId(),

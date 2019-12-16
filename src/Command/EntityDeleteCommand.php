@@ -4,7 +4,7 @@
 	use App\Entity\Armor;
 	use App\Entity\Weapon;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use Doctrine\Common\Persistence\ObjectManager;
+	use Doctrine\ORM\EntityManagerInterface;
 	use Symfony\Component\Console\Command\Command;
 	use Symfony\Component\Console\Input\InputArgument;
 	use Symfony\Component\Console\Input\InputInterface;
@@ -13,16 +13,16 @@
 
 	class EntityDeleteCommand extends Command {
 		/**
-		 * @var ObjectManager
+		 * @var EntityManagerInterface
 		 */
 		protected $manager;
 
 		/**
 		 * EntityDeleteCommand constructor.
 		 *
-		 * @param ObjectManager $manager
+		 * @param EntityManagerInterface $manager
 		 */
-		public function __construct(ObjectManager $manager) {
+		public function __construct(EntityManagerInterface $manager) {
 			parent::__construct();
 
 			$this->manager = $manager;

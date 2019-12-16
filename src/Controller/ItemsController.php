@@ -3,7 +3,8 @@
 
 	use App\Contrib\Transformers\ItemTransformer;
 	use App\Entity\Item;
-	use App\QueryDocument\Projection;
+	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
+	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 	use Symfony\Component\HttpFoundation\Request;
@@ -13,9 +14,11 @@
 	class ItemsController extends AbstractController {
 		/**
 		 * ItemsDataController constructor.
+		 *
+		 * @param QueryManagerInterface $queryManager
 		 */
-		public function __construct() {
-			parent::__construct(Item::class);
+		public function __construct(QueryManagerInterface $queryManager) {
+			parent::__construct($queryManager, Item::class);
 		}
 
 		/**
@@ -26,7 +29,7 @@
 		 * @return Response
 		 */
 		public function list(Request $request): Response {
-			return parent::list($request);
+			return $this->doList($request);
 		}
 
 		/**
@@ -45,12 +48,13 @@
 		/**
 		 * @Route(path="/items/{item<\d+>}", methods={"GET"}, name="items.read")
 		 *
-		 * @param Item $item
+		 * @param Request $request
+		 * @param Item    $item
 		 *
 		 * @return Response
 		 */
-		public function read(Item $item): Response {
-			return $this->respond($item);
+		public function read(Request $request, Item $item): Response {
+			return $this->respond($request, $item);
 		}
 
 		/**
@@ -81,14 +85,10 @@
 		}
 
 		/**
-		 * @param EntityInterface|Item|null $entity
-		 * @param Projection                $projection
-		 *
-		 * @return array|null
+		 * {@inheritdoc}
 		 */
-		protected function normalizeOne(?EntityInterface $entity, Projection $projection): ?array {
-			if (!$entity)
-				return null;
+		protected function normalizeOne(EntityInterface $entity, Projection $projection): array {
+			assert($entity instanceof Item);
 
 			return [
 				'id' => $entity->getId(),

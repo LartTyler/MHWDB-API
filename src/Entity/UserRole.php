@@ -18,7 +18,7 @@
 	 *
 	 * @package App\Entity
 	 */
-	class UserRole extends Role implements EntityInterface {
+	class UserRole implements EntityInterface {
 		use EntityTrait;
 
 		/**
@@ -43,8 +43,6 @@
 		 * @param string $name
 		 */
 		public function __construct(User $user, string $name) {
-			parent::__construct($name);
-
 			$this->user = $user;
 			$this->name = $name;
 		}

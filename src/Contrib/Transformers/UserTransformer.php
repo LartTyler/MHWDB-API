@@ -10,8 +10,8 @@
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\IntegrityException;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\ValidationException;
 	use Doctrine\ORM\EntityManagerInterface;
-	use Symfony\Component\Templating\EngineInterface;
 	use Symfony\Component\Validator\Validator\ValidatorInterface;
+	use Twig\Environment;
 
 	class UserTransformer extends AbstractEntityTransformer {
 		/**
@@ -20,9 +20,9 @@
 		protected $mailer;
 
 		/**
-		 * @var EngineInterface
+		 * @var Environment
 		 */
-		protected $templater;
+		protected $templating;
 
 		/**
 		 * UserTransformer constructor.
@@ -30,18 +30,18 @@
 		 * @param EntityManagerInterface $entityManager
 		 * @param ValidatorInterface     $validator
 		 * @param \Swift_Mailer          $mailer
-		 * @param EngineInterface        $templater
+		 * @param Environment            $templating
 		 */
 		public function __construct(
 			EntityManagerInterface $entityManager,
 			ValidatorInterface $validator,
 			\Swift_Mailer $mailer,
-			EngineInterface $templater
+			Environment $templating
 		) {
 			parent::__construct($entityManager, $validator);
 
 			$this->mailer = $mailer;
-			$this->templater = $templater;
+			$this->templating = $templating;
 		}
 
 		/**
@@ -130,7 +130,7 @@
 				->setFrom('no-reply@mail.mhw-db.com', 'MHWDB Contrib')
 				->setTo($user->getEmail())
 				->setBody(
-					$this->templater->render(
+					$this->templating->render(
 						'activation-email.html.twig',
 						[
 							'activationUrl' => $url,
@@ -164,7 +164,7 @@
 				->setFrom('no-reply@mail.mhw-db.com', 'MHWDB Contrib')
 				->setTo($user->getEmail())
 				->setBody(
-					$this->templater->render(
+					$this->templating->render(
 						'password-reset-email.html.twig',
 						[
 							'passwordResetUrl' => $url,

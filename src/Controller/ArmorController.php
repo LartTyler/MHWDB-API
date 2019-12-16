@@ -7,7 +7,8 @@
 	use App\Entity\Asset;
 	use App\Entity\CraftingMaterialCost;
 	use App\Entity\SkillRank;
-	use App\QueryDocument\Projection;
+	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
+	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 	use Symfony\Component\HttpFoundation\Request;
@@ -17,9 +18,11 @@
 	class ArmorController extends AbstractController {
 		/**
 		 * ArmorDataController constructor.
+		 *
+		 * @param QueryManagerInterface $queryManager
 		 */
-		public function __construct() {
-			parent::__construct(Armor::class);
+		public function __construct(QueryManagerInterface $queryManager) {
+			parent::__construct($queryManager, Armor::class);
 		}
 
 		/**
@@ -30,7 +33,7 @@
 		 * @return Response
 		 */
 		public function list(Request $request): Response {
-			return parent::list($request);
+			return $this->doList($request);
 		}
 
 		/**
@@ -49,12 +52,13 @@
 		/**
 		 * @Route(path="/armor/{armor<\d+>}", methods={"GET"}, name="armor.read")
 		 *
-		 * @param Armor $armor
+		 * @param Request $request
+		 * @param Armor   $armor
 		 *
 		 * @return Response
 		 */
-		public function read(Armor $armor): Response {
-			return $this->respond($armor);
+		public function read(Request $request, Armor $armor): Response {
+			return $this->respond($request, $armor);
 		}
 
 		/**
@@ -85,14 +89,10 @@
 		}
 
 		/**
-		 * @param EntityInterface|Armor|null $entity
-		 * @param Projection                 $projection
-		 *
-		 * @return array|null
+		 * {@inheritdoc}
 		 */
-		protected function normalizeOne(?EntityInterface $entity, Projection $projection): ?array {
-			if (!$entity)
-				return null;
+		protected function normalizeOne(EntityInterface $entity, Projection $projection): array {
+			assert($entity instanceof Armor);
 
 			$defense = $entity->getDefense();
 			$resists = $entity->getResistances();

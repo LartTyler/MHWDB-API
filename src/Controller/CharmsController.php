@@ -6,7 +6,8 @@
 	use App\Entity\CharmRank;
 	use App\Entity\CraftingMaterialCost;
 	use App\Entity\SkillRank;
-	use App\QueryDocument\Projection;
+	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
+	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 	use Symfony\Component\HttpFoundation\Request;
@@ -16,9 +17,11 @@
 	class CharmsController extends AbstractController {
 		/**
 		 * CharmsDataController constructor.
+		 *
+		 * @param QueryManagerInterface $queryManager
 		 */
-		public function __construct() {
-			parent::__construct(Charm::class);
+		public function __construct(QueryManagerInterface $queryManager) {
+			parent::__construct($queryManager, Charm::class);
 		}
 
 		/**
@@ -29,7 +32,7 @@
 		 * @return Response
 		 */
 		public function list(Request $request): Response {
-			return parent::list($request);
+			return $this->doList($request);
 		}
 
 		/**
@@ -48,12 +51,13 @@
 		/**
 		 * @Route(path="/charms/{charm<\d+>}", methods={"GET"}, name="charms.read")
 		 *
-		 * @param Charm $charm
+		 * @param Request $request
+		 * @param Charm   $charm
 		 *
 		 * @return Response
 		 */
-		public function read(Charm $charm): Response {
-			return $this->respond($charm);
+		public function read(Request $request, Charm $charm): Response {
+			return $this->respond($request, $charm);
 		}
 
 		/**
@@ -84,14 +88,10 @@
 		}
 
 		/**
-		 * @param EntityInterface|Charm|null $entity
-		 * @param Projection                 $projection
-		 *
-		 * @return array|null
+		 * {@inheritdoc}
 		 */
-		protected function normalizeOne(?EntityInterface $entity, Projection $projection): ?array {
-			if (!$entity)
-				return null;
+		protected function normalizeOne(EntityInterface $entity, Projection $projection): array {
+			assert($entity instanceof Charm);
 
 			$output = [
 				'id' => $entity->getId(),
@@ -162,7 +162,6 @@
 													'value' => $item->getValue(),
 												];
 											}
-
 											// endregion
 
 											return $output;
@@ -174,7 +173,6 @@
 							} else
 								$output['crafting'] = null;
 						}
-
 						// endregion
 
 						return $output;
@@ -182,7 +180,6 @@
 					$entity->getRanks()->toArray()
 				);
 			}
-
 			// endregion
 
 			return $output;

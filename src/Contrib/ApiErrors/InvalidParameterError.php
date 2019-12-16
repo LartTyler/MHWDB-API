@@ -1,7 +1,7 @@
 <?php
 	namespace App\Contrib\ApiErrors;
 
-	use DaybreakStudios\Doze\Errors\ApiError;
+	use DaybreakStudios\RestApiCommon\Error\ApiError;
 
 	class InvalidParameterError extends ApiError {
 		public function __construct(string $field, string $expected) {

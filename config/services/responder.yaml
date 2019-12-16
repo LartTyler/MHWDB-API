@@ -1,37 +1,22 @@
-parameters:
-    dbstudios.cors_listener.allow_credentials: false
-
 services:
     _defaults:
-        autowire: true       # Automatically injects dependencies in your services.
-        autoconfigure: false # Automatically registers your services as commands, event subscribers, etc.
-        public: false        # Allows optimizing the container by removing unused services; this also means
-                             # fetching services directly from the container via $container->get() won't work.
-                             # The best practice is to be explicit about your dependencies anyway.
-
-    DaybreakStudios\DozeBundle\ResponderService:
-        arguments:
-            - '@app.serializer'
-            - '@request_stack'
+        autowire: true
+        autoconfigure: false
+        public: false
 
     app.serializer:
         class: Symfony\Component\Serializer\Serializer
         arguments:
             -
-                - '@app.serializer.normalizer.datetime'
-                - '@app.serializer.normalizer.entity'
-                - '@app.serializer.normalizer.object'
+                - '@serializer.normalizer.datetime'
+                - '@serializer.normalizer.object'
             -
-                - '@app.serializer.encoder.json'
+                - '@serializer.encoder.json'
 
-    app.serializer.normalizer.datetime:
-        class: Symfony\Component\Serializer\Normalizer\DateTimeNormalizer
+    DaybreakStudios\RestApiCommon\Responder:
+        bind:
+            $serializer: '@app.serializer'
 
-    app.serializer.normalizer.entity:
-        class: DaybreakStudios\Doze\Serializer\EntityNormalizer
+    DaybreakStudios\RestApiCommon\ResponderInterface: '@DaybreakStudios\RestApiCommon\Responder'
 
-    app.serializer.normalizer.object:
-        class: Symfony\Component\Serializer\Normalizer\ObjectNormalizer
-
-    app.serializer.encoder.json:
-        class: Symfony\Component\Serializer\Encoder\JsonEncoder
+    DaybreakStudios\RestApiCommon\ResponderService: ~
