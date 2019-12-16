@@ -3,6 +3,7 @@
 
 	use App\Entity\Location;
 	use App\Entity\WorldEvent;
+	use App\Game\Expansion;
 	use App\Game\PlatformExclusivityType;
 	use App\Game\PlatformType;
 	use App\Game\WorldEventType;
@@ -14,8 +15,13 @@
 
 	class WorldEventReader {
 		public const PLATFORM_TYPE_MAP = [
-			PlatformType::CONSOLE => 'http://game.capcom.com/world/us/schedule.html',
-			PlatformType::PC => 'http://game.capcom.com/world/steam/us/schedule.html',
+			PlatformType::CONSOLE => [
+				Expansion::BASE => 'http://game.capcom.com/world/us/schedule.html',
+				Expansion::ICEBORNE => 'http://game.capcom.com/world/us/schedule-master.html',
+			],
+			PlatformType::PC => [
+				Expansion::BASE => 'http://game.capcom.com/world/steam/us/schedule.html',
+			],
 		];
 
 		public const TABLE_TYPE_MAP = [
@@ -48,12 +54,21 @@
 		}
 
 		/**
-		 * @param string $platform
+		 * @param string      $platform
+		 * @param string|null $expansion
 		 *
 		 * @return \Generator|WorldEvent[]
 		 */
-		public function read(string $platform): \Generator {
-			$crawler = new Crawler(file_get_contents(static::PLATFORM_TYPE_MAP[$platform]));
+		public function read(string $platform, ?string $expansion): \Generator {
+			$url = static::PLATFORM_TYPE_MAP[$platform][$expansion] ?? null;
+
+			if (!$url) {
+				throw new \InvalidArgumentException(
+					sprintf('No URL found for platform and expansion: %s, %s', $platform, $expansion ?? 'NULL')
+				);
+			}
+
+			$crawler = new Crawler(file_get_contents($url));
 			$timezoneOffsetNode = $crawler->filter('label[for=zoneSelect]');
 
 			// Pre-Iceborne events page contained a typo in the `for` attribute of the timezone selector. Until the PC
@@ -82,6 +97,7 @@
 
 					$popupItems = $questInfo->filter('.pop li > span');
 
+					/** @var Location|null $location */
 					$location = $this->entityManager->getRepository(Location::class)->findOneBy(
 						[
 							'name' => $locName = trim($popupItems->eq(0)->text()),
@@ -154,15 +170,23 @@
 						if ($event)
 							continue;
 
+						$type = static::TABLE_TYPE_MAP[$tables->eq($tableIndex)->attr('class')];
+
+						if ($expansion === Expansion::ICEBORNE && $type === WorldEventType::KULVE_TAROTH)
+							$type = WorldEventType::SAFI_JIIVA;
+
 						$event = new WorldEvent(
 							$name,
-							static::TABLE_TYPE_MAP[$tables->eq($tableIndex)->attr('class')],
+							$type,
 							$platform,
 							$term[0],
 							$term[1],
 							$location,
 							$rank
 						);
+
+						if ($expansion)
+							$event->setExpansion($expansion);
 
 						if ($description)
 							$event->setDescription($description);

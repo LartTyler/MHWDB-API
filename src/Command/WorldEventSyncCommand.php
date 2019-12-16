@@ -39,6 +39,7 @@
 		 */
 		protected function configure(): void {
 			$this->addArgument('platform', InputArgument::REQUIRED);
+			$this->addArgument('expansion', InputArgument::OPTIONAL);
 		}
 
 		/**
@@ -47,10 +48,11 @@
 		 *
 		 * @return void
 		 */
-		protected function execute(InputInterface $input, OutputInterface $output): void {
+		protected function execute(InputInterface $input, OutputInterface $output): int {
+			$events = $this->eventReader->read($input->getArgument('platform'), $input->getArgument('expansion'));
 			$added = 0;
 
-			foreach ($this->eventReader->read($input->getArgument('platform')) as $event) {
+			foreach ($events as $event) {
 				$this->entityManager->persist($event);
 
 				++$added;
