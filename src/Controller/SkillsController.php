@@ -4,7 +4,8 @@
 	use App\Contrib\Transformers\SkillTransformer;
 	use App\Entity\Skill;
 	use App\Entity\SkillRank;
-	use App\QueryDocument\Projection;
+	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
+	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 	use Symfony\Component\HttpFoundation\Request;
@@ -14,9 +15,11 @@
 	class SkillsController extends AbstractController {
 		/**
 		 * SkillsCrudController constructor.
+		 *
+		 * @param QueryManagerInterface $queryManager
 		 */
-		public function __construct() {
-			parent::__construct(Skill::class);
+		public function __construct(QueryManagerInterface $queryManager) {
+			parent::__construct($queryManager, Skill::class);
 		}
 
 		/**
@@ -27,7 +30,7 @@
 		 * @return Response
 		 */
 		public function list(Request $request): Response {
-			return parent::list($request);
+			return $this->doList($request);
 		}
 
 		/**
@@ -46,12 +49,13 @@
 		/**
 		 * @Route(path="/skills/{skill<\d+>}", methods={"GET"}, name="skills.read")
 		 *
-		 * @param Skill $skill
+		 * @param Request $request
+		 * @param Skill   $skill
 		 *
 		 * @return Response
 		 */
-		public function read(Skill $skill): Response {
-			return $this->respond($skill);
+		public function read(Request $request, Skill $skill): Response {
+			return $this->respond($request, $skill);
 		}
 
 		/**
@@ -81,14 +85,10 @@
 		}
 
 		/**
-		 * @param EntityInterface|Skill|null $entity
-		 * @param Projection                 $projection
-		 *
-		 * @return array|null
+		 * {@inheritdoc}
 		 */
-		protected function normalizeOne(?EntityInterface $entity, Projection $projection): ?array {
-			if (!$entity)
-				return null;
+		protected function normalizeOne(EntityInterface $entity, Projection $projection): array {
+			assert($entity instanceof Skill);
 
 			$output = [
 				'id' => $entity->getId(),
@@ -98,20 +98,22 @@
 
 			// region SkillRank Fields
 			if ($projection->isAllowed('ranks')) {
-				$output['ranks'] = array_map(function(SkillRank $rank): array {
-					// No related field optimizations needed for each SkillRank, as the parent skill is already loaded
+				$output['ranks'] = array_map(
+					function(SkillRank $rank): array {
+						// No related field optimizations needed for each SkillRank, as the parent skill is already loaded
 
-					return [
-						'id' => $rank->getId(),
-						'skill' => $rank->getSkill()->getId(),
-						'skillName' => $rank->getSkill()->getName(),
-						'level' => $rank->getLevel(),
-						'description' => $rank->getDescription(),
-						'modifiers' => $rank->getModifiers() ?: new \stdClass(),
-					];
-				}, $entity->getRanks()->toArray());
+						return [
+							'id' => $rank->getId(),
+							'skill' => $rank->getSkill()->getId(),
+							'skillName' => $rank->getSkill()->getName(),
+							'level' => $rank->getLevel(),
+							'description' => $rank->getDescription(),
+							'modifiers' => $rank->getModifiers() ?: new \stdClass(),
+						];
+					},
+					$entity->getRanks()->toArray()
+				);
 			}
-
 			// endregion
 
 			return $output;

@@ -1,7 +1,7 @@
 <?php
 	namespace App\Response;
 
-	use DaybreakStudios\Doze\Errors\ApiError;
+	use DaybreakStudios\RestApiCommon\Error\ApiError;
 
 	class UnknownWeaponTypeError extends ApiError {
 		/**

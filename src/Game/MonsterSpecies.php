@@ -14,6 +14,7 @@
 		public const PISCINE_WYVERN = 'piscine wyvern';
 		public const RELICT = 'relict';
 		public const WINGDRAKE = 'wingdrake';
+		public const FANGED_BEAST = 'fanged beast';
 
 		/**
 		 * @var string[]|null

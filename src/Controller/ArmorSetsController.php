@@ -10,7 +10,8 @@
 	use App\Entity\CraftingMaterialCost;
 	use App\Entity\SkillRank;
 	use App\Game\Element;
-	use App\QueryDocument\Projection;
+	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
+	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 	use Symfony\Component\HttpFoundation\Request;
@@ -20,9 +21,11 @@
 	class ArmorSetsController extends AbstractController {
 		/**
 		 * ArmorSetsDataController constructor.
+		 *
+		 * @param QueryManagerInterface $queryManager
 		 */
-		public function __construct() {
-			parent::__construct(ArmorSet::class);
+		public function __construct(QueryManagerInterface $queryManager) {
+			parent::__construct($queryManager, ArmorSet::class);
 		}
 
 		/**
@@ -33,7 +36,7 @@
 		 * @return Response
 		 */
 		public function list(Request $request): Response {
-			return parent::list($request);
+			return $this->doList($request);
 		}
 
 		/**
@@ -52,12 +55,13 @@
 		/**
 		 * @Route(path="/armor/sets/{set<\d+>}", methods={"GET"}, name="armor-sets.read")
 		 *
+		 * @param Request  $request
 		 * @param ArmorSet $set
 		 *
 		 * @return Response
 		 */
-		public function read(ArmorSet $set): Response {
-			return $this->respond($set);
+		public function read(Request $request, ArmorSet $set): Response {
+			return $this->respond($request, $set);
 		}
 
 		/**
@@ -88,14 +92,10 @@
 		}
 
 		/**
-		 * @param EntityInterface|ArmorSet|null $entity
-		 * @param Projection                    $projection
-		 *
-		 * @return array|null
+		 * {@inheritdoc}
 		 */
-		protected function normalizeOne(?EntityInterface $entity, Projection $projection): ?array {
-			if (!$entity)
-				return null;
+		protected function normalizeOne(EntityInterface $entity, Projection $projection): array {
+			assert($entity instanceof ArmorSet);
 
 			$output = [
 				'id' => $entity->getId(),
@@ -296,7 +296,6 @@
 				} else
 					$output['bonus'] = null;
 			}
-
 			// endregion
 
 			return $output;

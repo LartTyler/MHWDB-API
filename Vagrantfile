@@ -16,31 +16,31 @@ Vagrant.configure("2") do |config|
 	end
 
 	config.vm.provision "bootstrap", type: "shell", inline: <<-SHELL
-		fallocate -l 4G /swapfile
-		chmod 600 /swapfile
-
-		mkswap /swapfile
-		swapon /swapfile
-
 		if grep -Fqvx "^/swapfile" /etc/fstab; then
+			fallocate -l 4G /swapfile
+			chmod 600 /swapfile
+
+			mkswap /swapfile
+			swapon /swapfile
+
 			echo -e '/swapfile\tnone\tswap\tsw\t0\t0' >> /etc/fstab
 		fi
 
 		apt-get update -y
-		apt-get remove apache2 -y
+		apt-get remove apache2 php* -y
 
 		add-apt-repository -y ppa:ondrej/php
 
-		apt-get install -y ntp build-essential software-properties-common php7.2 php7.2-mysqlnd php7.2-curl \
-			php7.2-zip php7.2-mbstring php7.2-xml php7.2-xdebug php7.2-memcached php7.2-gd
+		apt-get install -y ntp build-essential software-properties-common php7.3-common php7.3-cli php7.3-mysqlnd \
+			php7.3-curl php7.3-zip php7.3-mbstring php7.3-xml php7.3-xdebug php7.3-memcached php7.3-gd
 		apt-get install -y composer
 
-		if grep -Fqvx "xdebug.remote_enable" /etc/php/7.2/mods-available/xdebug.ini; then
-			echo "xdebug.remote_enable = on" >> /etc/php/7.2/mods-available/xdebug.ini
-			echo "xdebug.remote_connect_back = on" >> /etc/php/7.2/mods-available/xdebug.ini
-			echo "xdebug.idekey = application" >> /etc/php/7.2/mods-available/xdebug.ini
-			echo "xdebug.remote_autostart = on" >> /etc/php/7.2/mods-available/xdebug.ini
-			echo "xdebug.remote_host = 10.0.2.2" >> /etc/php/7.2/mods-available/xdebug.ini
+		if grep -Fqvx "xdebug.remote_enable" /etc/php/7.3/mods-available/xdebug.ini; then
+			echo "xdebug.remote_enable = on" >> /etc/php/7.3/mods-available/xdebug.ini
+			echo "xdebug.remote_connect_back = on" >> /etc/php/7.3/mods-available/xdebug.ini
+			echo "xdebug.idekey = application" >> /etc/php/7.3/mods-available/xdebug.ini
+			echo "xdebug.remote_autostart = on" >> /etc/php/7.3/mods-available/xdebug.ini
+			echo "xdebug.remote_host = 10.0.2.2" >> /etc/php/7.3/mods-available/xdebug.ini
 		fi
 
 		apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8
@@ -55,6 +55,13 @@ Vagrant.configure("2") do |config|
 		mysql -e "CREATE SCHEMA application;"
 		mysql -e "CREATE USER 'application'@'%';"
 		mysql -e "GRANT ALL ON application.* TO 'application'@'%';"
+
+		wget https://get.symfony.com/cli/installer -O - | bash
+		mv /root/.symfony/bin/symfony /usr/local/bin/symfony
+
+		echo '[Assertion]' > /etc/php/7.3/cli/conf.d/99-assert.ini
+		echo 'zend.assertions = 1' >> /etc/php/7.3/cli/conf.d/99-assert.ini
+		echo 'assert.exception = On' >> /etc/php/7.3/cli/conf.d/99-assert.ini
 	SHELL
 
 	config.vm.provision "install", type: "shell", privileged: false, inline: <<-SHELL
@@ -75,7 +82,6 @@ Vagrant.configure("2") do |config|
 		openssl rsa -pubout -in config/jwt/private.pem -out config/jwt/public.pem
 
 		composer install
-		composer db:reset
 	SHELL
 
 	config.vm.provision "admin-run", type: "shell", run: "always", inline: <<-SHELL
@@ -87,7 +93,7 @@ Vagrant.configure("2") do |config|
 	config.vm.provision "run", type: "shell", run: "always", privileged: false, inline: <<-SHELL
 		echo ""
 		echo "Installed packages:"
-		echo "  -> PHP 7.2 (with extensions: mysqlnd, curl, zip, mbstring, xml, xdebug, memcached, gd)"
+		echo "  -> PHP 7.3 (with extensions: mysqlnd, curl, zip, mbstring, xml, xdebug, memcached, gd)"
 		echo "  -> Composer"
 		echo "  -> MariaDB"
 		echo ""
@@ -102,12 +108,10 @@ Vagrant.configure("2") do |config|
 		echo ""
 		echo "----------------------------------------------"
 		echo "Starting Symfony server at http://localhost:8000"
-		echo "If it doesn't come up, check the ~/symfony-server.log file for any error messages"
 
 		cd /vagrant
 
-
-		php bin/console server:stop > /dev/null
-		php bin/console server:start 0.0.0.0 &> ~/symfony-server.log &
+		symfony server:stop > /dev/null 2>&1
+		symfony server:start -d --no-tls
 	SHELL
 end

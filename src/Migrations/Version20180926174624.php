@@ -22,8 +22,6 @@
 		 * @param Schema $schema
 		 *
 		 * @return void
-		 * @throws \Doctrine\DBAL\DBALException
-		 * @throws \Doctrine\DBAL\Migrations\AbortMigrationException
 		 */
 		public function up(Schema $schema): void {
 			// this up() migration is auto-generated, please modify it to your needs
@@ -111,8 +109,6 @@
 		 * @param Schema $schema
 		 *
 		 * @return void
-		 * @throws \Doctrine\DBAL\DBALException
-		 * @throws \Doctrine\DBAL\Migrations\AbortMigrationException
 		 */
 		public function down(Schema $schema): void {
 			// this down() migration is auto-generated, please modify it to your needs
@@ -179,7 +175,7 @@
 		 * @return void
 		 * @throws \Doctrine\DBAL\DBALException
 		 */
-		public function postDown(Schema $schema) {
+		public function postDown(Schema $schema): void {
 			parent::postDown($schema);
 
 			$this->write('Inserting armor slot data preserved during down()...');

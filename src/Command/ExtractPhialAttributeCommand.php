@@ -54,7 +54,8 @@
 		/**
 		 * {@inheritdoc}
 		 */
-		protected function execute(InputInterface $input, OutputInterface $output): void {
+		protected function execute(InputInterface $input, OutputInterface $output): int {
+			/** @var Weapon[] $weapons */
 			$weapons = $this->entityManager->getRepository(Weapon::class)->findBy(
 				[
 					'type' => [
@@ -108,7 +109,7 @@
 
 					$io->error($message);
 
-					return;
+					return 1;
 				}
 
 				$weapon->setPhial($phial);
@@ -118,5 +119,7 @@
 
 			$io->progressFinish();
 			$io->success('Done!');
+
+			return 0;
 		}
 	}

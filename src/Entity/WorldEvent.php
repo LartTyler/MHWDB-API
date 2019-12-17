@@ -1,6 +1,7 @@
 <?php
 	namespace App\Entity;
 
+	use App\Game\Expansion;
 	use App\Game\PlatformExclusivityType;
 	use App\Game\PlatformType;
 	use App\Game\WorldEventType;
@@ -13,7 +14,7 @@
 	 * @ORM\Table(
 	 *     name="world_events",
 	 *     uniqueConstraints={
-	 *     		@ORM\UniqueConstraint(columns={"platform", "name", "start_timestamp"})
+	 *     		@ORM\UniqueConstraint(columns={"platform", "name", "expansion", "start_timestamp"})
 	 *     }
 	 * )
 	 */
@@ -39,6 +40,17 @@
 		 * @see WorldEventType
 		 */
 		private $type;
+
+		/**
+		 * @Assert\NotBlank()
+		 * @Assert\Choice(callback={"App\Game\Expansion", "values"})
+		 *
+		 * @ORM\Column(type="string", length=32)
+		 *
+		 * @var string
+		 * @see Expansion
+		 */
+		private $expansion;
 
 		/**
 		 * @Assert\NotBlank()
@@ -115,10 +127,18 @@
 		private $exclusive = null;
 
 		/**
+		 * @ORM\Column(type="boolean")
+		 *
+		 * @var bool
+		 */
+		private $masterRank = false;
+
+		/**
 		 * WorldEvent constructor.
 		 *
 		 * @param string             $name
 		 * @param string             $type
+		 * @param string             $expansion
 		 * @param string             $platform
 		 * @param \DateTimeImmutable $startTimestamp
 		 * @param \DateTimeImmutable $endTimestamp
@@ -128,6 +148,7 @@
 		public function __construct(
 			string $name,
 			string $type,
+			string $expansion,
 			string $platform,
 			\DateTimeImmutable $startTimestamp,
 			\DateTimeImmutable $endTimestamp,
@@ -136,6 +157,7 @@
 		) {
 			$this->name = $name;
 			$this->type = $type;
+			$this->expansion = $expansion;
 			$this->platform = $platform;
 			$this->startTimestamp = $startTimestamp;
 			$this->endTimestamp = $endTimestamp;
@@ -155,6 +177,14 @@
 		 */
 		public function getType(): string {
 			return $this->type;
+		}
+
+		/**
+		 * @return string
+		 * @see Expansion
+		 */
+		public function getExpansion(): string {
+			return $this->expansion;
 		}
 
 		/**
@@ -260,6 +290,24 @@
 		 */
 		public function setExclusive(?string $exclusive) {
 			$this->exclusive = $exclusive;
+
+			return $this;
+		}
+
+		/**
+		 * @return bool
+		 */
+		public function isMasterRank(): bool {
+			return $this->masterRank;
+		}
+
+		/**
+		 * @param bool $masterRank
+		 *
+		 * @return $this
+		 */
+		public function setMasterRank(bool $masterRank) {
+			$this->masterRank = $masterRank;
 
 			return $this;
 		}
