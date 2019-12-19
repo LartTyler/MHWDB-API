@@ -5,6 +5,8 @@
 	use App\Entity\Ailment;
 	use App\Entity\Item;
 	use App\Entity\Skill;
+	use App\Entity\Strings\AilmentStrings;
+	use App\Utility\NullObject;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -31,7 +33,12 @@
 		 * @return Response
 		 */
 		public function list(Request $request): Response {
-			return $this->doList($request);
+			return $this->doList(
+				$request,
+				[
+					'strings.language' => $request->getLocale(),
+				]
+			);
 		}
 
 		/**
@@ -94,9 +101,16 @@
 
 			$output = [
 				'id' => $entity->getId(),
-				'name' => $entity->getName(),
-				'description' => $entity->getDescription(),
 			];
+
+			if ($projection->isAllowed('name') || $projection->isAllowed('description')) {
+				$strings = $entity->getStringsByTag($this->requestStack->getCurrentRequest()->getLocale());
+
+				$output += [
+					'name' => $strings->getName(),
+					'description' => $strings->getDescription(),
+				];
+			}
 
 			if ($projection->isAllowed('recovery')) {
 				$recovery = $entity->getRecovery();

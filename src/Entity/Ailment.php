@@ -1,7 +1,14 @@
 <?php
 	namespace App\Entity;
 
+	use App\Entity\Strings\AilmentStrings;
+	use App\LanguageTag;
+	use App\Utility\NullObject;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
+	use Doctrine\Common\Collections\ArrayCollection;
+	use Doctrine\Common\Collections\Collection;
+	use Doctrine\Common\Collections\Criteria;
+	use Doctrine\Common\Collections\Selectable;
 	use Doctrine\ORM\Mapping as ORM;
 	use Symfony\Component\Validator\Constraints as Assert;
 
@@ -15,23 +22,6 @@
 	 */
 	class Ailment implements EntityInterface {
 		use EntityTrait;
-
-		/**
-		 * @Assert\NotBlank()
-		 * @Assert\Length(max=32)
-		 *
-		 * @ORM\Column(type="string", length=32, unique=true)
-		 *
-		 * @var string
-		 */
-		private $name;
-
-		/**
-		 * @ORM\Column(type="text")
-		 *
-		 * @var string
-		 */
-		private $description;
 
 		/**
 		 * @Assert\Valid()
@@ -62,53 +52,28 @@
 		private $protection;
 
 		/**
-		 * Ailment constructor.
+		 * @Assert\Valid()
+		 * @Assert\Count(min="1", minMessage="You must specify strings for at least {{ limit }} language.")
 		 *
-		 * @param string $name
-		 * @param string $description
+		 * @ORM\OneToMany(
+		 *     targetEntity="App\Entity\Strings\AilmentStrings",
+		 *     mappedBy="ailment",
+		 *     orphanRemoval=true,
+		 *     cascade={"all"}
+		 * )
+		 *
+		 * @var Collection|Selectable|AilmentStrings[]
 		 */
-		public function __construct(string $name, string $description) {
-			$this->name = $name;
-			$this->description = $description;
+		private $strings;
 
+		/**
+		 * Ailment constructor.
+		 */
+		public function __construct() {
 			$this->recovery = new AilmentRecovery($this);
 			$this->protection = new AilmentProtection($this);
-		}
 
-		/**
-		 * @return string
-		 */
-		public function getName(): string {
-			return $this->name;
-		}
-
-		/**
-		 * @param string $name
-		 *
-		 * @return $this
-		 */
-		public function setName(string $name) {
-			$this->name = $name;
-
-			return $this;
-		}
-
-		/**
-		 * @return string
-		 */
-		public function getDescription(): string {
-			return $this->description;
-		}
-
-		/**
-		 * @param string $description
-		 *
-		 * @return $this
-		 */
-		public function setDescription(string $description) {
-			$this->description = $description;
-
-			return $this;
+			$this->strings = new ArrayCollection();
 		}
 
 		/**
@@ -123,5 +88,26 @@
 		 */
 		public function getProtection(): AilmentProtection {
 			return $this->protection;
+		}
+
+		/**
+		 * @return AilmentStrings[]|Collection|Selectable
+		 */
+		public function getStrings(): Collection {
+			return $this->strings;
+		}
+
+		/**
+		 * @param string $language
+		 *
+		 * @return AilmentStrings|NullObject
+		 * @see LanguageTag
+		 */
+		public function getStringsByTag(string $language) {
+			$criteria = Criteria::create()
+				->where(Criteria::expr()->eq('language', $language))
+				->setMaxResults(1);
+
+			return NullObject::of($this->getStrings()->matching($criteria)->first() ?: null);
 		}
 	}
