@@ -2,11 +2,8 @@
 	namespace App\Entity\Strings;
 
 	use App\Entity\Ailment;
-	use App\Entity\EntityTrait;
-	use App\LanguageTag;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\ORM\Mapping as ORM;
-	use Symfony\Component\Validator\Constraints as Assert;
 
 	/**
 	 * @ORM\Entity()
@@ -18,7 +15,7 @@
 	 * )
 	 */
 	class AilmentStrings implements EntityInterface {
-		use EntityTrait;
+		use StringsEntityTrait;
 
 		/**
 		 * @ORM\ManyToOne(targetEntity="App\Entity\Ailment", inversedBy="strings")
@@ -27,17 +24,6 @@
 		 * @var Ailment
 		 */
 		private $ailment;
-
-		/**
-		 * @Assert\NotBlank()
-		 * @Assert\Choice(callback={"App\LanguageTag", "values"})
-		 *
-		 * @ORM\Column(type="string", length=7)
-		 *
-		 * @var string
-		 * @see LanguageTag
-		 */
-		private $language;
 
 		/**
 		 * @ORM\Column(type="string", length=32, nullable=true, unique=true)
@@ -69,13 +55,6 @@
 		 */
 		public function getAilment(): Ailment {
 			return $this->ailment;
-		}
-
-		/**
-		 * @return string
-		 */
-		public function getLanguage(): string {
-			return $this->language;
 		}
 
 		/**
