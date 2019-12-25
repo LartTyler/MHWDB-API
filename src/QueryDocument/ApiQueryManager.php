@@ -4,6 +4,7 @@
 	use App\Entity\Ailment;
 	use App\Entity\Armor;
 	use App\Entity\ArmorAssets;
+	use App\Entity\ArmorSet;
 	use App\Entity\SkillRank;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManager;
 	use Doctrine\ORM\EntityManagerInterface;
@@ -22,6 +23,9 @@
 						'description' => 'strings.description',
 					],
 					Armor::class => [
+						'name' => 'strings.name',
+					],
+					ArmorSet::class => [
 						'name' => 'strings.name',
 					],
 					ArmorAssets::class => [

@@ -4,13 +4,41 @@
 	use App\Entity\Armor;
 	use App\Entity\ArmorSet;
 	use App\Entity\ArmorSetBonus;
+	use App\Entity\Strings\ArmorSetStrings;
+	use App\Localization\L10nUtil;
+	use App\Utility\NullObject;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\IntegrityException;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\ValidationException;
 	use DaybreakStudios\Utility\EntityTransformers\Utility\ObjectUtil;
+	use Doctrine\ORM\EntityManagerInterface;
+	use Symfony\Component\HttpFoundation\RequestStack;
+	use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 	class ArmorSetTransformer extends BaseTransformer {
+		/**
+		 * @var RequestStack
+		 */
+		protected $requestStack;
+
+		/**
+		 * ArmorSetTransformer constructor.
+		 *
+		 * @param EntityManagerInterface $entityManager
+		 * @param ValidatorInterface     $validator
+		 * @param RequestStack           $requestStack
+		 */
+		public function __construct(
+			EntityManagerInterface $entityManager,
+			ValidatorInterface $validator,
+			RequestStack $requestStack
+		) {
+			parent::__construct($entityManager, $validator);
+
+			$this->requestStack = $requestStack;
+		}
+
 		/**
 		 * @param object $data
 		 *
@@ -28,20 +56,7 @@
 			if ($missing)
 				throw ValidationException::missingFields($missing);
 
-			return new ArmorSet($data->name, $data->rank);
-		}
-
-		/**
-		 * @param EntityInterface $entity
-		 *
-		 * @return void
-		 */
-		public function doDelete(EntityInterface $entity): void {
-			if (!($entity instanceof ArmorSet))
-				throw EntityTransformerException::subjectNotSupported($entity);
-
-			foreach ($entity->getPieces() as $piece)
-				$piece->setArmorSet(null);
+			return new ArmorSet($data->rank);
 		}
 
 		/**
@@ -55,7 +70,7 @@
 				throw EntityTransformerException::subjectNotSupported($entity);
 
 			if (ObjectUtil::isset($data, 'name'))
-				$entity->setName($data->name);
+				$this->getStrings($entity)->setName($data->name);
 
 			if (ObjectUtil::isset($data, 'rank'))
 				$entity->setRank($data->rank);
@@ -91,5 +106,35 @@
 					$entity->setBonus($bonus);
 				}
 			}
+		}
+
+		/**
+		 * @param EntityInterface $entity
+		 *
+		 * @return void
+		 */
+		public function doDelete(EntityInterface $entity): void {
+			if (!($entity instanceof ArmorSet))
+				throw EntityTransformerException::subjectNotSupported($entity);
+
+			foreach ($entity->getPieces() as $piece)
+				$piece->setArmorSet(null);
+		}
+
+		/**
+		 * @param ArmorSet $armorSet
+		 *
+		 * @return ArmorSetStrings
+		 */
+		protected function getStrings(ArmorSet $armorSet): ArmorSetStrings {
+			$strings = L10nUtil::findStringsForTag(
+				$lang = $this->requestStack->getCurrentRequest()->getLocale(),
+				$armorSet->getStrings()
+			);
+
+			if ($strings instanceof NullObject)
+				$armorSet->getStrings()->add($strings = new ArmorSetStrings($armorSet, $lang));
+
+			return $strings;
 		}
 	}

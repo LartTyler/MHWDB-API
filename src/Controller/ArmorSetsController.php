@@ -9,7 +9,10 @@
 	use App\Entity\Asset;
 	use App\Entity\CraftingMaterialCost;
 	use App\Entity\SkillRank;
+	use App\Entity\Strings\ArmorSetStrings;
+	use App\Entity\Strings\ArmorStrings;
 	use App\Game\Element;
+	use App\Localization\L10nUtil;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -36,7 +39,12 @@
 		 * @return Response
 		 */
 		public function list(Request $request): Response {
-			return $this->doList($request);
+			return $this->doList(
+				$request,
+				[
+					'strings.language' => $request->getLocale(),
+				]
+			);
 		}
 
 		/**
@@ -99,9 +107,15 @@
 
 			$output = [
 				'id' => $entity->getId(),
-				'name' => $entity->getName(),
 				'rank' => $entity->getRank(),
 			];
+
+			if ($projection->isAllowed('name')) {
+				/** @var ArmorSetStrings $strings */
+				$strings = $this->getStrings($entity->getStrings());
+
+				$output['name'] = $strings->getName();
+			}
 
 			// region Armor Fields
 			if ($projection->isAllowed('pieces')) {
@@ -112,7 +126,6 @@
 
 						$output = [
 							'id' => $armor->getId(),
-							'name' => $armor->getName(),
 							'type' => $armor->getType(),
 							'rank' => $armor->getRank(),
 							'rarity' => $armor->getRarity(),
@@ -131,6 +144,13 @@
 								Element::DRAGON => $resists->getDragon(),
 							],
 						];
+
+						if ($projection->isAllowed('pieces.name')) {
+							/** @var ArmorStrings $strings */
+							$strings = $this->getStrings($armor->getStrings());
+
+							$output['name'] = $strings->getName();
+						}
 
 						// region Slot Fields
 						if ($projection->isAllowed('pieces.slots')) {
@@ -296,6 +316,7 @@
 				} else
 					$output['bonus'] = null;
 			}
+
 			// endregion
 
 			return $output;
