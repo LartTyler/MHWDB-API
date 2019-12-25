@@ -1,13 +1,13 @@
 <?php
 	namespace App\Entity;
 
+	use App\Entity\Strings\CharmStrings;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\Common\Collections\Criteria;
 	use Doctrine\Common\Collections\Selectable;
 	use Doctrine\ORM\Mapping as ORM;
-	use Symfony\Component\Validator\Constraints as Assert;
 
 	/**
 	 * @ORM\Entity()
@@ -21,21 +21,24 @@
 		use EntityTrait;
 
 		/**
-		 * @Assert\NotBlank()
-		 *
-		 * @ORM\Column(type="string", length=64, unique=true)
-		 *
-		 * @var string
-		 */
-		private $name;
-
-		/**
 		 * @ORM\OneToMany(targetEntity="App\Entity\CharmRank", mappedBy="charm", orphanRemoval=true, cascade={"all"})
 		 * @ORM\OrderBy(value={"level": "ASC"})
 		 *
 		 * @var Collection|Selectable|CharmRank[]
 		 */
 		private $ranks;
+
+		/**
+		 * @ORM\OneToMany(
+		 *     targetEntity="App\Entity\Strings\CharmStrings",
+		 *     mappedBy="charm",
+		 *     orphanRemoval=true,
+		 *     cascade={"all"}
+		 * )
+		 *
+		 * @var Collection|Selectable|CharmStrings[]
+		 */
+		private $strings;
 
 		/**
 		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
@@ -47,30 +50,10 @@
 
 		/**
 		 * Charm constructor.
-		 *
-		 * @param string $name
 		 */
-		public function __construct(string $name) {
-			$this->name = $name;
+		public function __construct() {
 			$this->ranks = new ArrayCollection();
-		}
-
-		/**
-		 * @return string
-		 */
-		public function getName(): string {
-			return $this->name;
-		}
-
-		/**
-		 * @param string $name
-		 *
-		 * @return $this
-		 */
-		public function setName(string $name) {
-			$this->name = $name;
-
-			return $this;
+			$this->strings = new ArrayCollection();
 		}
 
 		/**
@@ -103,5 +86,12 @@
 		 */
 		public function syncLengthFields(): void {
 			$this->ranksLength = $this->ranks->count();
+		}
+
+		/**
+		 * @return CharmStrings[]|Collection|Selectable
+		 */
+		public function getStrings(): Collection {
+			return $this->strings;
 		}
 	}

@@ -1,6 +1,7 @@
 <?php
 	namespace App\Entity;
 
+	use App\Entity\Strings\ArmorSetBonusStrings;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
@@ -21,15 +22,6 @@
 		use EntityTrait;
 
 		/**
-		 * @Assert\NotBlank()
-		 *
-		 * @ORM\Column(type="string", length=64, unique=true)
-		 *
-		 * @var string
-		 */
-		private $name;
-
-		/**
 		 * @Assert\Valid()
 		 *
 		 * @ORM\OneToMany(
@@ -44,6 +36,20 @@
 		private $ranks;
 
 		/**
+		 * @Assert\Valid()
+		 *
+		 * @ORM\OneToMany(
+		 *     targetEntity="App\Entity\Strings\ArmorSetBonusStrings",
+		 *     mappedBy="armorSetBonus",
+		 *     orphanRemoval=true,
+		 *     cascade={"all"}
+		 * )
+		 *
+		 * @var Collection|Selectable|ArmorSetBonusStrings[]
+		 */
+		private $strings;
+
+		/**
 		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
 		 *
 		 * @var int
@@ -53,31 +59,9 @@
 
 		/**
 		 * ArmorSetBonus constructor.
-		 *
-		 * @param string $name
 		 */
-		public function __construct(string $name) {
-			$this->name = $name;
-
+		public function __construct() {
 			$this->ranks = new ArrayCollection();
-		}
-
-		/**
-		 * @return string
-		 */
-		public function getName(): string {
-			return $this->name;
-		}
-
-		/**
-		 * @param string $name
-		 *
-		 * @return $this
-		 */
-		public function setName(string $name) {
-			$this->name = $name;
-
-			return $this;
 		}
 
 		/**
@@ -110,5 +94,12 @@
 		 */
 		public function syncLengthFields(): void {
 			$this->ranksLength = $this->ranks->count();
+		}
+
+		/**
+		 * @return ArmorSetBonusStrings[]|Collection|Selectable
+		 */
+		public function getStrings() {
+			return $this->strings;
 		}
 	}

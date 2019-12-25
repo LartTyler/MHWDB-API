@@ -6,6 +6,8 @@
 	use App\Entity\CharmRank;
 	use App\Entity\CraftingMaterialCost;
 	use App\Entity\SkillRank;
+	use App\Entity\Strings\CharmStrings;
+	use App\Utility\NullObject;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -32,7 +34,12 @@
 		 * @return Response
 		 */
 		public function list(Request $request): Response {
-			return $this->doList($request);
+			return $this->doList(
+				$request,
+				[
+					'strings.language' => $request->getLocale(),
+				]
+			);
 		}
 
 		/**
@@ -95,8 +102,14 @@
 
 			$output = [
 				'id' => $entity->getId(),
-				'name' => $entity->getName(),
 			];
+
+			if ($projection->isAllowed('name')) {
+				/** @var CharmStrings|NullObject $strings */
+				$strings = $this->getStrings($entity->getStrings());
+
+				$output['name'] = $strings->getName();
+			}
 
 			// region CharmRank Fields
 			if ($projection->isAllowed('ranks')) {
@@ -162,6 +175,7 @@
 													'value' => $item->getValue(),
 												];
 											}
+
 											// endregion
 
 											return $output;
@@ -173,6 +187,7 @@
 							} else
 								$output['crafting'] = null;
 						}
+
 						// endregion
 
 						return $output;
@@ -180,6 +195,7 @@
 					$entity->getRanks()->toArray()
 				);
 			}
+
 			// endregion
 
 			return $output;

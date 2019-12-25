@@ -4,6 +4,7 @@
 	use App\Contrib\Transformers\ArmorSetBonusTransformer;
 	use App\Entity\ArmorSetBonus;
 	use App\Entity\ArmorSetBonusRank;
+	use App\Entity\Strings\ArmorSetBonusStrings;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -30,7 +31,12 @@
 		 * @return Response
 		 */
 		public function list(Request $request): Response {
-			return $this->doList($request);
+			return $this->doList(
+				$request,
+				[
+					'strings.language' => $request->getLocale(),
+				]
+			);
 		}
 
 		/**
@@ -97,8 +103,14 @@
 
 			$output = [
 				'id' => $entity->getId(),
-				'name' => $entity->getName(),
 			];
+
+			if ($projection->isAllowed('name')) {
+				/** @var ArmorSetBonusStrings $strings */
+				$strings = $this->getStrings($entity->getStrings());
+
+				$output['name'] = $strings->getName();
+			}
 
 			if ($projection->isAllowed('ranks')) {
 				$output['ranks'] = array_map(
