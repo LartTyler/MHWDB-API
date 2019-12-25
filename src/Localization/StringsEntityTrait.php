@@ -1,6 +1,6 @@
 <?php
 
-	namespace App\Entity\Strings;
+	namespace App\Localization;
 
 	use App\Entity\EntityTrait;
 	use App\LanguageTag;

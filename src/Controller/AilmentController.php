@@ -5,8 +5,7 @@
 	use App\Entity\Ailment;
 	use App\Entity\Item;
 	use App\Entity\Skill;
-	use App\Entity\Strings\AilmentStrings;
-	use App\Utility\NullObject;
+	use App\Localization\L10nUtil;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -104,7 +103,10 @@
 			];
 
 			if ($projection->isAllowed('name') || $projection->isAllowed('description')) {
-				$strings = $entity->getStringsByTag($this->requestStack->getCurrentRequest()->getLocale());
+				$strings = L10nUtil::findStringsForTag(
+					$this->requestStack->getCurrentRequest()->getLocale(),
+					$entity->getStrings()
+				);
 
 				$output += [
 					'name' => $strings->getName(),

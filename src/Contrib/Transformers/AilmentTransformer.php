@@ -6,7 +6,7 @@
 	use App\Entity\Monster;
 	use App\Entity\Skill;
 	use App\Entity\Strings\AilmentStrings;
-	use App\LanguageTag;
+	use App\Localization\L10nUtil;
 	use App\Utility\NullObject;
 	use App\Utility\ObjectUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -68,7 +68,10 @@
 			if (!($entity instanceof Ailment))
 				throw EntityTransformerException::subjectNotSupported($entity);
 
-			$strings = $entity->getStringsByTag($lang = $this->requestStack->getCurrentRequest()->getLocale());
+			$strings = L10nUtil::findStringsForTag(
+				$lang = $this->requestStack->getCurrentRequest()->getLocale(),
+				$entity->getStrings()
+			);
 
 			if ($strings instanceof NullObject)
 				$entity->getStrings()->add($strings = new AilmentStrings($entity, $lang));

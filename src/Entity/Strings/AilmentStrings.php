@@ -2,6 +2,7 @@
 	namespace App\Entity\Strings;
 
 	use App\Entity\Ailment;
+	use App\Localization\StringsEntityTrait;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\ORM\Mapping as ORM;
 

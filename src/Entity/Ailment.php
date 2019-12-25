@@ -96,18 +96,4 @@
 		public function getStrings(): Collection {
 			return $this->strings;
 		}
-
-		/**
-		 * @param string $language
-		 *
-		 * @return AilmentStrings|NullObject
-		 * @see LanguageTag
-		 */
-		public function getStringsByTag(string $language) {
-			$criteria = Criteria::create()
-				->where(Criteria::expr()->eq('language', $language))
-				->setMaxResults(1);
-
-			return NullObject::of($this->getStrings()->matching($criteria)->first() ?: null);
-		}
 	}
