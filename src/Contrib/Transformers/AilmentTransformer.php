@@ -68,19 +68,11 @@
 			if (!($entity instanceof Ailment))
 				throw EntityTransformerException::subjectNotSupported($entity);
 
-			$strings = L10nUtil::findStringsForTag(
-				$lang = $this->requestStack->getCurrentRequest()->getLocale(),
-				$entity->getStrings()
-			);
-
-			if ($strings instanceof NullObject)
-				$entity->getStrings()->add($strings = new AilmentStrings($entity, $lang));
-
 			if (ObjectUtil::isset($data, 'name'))
-				$strings->setName($data->name);
+				$this->getStrings($entity)->setName($data->name);
 
 			if (ObjectUtil::isset($data, 'description'))
-				$strings->setDescription($data->description);
+				$this->getStrings($entity)->setDescription($data->description);
 
 			if (ObjectUtil::isset($data, 'recovery')) {
 				$recovery = $entity->getRecovery();
@@ -137,5 +129,22 @@
 
 			foreach ($monsters as $monster)
 				$monster->getAilments()->removeElement($entity);
+		}
+
+		/**
+		 * @param Ailment $ailment
+		 *
+		 * @return AilmentStrings
+		 */
+		protected function getStrings(Ailment $ailment): AilmentStrings {
+			$strings = L10nUtil::findStringsForTag(
+				$lang = $this->requestStack->getCurrentRequest()->getLocale(),
+				$ailment->getStrings()
+			);
+
+			if ($strings instanceof NullObject)
+				$ailment->getStrings()->add($strings = new AilmentStrings($ailment, $lang));
+
+			return $strings;
 		}
 	}

@@ -5,14 +5,42 @@
 	use App\Entity\ArmorCraftingInfo;
 	use App\Entity\ArmorSet;
 	use App\Entity\ArmorSlot;
+	use App\Entity\Strings\ArmorStrings;
 	use App\Game\Element;
+	use App\Localization\L10nUtil;
+	use App\Utility\NullObject;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\IntegrityException;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\ValidationException;
 	use DaybreakStudios\Utility\EntityTransformers\Utility\ObjectUtil;
+	use Doctrine\ORM\EntityManagerInterface;
+	use Symfony\Component\HttpFoundation\RequestStack;
+	use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 	class ArmorTransformer extends BaseTransformer {
+		/**
+		 * @var RequestStack
+		 */
+		protected $requestStack;
+
+		/**
+		 * ArmorTransformer constructor.
+		 *
+		 * @param EntityManagerInterface $entityManager
+		 * @param ValidatorInterface     $validator
+		 * @param RequestStack           $requestStack
+		 */
+		public function __construct(
+			EntityManagerInterface $entityManager,
+			ValidatorInterface $validator,
+			RequestStack $requestStack
+		) {
+			parent::__construct($entityManager, $validator);
+
+			$this->requestStack = $requestStack;
+		}
+
 		/**
 		 * @param object $data
 		 *
@@ -32,20 +60,7 @@
 			if ($missing)
 				throw ValidationException::missingFields($missing);
 
-			return new Armor($data->name, $data->type, $data->rank, $data->rarity);
-		}
-
-		/**
-		 * @param EntityInterface $entity
-		 *
-		 * @return void
-		 */
-		public function doDelete(EntityInterface $entity): void {
-			if (!($entity instanceof Armor))
-				throw EntityTransformerException::subjectNotSupported($entity);
-
-			if ($set = $entity->getArmorSet())
-				$set->getPieces()->removeElement($entity);
+			return new Armor($data->type, $data->rank, $data->rarity);
 		}
 
 		/**
@@ -59,7 +74,7 @@
 				throw EntityTransformerException::subjectNotSupported($entity);
 
 			if (ObjectUtil::isset($data, 'name'))
-				$entity->setName($data->name);
+				$this->getStrings($entity)->setName($data->name);
 
 			if (ObjectUtil::isset($data, 'type'))
 				$entity->setType($data->type);
@@ -149,5 +164,35 @@
 
 			if (ObjectUtil::isset($data, 'assets'))
 				throw ValidationException::fieldNotSupported('assets');
+		}
+
+		/**
+		 * @param EntityInterface $entity
+		 *
+		 * @return void
+		 */
+		public function doDelete(EntityInterface $entity): void {
+			if (!($entity instanceof Armor))
+				throw EntityTransformerException::subjectNotSupported($entity);
+
+			if ($set = $entity->getArmorSet())
+				$set->getPieces()->removeElement($entity);
+		}
+
+		/**
+		 * @param Armor $armor
+		 *
+		 * @return ArmorStrings
+		 */
+		protected function getStrings(Armor $armor): ArmorStrings {
+			$strings = L10nUtil::findStringsForTag(
+				$lang = $this->requestStack->getCurrentRequest()->getLocale(),
+				$armor->getStrings()
+			);
+
+			if ($strings instanceof NullObject)
+				$armor->getStrings()->add($strings = new ArmorStrings($armor, $lang));
+
+			return $strings;
 		}
 	}

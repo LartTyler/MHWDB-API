@@ -2,6 +2,7 @@
 	namespace App\QueryDocument;
 
 	use App\Entity\Ailment;
+	use App\Entity\Armor;
 	use App\Entity\ArmorAssets;
 	use App\Entity\SkillRank;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManager;
@@ -19,6 +20,9 @@
 					Ailment::class => [
 						'name' => 'strings.name',
 						'description' => 'strings.description',
+					],
+					Armor::class => [
+						'name' => 'strings.name',
 					],
 					ArmorAssets::class => [
 						'imageMale' => 'imageMale.uri',

@@ -7,6 +7,9 @@
 	use App\Entity\Asset;
 	use App\Entity\CraftingMaterialCost;
 	use App\Entity\SkillRank;
+	use App\Entity\Strings\ArmorStrings;
+	use App\Localization\L10nUtil;
+	use App\Utility\NullObject;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -33,7 +36,12 @@
 		 * @return Response
 		 */
 		public function list(Request $request): Response {
-			return $this->doList($request);
+			return $this->doList(
+				$request,
+				[
+					'strings.language' => $request->getLocale(),
+				]
+			);
 		}
 
 		/**
@@ -99,7 +107,6 @@
 
 			$output = [
 				'id' => $entity->getId(),
-				'name' => $entity->getName(),
 				'type' => $entity->getType(),
 				'rank' => $entity->getRank(),
 				'rarity' => $entity->getRarity(),
@@ -118,6 +125,16 @@
 				// default to \stdClass to fix an empty array being returned instead of an empty object
 				'attributes' => $entity->getAttributes() ?: new \stdClass(),
 			];
+
+			if ($projection->isAllowed('name')) {
+				/** @var ArmorStrings|NullObject $strings */
+				$strings = L10nUtil::findStringsForTag(
+					$this->requestStack->getCurrentRequest()->getLocale(),
+					$entity->getStrings()
+				);
+
+				$output['name'] = $strings->getName();
+			}
 
 			// region Slots Fields
 			if ($projection->isAllowed('slots')) {

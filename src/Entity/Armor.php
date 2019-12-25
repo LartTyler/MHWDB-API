@@ -1,6 +1,8 @@
 <?php
 	namespace App\Entity;
 
+	use App\Entity\Strings\ArmorStrings;
+	use App\Game\ArmorType;
 	use App\Game\Rank;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\ArrayCollection;
@@ -28,21 +30,12 @@
 
 		/**
 		 * @Assert\NotBlank()
-		 * @Assert\Length(max="64")
-		 *
-		 * @ORM\Column(type="string", length=64, unique=true)
-		 *
-		 * @var string
-		 */
-		private $name;
-
-		/**
-		 * @Assert\NotBlank()
 		 * @Assert\Choice(callback={"App\Game\ArmorType", "all"})
 		 *
 		 * @ORM\Column(type="string", length=32)
 		 *
 		 * @var string
+		 * @see ArmorType
 		 */
 		private $type;
 
@@ -101,6 +94,20 @@
 		private $slots;
 
 		/**
+		 * @Assert\Valid()
+		 *
+		 * @ORM\OneToMany(
+		 *     targetEntity="App\Entity\Strings\ArmorStrings",
+		 *     mappedBy="armor",
+		 *     orphanRemoval=true,
+		 *     cascade={"all"}
+		 * )
+		 *
+		 * @var Collection|Selectable|ArmorStrings[]
+		 */
+		private $strings;
+
+		/**
 		 * @ORM\ManyToOne(targetEntity="App\Entity\ArmorSet", inversedBy="pieces")
 		 *
 		 * @var ArmorSet|null
@@ -144,13 +151,11 @@
 		/**
 		 * Armor constructor.
 		 *
-		 * @param string $name
 		 * @param string $type
 		 * @param string $rank
 		 * @param int    $rarity
 		 */
-		public function __construct(string $name, string $type, string $rank, int $rarity) {
-			$this->name = $name;
+		public function __construct(string $type, string $rank, int $rarity) {
 			$this->type = $type;
 			$this->rank = $rank;
 			$this->rarity = $rarity;
@@ -160,24 +165,7 @@
 
 			$this->skills = new ArrayCollection();
 			$this->slots = new ArrayCollection();
-		}
-
-		/**
-		 * @return string
-		 */
-		public function getName(): string {
-			return $this->name;
-		}
-
-		/**
-		 * @param string $name
-		 *
-		 * @return $this
-		 */
-		public function setName(string $name) {
-			$this->name = $name;
-
-			return $this;
+			$this->strings = new ArrayCollection();
 		}
 
 		/**
@@ -328,5 +316,12 @@
 		public function syncLengthFields(): void {
 			$this->skillsLength = $this->skills->count();
 			$this->slotsLength = $this->slots->count();
+		}
+
+		/**
+		 * @return ArmorStrings[]|Collection|Selectable
+		 */
+		public function getStrings(): Collection {
+			return $this->strings;
 		}
 	}
