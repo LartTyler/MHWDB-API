@@ -7,9 +7,9 @@
 	use App\Entity\Asset;
 	use App\Entity\CraftingMaterialCost;
 	use App\Entity\SkillRank;
+	use App\Entity\Strings\ArmorSetStrings;
 	use App\Entity\Strings\ArmorStrings;
-	use App\Localization\L10nUtil;
-	use App\Utility\NullObject;
+	use App\Entity\Strings\ItemStrings;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -127,11 +127,8 @@
 			];
 
 			if ($projection->isAllowed('name')) {
-				/** @var ArmorStrings|NullObject $strings */
-				$strings = L10nUtil::findStringsForTag(
-					$this->requestStack->getCurrentRequest()->getLocale(),
-					$entity->getStrings()
-				);
+				/** @var ArmorStrings $strings */
+				$strings = $this->getStrings($entity);
 
 				$output['name'] = $strings->getName();
 			}
@@ -180,9 +177,15 @@
 				if ($armorSet) {
 					$output['armorSet'] = [
 						'id' => $armorSet->getId(),
-						'name' => $armorSet->getName(),
 						'rank' => $armorSet->getRank(),
 					];
+
+					if ($projection->isAllowed('armorSet.name')) {
+						/** @var ArmorSetStrings $strings */
+						$strings = $this->getStrings($armorSet);
+
+						$output['armorSet']['name'] = $strings->getName();
+					}
 
 					if ($projection->isAllowed('armorSet.pieces')) {
 						$output['armorSet']['pieces'] = array_map(
@@ -245,12 +248,23 @@
 
 									$output['item'] = [
 										'id' => $item->getId(),
-										'name' => $item->getName(),
-										'description' => $item->getDescription(),
 										'rarity' => $item->getRarity(),
 										'carryLimit' => $item->getCarryLimit(),
 										'value' => $item->getValue(),
 									];
+
+									if (
+										$projection->isAllowed('crafting.materials.item.name') ||
+										$projection->isAllowed('crafting.materials.item.description')
+									) {
+										/** @var ItemStrings $strings */
+										$strings = $this->getStrings($item);
+
+										$output['item'] += [
+											'name' => $strings->getName(),
+											'description' => $strings->getDescription(),
+										];
+									}
 								}
 
 								// endregion

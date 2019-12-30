@@ -3,6 +3,7 @@
 
 	use App\Entity\Strings\ArmorSetStrings;
 	use App\Game\Rank;
+	use App\Localization\TranslatableEntityInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
@@ -18,7 +19,7 @@
 	 *
 	 * @package App\Entity
 	 */
-	class ArmorSet implements EntityInterface, LengthCachingEntityInterface {
+	class ArmorSet implements EntityInterface, TranslatableEntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
 
 		/**
@@ -39,6 +40,8 @@
 		private $pieces;
 
 		/**
+		 * @Assert\Valid()
+		 *
 		 * @ORM\OneToMany(
 		 *     targetEntity="App\Entity\Strings\ArmorSetStrings",
 		 *     mappedBy="armorSet",
@@ -134,5 +137,16 @@
 		 */
 		public function getStrings(): Collection {
 			return $this->strings;
+		}
+
+		/**
+		 * @param string $language
+		 *
+		 * @return ArmorSetStrings
+		 */
+		public function addStrings(string $language): EntityInterface {
+			$this->getStrings()->add($strings = new ArmorSetStrings($this, $language));
+
+			return $strings;
 		}
 	}

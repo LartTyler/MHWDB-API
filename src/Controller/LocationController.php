@@ -113,7 +113,7 @@
 
 						if ($projection->isAllowed('camps.name')) {
 							/** @var CampStrings $strings */
-							$strings = $this->getStrings($camp->getStrings());
+							$strings = $this->getStrings($camp);
 
 							$output['name'] = $strings->getName();
 						}

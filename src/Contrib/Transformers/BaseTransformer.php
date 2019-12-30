@@ -5,12 +5,17 @@
 	use App\Entity\Item;
 	use App\Entity\Skill;
 	use App\Entity\SkillRank;
+	use App\Localization\L10nUtil;
+	use App\Utility\NullObject;
+	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\EntityTransformers\AbstractEntityTransformer;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\IntegrityException;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\ValidationException;
 	use DaybreakStudios\Utility\EntityTransformers\Utility\ObjectUtil;
 	use Doctrine\Common\Collections\Collection;
+	use Doctrine\Common\Collections\Selectable;
 	use Doctrine\ORM\EntityManagerInterface;
+	use Symfony\Component\HttpFoundation\RequestStack;
 	use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 	abstract class BaseTransformer extends AbstractEntityTransformer {
@@ -20,13 +25,25 @@
 		protected $entityManager;
 
 		/**
+		 * @var RequestStack
+		 */
+		protected $requestStack;
+
+		/**
 		 * AbstractTransformer constructor.
 		 *
-		 * @param EntityManagerInterface  $entityManager
+		 * @param EntityManagerInterface $entityManager
+		 * @param RequestStack $requestStack
 		 * @param ValidatorInterface|null $validator
 		 */
-		public function __construct(EntityManagerInterface $entityManager, ValidatorInterface $validator = null) {
+		public function __construct(
+			EntityManagerInterface $entityManager,
+			RequestStack $requestStack,
+			ValidatorInterface $validator = null
+		) {
 			parent::__construct($entityManager, $validator);
+
+			$this->requestStack = $requestStack;
 		}
 
 		/**
@@ -140,6 +157,7 @@
 				if ($missing)
 					throw ValidationException::missingNestedFields($path, $index, $missing);
 
+				/** @var Item|null $item */
 				$item = $this->entityManager->getRepository(Item::class)->find($cost->item);
 
 				if (!$item)
@@ -147,5 +165,12 @@
 
 				$collection->add(new CraftingMaterialCost($item, $cost->quantity));
 			}
+		}
+
+		/**
+		 * @return string
+		 */
+		protected function getCurrentLocale(): string {
+			return $this->requestStack->getCurrentRequest()->getLocale();
 		}
 	}

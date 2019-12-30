@@ -2,6 +2,7 @@
 	namespace App\Entity;
 
 	use App\Entity\Strings\ArmorSetBonusStrings;
+	use App\Localization\TranslatableEntityInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
@@ -18,7 +19,7 @@
 	 *
 	 * @package App\Entity
 	 */
-	class ArmorSetBonus implements EntityInterface, LengthCachingEntityInterface {
+	class ArmorSetBonus implements EntityInterface, TranslatableEntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
 
 		/**
@@ -99,7 +100,18 @@
 		/**
 		 * @return ArmorSetBonusStrings[]|Collection|Selectable
 		 */
-		public function getStrings() {
+		public function getStrings(): Collection {
 			return $this->strings;
+		}
+
+		/**
+		 * @param string $language
+		 *
+		 * @return ArmorSetBonusStrings
+		 */
+		public function addStrings(string $language): EntityInterface {
+			$this->getStrings()->add($strings = new ArmorSetBonusStrings($this, $language));
+
+			return $strings;
 		}
 	}

@@ -4,6 +4,7 @@
 	use App\Contrib\Transformers\DecorationTransformer;
 	use App\Entity\Decoration;
 	use App\Entity\SkillRank;
+	use App\Entity\Strings\DecorationStrings;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -30,7 +31,12 @@
 		 * @return Response
 		 */
 		public function list(Request $request): Response {
-			return $this->doList($request);
+			return $this->doList(
+				$request,
+				[
+					'strings.language' => $request->getLocale(),
+				]
+			);
 		}
 
 		/**
@@ -93,10 +99,16 @@
 
 			$output = [
 				'id' => $entity->getId(),
-				'name' => $entity->getName(),
 				'rarity' => $entity->getRarity(),
 				'slot' => $entity->getSlot(),
 			];
+
+			if ($projection->isAllowed('name')) {
+				/** @var DecorationStrings $strings */
+				$strings = $this->getStrings($entity);
+
+				$output['name'] = $strings->getName();
+			}
 
 			// region SkillRank Fields
 			if ($projection->isAllowed('skills')) {
@@ -120,6 +132,7 @@
 					$entity->getSkills()->toArray()
 				);
 			}
+
 			// endregion
 
 			return $output;

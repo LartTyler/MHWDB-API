@@ -3,10 +3,10 @@
 
 	use App\Entity\User;
 	use App\Localization\L10nUtil;
+	use App\Localization\TranslatableEntityInterface;
 	use App\Utility\NullObject;
 	use DaybreakStudios\RestApiCommon\Controller\AbstractApiController;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use Doctrine\Common\Collections\Selectable;
 	use Symfony\Component\HttpFoundation\RequestStack;
 
 	abstract class AbstractController extends AbstractApiController {
@@ -37,11 +37,13 @@
 		}
 
 		/**
-		 * @param Selectable $strings
+		 * @param TranslatableEntityInterface $entity
 		 *
 		 * @return NullObject|EntityInterface
 		 */
-		protected function getStrings(Selectable $strings): object {
-			return L10nUtil::findStringsForTag($this->requestStack->getCurrentRequest()->getLocale(), $strings);
+		protected function getStrings(TranslatableEntityInterface $entity): object {
+			return NullObject::of(
+				L10nUtil::findStrings($this->requestStack->getCurrentRequest()->getLocale(), $entity)
+			);
 		}
 	}

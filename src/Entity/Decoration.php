@@ -1,7 +1,8 @@
 <?php
 	namespace App\Entity;
 
-	use App\Utility\StringUtil;
+	use App\Entity\Strings\DecorationStrings;
+	use App\Localization\TranslatableEntityInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
@@ -17,17 +18,8 @@
 	 *
 	 * @package App\Entity
 	 */
-	class Decoration implements EntityInterface, LengthCachingEntityInterface {
+	class Decoration implements EntityInterface, TranslatableEntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
-
-		/**
-		 * @Assert\NotBlank()
-		 *
-		 * @ORM\Column(type="string", length=64, unique=true)
-		 *
-		 * @var string
-		 */
-		private $name;
 
 		/**
 		 * @Assert\NotBlank()
@@ -58,6 +50,20 @@
 		private $skills;
 
 		/**
+		 * @Assert\Valid()
+		 *
+		 * @ORM\OneToMany(
+		 *     targetEntity="App\Entity\Strings\DecorationStrings",
+		 *     mappedBy="decoration",
+		 *     orphanRemoval=true,
+		 *     cascade={"all"}
+		 * )
+		 *
+		 * @var Collection|Selectable|DecorationStrings[]
+		 */
+		private $strings;
+
+		/**
 		 * @ORM\Column(type="integer", options={"unsigned": true})
 		 *
 		 * @var int
@@ -68,33 +74,15 @@
 		/**
 		 * Decoration constructor.
 		 *
-		 * @param string $name
-		 * @param int    $slot
-		 * @param int    $rarity
+		 * @param int $slot
+		 * @param int $rarity
 		 */
-		public function __construct(string $name, int $slot, int $rarity) {
-			$this->name = $name;
+		public function __construct(int $slot, int $rarity) {
 			$this->slot = $slot;
 			$this->rarity = $rarity;
+
 			$this->skills = new ArrayCollection();
-		}
-
-		/**
-		 * @return string
-		 */
-		public function getName(): string {
-			return $this->name;
-		}
-
-		/**
-		 * @param string $name
-		 *
-		 * @return $this
-		 */
-		public function setName(string $name) {
-			$this->name = $name;
-
-			return $this;
+			$this->strings = new ArrayCollection();
 		}
 
 		/**
@@ -138,6 +126,24 @@
 		 */
 		public function getSkills() {
 			return $this->skills;
+		}
+
+		/**
+		 * @return DecorationStrings[]|Collection|Selectable
+		 */
+		public function getStrings(): Collection {
+			return $this->strings;
+		}
+
+		/**
+		 * @param string $language
+		 *
+		 * @return DecorationStrings
+		 */
+		public function addStrings(string $language): EntityInterface {
+			$this->getStrings()->add($strings = new DecorationStrings($this, $language));
+
+			return $strings;
 		}
 
 		/**

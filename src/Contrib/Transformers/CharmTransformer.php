@@ -6,39 +6,13 @@
 	use App\Entity\CharmRankCraftingInfo;
 	use App\Entity\Strings\CharmStrings;
 	use App\Localization\L10nUtil;
-	use App\Utility\NullObject;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\ValidationException;
 	use DaybreakStudios\Utility\EntityTransformers\Utility\ObjectUtil;
 	use Doctrine\Common\Collections\Criteria;
-	use Doctrine\ORM\EntityManagerInterface;
-	use Symfony\Component\HttpFoundation\RequestStack;
-	use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 	class CharmTransformer extends BaseTransformer {
-		/**
-		 * @var RequestStack
-		 */
-		protected $requestStack;
-
-		/**
-		 * CharmTransformer constructor.
-		 *
-		 * @param EntityManagerInterface $entityManager
-		 * @param ValidatorInterface     $validator
-		 * @param RequestStack           $requestStack
-		 */
-		public function __construct(
-			EntityManagerInterface $entityManager,
-			ValidatorInterface $validator,
-			RequestStack $requestStack
-		) {
-			parent::__construct($entityManager, $validator);
-
-			$this->requestStack = $requestStack;
-		}
-
 		/**
 		 * @param object $data
 		 *
@@ -155,13 +129,8 @@
 		 * @return CharmStrings
 		 */
 		protected function getStrings(Charm $charm): CharmStrings {
-			$strings = L10nUtil::findStringsForTag(
-				$lang = $this->requestStack->getCurrentRequest()->getLocale(),
-				$charm->getStrings()
-			);
-
-			if ($strings instanceof NullObject)
-				$charm->getStrings()->add($strings = new CharmStrings($charm, $lang));
+			$strings = L10nUtil::findOrCreateStrings($this->getCurrentLocale(), $charm);
+			assert($strings instanceof CharmStrings);
 
 			return $strings;
 		}

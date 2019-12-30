@@ -2,12 +2,14 @@
 	namespace App\Entity;
 
 	use App\Entity\Strings\CharmStrings;
+	use App\Localization\TranslatableEntityInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\Common\Collections\Criteria;
 	use Doctrine\Common\Collections\Selectable;
 	use Doctrine\ORM\Mapping as ORM;
+	use Symfony\Component\Validator\Constraints as Assert;
 
 	/**
 	 * @ORM\Entity()
@@ -17,7 +19,7 @@
 	 *
 	 * @package App\Entity
 	 */
-	class Charm implements EntityInterface, LengthCachingEntityInterface {
+	class Charm implements EntityInterface, TranslatableEntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
 
 		/**
@@ -29,6 +31,8 @@
 		private $ranks;
 
 		/**
+		 * @Assert\Valid()
+		 *
 		 * @ORM\OneToMany(
 		 *     targetEntity="App\Entity\Strings\CharmStrings",
 		 *     mappedBy="charm",
@@ -93,5 +97,16 @@
 		 */
 		public function getStrings(): Collection {
 			return $this->strings;
+		}
+
+		/**
+		 * @param string $language
+		 *
+		 * @return CharmStrings
+		 */
+		public function addStrings(string $language): EntityInterface {
+			$this->getStrings()->add($strings = new CharmStrings($this, $language));
+
+			return $strings;
 		}
 	}

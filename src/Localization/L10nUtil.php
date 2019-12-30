@@ -2,23 +2,34 @@
 
 	namespace App\Localization;
 
-	use App\Utility\NullObject;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\Criteria;
-	use Doctrine\Common\Collections\Selectable;
 
 	final class L10nUtil {
 		/**
-		 * @param string     $language
-		 * @param Selectable $strings
+		 * @param string                      $language
+		 * @param TranslatableEntityInterface $entity
 		 *
-		 * @return EntityInterface|NullObject
+		 * @return EntityInterface|null
 		 */
-		public static function findStringsForTag(string $language, Selectable $strings) {
-			$criteria = Criteria::create()
+		public static function findStrings(string $language, TranslatableEntityInterface $entity): ?EntityInterface {
+			$criteria = $criteria = Criteria::create()
 				->where(Criteria::expr()->eq('language', $language))
 				->setMaxResults(1);
 
-			return NullObject::of($strings->matching($criteria)->first() ?: null);
+			return $entity->getStrings()->matching($criteria)->first() ?: null;
+		}
+
+		/**
+		 * @param string                      $language
+		 * @param TranslatableEntityInterface $entity
+		 *
+		 * @return EntityInterface
+		 */
+		public static function findOrCreateStrings(
+			string $language,
+			TranslatableEntityInterface $entity
+		): EntityInterface {
+			return self::findStrings($language, $entity) ?? $entity->addStrings($language);
 		}
 	}

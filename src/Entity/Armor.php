@@ -4,6 +4,7 @@
 	use App\Entity\Strings\ArmorStrings;
 	use App\Game\ArmorType;
 	use App\Game\Rank;
+	use App\Localization\TranslatableEntityInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
@@ -24,7 +25,7 @@
 	 *
 	 * @package App\Entity
 	 */
-	class Armor implements EntityInterface, LengthCachingEntityInterface {
+	class Armor implements EntityInterface, TranslatableEntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
 		use AttributableTrait;
 
@@ -323,5 +324,16 @@
 		 */
 		public function getStrings(): Collection {
 			return $this->strings;
+		}
+
+		/**
+		 * @param string $language
+		 *
+		 * @return ArmorStrings
+		 */
+		public function addStrings(string $language): EntityInterface {
+			$this->getStrings()->add($strings = new ArmorStrings($this, $language));
+
+			return $strings;
 		}
 	}

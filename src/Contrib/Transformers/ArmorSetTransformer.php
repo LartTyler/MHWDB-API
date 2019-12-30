@@ -6,39 +6,13 @@
 	use App\Entity\ArmorSetBonus;
 	use App\Entity\Strings\ArmorSetStrings;
 	use App\Localization\L10nUtil;
-	use App\Utility\NullObject;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\IntegrityException;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\ValidationException;
 	use DaybreakStudios\Utility\EntityTransformers\Utility\ObjectUtil;
-	use Doctrine\ORM\EntityManagerInterface;
-	use Symfony\Component\HttpFoundation\RequestStack;
-	use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 	class ArmorSetTransformer extends BaseTransformer {
-		/**
-		 * @var RequestStack
-		 */
-		protected $requestStack;
-
-		/**
-		 * ArmorSetTransformer constructor.
-		 *
-		 * @param EntityManagerInterface $entityManager
-		 * @param ValidatorInterface     $validator
-		 * @param RequestStack           $requestStack
-		 */
-		public function __construct(
-			EntityManagerInterface $entityManager,
-			ValidatorInterface $validator,
-			RequestStack $requestStack
-		) {
-			parent::__construct($entityManager, $validator);
-
-			$this->requestStack = $requestStack;
-		}
-
 		/**
 		 * @param object $data
 		 *
@@ -127,13 +101,8 @@
 		 * @return ArmorSetStrings
 		 */
 		protected function getStrings(ArmorSet $armorSet): ArmorSetStrings {
-			$strings = L10nUtil::findStringsForTag(
-				$lang = $this->requestStack->getCurrentRequest()->getLocale(),
-				$armorSet->getStrings()
-			);
-
-			if ($strings instanceof NullObject)
-				$armorSet->getStrings()->add($strings = new ArmorSetStrings($armorSet, $lang));
+			$strings = L10nUtil::findOrCreateStrings($this->getCurrentLocale(), $armorSet);
+			assert($strings instanceof ArmorSetStrings);
 
 			return $strings;
 		}

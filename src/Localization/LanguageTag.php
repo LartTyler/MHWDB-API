@@ -1,5 +1,5 @@
 <?php
-	namespace App;
+	namespace App\Localization;
 
 	use DaybreakStudios\RestApiCommon\Utility\ConstantsClassTrait;
 

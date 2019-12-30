@@ -5,7 +5,8 @@
 	use App\Entity\Ailment;
 	use App\Entity\Item;
 	use App\Entity\Skill;
-	use App\Localization\L10nUtil;
+	use App\Entity\Strings\AilmentStrings;
+	use App\Entity\Strings\ItemStrings;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -103,10 +104,8 @@
 			];
 
 			if ($projection->isAllowed('name') || $projection->isAllowed('description')) {
-				$strings = L10nUtil::findStringsForTag(
-					$this->requestStack->getCurrentRequest()->getLocale(),
-					$entity->getStrings()
-				);
+				/** @var AilmentStrings $strings */
+				$strings = $this->getStrings($entity);
 
 				$output += [
 					'name' => $strings->getName(),
@@ -123,15 +122,28 @@
 
 				if ($projection->isAllowed('recovery.items')) {
 					$output['recovery']['items'] = array_map(
-						function(Item $item): array {
-							return [
+						function(Item $item) use ($projection): array {
+							$output = [
 								'id' => $item->getId(),
-								'name' => $item->getName(),
-								'description' => $item->getDescription(),
 								'rarity' => $item->getRarity(),
 								'value' => $item->getValue(),
 								'carryLimit' => $item->getCarryLimit(),
 							];
+
+							if (
+								$projection->isAllowed('recovery.items.name') ||
+								$projection->isAllowed('recovery.items.description')
+							) {
+								/** @var ItemStrings $strings */
+								$strings = $this->getStrings($item);
+
+								$output += [
+									'name' => $strings->getName(),
+									'descriptoin' => $strings->getDescription(),
+								];
+							}
+
+							return $output;
 						},
 						$recovery->getItems()->toArray()
 					);

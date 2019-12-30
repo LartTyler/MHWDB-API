@@ -2,12 +2,10 @@
 	namespace App\Entity;
 
 	use App\Entity\Strings\AilmentStrings;
-	use App\LanguageTag;
-	use App\Utility\NullObject;
+	use App\Localization\TranslatableEntityInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
-	use Doctrine\Common\Collections\Criteria;
 	use Doctrine\Common\Collections\Selectable;
 	use Doctrine\ORM\Mapping as ORM;
 	use Symfony\Component\Validator\Constraints as Assert;
@@ -20,7 +18,7 @@
 	 *
 	 * @package App\Entity
 	 */
-	class Ailment implements EntityInterface {
+	class Ailment implements EntityInterface, TranslatableEntityInterface {
 		use EntityTrait;
 
 		/**
@@ -53,7 +51,6 @@
 
 		/**
 		 * @Assert\Valid()
-		 * @Assert\Count(min="1", minMessage="You must specify strings for at least {{ limit }} language.")
 		 *
 		 * @ORM\OneToMany(
 		 *     targetEntity="App\Entity\Strings\AilmentStrings",
@@ -95,5 +92,16 @@
 		 */
 		public function getStrings(): Collection {
 			return $this->strings;
+		}
+
+		/**
+		 * @param string $language
+		 *
+		 * @return AilmentStrings
+		 */
+		public function addStrings(string $language): EntityInterface {
+			$this->getStrings()->add($strings = new AilmentStrings($this, $language));
+
+			return $strings;
 		}
 	}

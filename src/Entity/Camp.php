@@ -2,6 +2,7 @@
 	namespace App\Entity;
 
 	use App\Entity\Strings\CampStrings;
+	use App\Localization\TranslatableEntityInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
@@ -17,7 +18,7 @@
 	 *
 	 * @package App\Entity
 	 */
-	class Camp implements EntityInterface {
+	class Camp implements EntityInterface, TranslatableEntityInterface {
 		use EntityTrait;
 
 		/**
@@ -83,5 +84,16 @@
 		 */
 		public function getStrings(): Collection {
 			return $this->strings;
+		}
+
+		/**
+		 * @param string $language
+		 *
+		 * @return CampStrings
+		 */
+		public function addStrings(string $language): EntityInterface {
+			$this->getStrings()->add($strings = new CampStrings($this, $language));
+
+			return $strings;
 		}
 	}

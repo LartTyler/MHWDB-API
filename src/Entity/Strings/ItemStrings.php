@@ -1,7 +1,7 @@
 <?php
 	namespace App\Entity\Strings;
 
-	use App\Entity\Ailment;
+	use App\Entity\Item;
 	use App\Localization\StringsEntityTrait;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\ORM\Mapping as ORM;
@@ -10,35 +10,33 @@
 	/**
 	 * @ORM\Entity()
 	 * @ORM\Table(
-	 *     name="ailment_strings",
-	 *     uniqueConstraints={
-	 *         @ORM\UniqueConstraint(columns={"ailment_id", "language"})
-	 *     }
+	 *     name="item_strings",
+	 *     uniqueConstraints={@ORM\UniqueConstraint(columns={"item_id", "language"})}
 	 * )
 	 */
-	class AilmentStrings implements EntityInterface {
+	class ItemStrings implements EntityInterface {
 		use StringsEntityTrait;
 
 		/**
-		 * @ORM\ManyToOne(targetEntity="App\Entity\Ailment", inversedBy="strings")
+		 * @ORM\ManyToOne(targetEntity="App\Entity\Item", inversedBy="strings")
 		 * @ORM\JoinColumn(nullable=false)
 		 *
-		 * @var Ailment
+		 * @var Item
 		 */
-		private $ailment;
+		private $item;
 
 		/**
 		 * @Assert\NotBlank()
-		 * @Assert\Length(max="32")
+		 * @Assert\Length(max="64")
 		 *
-		 * @ORM\Column(type="string", length=32, unique=true)
+		 * @ORM\Column(type="string", length=64, unique=true)
 		 *
 		 * @var string
 		 */
 		private $name;
 
 		/**
-		 * @Assert\NotBlank()
+		 * @Assert\NotNull()
 		 *
 		 * @ORM\Column(type="text")
 		 *
@@ -47,21 +45,21 @@
 		private $description;
 
 		/**
-		 * AilmentStrings constructor.
+		 * ItemStrings constructor.
 		 *
-		 * @param Ailment $ailment
-		 * @param string  $language
+		 * @param Item   $item
+		 * @param string $language
 		 */
-		public function __construct(Ailment $ailment, string $language) {
-			$this->ailment = $ailment;
+		public function __construct(Item $item, string $language) {
+			$this->item = $item;
 			$this->language = $language;
 		}
 
 		/**
-		 * @return Ailment
+		 * @return Item
 		 */
-		public function getAilment(): Ailment {
-			return $this->ailment;
+		public function getItem(): Item {
+			return $this->item;
 		}
 
 		/**

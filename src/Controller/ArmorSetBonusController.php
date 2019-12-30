@@ -107,7 +107,7 @@
 
 			if ($projection->isAllowed('name')) {
 				/** @var ArmorSetBonusStrings $strings */
-				$strings = $this->getStrings($entity->getStrings());
+				$strings = $this->getStrings($entity);
 
 				$output['name'] = $strings->getName();
 			}

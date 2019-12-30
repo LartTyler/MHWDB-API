@@ -3,7 +3,6 @@
 	namespace App\Localization;
 
 	use App\Entity\EntityTrait;
-	use App\LanguageTag;
 	use Doctrine\ORM\Mapping as ORM;
 	use Symfony\Component\Validator\Constraints as Assert;
 

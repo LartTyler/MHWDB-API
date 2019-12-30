@@ -6,39 +6,13 @@
 	use App\Entity\Monster;
 	use App\Entity\Strings\CampStrings;
 	use App\Localization\L10nUtil;
-	use App\Utility\NullObject;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\ValidationException;
 	use DaybreakStudios\Utility\EntityTransformers\Utility\ObjectUtil;
 	use Doctrine\Common\Collections\Criteria;
-	use Doctrine\ORM\EntityManagerInterface;
-	use Symfony\Component\HttpFoundation\RequestStack;
-	use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 	class LocationTransformer extends BaseTransformer {
-		/**
-		 * @var RequestStack
-		 */
-		protected $requestStack;
-
-		/**
-		 * LocationTransformer constructor.
-		 *
-		 * @param EntityManagerInterface $entityManager
-		 * @param ValidatorInterface     $validator
-		 * @param RequestStack           $requestStack
-		 */
-		public function __construct(
-			EntityManagerInterface $entityManager,
-			ValidatorInterface $validator,
-			RequestStack $requestStack
-		) {
-			parent::__construct($entityManager, $validator);
-
-			$this->requestStack = $requestStack;
-		}
-
 		/**
 		 * @param object $data
 		 *
@@ -87,16 +61,9 @@
 						]
 					);
 
-					if ($missing) {
-						throw ValidationException::missingFields(
-							array_map(
-								function(string $key) use ($index): string {
-									return 'camps[' . $index . '].' . $key;
-								},
-								$missing
-							)
-						);
-					} else if ($definition->zone > $entity->getZoneCount()) {
+					if ($missing)
+						throw ValidationException::missingNestedFields('camps', $index, $missing);
+					else if ($definition->zone > $entity->getZoneCount()) {
 						throw ValidationException::invalidFieldValue(
 							'camps[' . $index . '].zone',
 							'The location only has ' . $entity->getZoneCount() . ' zone(s)'
@@ -148,13 +115,8 @@
 		 * @return CampStrings
 		 */
 		protected function getCampStrings(Camp $camp): CampStrings {
-			$strings = L10nUtil::findStringsForTag(
-				$lang = $this->requestStack->getCurrentRequest()->getLocale(),
-				$camp->getStrings()
-			);
-
-			if ($strings instanceof NullObject)
-				$camp->getStrings()->add($strings = new CampStrings($camp, $lang));
+			$strings = L10nUtil::findOrCreateStrings($this->getCurrentLocale(), $camp);
+			assert($strings instanceof CampStrings);
 
 			return $strings;
 		}

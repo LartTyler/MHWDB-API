@@ -6,38 +6,12 @@
 	use App\Entity\ArmorSetBonusRank;
 	use App\Entity\Strings\ArmorSetBonusStrings;
 	use App\Localization\L10nUtil;
-	use App\Utility\NullObject;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\ValidationException;
 	use DaybreakStudios\Utility\EntityTransformers\Utility\ObjectUtil;
-	use Doctrine\ORM\EntityManagerInterface;
-	use Symfony\Component\HttpFoundation\RequestStack;
-	use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 	class ArmorSetBonusTransformer extends BaseTransformer {
-		/**
-		 * @var RequestStack
-		 */
-		protected $requestStack;
-
-		/**
-		 * ArmorSetBonusTransformer constructor.
-		 *
-		 * @param EntityManagerInterface $entityManager
-		 * @param ValidatorInterface     $validator
-		 * @param RequestStack           $requestStack
-		 */
-		public function __construct(
-			EntityManagerInterface $entityManager,
-			ValidatorInterface $validator,
-			RequestStack $requestStack
-		) {
-			parent::__construct($entityManager, $validator);
-
-			$this->requestStack = $requestStack;
-		}
-
 		/**
 		 * @param object $data
 		 *
@@ -113,18 +87,13 @@
 		}
 
 		/**
-		 * @param ArmorSetBonus $armorSetBonus
+		 * @param ArmorSetBonus $bonus
 		 *
 		 * @return ArmorSetBonusStrings
 		 */
-		protected function getStrings(ArmorSetBonus $armorSetBonus): ArmorSetBonusStrings {
-			$strings = L10nUtil::findStringsForTag(
-				$lang = $this->requestStack->getCurrentRequest()->getLocale(),
-				$armorSetBonus->getStrings()
-			);
-
-			if ($strings instanceof NullObject)
-				$armorSetBonus->getStrings()->add($strings = new ArmorSetBonusStrings($armorSetBonus, $lang));
+		protected function getStrings(ArmorSetBonus $bonus): ArmorSetBonusStrings {
+			$strings = L10nUtil::findOrCreateStrings($this->getCurrentLocale(), $bonus);
+			assert($strings instanceof ArmorSetBonusStrings);
 
 			return $strings;
 		}

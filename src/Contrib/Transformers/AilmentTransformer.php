@@ -7,38 +7,12 @@
 	use App\Entity\Skill;
 	use App\Entity\Strings\AilmentStrings;
 	use App\Localization\L10nUtil;
-	use App\Utility\NullObject;
 	use App\Utility\ObjectUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\ValidationException;
-	use Doctrine\ORM\EntityManagerInterface;
-	use Symfony\Component\HttpFoundation\RequestStack;
-	use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 	class AilmentTransformer extends BaseTransformer {
-		/**
-		 * @var RequestStack
-		 */
-		protected $requestStack;
-
-		/**
-		 * AilmentTransformer constructor.
-		 *
-		 * @param EntityManagerInterface $entityManager
-		 * @param ValidatorInterface     $validator
-		 * @param RequestStack           $requestStack
-		 */
-		public function __construct(
-			EntityManagerInterface $entityManager,
-			ValidatorInterface $validator,
-			RequestStack $requestStack
-		) {
-			parent::__construct($entityManager, $validator);
-
-			$this->requestStack = $requestStack;
-		}
-
 		/**
 		 * @param object $data
 		 *
@@ -137,13 +111,8 @@
 		 * @return AilmentStrings
 		 */
 		protected function getStrings(Ailment $ailment): AilmentStrings {
-			$strings = L10nUtil::findStringsForTag(
-				$lang = $this->requestStack->getCurrentRequest()->getLocale(),
-				$ailment->getStrings()
-			);
-
-			if ($strings instanceof NullObject)
-				$ailment->getStrings()->add($strings = new AilmentStrings($ailment, $lang));
+			$strings = L10nUtil::findOrCreateStrings($this->getCurrentLocale(), $ailment);
+			assert($strings instanceof AilmentStrings);
 
 			return $strings;
 		}

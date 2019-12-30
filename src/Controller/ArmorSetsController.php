@@ -9,10 +9,11 @@
 	use App\Entity\Asset;
 	use App\Entity\CraftingMaterialCost;
 	use App\Entity\SkillRank;
+	use App\Entity\Strings\ArmorSetBonusStrings;
 	use App\Entity\Strings\ArmorSetStrings;
 	use App\Entity\Strings\ArmorStrings;
+	use App\Entity\Strings\ItemStrings;
 	use App\Game\Element;
-	use App\Localization\L10nUtil;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -112,7 +113,7 @@
 
 			if ($projection->isAllowed('name')) {
 				/** @var ArmorSetStrings $strings */
-				$strings = $this->getStrings($entity->getStrings());
+				$strings = $this->getStrings($entity);
 
 				$output['name'] = $strings->getName();
 			}
@@ -147,7 +148,7 @@
 
 						if ($projection->isAllowed('pieces.name')) {
 							/** @var ArmorStrings $strings */
-							$strings = $this->getStrings($armor->getStrings());
+							$strings = $this->getStrings($armor);
 
 							$output['name'] = $strings->getName();
 						}
@@ -240,12 +241,23 @@
 
 												$output['item'] = [
 													'id' => $item->getId(),
-													'name' => $item->getName(),
-													'description' => $item->getDescription(),
 													'rarity' => $item->getRarity(),
 													'carryLimit' => $item->getCarryLimit(),
 													'value' => $item->getValue(),
 												];
+
+												if (
+													$projection->isAllowed('pieces.crafting.materials.item.name') ||
+													$projection->isAllowed('pieces.crafting.materials.item.description')
+												) {
+													/** @var ItemStrings $strings */
+													$strings = $this->getStrings($item);
+
+													$output['item'] += [
+														'name' => $strings->getName(),
+														'description' => $strings->getDescription(),
+													];
+												}
 											}
 
 											// endregion
@@ -276,8 +288,14 @@
 				if ($bonus) {
 					$output['bonus'] = [
 						'id' => $bonus->getId(),
-						'name' => $bonus->getName(),
 					];
+
+					if ($projection->isAllowed('bonus.name')) {
+						/** @var ArmorSetBonusStrings $strings */
+						$strings = $this->getStrings($bonus);
+
+						$output['bonus']['name'] = $strings->getName();
+					}
 
 					// region ArmorSetBonusRank Fields
 					if ($projection->isAllowed('bonus.ranks')) {

@@ -7,7 +7,7 @@
 	use App\Entity\CraftingMaterialCost;
 	use App\Entity\SkillRank;
 	use App\Entity\Strings\CharmStrings;
-	use App\Utility\NullObject;
+	use App\Entity\Strings\ItemStrings;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -105,8 +105,8 @@
 			];
 
 			if ($projection->isAllowed('name')) {
-				/** @var CharmStrings|NullObject $strings */
-				$strings = $this->getStrings($entity->getStrings());
+				/** @var CharmStrings $strings */
+				$strings = $this->getStrings($entity);
 
 				$output['name'] = $strings->getName();
 			}
@@ -168,12 +168,23 @@
 
 												$output['item'] = [
 													'id' => $item->getId(),
-													'name' => $item->getName(),
-													'description' => $item->getDescription(),
 													'rarity' => $item->getRarity(),
 													'carryLimit' => $item->getCarryLimit(),
 													'value' => $item->getValue(),
 												];
+
+												if (
+													$projection->isAllowed('ranks.crafting.materials.item.name') ||
+													$projection->isAllowed('ranks.crafting.materials.item.description')
+												) {
+													/** @var ItemStrings $strings */
+													$strings = $this->getStrings($item);
+
+													$output['item'] += [
+														'name' => $strings->getName(),
+														'description' => $strings->getDescription(),
+													];
+												}
 											}
 
 											// endregion
