@@ -1,8 +1,7 @@
 <?php
-
 	namespace App\Entity\Strings;
 
-	use App\Entity\Camp;
+	use App\Entity\Location;
 	use App\Localization\StringsEntityInterface;
 	use App\Localization\StringsEntityTrait;
 	use Doctrine\ORM\Mapping as ORM;
@@ -11,39 +10,39 @@
 	/**
 	 * @ORM\Entity()
 	 * @ORM\Table(
-	 *     name="camp_strings",
-	 *     uniqueConstraints={@ORM\UniqueConstraint(columns={"camp_id", "language"})}
+	 *     name="location_strings",
+	 *     uniqueConstraints={@ORM\UniqueConstraint(columns={"location_id", "language"})}
 	 * )
 	 */
-	class CampStrings implements StringsEntityInterface {
+	class LocationStrings implements StringsEntityInterface {
 		use StringsEntityTrait;
 
 		/**
-		 * @ORM\ManyToOne(targetEntity="App\Entity\Camp", inversedBy="strings")
+		 * @ORM\ManyToOne(targetEntity="App\Entity\Location", inversedBy="strings")
 		 * @ORM\JoinColumn(nullable=false)
 		 *
-		 * @var Camp
+		 * @var Location
 		 */
-		private $camp;
+		private $location;
 
 		/**
 		 * @Assert\NotBlank()
-		 * @Assert\Length(max="64")
+		 * @Assert\Length(max="32")
 		 *
-		 * @ORM\Column(type="string", length=64)
+		 * @ORM\Column(type="string", length=32, unique=true)
 		 *
 		 * @var string
 		 */
 		private $name;
 
 		/**
-		 * CampStrings constructor.
+		 * LocationStrings constructor.
 		 *
-		 * @param Camp   $camp
-		 * @param string $language
+		 * @param Location $location
+		 * @param string   $language
 		 */
-		public function __construct(Camp $camp, string $language) {
-			$this->camp = $camp;
+		public function __construct(Location $location, string $language) {
+			$this->location = $location;
 			$this->language = $language;
 		}
 

@@ -5,6 +5,7 @@
 	use App\Entity\Location;
 	use App\Entity\Monster;
 	use App\Entity\Strings\CampStrings;
+	use App\Entity\Strings\LocationStrings;
 	use App\Localization\L10nUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
@@ -30,7 +31,7 @@
 			if ($missing)
 				throw ValidationException::missingFields($missing);
 
-			return new Location($data->name, $data->zoneCount);
+			return new Location($data->zoneCount);
 		}
 
 		/**
@@ -44,7 +45,7 @@
 				throw EntityTransformerException::subjectNotSupported($entity);
 
 			if (ObjectUtil::isset($data, 'name'))
-				$entity->setName($data->name);
+				$this->getLocationStrings($entity)->setName($data->name);
 
 			if (ObjectUtil::isset($data, 'zoneCount'))
 				$entity->setZoneCount($data->zoneCount);
@@ -107,6 +108,18 @@
 
 			foreach ($monsters as $monster)
 				$monster->getLocations()->removeElement($entity);
+		}
+
+		/**
+		 * @param Location $location
+		 *
+		 * @return LocationStrings
+		 */
+		protected function getLocationStrings(Location $location): LocationStrings {
+			$strings = L10nUtil::findOrCreateStrings($this->getCurrentLocale(), $location);
+			assert($strings instanceof LocationStrings);
+
+			return $strings;
 		}
 
 		/**

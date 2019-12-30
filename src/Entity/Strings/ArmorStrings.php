@@ -3,8 +3,8 @@
 	namespace App\Entity\Strings;
 
 	use App\Entity\Armor;
+	use App\Localization\StringsEntityInterface;
 	use App\Localization\StringsEntityTrait;
-	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\ORM\Mapping as ORM;
 	use Symfony\Component\Validator\Constraints as Assert;
 
@@ -17,7 +17,7 @@
 	 *     }
 	 * )
 	 */
-	class ArmorStrings implements EntityInterface {
+	class ArmorStrings implements StringsEntityInterface {
 		use StringsEntityTrait;
 
 		/**
@@ -47,13 +47,6 @@
 		public function __construct(Armor $armor, string $language) {
 			$this->armor = $armor;
 			$this->language = $language;
-		}
-
-		/**
-		 * @return Armor
-		 */
-		public function getArmor(): Armor {
-			return $this->armor;
 		}
 
 		/**

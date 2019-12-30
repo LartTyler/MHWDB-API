@@ -2,8 +2,8 @@
 	namespace App\Entity\Strings;
 
 	use App\Entity\Item;
+	use App\Localization\StringsEntityInterface;
 	use App\Localization\StringsEntityTrait;
-	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\ORM\Mapping as ORM;
 	use Symfony\Component\Validator\Constraints as Assert;
 
@@ -14,7 +14,7 @@
 	 *     uniqueConstraints={@ORM\UniqueConstraint(columns={"item_id", "language"})}
 	 * )
 	 */
-	class ItemStrings implements EntityInterface {
+	class ItemStrings implements StringsEntityInterface {
 		use StringsEntityTrait;
 
 		/**
@@ -53,13 +53,6 @@
 		public function __construct(Item $item, string $language) {
 			$this->item = $item;
 			$this->language = $language;
-		}
-
-		/**
-		 * @return Item
-		 */
-		public function getItem(): Item {
-			return $this->item;
 		}
 
 		/**

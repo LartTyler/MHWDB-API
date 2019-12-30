@@ -25,3 +25,5 @@ services:
     App\Contrib\Transformers\SkillTransformer: ~
     App\Contrib\Transformers\UserTransformer: ~
     App\Contrib\Transformers\WeaponTransformer: ~
+
+    App\Localization\QueryLocalizationHelper: ~

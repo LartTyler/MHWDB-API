@@ -3,8 +3,8 @@
 	namespace App\Entity\Strings;
 
 	use App\Entity\Charm;
+	use App\Localization\StringsEntityInterface;
 	use App\Localization\StringsEntityTrait;
-	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\ORM\Mapping as ORM;
 	use Symfony\Component\Validator\Constraints as Assert;
 
@@ -15,7 +15,7 @@
 	 *     uniqueConstraints={@ORM\UniqueConstraint(columns={"charm_id", "language"})}
 	 * )
 	 */
-	class CharmStrings implements EntityInterface {
+	class CharmStrings implements StringsEntityInterface {
 		use StringsEntityTrait;
 
 		/**
@@ -45,13 +45,6 @@
 		public function __construct(Charm $charm, string $language) {
 			$this->charm = $charm;
 			$this->language = $language;
-		}
-
-		/**
-		 * @return Charm
-		 */
-		public function getCharm(): Charm {
-			return $this->charm;
 		}
 
 		/**

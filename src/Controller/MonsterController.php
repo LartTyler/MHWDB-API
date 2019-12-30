@@ -11,6 +11,11 @@
 	use App\Entity\MonsterWeakness;
 	use App\Entity\RewardCondition;
 	use App\Entity\Skill;
+	use App\Entity\Strings\AilmentStrings;
+	use App\Entity\Strings\ItemStrings;
+	use App\Entity\Strings\LocationStrings;
+	use App\Entity\Strings\MonsterStrings;
+	use App\Entity\Strings\MonsterWeaknessStrings;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -37,7 +42,14 @@
 		 * @return Response
 		 */
 		public function list(Request $request): Response {
-			return $this->doList($request);
+			return $this->doList(
+				$request,
+				[
+					'strings.language' => $request->getLocale(),
+					'locations.strings.language' => $request->getLocale(),
+					'weaknesses.strings.language' => $request->getLocale(),
+				]
+			);
 		}
 
 		/**
@@ -100,21 +112,37 @@
 
 			$output = [
 				'id' => $entity->getId(),
-				'name' => $entity->getName(),
 				'type' => $entity->getType(),
 				'species' => $entity->getSpecies(),
-				'description' => $entity->getDescription(),
 				'elements' => $entity->getElements(),
 			];
+
+			if ($projection->isAllowed('name') || $projection->isAllowed('description')) {
+				/** @var MonsterStrings $strings */
+				$strings = $this->getStrings($entity);
+
+				$output += [
+					'name' => $strings->getName(),
+					'description' => $strings->getDescription(),
+				];
+			}
 
 			if ($projection->isAllowed('ailments')) {
 				$output['ailments'] = array_map(
 					function(Ailment $ailment) use ($projection): array {
 						$output = [
 							'id' => $ailment->getId(),
-							'name' => $ailment->getName(),
-							'description' => $ailment->getDescription(),
 						];
+
+						if ($projection->isAllowed('ailments.name') || $projection->isAllowed('ailments.description')) {
+							/** @var AilmentStrings $strings */
+							$strings = $this->getStrings($ailment);
+
+							$output += [
+								'name' => $strings->getName(),
+								'description' => $strings->getDescription(),
+							];
+						}
 
 						if ($projection->isAllowed('ailments.recovery')) {
 							$recovery = $ailment->getRecovery();
@@ -125,15 +153,28 @@
 
 							if ($projection->isAllowed('ailments.recovery.items')) {
 								$output['recovery']['items'] = array_map(
-									function(Item $item): array {
-										return [
+									function(Item $item) use ($projection): array {
+										$output = [
 											'id' => $item->getId(),
-											'name' => $item->getName(),
-											'description' => $item->getDescription(),
 											'rarity' => $item->getRarity(),
 											'value' => $item->getValue(),
 											'carryLimit' => $item->getCarryLimit(),
 										];
+
+										if (
+											$projection->isAllowed('ailments.recovery.items.name') ||
+											$projection->isAllowed('ailments.recovery.items.description')
+										) {
+											/** @var ItemStrings $strings */
+											$strings = $this->getStrings($item);
+
+											$output += [
+												'name' => $strings->getName(),
+												'description' => $strings->getDescription(),
+											];
+										}
+
+										return $output;
 									},
 									$recovery->getItems()->toArray()
 								);
@@ -160,15 +201,28 @@
 
 							if ($projection->isAllowed('ailments.protection.items')) {
 								$output['protection']['items'] = array_map(
-									function(Item $item): array {
-										return [
+									function(Item $item) use ($projection): array {
+										$output = [
 											'id' => $item->getId(),
-											'name' => $item->getName(),
-											'description' => $item->getDescription(),
 											'rarity' => $item->getRarity(),
 											'value' => $item->getValue(),
 											'carryLimit' => $item->getCarryLimit(),
 										];
+
+										if (
+											$projection->isAllowed('ailments.protection.items.name') ||
+											$projection->isAllowed('ailments.protection.items.description')
+										) {
+											/** @var ItemStrings $strings */
+											$strings = $this->getStrings($item);
+
+											$output += [
+												'name' => $strings->getName(),
+												'description' => $strings->getDescription(),
+											];
+										}
+
+										return $output;
 									},
 									$protection->getItems()->toArray()
 								);
@@ -186,12 +240,20 @@
 
 			if ($projection->isAllowed('locations')) {
 				$output['locations'] = array_map(
-					function(Location $location): array {
-						return [
+					function(Location $location) use ($projection): array {
+						$output = [
 							'id' => $location->getId(),
-							'name' => $location->getName(),
 							'zoneCount' => $location->getZoneCount(),
 						];
+
+						if ($projection->isAllowed('locations.name')) {
+							/** @var LocationStrings $strings */
+							$strings = $this->getStrings($location);
+
+							$output['name'] = $strings->getName();
+						}
+
+						return $output;
 					},
 					$entity->getLocations()->toArray()
 				);
@@ -211,12 +273,20 @@
 
 			if ($projection->isAllowed('weaknesses')) {
 				$output['weaknesses'] = array_map(
-					function(MonsterWeakness $weakness): array {
-						return [
+					function(MonsterWeakness $weakness) use ($projection): array {
+						$output = [
 							'element' => $weakness->getElement(),
 							'stars' => $weakness->getStars(),
-							'condition' => $weakness->getCondition(),
 						];
+
+						if ($projection->isAllowed('weaknesses.condition')) {
+							/** @var MonsterWeaknessStrings $strings */
+							$strings = $this->getStrings($weakness);
+
+							$output['condition'] = $strings->getCondition();
+						}
+
+						return $output;
 					},
 					$entity->getWeaknesses()->toArray()
 				);
@@ -234,12 +304,23 @@
 
 							$output['item'] = [
 								'id' => $item->getId(),
-								'name' => $item->getName(),
-								'description' => $item->getDescription(),
 								'rarity' => $item->getRarity(),
 								'carryLimit' => $item->getCarryLimit(),
 								'value' => $item->getValue(),
 							];
+
+							if (
+								$projection->isAllowed('rewards.item.name') ||
+								$projection->isAllowed('rewards.item.description')
+							) {
+								/** @var ItemStrings $strings */
+								$strings = $this->getStrings($item);
+
+								$output['item'] += [
+									'name' => $strings->getName(),
+									'description' => $strings->getDescription(),
+								];
+							}
 						}
 
 						if ($projection->isAllowed('rewards.condition')) {

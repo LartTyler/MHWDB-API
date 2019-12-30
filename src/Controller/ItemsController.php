@@ -3,6 +3,7 @@
 
 	use App\Contrib\Transformers\ItemTransformer;
 	use App\Entity\Item;
+	use App\Entity\Strings\ItemStrings;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -90,13 +91,23 @@
 		protected function normalizeOne(EntityInterface $entity, Projection $projection): array {
 			assert($entity instanceof Item);
 
-			return [
+			$output = [
 				'id' => $entity->getId(),
-				'name' => $entity->getName(),
-				'description' => $entity->getDescription(),
 				'rarity' => $entity->getRarity(),
 				'carryLimit' => $entity->getCarryLimit(),
 				'value' => $entity->getValue(),
 			];
+
+			if ($projection->isAllowed('name') || $projection->isAllowed('description')) {
+				/** @var ItemStrings $strings */
+				$strings = $this->getStrings($entity);
+
+				$output += [
+					'name' => $strings->getName(),
+					'description' => $strings->getDescription(),
+				];
+			}
+
+			return $output;
 		}
 	}

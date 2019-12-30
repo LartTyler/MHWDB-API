@@ -3,8 +3,8 @@
 	namespace App\Entity\Strings;
 
 	use App\Entity\ArmorSet;
+	use App\Localization\StringsEntityInterface;
 	use App\Localization\StringsEntityTrait;
-	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\ORM\Mapping as ORM;
 	use Symfony\Component\Validator\Constraints as Assert;
 
@@ -15,7 +15,7 @@
 	 *     uniqueConstraints={@ORM\UniqueConstraint(columns={"armor_set_id", "language"})}
 	 * )
 	 */
-	class ArmorSetStrings implements EntityInterface {
+	class ArmorSetStrings implements StringsEntityInterface {
 		use StringsEntityTrait;
 
 		/**
@@ -45,13 +45,6 @@
 		public function __construct(ArmorSet $armorSet, string $language) {
 			$this->armorSet = $armorSet;
 			$this->language = $language;
-		}
-
-		/**
-		 * @return ArmorSet
-		 */
-		public function getArmorSet(): ArmorSet {
-			return $this->armorSet;
 		}
 
 		/**

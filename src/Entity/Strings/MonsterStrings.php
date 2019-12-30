@@ -1,7 +1,7 @@
 <?php
 	namespace App\Entity\Strings;
 
-	use App\Entity\Ailment;
+	use App\Entity\Monster;
 	use App\Localization\StringsEntityInterface;
 	use App\Localization\StringsEntityTrait;
 	use Doctrine\ORM\Mapping as ORM;
@@ -10,50 +10,46 @@
 	/**
 	 * @ORM\Entity()
 	 * @ORM\Table(
-	 *     name="ailment_strings",
-	 *     uniqueConstraints={
-	 *         @ORM\UniqueConstraint(columns={"ailment_id", "language"})
-	 *     }
+	 *     name="monster_strings",
+	 *     uniqueConstraints={@ORM\UniqueConstraint(columns={"monster_id", "language"})}
 	 * )
 	 */
-	class AilmentStrings implements StringsEntityInterface {
+	class MonsterStrings implements StringsEntityInterface {
 		use StringsEntityTrait;
 
 		/**
-		 * @ORM\ManyToOne(targetEntity="App\Entity\Ailment", inversedBy="strings")
+		 * @ORM\ManyToOne(targetEntity="App\Entity\Monster", inversedBy="strings")
 		 * @ORM\JoinColumn(nullable=false)
 		 *
-		 * @var Ailment
+		 * @var Monster
 		 */
-		private $ailment;
+		private $monster;
 
 		/**
 		 * @Assert\NotBlank()
-		 * @Assert\Length(max="32")
+		 * @Assert\Length(max="64")
 		 *
-		 * @ORM\Column(type="string", length=32, unique=true)
+		 * @ORM\Column(type="string", length=64, unique=true)
 		 *
 		 * @var string
 		 */
 		private $name;
 
 		/**
-		 * @Assert\NotBlank()
+		 * @ORM\Column(type="text", nullable=true)
 		 *
-		 * @ORM\Column(type="text")
-		 *
-		 * @var string
+		 * @var string|null
 		 */
-		private $description;
+		private $description = null;
 
 		/**
-		 * AilmentStrings constructor.
+		 * MonsterStrings constructor.
 		 *
-		 * @param Ailment $ailment
+		 * @param Monster $monster
 		 * @param string  $language
 		 */
-		public function __construct(Ailment $ailment, string $language) {
-			$this->ailment = $ailment;
+		public function __construct(Monster $monster, string $language) {
+			$this->monster = $monster;
 			$this->language = $language;
 		}
 
@@ -76,18 +72,18 @@
 		}
 
 		/**
-		 * @return string
+		 * @return string|null
 		 */
-		public function getDescription(): string {
+		public function getDescription(): ?string {
 			return $this->description;
 		}
 
 		/**
-		 * @param string $description
+		 * @param string|null $description
 		 *
 		 * @return $this
 		 */
-		public function setDescription(string $description) {
+		public function setDescription(?string $description) {
 			$this->description = $description;
 
 			return $this;

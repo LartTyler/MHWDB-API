@@ -2,8 +2,8 @@
 	namespace App\Entity\Strings;
 
 	use App\Entity\Decoration;
+	use App\Localization\StringsEntityInterface;
 	use App\Localization\StringsEntityTrait;
-	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\ORM\Mapping as ORM;
 	use Symfony\Component\Validator\Constraints as Assert;
 
@@ -14,7 +14,7 @@
 	 *     uniqueConstraints={@ORM\UniqueConstraint(columns={"decoration_id", "language"})}
 	 * )
 	 */
-	class DecorationStrings implements EntityInterface {
+	class DecorationStrings implements StringsEntityInterface {
 		use StringsEntityTrait;
 
 		/**
@@ -44,13 +44,6 @@
 		public function __construct(Decoration $decoration, string $language) {
 			$this->decoration = $decoration;
 			$this->language = $language;
-		}
-
-		/**
-		 * @return Decoration
-		 */
-		public function getDecoration(): Decoration {
-			return $this->decoration;
 		}
 
 		/**

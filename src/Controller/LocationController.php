@@ -5,6 +5,7 @@
 	use App\Entity\Camp;
 	use App\Entity\Location;
 	use App\Entity\Strings\CampStrings;
+	use App\Entity\Strings\LocationStrings;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -34,6 +35,7 @@
 			return $this->doList(
 				$request,
 				[
+					'strings.language' => $request->getLocale(),
 					'camp.strings.language' => $request->getLocale(),
 				]
 			);
@@ -99,9 +101,15 @@
 
 			$output = [
 				'id' => $entity->getId(),
-				'name' => $entity->getName(),
 				'zoneCount' => $entity->getZoneCount(),
 			];
+
+			if ($projection->isAllowed('name')) {
+				/** @var LocationStrings $strings */
+				$strings = $this->getStrings($entity);
+
+				$output['name'] = $strings->getName();
+			}
 
 			if ($projection->isAllowed('camps')) {
 				$output['camps'] = array_map(

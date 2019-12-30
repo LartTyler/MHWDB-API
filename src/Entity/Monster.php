@@ -1,9 +1,11 @@
 <?php
 	namespace App\Entity;
 
+	use App\Entity\Strings\MonsterStrings;
 	use App\Game\Element;
 	use App\Game\MonsterSpecies;
 	use App\Game\MonsterType;
+	use App\Localization\TranslatableEntityInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
@@ -20,17 +22,8 @@
 	 *
 	 * @package App\Entity
 	 */
-	class Monster implements EntityInterface, LengthCachingEntityInterface {
+	class Monster implements EntityInterface, TranslatableEntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
-
-		/**
-		 * @Assert\NotBlank()
-		 *
-		 * @ORM\Column(type="string", length=64, unique=true)
-		 *
-		 * @var string
-		 */
-		private $name;
 
 		/**
 		 * @Assert\NotBlank()
@@ -113,11 +106,18 @@
 		private $rewards;
 
 		/**
-		 * @ORM\Column(type="text", nullable=true)
+		 * @Assert\Valid()
 		 *
-		 * @var string|null
+		 * @ORM\OneToMany(
+		 *     targetEntity="App\Entity\Strings\MonsterStrings",
+		 *     mappedBy="monster",
+		 *     orphanRemoval=true,
+		 *     cascade={"all"}
+		 * )
+		 *
+		 * @var Collection|Selectable|MonsterStrings[]
 		 */
-		private $description = null;
+		private $strings;
 
 		/**
 		 * @ORM\Column(type="json")
@@ -162,12 +162,10 @@
 		/**
 		 * Monster constructor.
 		 *
-		 * @param string $name
 		 * @param string $type
 		 * @param string $species
 		 */
-		public function __construct(string $name, string $type, string $species) {
-			$this->name = $name;
+		public function __construct(string $type, string $species) {
 			$this->type = $type;
 			$this->species = $species;
 
@@ -176,24 +174,7 @@
 			$this->resistances = new ArrayCollection();
 			$this->weaknesses = new ArrayCollection();
 			$this->rewards = new ArrayCollection();
-		}
-
-		/**
-		 * @return string
-		 */
-		public function getName(): string {
-			return $this->name;
-		}
-
-		/**
-		 * @param string $name
-		 *
-		 * @return $this
-		 */
-		public function setName(string $name) {
-			$this->name = $name;
-
-			return $this;
+			$this->strings = new ArrayCollection();
 		}
 
 		/**
@@ -228,24 +209,6 @@
 		 */
 		public function setSpecies(string $species) {
 			$this->species = $species;
-
-			return $this;
-		}
-
-		/**
-		 * @return null|string
-		 */
-		public function getDescription(): ?string {
-			return $this->description;
-		}
-
-		/**
-		 * @param null|string $description
-		 *
-		 * @return $this
-		 */
-		public function setDescription(?string $description) {
-			$this->description = $description;
 
 			return $this;
 		}
@@ -326,5 +289,23 @@
 			$this->locationsLength = $this->locations->count();
 			$this->elementsLength = sizeof($this->elements);
 			$this->rewardsLength = $this->rewards->count();
+		}
+
+		/**
+		 * @return Collection|Selectable|MonsterStrings[]
+		 */
+		public function getStrings(): Collection {
+			return $this->strings;
+		}
+
+		/**
+		 * @param string $language
+		 *
+		 * @return MonsterStrings
+		 */
+		public function addStrings(string $language): EntityInterface {
+			$this->getStrings()->add($strings = new MonsterStrings($this, $language));
+
+			return $strings;
 		}
 	}

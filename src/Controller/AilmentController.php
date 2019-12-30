@@ -157,15 +157,28 @@
 
 				if ($projection->isAllowed('protection.items')) {
 					$output['protection']['items'] = array_map(
-						function(Item $item): array {
-							return [
+						function(Item $item) use ($projection): array {
+							$output = [
 								'id' => $item->getId(),
-								'name' => $item->getName(),
-								'description' => $item->getDescription(),
 								'rarity' => $item->getRarity(),
 								'value' => $item->getValue(),
 								'carryLimit' => $item->getCarryLimit(),
 							];
+
+							if (
+								$projection->isAllowed('protection.items.name') ||
+								$projection->isAllowed('protection.items.description')
+							) {
+								/** @var ItemStrings $strings */
+								$strings = $this->getStrings($item);
+
+								$output += [
+									'name' => $strings->getName(),
+									'description' => $strings->getDescription(),
+								];
+							}
+
+							return $output;
 						},
 						$protection->getItems()->toArray()
 					);
