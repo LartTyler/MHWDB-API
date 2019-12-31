@@ -8,7 +8,12 @@
 	use App\Entity\ArmorSetBonus;
 	use App\Entity\Camp;
 	use App\Entity\Charm;
+	use App\Entity\Decoration;
 	use App\Entity\Item;
+	use App\Entity\Location;
+	use App\Entity\Monster;
+	use App\Entity\MonsterWeakness;
+	use App\Entity\MotionValue;
 	use App\Entity\SkillRank;
 	use App\Localization\QueryLocalizationHelper;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManager;
@@ -59,9 +64,22 @@
 					Charm::class => [
 						'name' => 'strings.name',
 					],
+					Decoration::class => [
+						'name' => 'strings.name',
+					],
 					Item::class => [
 						'name' => 'strings.name',
 						'description' => 'strings.description',
+					],
+					Location::class => [
+						'name' => 'strings.name',
+					],
+					Monster::class => [
+						'name' => 'strings.name',
+						'description' => 'strings.description',
+					],
+					MonsterWeakness::class => [
+						'condition' => 'strings.description',
 					],
 					SkillRank::class => [
 						'skillName' => 'skill.name',

@@ -13,10 +13,8 @@
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
-	use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 	use Symfony\Component\HttpFoundation\Request;
 	use Symfony\Component\HttpFoundation\Response;
-	use Symfony\Component\Routing\Annotation\Route;
 
 	class ArmorController extends AbstractController {
 		/**
@@ -36,12 +34,7 @@
 		 * @return Response
 		 */
 		public function list(Request $request): Response {
-			return $this->doList(
-				$request,
-				[
-					'strings.language' => $request->getLocale(),
-				]
-			);
+			return $this->doList($request);
 		}
 
 		/**

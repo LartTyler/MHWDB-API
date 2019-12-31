@@ -42,14 +42,7 @@
 		 * @return Response
 		 */
 		public function list(Request $request): Response {
-			return $this->doList(
-				$request,
-				[
-					'strings.language' => $request->getLocale(),
-					'locations.strings.language' => $request->getLocale(),
-					'weaknesses.strings.language' => $request->getLocale(),
-				]
-			);
+			return $this->doList($request);
 		}
 
 		/**

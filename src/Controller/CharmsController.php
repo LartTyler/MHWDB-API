@@ -34,12 +34,7 @@
 		 * @return Response
 		 */
 		public function list(Request $request): Response {
-			return $this->doList(
-				$request,
-				[
-					'strings.language' => $request->getLocale(),
-				]
-			);
+			return $this->doList($request);
 		}
 
 		/**
