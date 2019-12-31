@@ -1,20 +1,21 @@
 <?php
 	namespace App\Entity;
 
+	use App\Entity\Strings\SkillRankStrings;
 	use App\Game\Attribute;
+	use App\Localization\TranslatableEntityInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
+	use Doctrine\Common\Collections\ArrayCollection;
+	use Doctrine\Common\Collections\Collection;
+	use Doctrine\Common\Collections\Selectable;
 	use Doctrine\ORM\Mapping as ORM;
 	use Symfony\Component\Validator\Constraints as Assert;
 
 	/**
 	 * @ORM\Entity()
 	 * @ORM\Table(name="skill_ranks")
-	 *
-	 * Class SkillRank
-	 *
-	 * @package App\Entity
 	 */
-	class SkillRank implements EntityInterface {
+	class SkillRank implements EntityInterface, TranslatableEntityInterface {
 		use EntityTrait;
 
 		/**
@@ -35,11 +36,16 @@
 		private $level;
 
 		/**
-		 * @ORM\Column(type="text")
+		 * @ORM\OneToMany(
+		 *     targetEntity="App\Entity\Strings\SkillRankStrings",
+		 *     mappedBy="rank",
+		 *     orphanRemoval=true,
+		 *     cascade={"all"}
+		 * )
 		 *
-		 * @var string
+		 * @var Collection|Selectable|SkillRankStrings[]
 		 */
-		private $description;
+		private $strings;
 
 		/**
 		 * @ORM\Column(type="json")
@@ -53,12 +59,12 @@
 		 *
 		 * @param Skill  $skill
 		 * @param int    $level
-		 * @param string $description
 		 */
-		public function __construct(Skill $skill, int $level, string $description) {
+		public function __construct(Skill $skill, int $level) {
 			$this->skill = $skill;
 			$this->level = $level;
-			$this->description = $description;
+
+			$this->strings = new ArrayCollection();
 		}
 
 		/**
@@ -73,24 +79,6 @@
 		 */
 		public function getLevel(): int {
 			return $this->level;
-		}
-
-		/**
-		 * @return string
-		 */
-		public function getDescription(): string {
-			return $this->description;
-		}
-
-		/**
-		 * @param string $description
-		 *
-		 * @return $this
-		 */
-		public function setDescription(string $description) {
-			$this->description = $description;
-
-			return $this;
 		}
 
 		/**
@@ -109,7 +97,7 @@
 			$this->modifiers = [];
 
 			foreach ($modifiers as $attribute => $amount)
-				$this->setModifer($attribute, $amount);
+				$this->setModifier($attribute, $amount);
 
 			return $this;
 		}
@@ -121,7 +109,7 @@
 		 * @return $this
 		 * @see Attribute
 		 */
-		public function setModifer(string $attribute, $amount): SkillRank {
+		public function setModifier(string $attribute, $amount): SkillRank {
 			$this->modifiers[$attribute] = $amount;
 
 			return $this;
@@ -137,5 +125,23 @@
 				return $this->modifiers[$attribute];
 
 			return 0;
+		}
+
+		/**
+		 * @return Collection|Selectable|SkillRankStrings[]
+		 */
+		public function getStrings(): Collection {
+			return $this->strings;
+		}
+
+		/**
+		 * @param string $language
+		 *
+		 * @return SkillRankStrings
+		 */
+		public function addStrings(string $language): EntityInterface {
+			$this->getStrings()->add($strings = new SkillRankStrings($this, $language));
+
+			return $strings;
 		}
 	}

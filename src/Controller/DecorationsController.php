@@ -5,6 +5,8 @@
 	use App\Entity\Decoration;
 	use App\Entity\SkillRank;
 	use App\Entity\Strings\DecorationStrings;
+	use App\Entity\Strings\SkillRankStrings;
+	use App\Entity\Strings\SkillStrings;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -111,16 +113,26 @@
 					function(SkillRank $rank) use ($projection): array {
 						$output = [
 							'id' => $rank->getId(),
-							'description' => $rank->getDescription(),
 							'level' => $rank->getLevel(),
 							'modifiers' => $rank->getModifiers(),
 						];
 
+						if ($projection->isAllowed('skills.description')) {
+							/** @var SkillRankStrings $strings */
+							$strings = $this->getStrings($rank);
+
+							$output['description'] = $strings->getDescription();
+						}
+
 						if ($projection->isAllowed('skills.skill'))
 							$output['skill'] = $rank->getSkill()->getId();
 
-						if ($projection->isAllowed('skills.skillName'))
-							$output['skillName'] = $rank->getSkill()->getName();
+						if ($projection->isAllowed('skills.skillName')) {
+							/** @var SkillStrings $strings */
+							$strings = $this->getStrings($rank->getSkill());
+
+							$output['skillName'] = $strings->getName();
+						}
 
 						return $output;
 					},

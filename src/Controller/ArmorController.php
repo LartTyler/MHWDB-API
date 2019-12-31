@@ -10,11 +10,15 @@
 	use App\Entity\Strings\ArmorSetStrings;
 	use App\Entity\Strings\ArmorStrings;
 	use App\Entity\Strings\ItemStrings;
+	use App\Entity\Strings\SkillRankStrings;
+	use App\Entity\Strings\SkillStrings;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
+	use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 	use Symfony\Component\HttpFoundation\Request;
 	use Symfony\Component\HttpFoundation\Response;
+	use Symfony\Component\Routing\Annotation\Route;
 
 	class ArmorController extends AbstractController {
 		/**
@@ -146,15 +150,25 @@
 						$output = [
 							'id' => $rank->getId(),
 							'level' => $rank->getLevel(),
-							'description' => $rank->getDescription(),
 							'modifiers' => $rank->getModifiers() ?: new \stdClass(),
 						];
+
+						if ($projection->isAllowed('skills.description')) {
+							/** @var SkillRankStrings $strings */
+							$strings = $this->getStrings($rank);
+
+							$output['description'] = $strings->getDescription();
+						}
 
 						if ($projection->isAllowed('skills.skill'))
 							$output['skill'] = $rank->getSkill()->getId();
 
-						if ($projection->isAllowed('skills.skillName'))
-							$output['skillName'] = $rank->getSkill()->getName();
+						if ($projection->isAllowed('skills.skillName')) {
+							/** @var SkillStrings $strings */
+							$strings = $this->getStrings($rank->getSkill());
+
+							$output['skillName'] = $strings->getName();
+						}
 
 						return $output;
 					},

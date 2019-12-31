@@ -10,6 +10,7 @@
 	use App\Entity\Decoration;
 	use App\Entity\Skill;
 	use App\Entity\SkillRank;
+	use App\Entity\Strings\SkillRankStrings;
 	use App\Entity\Strings\SkillStrings;
 	use App\Localization\L10nUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -77,12 +78,10 @@
 
 					$rank = $entity->getRank($definition->level);
 
-					if (!$rank) {
-						$rank = new SkillRank($entity, $definition->level, $definition->description);
+					if (!$rank)
+						$entity->getRanks()->add($rank = new SkillRank($entity, $definition->level));
 
-						$entity->getRanks()->add($rank);
-					} else
-						$rank->setDescription($definition->description);
+					$this->getRankStrings($rank)->setDescription($definition->description);
 
 					if (ObjectUtil::isset($definition, 'modifiers'))
 						$rank->setModifiers((array)$definition->modifiers);
@@ -213,6 +212,18 @@
 		protected function getSkillStrings(Skill $skill): SkillStrings {
 			$strings = L10nUtil::findOrCreateStrings($this->getCurrentLocale(), $skill);
 			assert($strings instanceof SkillStrings);
+
+			return $strings;
+		}
+
+		/**
+		 * @param SkillRank $rank
+		 *
+		 * @return SkillRankStrings
+		 */
+		protected function getRankStrings(SkillRank $rank): SkillRankStrings {
+			$strings = L10nUtil::findOrCreateStrings($this->getCurrentLocale(), $rank);
+			assert($strings instanceof SkillRankStrings);
 
 			return $strings;
 		}

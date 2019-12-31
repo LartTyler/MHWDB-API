@@ -5,15 +5,11 @@
 	use App\Entity\Item;
 	use App\Entity\Skill;
 	use App\Entity\SkillRank;
-	use App\Localization\L10nUtil;
-	use App\Utility\NullObject;
-	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\EntityTransformers\AbstractEntityTransformer;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\IntegrityException;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\ValidationException;
 	use DaybreakStudios\Utility\EntityTransformers\Utility\ObjectUtil;
 	use Doctrine\Common\Collections\Collection;
-	use Doctrine\Common\Collections\Selectable;
 	use Doctrine\ORM\EntityManagerInterface;
 	use Symfony\Component\HttpFoundation\RequestStack;
 	use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -32,8 +28,8 @@
 		/**
 		 * AbstractTransformer constructor.
 		 *
-		 * @param EntityManagerInterface $entityManager
-		 * @param RequestStack $requestStack
+		 * @param EntityManagerInterface  $entityManager
+		 * @param RequestStack            $requestStack
 		 * @param ValidatorInterface|null $validator
 		 */
 		public function __construct(
@@ -44,39 +40,6 @@
 			parent::__construct($entityManager, $validator);
 
 			$this->requestStack = $requestStack;
-		}
-
-		/**
-		 * @param string $class
-		 *
-		 * @return \InvalidArgumentException
-		 * @deprecated
-		 */
-		protected function createEntityNotSupportedException(string $class): \InvalidArgumentException {
-			return new \InvalidArgumentException('This transformer does not support transforming ' . $class);
-		}
-
-		/**
-		 * @param string   $prefix
-		 * @param int      $index
-		 * @param string[] $keys
-		 *
-		 * @return ValidationException
-		 * @deprecated
-		 */
-		protected function createMissingArrayFieldsException(
-			string $prefix,
-			int $index,
-			array $keys
-		): ValidationException {
-			return ValidationException::missingFields(
-				array_map(
-					function(string $key) use ($prefix, $index): string {
-						return $prefix . '[' . $index . '].' . $key;
-					},
-					$keys
-				)
-			);
 		}
 
 		/**

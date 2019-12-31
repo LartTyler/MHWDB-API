@@ -7,6 +7,7 @@
 	use App\Entity\Skill;
 	use App\Entity\Strings\AilmentStrings;
 	use App\Entity\Strings\ItemStrings;
+	use App\Entity\Strings\SkillStrings;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -181,12 +182,25 @@
 
 				if ($projection->isAllowed('protection.skills')) {
 					$output['protection']['skills'] = array_map(
-						function(Skill $skill): array {
-							return [
+						function(Skill $skill) use ($projection): array {
+							$output = [
 								'id' => $skill->getId(),
-								'name' => $skill->getName(),
-								'description' => $skill->getDescription(),
 							];
+
+							if (
+								$projection->isAllowed('protection.skills.name') ||
+								$projection->isAllowed('protection.skills.description')
+							) {
+								/** @var SkillStrings $strings */
+								$strings = $this->getStrings($skill);
+
+								$output += [
+									'name' => $strings->getName(),
+									'description' => $strings->getDescription(),
+								];
+							}
+
+							return $output;
 						},
 						$protection->getSkills()->toArray()
 					);

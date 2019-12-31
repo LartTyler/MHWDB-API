@@ -13,6 +13,8 @@
 	use App\Entity\Strings\ArmorSetStrings;
 	use App\Entity\Strings\ArmorStrings;
 	use App\Entity\Strings\ItemStrings;
+	use App\Entity\Strings\SkillRankStrings;
+	use App\Entity\Strings\SkillStrings;
 	use App\Game\Element;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
@@ -168,17 +170,26 @@
 									$output = [
 										'id' => $rank->getId(),
 										'level' => $rank->getLevel(),
-										'description' => $rank->getDescription(),
 										'modifiers' => $rank->getModifiers(),
 										'skill' => $rank->getSkill()->getId(),
-										'skillName' => $rank->getSkill()->getName(),
 									];
+
+									if ($projection->isAllowed('pieces.skills.description')) {
+										/** @var SkillRankStrings $strings */
+										$strings = $this->getStrings($rank);
+
+										$output['description'] = $strings->getDescription();
+									}
 
 									if ($projection->isAllowed('pieces.skills.skill'))
 										$output['skill'] = $rank->getSkill()->getId();
 
-									if ($projection->isAllowed('pieces.skills.skillName'))
-										$output['skill'] = $rank->getSkill()->getName();
+									if ($projection->isAllowed('pieces.skills.skillName')) {
+										/** @var SkillStrings $strings */
+										$strings = $this->getStrings($rank->getSkill());
+
+										$output['skillName'] = $strings->getName();
+									}
 
 									return $output;
 								},
@@ -307,15 +318,25 @@
 									$output['skill'] = [
 										'id' => $skillRank->getId(),
 										'level' => $skillRank->getLevel(),
-										'description' => $skillRank->getDescription(),
 										'modifiers' => $skillRank->getModifiers() ?: new \stdClass(),
 									];
+
+									if ($projection->isAllowed('bonus.ranks.skill.description')) {
+										/** @var SkillRankStrings $strings */
+										$strings = $this->getStrings($skillRank);
+
+										$output['description'] = $strings->getDescription();
+									}
 
 									if ($projection->isAllowed('bonus.ranks.skill.skill'))
 										$output['skill']['skill'] = $skillRank->getSkill()->getId();
 
-									if ($projection->isAllowed('bonus.ranks.skill.skillName'))
-										$output['skill']['skillName'] = $skillRank->getSkill()->getName();
+									if ($projection->isAllowed('bonus.ranks.skill.skillName')) {
+										/** @var SkillStrings $strings */
+										$strings = $this->getStrings($skillRank->getSkill());
+
+										$output['skill']['skillName'] = $strings->getName();
+									}
 								}
 
 								// endregion

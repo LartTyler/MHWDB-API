@@ -5,6 +5,8 @@
 	use App\Entity\ArmorSetBonus;
 	use App\Entity\ArmorSetBonusRank;
 	use App\Entity\Strings\ArmorSetBonusStrings;
+	use App\Entity\Strings\SkillRankStrings;
+	use App\Entity\Strings\SkillStrings;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -120,15 +122,25 @@
 							$output['skill'] = [
 								'id' => $skill->getId(),
 								'level' => $skill->getLevel(),
-								'description' => $skill->getDescription(),
 								'modifiers' => $skill->getModifiers(),
 							];
+
+							if ($projection->isAllowed('ranks.skill.description')) {
+								/** @var SkillRankStrings $strings */
+								$strings = $this->getStrings($skill);
+
+								$output['description'] = $strings->getDescription();
+							}
 
 							if ($projection->isAllowed('ranks.skill.skill'))
 								$output['skill']['skill'] = $skill->getSkill()->getId();
 
-							if ($projection->isAllowed('ranks.skill.skillName'))
-								$output['skill']['skillName'] = $skill->getSkill()->getName();
+							if ($projection->isAllowed('ranks.skill.skillName')) {
+								/** @var SkillStrings $strings */
+								$strings = $this->getStrings($skill->getSkill());
+
+								$output['skill']['skillName'] = $strings->getName();
+							}
 						}
 
 						return $output;

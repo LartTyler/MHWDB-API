@@ -8,6 +8,8 @@
 	use App\Entity\SkillRank;
 	use App\Entity\Strings\CharmStrings;
 	use App\Entity\Strings\ItemStrings;
+	use App\Entity\Strings\SkillRankStrings;
+	use App\Entity\Strings\SkillStrings;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -123,15 +125,25 @@
 									$output = [
 										'id' => $skillRank->getId(),
 										'level' => $skillRank->getLevel(),
-										'description' => $skillRank->getDescription(),
 										'modifiers' => $skillRank->getModifiers(),
 									];
+
+									if ($projection->isAllowed('ranks.skills.description')) {
+										/** @var SkillRankStrings $strings */
+										$strings = $this->getStrings($skillRank);
+
+										$output['description'] = $strings->getDescription();
+									}
 
 									if ($projection->isAllowed('ranks.skills.skill'))
 										$output['skill'] = $skillRank->getSkill()->getId();
 
-									if ($projection->isAllowed('ranks.skills.skillName'))
-										$output['skillName'] = $skillRank->getSkill()->getName();
+									if ($projection->isAllowed('ranks.skills.skillName')) {
+										/** @var SkillStrings $strings */
+										$strings = $this->getStrings($skillRank->getSkill());
+
+										$output['skillName'] = $strings->getName();
+									}
 
 									return $output;
 								},

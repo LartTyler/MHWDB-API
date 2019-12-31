@@ -4,6 +4,7 @@
 	use App\Contrib\Transformers\SkillTransformer;
 	use App\Entity\Skill;
 	use App\Entity\SkillRank;
+	use App\Entity\Strings\SkillRankStrings;
 	use App\Entity\Strings\SkillStrings;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
@@ -113,9 +114,15 @@
 							'id' => $rank->getId(),
 							'skill' => $rank->getSkill()->getId(),
 							'level' => $rank->getLevel(),
-							'description' => $rank->getDescription(),
 							'modifiers' => $rank->getModifiers() ?: new \stdClass(),
 						];
+
+						if ($projection->isAllowed('ranks.description')) {
+							/** @var SkillRankStrings $strings */
+							$strings = $this->getStrings($rank);
+
+							$output['description'] = $strings->getDescription();
+						}
 
 						if ($projection->isAllowed('ranks.skillName')) {
 							/** @var SkillStrings $strings */
