@@ -15,6 +15,7 @@
 	use App\Entity\MonsterWeakness;
 	use App\Entity\MotionValue;
 	use App\Entity\RewardCondition;
+	use App\Entity\Skill;
 	use App\Entity\SkillRank;
 	use App\Localization\QueryLocalizationHelper;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManager;
@@ -88,8 +89,11 @@
 					RewardCondition::class => [
 						'subtype' => 'strings.subtype',
 					],
+					Skill::class => [
+						'name' => 'strings.name',
+					],
 					SkillRank::class => [
-						'skillName' => 'skill.name',
+						'skillName' => 'skill.strings.name',
 					],
 				]
 			);
