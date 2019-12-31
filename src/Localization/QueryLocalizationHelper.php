@@ -62,6 +62,8 @@
 				}
 			}
 
+			$languageParamSet = false;
+
 			foreach ($query as $key => $value) {
 				if ($key[0] === '$') {
 					$this->addTranslationClauses($resolver, $qb, $value, $visited, $entities);
@@ -82,9 +84,13 @@
 
 				$visited[$class] = true;
 
-				$qb
-					->andWhere($alias . '.language = :language')
-					->setParameter('language', $this->requestStack->getCurrentRequest()->getLocale());
+				if (!$languageParamSet) {
+					$qb->setParameter('language', $this->requestStack->getCurrentRequest()->getLocale());
+
+					$languageParamSet = true;
+				}
+
+				$qb->andWhere($alias . '.language = :language');
 			}
 		}
 	}
