@@ -17,6 +17,7 @@
 	use App\Entity\RewardCondition;
 	use App\Entity\Skill;
 	use App\Entity\SkillRank;
+	use App\Entity\Weapon;
 	use App\Localization\QueryLocalizationHelper;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManager;
 	use Doctrine\ORM\EntityManagerInterface;
@@ -93,7 +94,11 @@
 						'name' => 'strings.name',
 					],
 					SkillRank::class => [
+						'description' => 'strings.description',
 						'skillName' => 'skill.strings.name',
+					],
+					Weapon::class => [
+						'name' => 'strings.name',
 					],
 				]
 			);

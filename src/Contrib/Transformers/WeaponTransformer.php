@@ -4,6 +4,7 @@
 	use App\Entity\Ammo;
 	use App\Entity\Phial;
 	use App\Entity\Shelling;
+	use App\Entity\Strings\WeaponStrings;
 	use App\Entity\Weapon;
 	use App\Entity\WeaponCraftingInfo;
 	use App\Entity\WeaponElement;
@@ -11,6 +12,7 @@
 	use App\Entity\WeaponSlot;
 	use App\Game\Attribute;
 	use App\Game\RawDamageMultiplier;
+	use App\Localization\L10nUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\IntegrityException;
@@ -37,7 +39,7 @@
 			if ($missing)
 				throw ValidationException::missingFields($missing);
 
-			return new Weapon($data->name, $data->type, $data->rarity);
+			return new Weapon($data->type, $data->rarity);
 		}
 
 		/**
@@ -76,7 +78,7 @@
 				throw EntityTransformerException::subjectNotSupported($entity);
 
 			if (ObjectUtil::isset($data, 'name'))
-				$entity->setName($data->name);
+				$this->getStrings($entity)->setName($data->name);
 
 			if (ObjectUtil::isset($data, 'type'))
 				$entity->setType($data->type);
@@ -424,5 +426,17 @@
 
 			if (ObjectUtil::isset($data, 'assets'))
 				throw ValidationException::fieldNotSupported('assets');
+		}
+
+		/**
+		 * @param Weapon $weapon
+		 *
+		 * @return WeaponStrings
+		 */
+		protected function getStrings(Weapon $weapon): WeaponStrings {
+			$strings = L10nUtil::findOrCreateStrings($this->getCurrentLocale(), $weapon);
+			assert($strings instanceof WeaponStrings);
+
+			return $strings;
 		}
 	}
