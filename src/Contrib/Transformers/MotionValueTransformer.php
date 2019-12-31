@@ -2,6 +2,8 @@
 	namespace App\Contrib\Transformers;
 
 	use App\Entity\MotionValue;
+	use App\Entity\Strings\MotionValueStrings;
+	use App\Localization\L10nUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\ValidationException;
@@ -14,24 +16,18 @@
 		 * @return EntityInterface
 		 */
 		public function doCreate(object $data): EntityInterface {
-			$missing = ObjectUtil::getMissingProperties($data, [
-				'name',
-				'weaponType',
-			]);
+			$missing = ObjectUtil::getMissingProperties(
+				$data,
+				[
+					'name',
+					'weaponType',
+				]
+			);
 
 			if ($missing)
 				throw ValidationException::missingFields($missing);
 
-			return new MotionValue($data->name, $data->weaponType);
-		}
-
-		/**
-		 * @param EntityInterface $entity
-		 *
-		 * @return void
-		 */
-		public function doDelete(EntityInterface $entity): void {
-			// noop
+			return new MotionValue($data->weaponType);
 		}
 
 		/**
@@ -45,7 +41,7 @@
 				throw EntityTransformerException::subjectNotSupported($entity);
 
 			if (ObjectUtil::isset($data, 'name'))
-				$entity->setName($data->name);
+				$this->getStrings($entity)->setName($data->name);
 
 			if (ObjectUtil::isset($data, 'weaponType'))
 				$entity->setWeaponType($data->weaponType);
@@ -61,5 +57,26 @@
 
 			if (ObjectUtil::isset($data, 'hits'))
 				$entity->setHits($data->hits);
+		}
+
+		/**
+		 * @param EntityInterface $entity
+		 *
+		 * @return void
+		 */
+		public function doDelete(EntityInterface $entity): void {
+			// noop
+		}
+
+		/**
+		 * @param MotionValue $motionValue
+		 *
+		 * @return MotionValueStrings
+		 */
+		protected function getStrings(MotionValue $motionValue): MotionValueStrings {
+			$strings = L10nUtil::findOrCreateStrings($this->getCurrentLocale(), $motionValue);
+			assert($strings instanceof MotionValueStrings);
+
+			return $strings;
 		}
 	}

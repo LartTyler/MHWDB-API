@@ -81,6 +81,9 @@
 					MonsterWeakness::class => [
 						'condition' => 'strings.description',
 					],
+					MotionValue::class => [
+						'name' => 'strings.name',
+					],
 					SkillRank::class => [
 						'skillName' => 'skill.name',
 					],
