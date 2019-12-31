@@ -139,7 +139,7 @@
 
 								$output += [
 									'name' => $strings->getName(),
-									'descriptoin' => $strings->getDescription(),
+									'description' => $strings->getDescription(),
 								];
 							}
 
