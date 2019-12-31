@@ -11,6 +11,7 @@
 	use App\Entity\RewardCondition;
 	use App\Entity\Strings\MonsterStrings;
 	use App\Entity\Strings\MonsterWeaknessStrings;
+	use App\Entity\Strings\RewardConditionStrings;
 	use App\Localization\L10nUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
@@ -181,7 +182,7 @@
 							if (is_string($subtype))
 								$subtype = strtolower($subtype);
 
-							$condition->setSubtype($subtype);
+							$this->getRewardConditionStrings($condition)->setSubtype($subtype);
 						}
 					}
 				}
@@ -213,6 +214,18 @@
 		protected function getWeaknessStrings(MonsterWeakness $weakness): MonsterWeaknessStrings {
 			$strings = L10nUtil::findOrCreateStrings($this->getCurrentLocale(), $weakness);
 			assert($strings instanceof MonsterWeaknessStrings);
+
+			return $strings;
+		}
+
+		/**
+		 * @param RewardCondition $rewardCondition
+		 *
+		 * @return RewardConditionStrings
+		 */
+		protected function getRewardConditionStrings(RewardCondition $rewardCondition): RewardConditionStrings {
+			$strings = L10nUtil::findOrCreateStrings($this->getCurrentLocale(), $rewardCondition);
+			assert($strings instanceof RewardConditionStrings);
 
 			return $strings;
 		}
