@@ -7,6 +7,7 @@
 	use App\Game\PlatformExclusivityType;
 	use App\Game\PlatformType;
 	use App\Game\WorldEventType;
+	use App\Localization\LanguageTag;
 	use Doctrine\ORM\EntityManagerInterface;
 	use Http\Client\Common\HttpMethodsClient;
 	use Http\Discovery\HttpClientDiscovery;
@@ -16,12 +17,20 @@
 	class WorldEventReader {
 		public const PLATFORM_TYPE_MAP = [
 			PlatformType::CONSOLE => [
-				Expansion::BASE => 'http://game.capcom.com/world/us/schedule.html',
-				Expansion::ICEBORNE => 'http://game.capcom.com/world/us/schedule-master.html',
+				Expansion::BASE => 'http://game.capcom.com/world/%s/schedule.html',
+				Expansion::ICEBORNE => 'http://game.capcom.com/world/%s/schedule-master.html',
 			],
 			PlatformType::PC => [
-				Expansion::BASE => 'http://game.capcom.com/world/steam/us/schedule.html',
+				Expansion::BASE => 'http://game.capcom.com/world/steam/%s/schedule.html',
 			],
+		];
+
+		public const LANGUAGE_TAG_MAP = [
+			LanguageTag::ENGLISH => 'us',
+			LanguageTag::FRENCH => 'fr',
+			LanguageTag::GERMAN => 'de',
+			LanguageTag::CHINESE_SIMPLIFIED => 'cn',
+			LanguageTag::CHINESE_TRADITIONAL => 'hk',
 		];
 
 		public const TABLE_TYPE_MAP = [
@@ -56,10 +65,11 @@
 		/**
 		 * @param string $platform
 		 * @param string $expansion
+		 * @param string $language
 		 *
 		 * @return \Generator|WorldEvent[]
 		 */
-		public function read(string $platform, string $expansion): \Generator {
+		public function read(string $platform, string $expansion, string $language): \Generator {
 			$url = static::PLATFORM_TYPE_MAP[$platform][$expansion] ?? null;
 
 			if (!$url) {
@@ -68,7 +78,7 @@
 				);
 			}
 
-			$crawler = new Crawler(file_get_contents($url));
+			$crawler = new Crawler(file_get_contents(sprintf($url, static::LANGUAGE_TAG_MAP[$language])));
 			$timezoneOffsetNode = $crawler->filter('label[for=zoneSelect]');
 
 			// Pre-Iceborne events page contained a typo in the `for` attribute of the timezone selector. Until the PC
@@ -176,7 +186,6 @@
 							$type = WorldEventType::SAFI_JIIVA;
 
 						$event = new WorldEvent(
-							$name,
 							$type,
 							$expansion,
 							$platform,
@@ -185,6 +194,8 @@
 							$location,
 							$rank
 						);
+
+						$strings = $event->addStrings($language);
 
 						$event->setMasterRank($expansion === Expansion::ICEBORNE);
 

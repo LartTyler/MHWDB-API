@@ -2,6 +2,9 @@
 	namespace App\Controller;
 
 	use App\Entity\Camp;
+	use App\Entity\Strings\CampStrings;
+	use App\Entity\Strings\LocationStrings;
+	use App\Entity\Strings\WorldEventStrings;
 	use App\Entity\WorldEvent;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
@@ -51,37 +54,64 @@
 
 			$output = [
 				'id' => $entity->getId(),
-				'name' => $entity->getName(),
 				'platform' => $entity->getPlatform(),
 				'exclusive' => $entity->getExclusive(),
 				'type' => $entity->getType(),
 				'expansion' => $entity->getExpansion(),
-				'description' => $entity->getDescription(),
-				'requirements' => $entity->getRequirements(),
 				'questRank' => $entity->getQuestRank(),
 				'masterRank' => $entity->isMasterRank(),
-				'successConditions' => $entity->getSuccessConditions(),
 				'startTimestamp' => $entity->getStartTimestamp()->format(\DateTime::ISO8601),
 				'endTimestamp' => $entity->getEndTimestamp()->format(\DateTime::ISO8601),
 			];
+
+			if (
+				$projection->isAllowed('name') ||
+				$projection->isAllowed('description') ||
+				$projection->isAllowed('requirements') ||
+				$projection->isAllowed('successConditions')
+			) {
+				/** @var WorldEventStrings $strings */
+				$strings = $this->getStrings($entity);
+
+				$output += [
+					'name' => $strings->getName(),
+					'description' => $strings->getDescription(),
+					'requirements' => $strings->getRequirements(),
+					'successConditions' => $strings->getSuccessConditions(),
+				];
+			}
 
 			if ($projection->isAllowed('location')) {
 				$location = $entity->getLocation();
 
 				$output['location'] = [
 					'id' => $location->getId(),
-					'name' => $location->getName(),
 					'zoneCount' => $location->getZoneCount(),
 				];
 
+				if ($projection->isAllowed('location.name')) {
+					/** @var LocationStrings $strings */
+					$strings = $this->getStrings($location);
+
+					$output['location']['name'] = $strings->getName();
+				}
+
 				if ($projection->isAllowed('location.camps')) {
 					$output['location']['camps'] = $location->getCamps()->map(
-						function(Camp $camp): array {
-							return [
+						function(Camp $camp) use ($projection): array {
+							$output = [
 								'id' => $camp->getId(),
-								'name' => $camp->getName(),
 								'zone' => $camp->getZone(),
 							];
+
+							if ($projection->isAllowed('location.camps.name')) {
+								/** @var CampStrings $strings */
+								$strings = $this->getStrings($camp);
+
+								$output['name'] = $strings->getName();
+							}
+
+							return $output;
 						}
 					)->toArray();
 				}
