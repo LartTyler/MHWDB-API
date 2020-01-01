@@ -17,6 +17,7 @@
 	use App\Entity\Strings\MonsterStrings;
 	use App\Entity\Strings\MonsterWeaknessStrings;
 	use App\Entity\Strings\RewardConditionStrings;
+	use App\Entity\Strings\SkillStrings;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -182,12 +183,25 @@
 
 							if ($projection->isAllowed('ailments.protection.skills')) {
 								$output['protection']['skills'] = array_map(
-									function(Skill $skill): array {
-										return [
+									function(Skill $skill) use ($projection): array {
+										$output = [
 											'id' => $skill->getId(),
-											'name' => $skill->getName(),
-											'description' => $skill->getDescription(),
 										];
+
+										if (
+											$projection->isAllowed('ailments.protection.skills.name') ||
+											$projection->isAllowed('ailments.protection.skills.description')
+										) {
+											/** @var SkillStrings $strings */
+											$strings = $this->getStrings($skill);
+
+											$output += [
+												'name' => $strings->getName(),
+												'description' => $strings->getDescription(),
+											];
+										}
+
+										return $output;
 									},
 									$protection->getSkills()->toArray()
 								);
