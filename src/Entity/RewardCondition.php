@@ -70,7 +70,8 @@
 		 *     targetEntity="App\Entity\Strings\RewardConditionStrings",
 		 *     mappedBy="rewardCondition",
 		 *     orphanRemoval=true,
-		 *     cascade={"all"}
+		 *     cascade={"all"},
+		 *     fetch="EAGER"
 		 * )
 		 *
 		 * @var Collection|Selectable|RewardConditionStrings[]

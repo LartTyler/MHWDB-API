@@ -37,7 +37,8 @@
 		 *     targetEntity="App\Entity\Strings\CharmStrings",
 		 *     mappedBy="charm",
 		 *     orphanRemoval=true,
-		 *     cascade={"all"}
+		 *     cascade={"all"},
+		 *     fetch="EAGER"
 		 * )
 		 *
 		 * @var Collection|Selectable|CharmStrings[]

@@ -34,7 +34,8 @@
 		 *     targetEntity="App\Entity\Strings\SkillStrings",
 		 *     mappedBy="skill",
 		 *     orphanRemoval=true,
-		 *     cascade={"all"}
+		 *     cascade={"all"},
+		 *     fetch="EAGER"
 		 * )
 		 *
 		 * @var Collection|Selectable|SkillStrings[]

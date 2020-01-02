@@ -58,7 +58,8 @@
 		 *     targetEntity="App\Entity\Strings\MonsterWeaknessStrings",
 		 *     mappedBy="monsterWeakness",
 		 *     orphanRemoval=true,
-		 *     cascade={"all"}
+		 *     cascade={"all"},
+		 *     fetch="EAGER"
 		 * )
 		 *
 		 * @var Collection|Selectable|MonsterWeaknessStrings[]

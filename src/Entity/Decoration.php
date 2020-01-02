@@ -56,7 +56,8 @@
 		 *     targetEntity="App\Entity\Strings\DecorationStrings",
 		 *     mappedBy="decoration",
 		 *     orphanRemoval=true,
-		 *     cascade={"all"}
+		 *     cascade={"all"},
+		 *     fetch="EAGER"
 		 * )
 		 *
 		 * @var Collection|Selectable|DecorationStrings[]

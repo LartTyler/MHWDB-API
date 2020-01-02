@@ -43,7 +43,8 @@
 		 *     targetEntity="App\Entity\Strings\ArmorSetBonusStrings",
 		 *     mappedBy="armorSetBonus",
 		 *     orphanRemoval=true,
-		 *     cascade={"all"}
+		 *     cascade={"all"},
+		 *     fetch="EAGER"
 		 * )
 		 *
 		 * @var Collection|Selectable|ArmorSetBonusStrings[]
