@@ -18,6 +18,7 @@
 	use App\Entity\Skill;
 	use App\Entity\SkillRank;
 	use App\Entity\Weapon;
+	use App\Entity\WorldEvent;
 	use App\Localization\QueryLocalizationHelper;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManager;
 	use Doctrine\ORM\EntityManagerInterface;
@@ -99,6 +100,12 @@
 					],
 					Weapon::class => [
 						'name' => 'strings.name',
+					],
+					WorldEvent::class => [
+						'name' => 'strings.name',
+						'description' => 'strings.description',
+						'requirements' => 'strings.requirements',
+						'successConditions' => 'strings.successConditions',
 					],
 				]
 			);
