@@ -15,12 +15,7 @@
 
 	/**
 	 * @ORM\Entity(repositoryClass="App\Repository\WorldEventRepository")
-	 * @ORM\Table(
-	 *     name="world_events",
-	 *     uniqueConstraints={
-	 *     		@ORM\UniqueConstraint(columns={"platform", "name", "expansion", "start_timestamp"})
-	 *     }
-	 * )
+	 * @ORM\Table(name="world_events")
 	 */
 	class WorldEvent implements EntityInterface, TranslatableEntityInterface {
 		use EntityTrait;

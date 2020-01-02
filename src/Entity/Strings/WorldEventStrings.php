@@ -11,7 +11,7 @@
 	 * @ORM\Entity()
 	 * @ORM\Table(
 	 *     name="world_event_strings",
-	 *     uniqueConstraints={@ORM\UniqueConstraint(columns={"world_event_id", "language"})}
+	 *     uniqueConstraints={@ORM\UniqueConstraint(columns={"event_id", "language"})}
 	 * )
 	 */
 	class WorldEventStrings implements StringsEntityInterface {
