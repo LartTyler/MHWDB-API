@@ -12,7 +12,7 @@
 	use Symfony\Component\Validator\Constraints as Assert;
 
 	/**
-	 * @ORM\Entity()
+	 * @ORM\Entity(repositoryClass="App\Repository\LocationRepository")
 	 * @ORM\Table(name="locations")
 	 *
 	 * Class Location
@@ -48,7 +48,8 @@
 		 *     targetEntity="App\Entity\Strings\LocationStrings",
 		 *     mappedBy="location",
 		 *     orphanRemoval=true,
-		 *     cascade={"all"}
+		 *     cascade={"all"},
+		 *     fetch="EAGER"
 		 * )
 		 *
 		 * @var Collection|Selectable|LocationStrings[]

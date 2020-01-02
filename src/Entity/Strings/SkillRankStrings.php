@@ -10,7 +10,7 @@
 	 * @ORM\Entity()
 	 * @ORM\Table(
 	 *     name="skill_rank_strings",
-	 *     uniqueConstraints={@ORM\UniqueConstraint(columns={"skill_rank_id", "language"})}
+	 *     uniqueConstraints={@ORM\UniqueConstraint(columns={"rank_id", "language"})}
 	 * )
 	 */
 	class SkillRankStrings implements StringsEntityInterface {

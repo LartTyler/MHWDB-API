@@ -40,7 +40,8 @@
 		 *     targetEntity="App\Entity\Strings\SkillRankStrings",
 		 *     mappedBy="rank",
 		 *     orphanRemoval=true,
-		 *     cascade={"all"}
+		 *     cascade={"all"},
+		 *     fetch="EAGER"
 		 * )
 		 *
 		 * @var Collection|Selectable|SkillRankStrings[]

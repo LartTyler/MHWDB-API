@@ -112,7 +112,8 @@
 		 *     targetEntity="App\Entity\Strings\MonsterStrings",
 		 *     mappedBy="monster",
 		 *     orphanRemoval=true,
-		 *     cascade={"all"}
+		 *     cascade={"all"},
+		 *     fetch="EAGER"
 		 * )
 		 *
 		 * @var Collection|Selectable|MonsterStrings[]

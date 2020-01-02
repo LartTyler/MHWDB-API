@@ -101,7 +101,8 @@
 		 *     targetEntity="App\Entity\Strings\ArmorStrings",
 		 *     mappedBy="armor",
 		 *     orphanRemoval=true,
-		 *     cascade={"all"}
+		 *     cascade={"all"},
+		 *     fetch="EAGER"
 		 * )
 		 *
 		 * @var Collection|Selectable|ArmorStrings[]

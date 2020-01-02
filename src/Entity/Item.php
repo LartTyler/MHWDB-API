@@ -38,7 +38,8 @@
 		 *     targetEntity="App\Entity\Strings\ItemStrings",
 		 *     mappedBy="item",
 		 *     orphanRemoval=true,
-		 *     cascade={"all"}
+		 *     cascade={"all"},
+		 *     fetch="EAGER"
 		 * )
 		 *
 		 * @var Collection|Selectable|ItemStrings[]

@@ -8,19 +8,15 @@
 	use App\Game\WorldEventType;
 	use App\Localization\TranslatableEntityInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
+	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\Common\Collections\Selectable;
 	use Doctrine\ORM\Mapping as ORM;
 	use Symfony\Component\Validator\Constraints as Assert;
 
 	/**
-	 * @ORM\Entity()
-	 * @ORM\Table(
-	 *     name="world_events",
-	 *     uniqueConstraints={
-	 *     		@ORM\UniqueConstraint(columns={"platform", "name", "expansion", "start_timestamp"})
-	 *     }
-	 * )
+	 * @ORM\Entity(repositoryClass="App\Repository\WorldEventRepository")
+	 * @ORM\Table(name="world_events")
 	 */
 	class WorldEvent implements EntityInterface, TranslatableEntityInterface {
 		use EntityTrait;
@@ -97,7 +93,8 @@
 		 *     targetEntity="App\Entity\Strings\WorldEventStrings",
 		 *     mappedBy="event",
 		 *     orphanRemoval=true,
-		 *     cascade={"all"}
+		 *     cascade={"all"},
+		 *     fetch="EAGER"
 		 * )
 		 *
 		 * @var Collection|Selectable|WorldEventStrings[]
@@ -148,6 +145,8 @@
 			$this->endTimestamp = $endTimestamp;
 			$this->location = $location;
 			$this->questRank = $questRank;
+
+			$this->strings = new ArrayCollection();
 		}
 
 		/**

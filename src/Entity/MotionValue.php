@@ -37,7 +37,8 @@
 		 *     targetEntity="App\Entity\Strings\MotionValueStrings",
 		 *     mappedBy="motionValue",
 		 *     orphanRemoval=true,
-		 *     cascade={"all"}
+		 *     cascade={"all"},
+		 *     fetch="EAGER"
 		 * )
 		 *
 		 * @var Collection|Selectable|MotionValueStrings[]

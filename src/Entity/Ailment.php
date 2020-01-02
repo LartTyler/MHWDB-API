@@ -56,7 +56,8 @@
 		 *     targetEntity="App\Entity\Strings\AilmentStrings",
 		 *     mappedBy="ailment",
 		 *     orphanRemoval=true,
-		 *     cascade={"all"}
+		 *     cascade={"all"},
+		 *     fetch="EAGER"
 		 * )
 		 *
 		 * @var Collection|Selectable|AilmentStrings[]

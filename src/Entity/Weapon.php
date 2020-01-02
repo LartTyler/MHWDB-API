@@ -118,7 +118,8 @@
 		 *     targetEntity="App\Entity\Strings\WeaponStrings",
 		 *     mappedBy="weapon",
 		 *     orphanRemoval=true,
-		 *     cascade={"all"}
+		 *     cascade={"all"},
+		 *     fetch="EAGER"
 		 * )
 		 *
 		 * @var Collection|Selectable|WeaponStrings[]

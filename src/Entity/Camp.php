@@ -45,7 +45,8 @@
 		 *     targetEntity="App\Entity\Strings\CampStrings",
 		 *     mappedBy="camp",
 		 *     orphanRemoval=true,
-		 *     cascade={"all"}
+		 *     cascade={"all"},
+		 *     fetch="EAGER"
 		 * )
 		 *
 		 * @var Collection|Selectable|CampStrings[]

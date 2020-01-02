@@ -8,6 +8,7 @@
 	use Symfony\Component\Console\Command\Command;
 	use Symfony\Component\Console\Input\InputArgument;
 	use Symfony\Component\Console\Input\InputInterface;
+	use Symfony\Component\Console\Input\InputOption;
 	use Symfony\Component\Console\Output\OutputInterface;
 	use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -39,8 +40,10 @@
 		 * @return void
 		 */
 		protected function configure(): void {
-			$this->addArgument('platform', InputArgument::REQUIRED);
-			$this->addArgument('expansion', InputArgument::OPTIONAL, '', Expansion::BASE);
+			$this
+				->addArgument('platform', InputArgument::REQUIRED)
+				->addArgument('expansion', InputArgument::OPTIONAL, '', Expansion::BASE)
+				->addOption('sleep', null, InputOption::VALUE_REQUIRED, '', 5);
 		}
 
 		/**
@@ -50,7 +53,12 @@
 		 * @return int
 		 */
 		protected function execute(InputInterface $input, OutputInterface $output): int {
-			$events = $this->eventReader->read($input->getArgument('platform'), $input->getArgument('expansion'));
+			$events = $this->eventReader->read(
+				$input->getArgument('platform'),
+				$input->getArgument('expansion'),
+				(int)$input->getOption('sleep')
+			);
+
 			$added = 0;
 
 			foreach ($events as $event) {
