@@ -7,6 +7,7 @@
 	use App\Game\PlatformExclusivityType;
 	use App\Game\PlatformType;
 	use App\Game\WorldEventType;
+	use App\Localization\L10nUtil;
 	use App\Localization\LanguageTag;
 	use Doctrine\ORM\EntityManagerInterface;
 	use Http\Client\Common\HttpMethodsClient;
@@ -71,8 +72,8 @@
 		 */
 		public function read(string $platform, string $expansion, int $sleepDuration = 5): \Generator {
 			/**
-			 * Holds new events, in the order they are parsed out of the initial page. Events already in the database
-			 * are represented by `null` values, to indicate that they should be skipped.
+			 * Holds new events, in the order they are parsed out of the initial page. Used to add non-English strings
+			 * to events during parsing.
 			 *
 			 * @var WorldEvent[] $events
 			 */
@@ -92,6 +93,9 @@
 				)
 			);
 
+			// Used to infer years for event terms during parsing.
+			$currentTimestamp = new \DateTimeImmutable();
+
 			foreach ($languages as $languageIndex => $language) {
 				$url = static::PLATFORM_TYPE_MAP[$platform][$expansion] ?? null;
 
@@ -101,7 +105,7 @@
 					);
 				}
 
-				$crawler = new Crawler(file_get_contents($url, static::LANGUAGE_TAG_MAP[$language]));
+				$crawler = new Crawler(file_get_contents(sprintf($url, static::LANGUAGE_TAG_MAP[$language])));
 				$timezoneOffsetNode = $crawler->filter('label[for=zoneSelect]');
 
 				// Pre-Iceborne events page contained a typo in the `for` attribute of the timezone selector. Until the PC
@@ -132,33 +136,39 @@
 
 						$name = trim($questInfo->filter('.title > span')->text());
 
-						$termText = trim(
-							str_replace(
-								[
-									'availability',
-									'-',
-								],
-								[
-									'',
-									'/',
-								],
-								mb_strtolower($questInfo->filter('.terms')->text())
-							)
+						$termStrings = preg_split(
+							'/(\d{2}-\d{2} \d{2}:\d{2} 〜 \d{2}-\d{2} \d{2}:\d{2})/',
+							mb_strtolower($questInfo->filter('.terms')->text()),
+							null,
+							PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE
 						);
 
 						/** @var \DateTimeImmutable[][] $terms */
 						$terms = [];
 
-						foreach (explode("\n", $termText) as $item) {
+						foreach ($termStrings as $item) {
 							$text = trim($item);
+
+							if (!$text || !is_numeric($text[0]))
+								continue;
+
+							$text = str_replace('-', '/', $text);
 
 							$start = (new \DateTimeImmutable(substr($text, 0, 10), new \DateTimeZone('UTC')))
 								->sub($offsetInterval);
 
+							if ($start->diff($currentTimestamp)->days >= 90) {
+								$start = $start->setDate(
+									(int)$start->format('Y') - 1,
+									(int)$start->format('m'),
+									(int)$start->format('d')
+								);
+							}
+
 							$end = (new \DateTimeImmutable(substr($text, 15), new \DateTimeZone('UTC')))
 								->sub($offsetInterval);
 
-							if ((int)$end->format('m') < (int)$start->format('m')) {
+							if ($end->diff($currentTimestamp)->days >= 90) {
 								$end = $end->setDate(
 									(int)$end->format('Y') + 1,
 									(int)$end->format('m'),
@@ -178,72 +188,73 @@
 									$term[0]
 								);
 
-								if ($event) {
-									$events[$eventIndex++] = null;
+								if (!$event) {
+									/** @var Location|null $location */
+									$location = $this->entityManager->getRepository(Location::class)->findOneByName(
+										$language,
+										$locName = trim($popupItems->eq(0)->text())
+									);
 
-									continue;
+									if (!$location)
+										throw new \Exception('Unrecognized location: ' . $locName);
+
+									$rank = (int)preg_replace('/\D/', '', $row->filter('.level')->text());
+									$exclusive = null;
+
+									if ($row->filter('.image > .ps4')->count() > 0)
+										$exclusive = PlatformExclusivityType::PS4;
+
+									$type = static::TABLE_TYPE_MAP[$tables->eq($tableIndex)->attr('class')];
+
+									if ($expansion === Expansion::ICEBORNE && $type === WorldEventType::KULVE_TAROTH)
+										$type = WorldEventType::SAFI_JIIVA;
+
+									$event = new WorldEvent(
+										$type,
+										$expansion,
+										$platform,
+										$term[0],
+										$term[1],
+										$location,
+										$rank
+									);
+
+									$event->setMasterRank($expansion === Expansion::ICEBORNE);
+
+									if ($exclusive)
+										$event->setExclusive($exclusive);
+
+									yield $event;
 								}
 
-								/** @var Location|null $location */
-								$location = $this->entityManager->getRepository(Location::class)->findOneBy(
-									[
-										'name' => $locName = trim($popupItems->eq(0)->text()),
-									]
-								);
-
-								if (!$location)
-									throw new \Exception('Unrecognized location: ' . $locName);
-
-								$rank = (int)preg_replace('/\D/', '', $row->filter('.level')->text());
-								$exclusive = null;
-
-								if ($row->filter('.image > .ps4')->count() > 0)
-									$exclusive = PlatformExclusivityType::PS4;
-
-								$type = static::TABLE_TYPE_MAP[$tables->eq($tableIndex)->attr('class')];
-
-								if ($expansion === Expansion::ICEBORNE && $type === WorldEventType::KULVE_TAROTH)
-									$type = WorldEventType::SAFI_JIIVA;
-
-								$events[$eventIndex] = $event = new WorldEvent(
-									$type,
-									$expansion,
-									$platform,
-									$term[0],
-									$term[1],
-									$location,
-									$rank
-								);
-
-								$event->setMasterRank($expansion === Expansion::ICEBORNE);
-
-								if ($exclusive)
-									$event->setExclusive($exclusive);
-							} else if ($events[$eventIndex] === null)
-								continue;
-
-							$description = str_replace("\r\n", "\n", trim($questInfo->filter('.txt')->text()));
-							$successConditions = trim($popupItems->eq(2)->text());
-							$requirements = trim($popupItems->eq(1)->text());
-
-							if (strtolower($requirements) === 'none')
-								$requirements = null;
+								$events[$eventIndex] = $event;
+							}
 
 							$event = $events[$eventIndex++];
-							$strings = $event->addStrings($language);
 
+							if (!$event)
+								throw new \RuntimeException('No event found for index ' . $eventIndex);
+
+							if (L10nUtil::findStrings($language, $event))
+								continue;
+
+							$strings = $event->addStrings($language);
 							$strings->setName($name);
+
+							$description = str_replace("\r\n", "\n", trim($questInfo->filter('.txt')->text()));
 
 							if ($description)
 								$strings->setDescription($description);
 
+							$successConditions = trim($popupItems->eq(2)->text());
+
 							if ($successConditions)
 								$strings->setSuccessConditions($successConditions);
 
-							if ($requirements)
-								$strings->setRequirements($requirements);
+							$requirements = trim($popupItems->eq(1)->text());
 
-							yield $event;
+							if (strtolower($requirements) !== 'none')
+								$strings->setRequirements($requirements);
 						}
 					}
 				}
