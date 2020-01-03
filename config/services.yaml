@@ -28,13 +28,4 @@ services:
                 region: 'us-east-2'
                 version: 'latest'
 
-    App\Doctrine\LengthCachingListener:
-        tags:
-            -
-                name: doctrine.event_listener
-                event: prePersist
-            -
-                name: doctrine.event_listener
-                event: preUpdate
-
     App\WorldEvent\WorldEventReader: ~

@@ -16,7 +16,7 @@
 	 * @ORM\Entity()
 	 * @ORM\Table(name="motion_values")
 	 */
-	class MotionValue implements EntityInterface, TranslatableEntityInterface, LengthCachingEntityInterface {
+	class MotionValue implements EntityInterface, TranslatableEntityInterface {
 		use EntityTrait;
 
 		/**
@@ -79,14 +79,6 @@
 		 * @var int[]
 		 */
 		private $hits = [];
-
-		/**
-		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
-		 *
-		 * @var int
-		 * @internal Used to allow API queries against "hits.length"
-		 */
-		private $hitsLength = 0;
 
 		/**
 		 * MotionValue constructor.
@@ -187,13 +179,6 @@
 			$this->hits = $hits;
 
 			return $this;
-		}
-
-		/**
-		 * {@inheritdoc}
-		 */
-		public function syncLengthFields(): void {
-			$this->hitsLength = sizeof($this->hits);
 		}
 
 		/**

@@ -19,7 +19,7 @@
 	 *
 	 * @package App\Entity
 	 */
-	class ArmorSet implements EntityInterface, TranslatableEntityInterface, LengthCachingEntityInterface {
+	class ArmorSet implements EntityInterface, TranslatableEntityInterface {
 		use EntityTrait;
 
 		/**
@@ -60,14 +60,6 @@
 		 * @var ArmorSetBonus
 		 */
 		private $bonus = null;
-
-		/**
-		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
-		 *
-		 * @var int
-		 * @internal Used to allow API queries against "pieces.length"
-		 */
-		private $piecesLength = 0;
 
 		/**
 		 * ArmorSet constructor.
@@ -124,13 +116,6 @@
 			$this->bonus = $bonus;
 
 			return $this;
-		}
-
-		/**
-		 * {@inheritdoc}
-		 */
-		public function syncLengthFields(): void {
-			$this->piecesLength = $this->pieces->count();
 		}
 
 		/**

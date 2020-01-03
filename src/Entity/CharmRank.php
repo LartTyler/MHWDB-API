@@ -16,7 +16,7 @@
 	 *
 	 * @package App\Entity
 	 */
-	class CharmRank implements EntityInterface, LengthCachingEntityInterface {
+	class CharmRank implements EntityInterface {
 		use EntityTrait;
 
 		/**
@@ -72,14 +72,6 @@
 		 * @var CharmRankCraftingInfo|null
 		 */
 		private $crafting = null;
-
-		/**
-		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
-		 *
-		 * @var int
-		 * @internal Used to allow API queries against "skills.length"
-		 */
-		private $skillsLength = 0;
 
 		/**
 		 * CharmRank constructor.
@@ -179,12 +171,5 @@
 			$this->crafting = $crafting;
 
 			return $this;
-		}
-
-		/**
-		 * {@inheritdoc}
-		 */
-		public function syncLengthFields(): void {
-			$this->skillsLength = $this->skills->count();
 		}
 	}

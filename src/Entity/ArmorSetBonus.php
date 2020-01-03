@@ -19,7 +19,7 @@
 	 *
 	 * @package App\Entity
 	 */
-	class ArmorSetBonus implements EntityInterface, TranslatableEntityInterface, LengthCachingEntityInterface {
+	class ArmorSetBonus implements EntityInterface, TranslatableEntityInterface {
 		use EntityTrait;
 
 		/**
@@ -52,18 +52,11 @@
 		private $strings;
 
 		/**
-		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
-		 *
-		 * @var int
-		 * @internal Used to allow API queries against "ranks.length"
-		 */
-		private $ranksLength = 0;
-
-		/**
 		 * ArmorSetBonus constructor.
 		 */
 		public function __construct() {
 			$this->ranks = new ArrayCollection();
+			$this->strings = new ArrayCollection();
 		}
 
 		/**
@@ -89,13 +82,6 @@
 				return null;
 
 			return $matching->first();
-		}
-
-		/**
-		 * {@inheritdoc}
-		 */
-		public function syncLengthFields(): void {
-			$this->ranksLength = $this->ranks->count();
 		}
 
 		/**

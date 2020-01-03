@@ -19,7 +19,7 @@
 	 *
 	 * @package App\Entity
 	 */
-	class Charm implements EntityInterface, TranslatableEntityInterface, LengthCachingEntityInterface {
+	class Charm implements EntityInterface, TranslatableEntityInterface {
 		use EntityTrait;
 
 		/**
@@ -44,14 +44,6 @@
 		 * @var Collection|Selectable|CharmStrings[]
 		 */
 		private $strings;
-
-		/**
-		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
-		 *
-		 * @var int
-		 * @internal Used to allow API queries against "ranks.length"
-		 */
-		private $ranksLength = 0;
 
 		/**
 		 * Charm constructor.
@@ -84,13 +76,6 @@
 				return $matches->first();
 
 			return null;
-		}
-
-		/**
-		 * {@inheritdoc}
-		 */
-		public function syncLengthFields(): void {
-			$this->ranksLength = $this->ranks->count();
 		}
 
 		/**

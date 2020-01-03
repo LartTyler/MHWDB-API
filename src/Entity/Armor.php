@@ -25,7 +25,7 @@
 	 *
 	 * @package App\Entity
 	 */
-	class Armor implements EntityInterface, TranslatableEntityInterface, LengthCachingEntityInterface {
+	class Armor implements EntityInterface, TranslatableEntityInterface {
 		use EntityTrait;
 		use AttributableTrait;
 
@@ -133,22 +133,6 @@
 		 * @var ArmorCraftingInfo|null
 		 */
 		private $crafting = null;
-
-		/**
-		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
-		 *
-		 * @var int
-		 * @internal Used to allow API queries against "skills.length"
-		 */
-		private $skillsLength = 0;
-
-		/**
-		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
-		 *
-		 * @var int
-		 * @internal Used to allow API queries against "slots.length"
-		 */
-		private $slotsLength = 0;
 
 		/**
 		 * Armor constructor.
@@ -310,14 +294,6 @@
 			$this->crafting = $crafting;
 
 			return $this;
-		}
-
-		/**
-		 * @return void
-		 */
-		public function syncLengthFields(): void {
-			$this->skillsLength = $this->skills->count();
-			$this->slotsLength = $this->slots->count();
 		}
 
 		/**
