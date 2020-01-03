@@ -1,36 +1,23 @@
 <?php
 	namespace App\Entity;
 
+	use App\Entity\Strings\MotionValueStrings;
 	use App\Game\DamageType;
 	use App\Game\WeaponType;
+	use App\Localization\TranslatableEntityInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
+	use Doctrine\Common\Collections\ArrayCollection;
+	use Doctrine\Common\Collections\Collection;
+	use Doctrine\Common\Collections\Selectable;
 	use Doctrine\ORM\Mapping as ORM;
 	use Symfony\Component\Validator\Constraints as Assert;
 
 	/**
 	 * @ORM\Entity()
-	 * @ORM\Table(
-	 *     name="motion_values",
-	 *     uniqueConstraints={
-	 *         @ORM\UniqueConstraint(columns={"weapon_type", "name"})
-	 *     }
-	 * )
-	 *
-	 * Class MotionValue
-	 *
-	 * @package App\Entity
+	 * @ORM\Table(name="motion_values")
 	 */
-	class MotionValue implements EntityInterface, LengthCachingEntityInterface {
+	class MotionValue implements EntityInterface, TranslatableEntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
-
-		/**
-		 * @Assert\NotBlank()
-		 *
-		 * @ORM\Column(type="string", length=64)
-		 *
-		 * @var string
-		 */
-		private $name;
 
 		/**
 		 * @Assert\NotBlank()
@@ -42,6 +29,21 @@
 		 * @see WeaponType
 		 */
 		private $weaponType;
+
+		/**
+		 * @Assert\Valid()
+		 *
+		 * @ORM\OneToMany(
+		 *     targetEntity="App\Entity\Strings\MotionValueStrings",
+		 *     mappedBy="motionValue",
+		 *     orphanRemoval=true,
+		 *     cascade={"all"},
+		 *     fetch="EAGER"
+		 * )
+		 *
+		 * @var Collection|Selectable|MotionValueStrings[]
+		 */
+		private $strings;
 
 		/**
 		 * @Assert\Choice(callback={"App\Game\DamageType", "all"})
@@ -89,30 +91,12 @@
 		/**
 		 * MotionValue constructor.
 		 *
-		 * @param string $name
 		 * @param string $weaponType
 		 */
-		public function __construct(string $name, string $weaponType) {
-			$this->name = $name;
+		public function __construct(string $weaponType) {
 			$this->weaponType = $weaponType;
-		}
 
-		/**
-		 * @return string
-		 */
-		public function getName(): string {
-			return $this->name;
-		}
-
-		/**
-		 * @param string $name
-		 *
-		 * @return $this
-		 */
-		public function setName(string $name) {
-			$this->name = $name;
-
-			return $this;
+			$this->strings = new ArrayCollection();
 		}
 
 		/**
@@ -210,5 +194,23 @@
 		 */
 		public function syncLengthFields(): void {
 			$this->hitsLength = sizeof($this->hits);
+		}
+
+		/**
+		 * @return Collection|Selectable|MotionValueStrings[]
+		 */
+		public function getStrings(): Collection {
+			return $this->strings;
+		}
+
+		/**
+		 * @param string $language
+		 *
+		 * @return MotionValueStrings
+		 */
+		public function addStrings(string $language): EntityInterface {
+			$this->getStrings()->add($strings = new MotionValueStrings($this, $language));
+
+			return $strings;
 		}
 	}

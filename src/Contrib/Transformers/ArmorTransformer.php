@@ -5,7 +5,9 @@
 	use App\Entity\ArmorCraftingInfo;
 	use App\Entity\ArmorSet;
 	use App\Entity\ArmorSlot;
+	use App\Entity\Strings\ArmorStrings;
 	use App\Game\Element;
+	use App\Localization\L10nUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\IntegrityException;
@@ -32,20 +34,7 @@
 			if ($missing)
 				throw ValidationException::missingFields($missing);
 
-			return new Armor($data->name, $data->type, $data->rank, $data->rarity);
-		}
-
-		/**
-		 * @param EntityInterface $entity
-		 *
-		 * @return void
-		 */
-		public function doDelete(EntityInterface $entity): void {
-			if (!($entity instanceof Armor))
-				throw EntityTransformerException::subjectNotSupported($entity);
-
-			if ($set = $entity->getArmorSet())
-				$set->getPieces()->removeElement($entity);
+			return new Armor($data->type, $data->rank, $data->rarity);
 		}
 
 		/**
@@ -59,7 +48,7 @@
 				throw EntityTransformerException::subjectNotSupported($entity);
 
 			if (ObjectUtil::isset($data, 'name'))
-				$entity->setName($data->name);
+				$this->getStrings($entity)->setName($data->name);
 
 			if (ObjectUtil::isset($data, 'type'))
 				$entity->setType($data->type);
@@ -149,5 +138,30 @@
 
 			if (ObjectUtil::isset($data, 'assets'))
 				throw ValidationException::fieldNotSupported('assets');
+		}
+
+		/**
+		 * @param EntityInterface $entity
+		 *
+		 * @return void
+		 */
+		public function doDelete(EntityInterface $entity): void {
+			if (!($entity instanceof Armor))
+				throw EntityTransformerException::subjectNotSupported($entity);
+
+			if ($set = $entity->getArmorSet())
+				$set->getPieces()->removeElement($entity);
+		}
+
+		/**
+		 * @param Armor $armor
+		 *
+		 * @return ArmorStrings
+		 */
+		protected function getStrings(Armor $armor): ArmorStrings {
+			$strings = L10nUtil::findOrCreateStrings($this->getCurrentLocale(), $armor);
+			assert($strings instanceof ArmorStrings);
+
+			return $strings;
 		}
 	}

@@ -1,7 +1,12 @@
 <?php
 	namespace App\Entity;
 
+	use App\Entity\Strings\CampStrings;
+	use App\Localization\TranslatableEntityInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
+	use Doctrine\Common\Collections\ArrayCollection;
+	use Doctrine\Common\Collections\Collection;
+	use Doctrine\Common\Collections\Selectable;
 	use Doctrine\ORM\Mapping as ORM;
 	use Symfony\Component\Validator\Constraints as Assert;
 
@@ -13,7 +18,7 @@
 	 *
 	 * @package App\Entity
 	 */
-	class Camp implements EntityInterface {
+	class Camp implements EntityInterface, TranslatableEntityInterface {
 		use EntityTrait;
 
 		/**
@@ -22,15 +27,6 @@
 		 * @var Location
 		 */
 		private $location;
-
-		/**
-		 * @Assert\NotBlank()
-		 *
-		 * @ORM\Column(type="string")
-		 *
-		 * @var string
-		 */
-		private $name;
 
 		/**
 		 * @Assert\NotBlank()
@@ -43,16 +39,31 @@
 		private $zone;
 
 		/**
+		 * @Assert\Valid()
+		 *
+		 * @ORM\OneToMany(
+		 *     targetEntity="App\Entity\Strings\CampStrings",
+		 *     mappedBy="camp",
+		 *     orphanRemoval=true,
+		 *     cascade={"all"},
+		 *     fetch="EAGER"
+		 * )
+		 *
+		 * @var Collection|Selectable|CampStrings[]
+		 */
+		private $strings;
+
+		/**
 		 * Camp constructor.
 		 *
 		 * @param Location $location
-		 * @param string   $name
 		 * @param int      $zone
 		 */
-		public function __construct(Location $location, string $name, int $zone) {
+		public function __construct(Location $location, int $zone) {
 			$this->location = $location;
-			$this->name = $name;
 			$this->zone = $zone;
+
+			$this->strings = new ArrayCollection();
 		}
 
 		/**
@@ -63,27 +74,27 @@
 		}
 
 		/**
-		 * @return string
-		 */
-		public function getName(): string {
-			return $this->name;
-		}
-
-		/**
-		 * @param string $name
-		 *
-		 * @return $this
-		 */
-		public function setName(string $name) {
-			$this->name = $name;
-
-			return $this;
-		}
-
-		/**
 		 * @return int
 		 */
 		public function getZone(): int {
 			return $this->zone;
+		}
+
+		/**
+		 * @return CampStrings[]|Collection|Selectable
+		 */
+		public function getStrings(): Collection {
+			return $this->strings;
+		}
+
+		/**
+		 * @param string $language
+		 *
+		 * @return CampStrings
+		 */
+		public function addStrings(string $language): EntityInterface {
+			$this->getStrings()->add($strings = new CampStrings($this, $language));
+
+			return $strings;
 		}
 	}

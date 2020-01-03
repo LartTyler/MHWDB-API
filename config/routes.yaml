@@ -1,6 +1,12 @@
 app._annotations:
     resource: '../src/Controller/'
     type: annotation
+    prefix:
+        en: ''
+        fr: '/fr'
+        de: '/de'
+        zh: '/zh' # Used in place of `zh-Hans`
+        zh-Hant: '/zh-Hant'
     defaults:
         _format: json
 

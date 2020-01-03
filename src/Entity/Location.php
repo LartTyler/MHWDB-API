@@ -1,6 +1,8 @@
 <?php
 	namespace App\Entity;
 
+	use App\Entity\Strings\LocationStrings;
+	use App\Localization\TranslatableEntityInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
@@ -10,24 +12,15 @@
 	use Symfony\Component\Validator\Constraints as Assert;
 
 	/**
-	 * @ORM\Entity()
+	 * @ORM\Entity(repositoryClass="App\Repository\LocationRepository")
 	 * @ORM\Table(name="locations")
 	 *
 	 * Class Location
 	 *
 	 * @package App\Entity
 	 */
-	class Location implements EntityInterface, LengthCachingEntityInterface {
+	class Location implements EntityInterface, TranslatableEntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
-
-		/**
-		 * @Assert\NotBlank()
-		 *
-		 * @ORM\Column(type="string", length=32, unique=true)
-		 *
-		 * @var string
-		 */
-		private $name;
 
 		/**
 		 * @Assert\NotBlank()
@@ -49,6 +42,21 @@
 		private $camps;
 
 		/**
+		 * @Assert\Valid()
+		 *
+		 * @ORM\OneToMany(
+		 *     targetEntity="App\Entity\Strings\LocationStrings",
+		 *     mappedBy="location",
+		 *     orphanRemoval=true,
+		 *     cascade={"all"},
+		 *     fetch="EAGER"
+		 * )
+		 *
+		 * @var Collection|Selectable|LocationStrings[]
+		 */
+		private $strings;
+
+		/**
 		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
 		 *
 		 * @var int
@@ -59,32 +67,13 @@
 		/**
 		 * Location constructor.
 		 *
-		 * @param string $name
-		 * @param int    $zoneCount
+		 * @param int $zoneCount
 		 */
-		public function __construct(string $name, int $zoneCount) {
-			$this->name = $name;
+		public function __construct(int $zoneCount) {
 			$this->zoneCount = $zoneCount;
 
 			$this->camps = new ArrayCollection();
-		}
-
-		/**
-		 * @return string
-		 */
-		public function getName(): string {
-			return $this->name;
-		}
-
-		/**
-		 * @param string $name
-		 *
-		 * @return $this
-		 */
-		public function setName(string $name) {
-			$this->name = $name;
-
-			return $this;
+			$this->strings = new ArrayCollection();
 		}
 
 		/**
@@ -135,5 +124,23 @@
 		 */
 		public function syncLengthFields(): void {
 			$this->campsLength = $this->camps->count();
+		}
+
+		/**
+		 * @return Collection|Selectable|LocationStrings[]
+		 */
+		public function getStrings(): Collection {
+			return $this->strings;
+		}
+
+		/**
+		 * @param string $language
+		 *
+		 * @return LocationStrings
+		 */
+		public function addStrings(string $language): EntityInterface {
+			$this->getStrings()->add($strings = new LocationStrings($this, $language));
+
+			return $strings;
 		}
 	}

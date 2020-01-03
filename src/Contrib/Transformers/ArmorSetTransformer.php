@@ -4,6 +4,8 @@
 	use App\Entity\Armor;
 	use App\Entity\ArmorSet;
 	use App\Entity\ArmorSetBonus;
+	use App\Entity\Strings\ArmorSetStrings;
+	use App\Localization\L10nUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\IntegrityException;
@@ -28,20 +30,7 @@
 			if ($missing)
 				throw ValidationException::missingFields($missing);
 
-			return new ArmorSet($data->name, $data->rank);
-		}
-
-		/**
-		 * @param EntityInterface $entity
-		 *
-		 * @return void
-		 */
-		public function doDelete(EntityInterface $entity): void {
-			if (!($entity instanceof ArmorSet))
-				throw EntityTransformerException::subjectNotSupported($entity);
-
-			foreach ($entity->getPieces() as $piece)
-				$piece->setArmorSet(null);
+			return new ArmorSet($data->rank);
 		}
 
 		/**
@@ -55,7 +44,7 @@
 				throw EntityTransformerException::subjectNotSupported($entity);
 
 			if (ObjectUtil::isset($data, 'name'))
-				$entity->setName($data->name);
+				$this->getStrings($entity)->setName($data->name);
 
 			if (ObjectUtil::isset($data, 'rank'))
 				$entity->setRank($data->rank);
@@ -91,5 +80,30 @@
 					$entity->setBonus($bonus);
 				}
 			}
+		}
+
+		/**
+		 * @param EntityInterface $entity
+		 *
+		 * @return void
+		 */
+		public function doDelete(EntityInterface $entity): void {
+			if (!($entity instanceof ArmorSet))
+				throw EntityTransformerException::subjectNotSupported($entity);
+
+			foreach ($entity->getPieces() as $piece)
+				$piece->setArmorSet(null);
+		}
+
+		/**
+		 * @param ArmorSet $armorSet
+		 *
+		 * @return ArmorSetStrings
+		 */
+		protected function getStrings(ArmorSet $armorSet): ArmorSetStrings {
+			$strings = L10nUtil::findOrCreateStrings($this->getCurrentLocale(), $armorSet);
+			assert($strings instanceof ArmorSetStrings);
+
+			return $strings;
 		}
 	}

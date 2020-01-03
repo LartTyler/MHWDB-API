@@ -11,6 +11,7 @@
 	use DaybreakStudios\Utility\EntityTransformers\Utility\ObjectUtil;
 	use Doctrine\Common\Collections\Collection;
 	use Doctrine\ORM\EntityManagerInterface;
+	use Symfony\Component\HttpFoundation\RequestStack;
 	use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 	abstract class BaseTransformer extends AbstractEntityTransformer {
@@ -20,46 +21,25 @@
 		protected $entityManager;
 
 		/**
+		 * @var RequestStack
+		 */
+		protected $requestStack;
+
+		/**
 		 * AbstractTransformer constructor.
 		 *
 		 * @param EntityManagerInterface  $entityManager
+		 * @param RequestStack            $requestStack
 		 * @param ValidatorInterface|null $validator
 		 */
-		public function __construct(EntityManagerInterface $entityManager, ValidatorInterface $validator = null) {
+		public function __construct(
+			EntityManagerInterface $entityManager,
+			RequestStack $requestStack,
+			ValidatorInterface $validator = null
+		) {
 			parent::__construct($entityManager, $validator);
-		}
 
-		/**
-		 * @param string $class
-		 *
-		 * @return \InvalidArgumentException
-		 * @deprecated
-		 */
-		protected function createEntityNotSupportedException(string $class): \InvalidArgumentException {
-			return new \InvalidArgumentException('This transformer does not support transforming ' . $class);
-		}
-
-		/**
-		 * @param string   $prefix
-		 * @param int      $index
-		 * @param string[] $keys
-		 *
-		 * @return ValidationException
-		 * @deprecated
-		 */
-		protected function createMissingArrayFieldsException(
-			string $prefix,
-			int $index,
-			array $keys
-		): ValidationException {
-			return ValidationException::missingFields(
-				array_map(
-					function(string $key) use ($prefix, $index): string {
-						return $prefix . '[' . $index . '].' . $key;
-					},
-					$keys
-				)
-			);
+			$this->requestStack = $requestStack;
 		}
 
 		/**
@@ -140,6 +120,7 @@
 				if ($missing)
 					throw ValidationException::missingNestedFields($path, $index, $missing);
 
+				/** @var Item|null $item */
 				$item = $this->entityManager->getRepository(Item::class)->find($cost->item);
 
 				if (!$item)
@@ -147,5 +128,12 @@
 
 				$collection->add(new CraftingMaterialCost($item, $cost->quantity));
 			}
+		}
+
+		/**
+		 * @return string
+		 */
+		protected function getCurrentLocale(): string {
+			return $this->requestStack->getCurrentRequest()->getLocale();
 		}
 	}

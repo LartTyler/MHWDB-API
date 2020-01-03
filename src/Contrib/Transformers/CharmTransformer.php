@@ -4,6 +4,8 @@
 	use App\Entity\Charm;
 	use App\Entity\CharmRank;
 	use App\Entity\CharmRankCraftingInfo;
+	use App\Entity\Strings\CharmStrings;
+	use App\Localization\L10nUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\ValidationException;
@@ -27,16 +29,7 @@
 			if ($missing)
 				throw ValidationException::missingFields($missing);
 
-			return new Charm($data->name);
-		}
-
-		/**
-		 * @param EntityInterface $entity
-		 *
-		 * @return void
-		 */
-		public function doDelete(EntityInterface $entity): void {
-			// noop
+			return new Charm();
 		}
 
 		/**
@@ -50,7 +43,7 @@
 				throw EntityTransformerException::subjectNotSupported($entity);
 
 			if (ObjectUtil::isset($data, 'name'))
-				$entity->setName($data->name);
+				$this->getStrings($entity)->setName($data->name);
 
 			if (ObjectUtil::isset($data, 'ranks')) {
 				$levels = [];
@@ -119,5 +112,26 @@
 				} else
 					$entity->getRanks()->clear();
 			}
+		}
+
+		/**
+		 * @param EntityInterface $entity
+		 *
+		 * @return void
+		 */
+		public function doDelete(EntityInterface $entity): void {
+			// noop
+		}
+
+		/**
+		 * @param Charm $charm
+		 *
+		 * @return CharmStrings
+		 */
+		protected function getStrings(Charm $charm): CharmStrings {
+			$strings = L10nUtil::findOrCreateStrings($this->getCurrentLocale(), $charm);
+			assert($strings instanceof CharmStrings);
+
+			return $strings;
 		}
 	}

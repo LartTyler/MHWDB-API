@@ -1,7 +1,12 @@
 <?php
 	namespace App\Entity;
 
+	use App\Entity\Strings\ItemStrings;
+	use App\Localization\TranslatableEntityInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
+	use Doctrine\Common\Collections\ArrayCollection;
+	use Doctrine\Common\Collections\Collection;
+	use Doctrine\Common\Collections\Selectable;
 	use Doctrine\ORM\Mapping as ORM;
 	use Symfony\Component\Validator\Constraints as Assert;
 
@@ -13,24 +18,8 @@
 	 *
 	 * @package App\Entity
 	 */
-	class Item implements EntityInterface {
+	class Item implements EntityInterface, TranslatableEntityInterface {
 		use EntityTrait;
-
-		/**
-		 * @Assert\NotBlank()
-		 *
-		 * @ORM\Column(type="string", length=64, unique=true)
-		 *
-		 * @var string
-		 */
-		private $name;
-
-		/**
-		 * @ORM\Column(type="text")
-		 *
-		 * @var string
-		 */
-		private $description;
 
 		/**
 		 * @Assert\NotBlank()
@@ -41,6 +30,21 @@
 		 * @var int
 		 */
 		private $rarity;
+
+		/**
+		 * @Assert\Valid()
+		 *
+		 * @ORM\OneToMany(
+		 *     targetEntity="App\Entity\Strings\ItemStrings",
+		 *     mappedBy="item",
+		 *     orphanRemoval=true,
+		 *     cascade={"all"},
+		 *     fetch="EAGER"
+		 * )
+		 *
+		 * @var Collection|Selectable|ItemStrings[]
+		 */
+		private $strings;
 
 		/**
 		 * @ORM\Column(type="integer", options={"unsigned": true}, name="_value")
@@ -59,50 +63,12 @@
 		/**
 		 * Item constructor.
 		 *
-		 * @param string $name
-		 * @param string $description
-		 * @param int    $rarity
+		 * @param int $rarity
 		 */
-		public function __construct(string $name, string $description, int $rarity) {
-			$this->name = $name;
-			$this->description = $description;
+		public function __construct(int $rarity) {
 			$this->rarity = $rarity;
-		}
 
-		/**
-		 * @return string
-		 */
-		public function getName(): string {
-			return $this->name;
-		}
-
-		/**
-		 * @param string $name
-		 *
-		 * @return $this
-		 */
-		public function setName(string $name) {
-			$this->name = $name;
-
-			return $this;
-		}
-
-		/**
-		 * @return string
-		 */
-		public function getDescription(): string {
-			return $this->description;
-		}
-
-		/**
-		 * @param string $description
-		 *
-		 * @return $this
-		 */
-		public function setDescription(string $description) {
-			$this->description = $description;
-
-			return $this;
+			$this->strings = new ArrayCollection();
 		}
 
 		/**
@@ -157,5 +123,23 @@
 			$this->carryLimit = $carryLimit;
 
 			return $this;
+		}
+
+		/**
+		 * @return ItemStrings[]|Collection|Selectable
+		 */
+		public function getStrings(): Collection {
+			return $this->strings;
+		}
+
+		/**
+		 * @param string $language
+		 *
+		 * @return ItemStrings
+		 */
+		public function addStrings(string $language): EntityInterface {
+			$this->getStrings()->add($strings = new ItemStrings($this, $language));
+
+			return $strings;
 		}
 	}

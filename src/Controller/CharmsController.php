@@ -6,6 +6,10 @@
 	use App\Entity\CharmRank;
 	use App\Entity\CraftingMaterialCost;
 	use App\Entity\SkillRank;
+	use App\Entity\Strings\CharmStrings;
+	use App\Entity\Strings\ItemStrings;
+	use App\Entity\Strings\SkillRankStrings;
+	use App\Entity\Strings\SkillStrings;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -95,8 +99,14 @@
 
 			$output = [
 				'id' => $entity->getId(),
-				'name' => $entity->getName(),
 			];
+
+			if ($projection->isAllowed('name')) {
+				/** @var CharmStrings $strings */
+				$strings = $this->getStrings($entity);
+
+				$output['name'] = $strings->getName();
+			}
 
 			// region CharmRank Fields
 			if ($projection->isAllowed('ranks')) {
@@ -115,15 +125,25 @@
 									$output = [
 										'id' => $skillRank->getId(),
 										'level' => $skillRank->getLevel(),
-										'description' => $skillRank->getDescription(),
 										'modifiers' => $skillRank->getModifiers(),
 									];
+
+									if ($projection->isAllowed('ranks.skills.description')) {
+										/** @var SkillRankStrings $strings */
+										$strings = $this->getStrings($skillRank);
+
+										$output['description'] = $strings->getDescription();
+									}
 
 									if ($projection->isAllowed('ranks.skills.skill'))
 										$output['skill'] = $skillRank->getSkill()->getId();
 
-									if ($projection->isAllowed('ranks.skills.skillName'))
-										$output['skillName'] = $skillRank->getSkill()->getName();
+									if ($projection->isAllowed('ranks.skills.skillName')) {
+										/** @var SkillStrings $strings */
+										$strings = $this->getStrings($skillRank->getSkill());
+
+										$output['skillName'] = $strings->getName();
+									}
 
 									return $output;
 								},
@@ -155,13 +175,25 @@
 
 												$output['item'] = [
 													'id' => $item->getId(),
-													'name' => $item->getName(),
-													'description' => $item->getDescription(),
 													'rarity' => $item->getRarity(),
 													'carryLimit' => $item->getCarryLimit(),
 													'value' => $item->getValue(),
 												];
+
+												if (
+													$projection->isAllowed('ranks.crafting.materials.item.name') ||
+													$projection->isAllowed('ranks.crafting.materials.item.description')
+												) {
+													/** @var ItemStrings $strings */
+													$strings = $this->getStrings($item);
+
+													$output['item'] += [
+														'name' => $strings->getName(),
+														'description' => $strings->getDescription(),
+													];
+												}
 											}
+
 											// endregion
 
 											return $output;
@@ -173,6 +205,7 @@
 							} else
 								$output['crafting'] = null;
 						}
+
 						// endregion
 
 						return $output;
@@ -180,6 +213,7 @@
 					$entity->getRanks()->toArray()
 				);
 			}
+
 			// endregion
 
 			return $output;

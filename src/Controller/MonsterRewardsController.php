@@ -3,6 +3,9 @@
 
 	use App\Entity\MonsterReward;
 	use App\Entity\RewardCondition;
+	use App\Entity\Strings\ItemStrings;
+	use App\Entity\Strings\MonsterStrings;
+	use App\Entity\Strings\RewardConditionStrings;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -55,14 +58,22 @@
 
 			if ($projection->isAllowed('conditions')) {
 				$output['conditions'] = $entity->getConditions()->map(
-					function(RewardCondition $condition): array {
-						return [
+					function(RewardCondition $condition) use ($projection): array {
+						$output = [
 							'type' => $condition->getType(),
-							'subtype' => $condition->getSubtype(),
 							'rank' => $condition->getRank(),
 							'quantity' => $condition->getQuantity(),
 							'chance' => $condition->getChance(),
 						];
+
+						if ($projection->isAllowed('conditions.subtype')) {
+							/** @var RewardConditionStrings $strings */
+							$strings = $this->getStrings($condition);
+
+							$output['subtype'] = $strings->getSubtype();
+						}
+
+						return $output;
 					}
 				);
 			}
@@ -72,10 +83,16 @@
 
 				$output['monster'] = [
 					'id' => $monster->getId(),
-					'name' => $monster->getName(),
 					'type' => $monster->getType(),
 					'species' => $monster->getSpecies(),
 				];
+
+				if ($projection->isAllowed('monster.name')) {
+					/** @var MonsterStrings $strings */
+					$strings = $this->getStrings($monster);
+
+					$output['name'] = $strings->getName();
+				}
 			}
 
 			if ($projection->isAllowed('item')) {
@@ -83,12 +100,20 @@
 
 				$output['item'] = [
 					'id' => $item->getId(),
-					'name' => $item->getName(),
-					'description' => $item->getDescription(),
 					'rarity' => $item->getRarity(),
 					'carryLimit' => $item->getCarryLimit(),
 					'value' => $item->getValue(),
 				];
+
+				if ($projection->isAllowed('item.name') || $projection->isAllowed('item.description')) {
+					/** @var ItemStrings $strings */
+					$strings = $this->getStrings($item);
+
+					$output['item'] += [
+						'name' => $strings->getName(),
+						'description' => $strings->getDescription(),
+					];
+				}
 			}
 
 			return $output;

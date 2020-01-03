@@ -5,6 +5,9 @@
 	use App\Entity\Ailment;
 	use App\Entity\Item;
 	use App\Entity\Skill;
+	use App\Entity\Strings\AilmentStrings;
+	use App\Entity\Strings\ItemStrings;
+	use App\Entity\Strings\SkillStrings;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -94,9 +97,17 @@
 
 			$output = [
 				'id' => $entity->getId(),
-				'name' => $entity->getName(),
-				'description' => $entity->getDescription(),
 			];
+
+			if ($projection->isAllowed('name') || $projection->isAllowed('description')) {
+				/** @var AilmentStrings $strings */
+				$strings = $this->getStrings($entity);
+
+				$output += [
+					'name' => $strings->getName(),
+					'description' => $strings->getDescription(),
+				];
+			}
 
 			if ($projection->isAllowed('recovery')) {
 				$recovery = $entity->getRecovery();
@@ -107,15 +118,28 @@
 
 				if ($projection->isAllowed('recovery.items')) {
 					$output['recovery']['items'] = array_map(
-						function(Item $item): array {
-							return [
+						function(Item $item) use ($projection): array {
+							$output = [
 								'id' => $item->getId(),
-								'name' => $item->getName(),
-								'description' => $item->getDescription(),
 								'rarity' => $item->getRarity(),
 								'value' => $item->getValue(),
 								'carryLimit' => $item->getCarryLimit(),
 							];
+
+							if (
+								$projection->isAllowed('recovery.items.name') ||
+								$projection->isAllowed('recovery.items.description')
+							) {
+								/** @var ItemStrings $strings */
+								$strings = $this->getStrings($item);
+
+								$output += [
+									'name' => $strings->getName(),
+									'description' => $strings->getDescription(),
+								];
+							}
+
+							return $output;
 						},
 						$recovery->getItems()->toArray()
 					);
@@ -129,15 +153,28 @@
 
 				if ($projection->isAllowed('protection.items')) {
 					$output['protection']['items'] = array_map(
-						function(Item $item): array {
-							return [
+						function(Item $item) use ($projection): array {
+							$output = [
 								'id' => $item->getId(),
-								'name' => $item->getName(),
-								'description' => $item->getDescription(),
 								'rarity' => $item->getRarity(),
 								'value' => $item->getValue(),
 								'carryLimit' => $item->getCarryLimit(),
 							];
+
+							if (
+								$projection->isAllowed('protection.items.name') ||
+								$projection->isAllowed('protection.items.description')
+							) {
+								/** @var ItemStrings $strings */
+								$strings = $this->getStrings($item);
+
+								$output += [
+									'name' => $strings->getName(),
+									'description' => $strings->getDescription(),
+								];
+							}
+
+							return $output;
 						},
 						$protection->getItems()->toArray()
 					);
@@ -145,12 +182,25 @@
 
 				if ($projection->isAllowed('protection.skills')) {
 					$output['protection']['skills'] = array_map(
-						function(Skill $skill): array {
-							return [
+						function(Skill $skill) use ($projection): array {
+							$output = [
 								'id' => $skill->getId(),
-								'name' => $skill->getName(),
-								'description' => $skill->getDescription(),
 							];
+
+							if (
+								$projection->isAllowed('protection.skills.name') ||
+								$projection->isAllowed('protection.skills.description')
+							) {
+								/** @var SkillStrings $strings */
+								$strings = $this->getStrings($skill);
+
+								$output += [
+									'name' => $strings->getName(),
+									'description' => $strings->getDescription(),
+								];
+							}
+
+							return $output;
 						},
 						$protection->getSkills()->toArray()
 					);

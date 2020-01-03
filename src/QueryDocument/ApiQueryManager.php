@@ -1,98 +1,123 @@
 <?php
 	namespace App\QueryDocument;
 
-	use App\Entity\Ammo;
+	use App\Entity\Ailment;
 	use App\Entity\Armor;
 	use App\Entity\ArmorAssets;
-	use App\Entity\ArmorCraftingInfo;
 	use App\Entity\ArmorSet;
 	use App\Entity\ArmorSetBonus;
+	use App\Entity\Camp;
 	use App\Entity\Charm;
-	use App\Entity\CharmRank;
-	use App\Entity\CharmRankCraftingInfo;
 	use App\Entity\Decoration;
+	use App\Entity\Item;
 	use App\Entity\Location;
 	use App\Entity\Monster;
+	use App\Entity\MonsterWeakness;
 	use App\Entity\MotionValue;
+	use App\Entity\RewardCondition;
 	use App\Entity\Skill;
 	use App\Entity\SkillRank;
 	use App\Entity\Weapon;
-	use App\Entity\WeaponCraftingInfo;
+	use App\Entity\WorldEvent;
+	use App\Localization\QueryLocalizationHelper;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManager;
-	use Doctrine\Common\Persistence\ObjectManager;
+	use Doctrine\ORM\EntityManagerInterface;
+	use Doctrine\ORM\QueryBuilder;
 
 	class ApiQueryManager extends QueryManager {
 		/**
+		 * @var QueryLocalizationHelper
+		 */
+		protected $localizationHelper;
+
+		/**
 		 * {@inheritdoc}
 		 */
-		public function __construct(ObjectManager $objectManager, array $operators = [], $useBuiltin = true) {
-			parent::__construct($objectManager, $operators, $useBuiltin);
+		public function __construct(
+			EntityManagerInterface $entityManager,
+			QueryLocalizationHelper $localizationHelper,
+			array $operators = [],
+			$useBuiltin = true
+		) {
+			parent::__construct($entityManager, $operators, $useBuiltin);
+
+			$this->localizationHelper = $localizationHelper;
 
 			$this->setAllMappedFields(
 				[
-					Ammo::class => [
-						'capacities.length' => 'capacitiesLength',
+					Ailment::class => [
+						'name' => 'strings.name',
+						'description' => 'strings.description',
 					],
 					Armor::class => [
-						'skills.length' => 'skillsLength',
-						'slots.length' => 'slotsLength',
+						'name' => 'strings.name',
+					],
+					ArmorSet::class => [
+						'name' => 'strings.name',
+					],
+					ArmorSetBonus::class => [
+						'name' => 'strings.name',
 					],
 					ArmorAssets::class => [
 						'imageMale' => 'imageMale.uri',
 						'imageFemale' => 'imageFemale.uri',
 					],
-					ArmorCraftingInfo::class => [
-						'materials.length' => 'materialsLength',
-					],
-					ArmorSet::class => [
-						'pieces.length' => 'piecesLength',
-					],
-					ArmorSetBonus::class => [
-						'ranks.length' => 'ranksLength',
+					Camp::class => [
+						'name' => 'strings.name',
 					],
 					Charm::class => [
-						'ranks.length' => 'ranksLength',
-					],
-					CharmRank::class => [
-						'skills.length' => 'skillsLength',
-					],
-					CharmRankCraftingInfo::class => [
-						'materials.length' => 'materialsLength',
+						'name' => 'strings.name',
 					],
 					Decoration::class => [
-						'skills.length' => 'skillsLength',
+						'name' => 'strings.name',
+					],
+					Item::class => [
+						'name' => 'strings.name',
+						'description' => 'strings.description',
 					],
 					Location::class => [
-						'camps.length' => 'campsLength',
+						'name' => 'strings.name',
 					],
 					Monster::class => [
-						'ailments.length' => 'ailmentsLength',
-						'locations.length' => 'locationsLength',
-						'elements.length' => 'elementsLength',
-						'rewards.length' => 'rewardsLength',
+						'name' => 'strings.name',
+						'description' => 'strings.description',
+					],
+					MonsterWeakness::class => [
+						'condition' => 'strings.description',
 					],
 					MotionValue::class => [
-						'hits.length' => 'hitsLength',
+						'name' => 'strings.name',
+					],
+					RewardCondition::class => [
+						'subtype' => 'strings.subtype',
 					],
 					Skill::class => [
-						'ranks.length' => 'ranksLength',
+						'name' => 'strings.name',
 					],
 					SkillRank::class => [
-						'skillName' => 'skill.name',
+						'description' => 'strings.description',
+						'skillName' => 'skill.strings.name',
 					],
 					Weapon::class => [
-						'elements.length' => 'elementsLength',
-						'slots.length' => 'slotsLength',
-						'durability.length' => 'durabilityLength',
-						'ammo.length' => 'ammoLength',
-						'coatings.length' => 'coatingsLength',
+						'name' => 'strings.name',
 					],
-					WeaponCraftingInfo::class => [
-						'branches.length' => 'branchesLength',
-						'craftingMaterials.length' => 'craftingMaterialsLength',
-						'upgradeMaterials.length' => 'upgradeMaterialsLength',
+					WorldEvent::class => [
+						'name' => 'strings.name',
+						'description' => 'strings.description',
+						'requirements' => 'strings.requirements',
+						'successConditions' => 'strings.successConditions',
 					],
 				]
 			);
+		}
+
+		/**
+		 * {@inheritdoc}
+		 */
+		public function apply(QueryBuilder $qb, array $query): void {
+			$document = $this->create($qb);
+			$document->process($query);
+
+			$this->localizationHelper->addTranslationClauses($document->getResolver(), $qb, $query);
 		}
 	}

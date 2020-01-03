@@ -4,6 +4,9 @@
 	use App\Entity\Camp;
 	use App\Entity\Location;
 	use App\Entity\Monster;
+	use App\Entity\Strings\CampStrings;
+	use App\Entity\Strings\LocationStrings;
+	use App\Localization\L10nUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\ValidationException;
@@ -28,22 +31,7 @@
 			if ($missing)
 				throw ValidationException::missingFields($missing);
 
-			return new Location($data->name, $data->zoneCount);
-		}
-
-		/**
-		 * @param EntityInterface $entity
-		 *
-		 * @return void
-		 */
-		public function doDelete(EntityInterface $entity): void {
-			if (!($entity instanceof Location))
-				throw EntityTransformerException::subjectNotSupported($entity);
-
-			$monsters = $this->entityManager->getRepository(Monster::class)->findByLocation($entity);
-
-			foreach ($monsters as $monster)
-				$monster->getLocations()->removeElement($entity);
+			return new Location($data->zoneCount);
 		}
 
 		/**
@@ -57,7 +45,7 @@
 				throw EntityTransformerException::subjectNotSupported($entity);
 
 			if (ObjectUtil::isset($data, 'name'))
-				$entity->setName($data->name);
+				$this->getLocationStrings($entity)->setName($data->name);
 
 			if (ObjectUtil::isset($data, 'zoneCount'))
 				$entity->setZoneCount($data->zoneCount);
@@ -74,16 +62,9 @@
 						]
 					);
 
-					if ($missing) {
-						throw ValidationException::missingFields(
-							array_map(
-								function(string $key) use ($index): string {
-									return 'camps[' . $index . '].' . $key;
-								},
-								$missing
-							)
-						);
-					} else if ($definition->zone > $entity->getZoneCount()) {
+					if ($missing)
+						throw ValidationException::missingNestedFields('camps', $index, $missing);
+					else if ($definition->zone > $entity->getZoneCount()) {
 						throw ValidationException::invalidFieldValue(
 							'camps[' . $index . '].zone',
 							'The location only has ' . $entity->getZoneCount() . ' zone(s)'
@@ -95,9 +76,9 @@
 					$camp = $entity->getCamp($definition->zone);
 
 					if (!$camp)
-						$entity->getCamps()->add(new Camp($entity, $definition->name, $definition->zone));
-					else
-						$camp->setName($definition->name);
+						$entity->getCamps()->add($camp = new Camp($entity, $definition->zone));
+
+					$this->getCampStrings($camp)->setName($definition->name);
 				}
 
 				if ($zones) {
@@ -111,5 +92,45 @@
 				} else
 					$entity->getCamps()->clear();
 			}
+		}
+
+		/**
+		 * @param EntityInterface $entity
+		 *
+		 * @return void
+		 */
+		public function doDelete(EntityInterface $entity): void {
+			if (!($entity instanceof Location))
+				throw EntityTransformerException::subjectNotSupported($entity);
+
+			/** @var Monster[] $monsters */
+			$monsters = $this->entityManager->getRepository(Monster::class)->findByLocation($entity);
+
+			foreach ($monsters as $monster)
+				$monster->getLocations()->removeElement($entity);
+		}
+
+		/**
+		 * @param Location $location
+		 *
+		 * @return LocationStrings
+		 */
+		protected function getLocationStrings(Location $location): LocationStrings {
+			$strings = L10nUtil::findOrCreateStrings($this->getCurrentLocale(), $location);
+			assert($strings instanceof LocationStrings);
+
+			return $strings;
+		}
+
+		/**
+		 * @param Camp $camp
+		 *
+		 * @return CampStrings
+		 */
+		protected function getCampStrings(Camp $camp): CampStrings {
+			$strings = L10nUtil::findOrCreateStrings($this->getCurrentLocale(), $camp);
+			assert($strings instanceof CampStrings);
+
+			return $strings;
 		}
 	}

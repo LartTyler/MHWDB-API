@@ -1,8 +1,13 @@
 <?php
 	namespace App\Entity;
 
+	use App\Entity\Strings\MonsterWeaknessStrings;
 	use App\Game\Element;
+	use App\Localization\TranslatableEntityInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
+	use Doctrine\Common\Collections\ArrayCollection;
+	use Doctrine\Common\Collections\Collection;
+	use Doctrine\Common\Collections\Selectable;
 	use Doctrine\ORM\Mapping as ORM;
 	use Symfony\Component\Validator\Constraints as Assert;
 
@@ -14,7 +19,7 @@
 	 *
 	 * @package App\Entity
 	 */
-	class MonsterWeakness implements EntityInterface {
+	class MonsterWeakness implements EntityInterface, TranslatableEntityInterface {
 		use EntityTrait;
 
 		/**
@@ -47,11 +52,19 @@
 		private $stars;
 
 		/**
-		 * @ORM\Column(type="text", nullable=true, name="_condition")
+		 * @Assert\Valid()
 		 *
-		 * @var null|string
+		 * @ORM\OneToMany(
+		 *     targetEntity="App\Entity\Strings\MonsterWeaknessStrings",
+		 *     mappedBy="monsterWeakness",
+		 *     orphanRemoval=true,
+		 *     cascade={"all"},
+		 *     fetch="EAGER"
+		 * )
+		 *
+		 * @var Collection|Selectable|MonsterWeaknessStrings[]
 		 */
-		private $condition = null;
+		private $strings;
 
 		/**
 		 * MonsterWeakness constructor.
@@ -64,6 +77,8 @@
 			$this->monster = $monster;
 			$this->element = $element;
 			$this->stars = $stars;
+
+			$this->strings = new ArrayCollection();
 		}
 
 		/**
@@ -110,20 +125,20 @@
 		}
 
 		/**
-		 * @return null|string
+		 * @return Collection|Selectable|MonsterWeaknessStrings[]
 		 */
-		public function getCondition(): ?string {
-			return $this->condition;
+		public function getStrings(): Collection {
+			return $this->strings;
 		}
 
 		/**
-		 * @param null|string $condition
+		 * @param string $language
 		 *
-		 * @return $this
+		 * @return MonsterWeaknessStrings
 		 */
-		public function setCondition(?string $condition) {
-			$this->condition = $condition;
+		public function addStrings(string $language): EntityInterface {
+			$this->getStrings()->add($strings = new MonsterWeaknessStrings($this, $language));
 
-			return $this;
+			return $strings;
 		}
 	}

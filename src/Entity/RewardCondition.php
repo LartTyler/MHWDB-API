@@ -1,18 +1,24 @@
 <?php
 	namespace App\Entity;
 
+	use App\Entity\Strings\RewardConditionStrings;
+	use App\Game\Rank;
 	use App\Game\RewardConditionType;
+	use App\Localization\TranslatableEntityInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
+	use Doctrine\Common\Collections\ArrayCollection;
+	use Doctrine\Common\Collections\Collection;
+	use Doctrine\Common\Collections\Selectable;
 	use Doctrine\ORM\Mapping as ORM;
 	use Symfony\Component\Validator\Constraints as Assert;
 
 	/**
-	 * @ORM\Entity()
+	 * @ORM\Entity(readOnly=true)
 	 * @ORM\Table(name="reward_conditions")
 	 *
 	 * @package App\Entity
 	 */
-	class RewardCondition implements EntityInterface {
+	class RewardCondition implements EntityInterface, TranslatableEntityInterface {
 		use EntityTrait;
 
 		/**
@@ -33,6 +39,7 @@
 		 * @ORM\Column(type="string", length=16)
 		 *
 		 * @var string
+		 * @see Rank
 		 */
 		private $rank;
 
@@ -57,13 +64,19 @@
 		private $chance;
 
 		/**
-		 * @Assert\Length(max=128)
+		 * @Assert\Valid()
 		 *
-		 * @ORM\Column(type="string", length=128, nullable=true)
+		 * @ORM\OneToMany(
+		 *     targetEntity="App\Entity\Strings\RewardConditionStrings",
+		 *     mappedBy="rewardCondition",
+		 *     orphanRemoval=true,
+		 *     cascade={"all"},
+		 *     fetch="EAGER"
+		 * )
 		 *
-		 * @var string|null
+		 * @var Collection|Selectable|RewardConditionStrings[]
 		 */
-		private $subtype = null;
+		private $strings;
 
 		/**
 		 * RewardCondition constructor.
@@ -78,6 +91,8 @@
 			$this->rank = $rank;
 			$this->quantity = $quantity;
 			$this->chance = $chance;
+
+			$this->strings = new ArrayCollection();
 		}
 
 		/**
@@ -153,20 +168,20 @@
 		}
 
 		/**
-		 * @return string|null
+		 * @return Collection|Selectable|RewardConditionStrings[]
 		 */
-		public function getSubtype(): ?string {
-			return $this->subtype;
+		public function getStrings(): Collection {
+			return $this->strings;
 		}
 
 		/**
-		 * @param string|null $subtype
+		 * @param string $language
 		 *
-		 * @return $this
+		 * @return RewardConditionStrings
 		 */
-		public function setSubtype(?string $subtype) {
-			$this->subtype = $subtype;
+		public function addStrings(string $language): EntityInterface {
+			$this->getStrings()->add($strings = new RewardConditionStrings($this, $language));
 
-			return $this;
+			return $strings;
 		}
 	}

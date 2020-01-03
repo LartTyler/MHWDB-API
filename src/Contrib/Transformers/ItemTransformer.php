@@ -5,6 +5,8 @@
 	use App\Entity\AilmentRecovery;
 	use App\Entity\CraftingMaterialCost;
 	use App\Entity\Item;
+	use App\Entity\Strings\ItemStrings;
+	use App\Localization\L10nUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\ValidationException;
@@ -29,7 +31,33 @@
 			if ($missing)
 				throw ValidationException::missingFields($missing);
 
-			return new Item($data->name, $data->description, $data->rarity);
+			return new Item($data->rarity);
+		}
+
+		/**
+		 * @param EntityInterface $entity
+		 * @param object          $data
+		 *
+		 * @return void
+		 */
+		public function doUpdate(EntityInterface $entity, object $data): void {
+			if (!($entity instanceof Item))
+				throw EntityTransformerException::subjectNotSupported($entity);
+
+			if (ObjectUtil::isset($data, 'name'))
+				$this->getStrings($entity)->setName($data->name);
+
+			if (ObjectUtil::isset($data, 'description'))
+				$this->getStrings($entity)->setDescription($data->description);
+
+			if (ObjectUtil::isset($data, 'rarity'))
+				$entity->setRarity($data->rarity);
+
+			if (ObjectUtil::isset($data, 'value'))
+				$entity->setValue($data->value);
+
+			if (ObjectUtil::isset($data, 'carryLimit'))
+				$entity->setCarryLimit($data->carryLimit);
 		}
 
 		/**
@@ -50,11 +78,13 @@
 			foreach ($costs as $cost)
 				$this->entityManager->remove($cost);
 
+			/** @var AilmentProtection[] $protections */
 			$protections = $this->entityManager->getRepository(AilmentProtection::class)->findByItem($entity);
 
 			foreach ($protections as $protection)
 				$protection->getItems()->removeElement($entity);
 
+			/** @var AilmentRecovery[] $recoveries */
 			$recoveries = $this->entityManager->getRepository(AilmentRecovery::class)->findByItem($entity);
 
 			foreach ($recoveries as $recovery)
@@ -62,28 +92,14 @@
 		}
 
 		/**
-		 * @param EntityInterface $entity
-		 * @param object          $data
+		 * @param Item $item
 		 *
-		 * @return void
+		 * @return ItemStrings
 		 */
-		public function doUpdate(EntityInterface $entity, object $data): void {
-			if (!($entity instanceof Item))
-				throw EntityTransformerException::subjectNotSupported($entity);
+		protected function getStrings(Item $item): ItemStrings {
+			$strings = L10nUtil::findOrCreateStrings($this->getCurrentLocale(), $item);
+			assert($strings instanceof ItemStrings);
 
-			if (ObjectUtil::isset($data, 'name'))
-				$entity->setName($data->name);
-
-			if (ObjectUtil::isset($data, 'description'))
-				$entity->setDescription($data->description);
-
-			if (ObjectUtil::isset($data, 'rarity'))
-				$entity->setRarity($data->rarity);
-
-			if (ObjectUtil::isset($data, 'value'))
-				$entity->setValue($data->value);
-
-			if (ObjectUtil::isset($data, 'carryLimit'))
-				$entity->setCarryLimit($data->carryLimit);
+			return $strings;
 		}
 	}

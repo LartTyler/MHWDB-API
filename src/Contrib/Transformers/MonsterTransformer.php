@@ -9,6 +9,10 @@
 	use App\Entity\MonsterReward;
 	use App\Entity\MonsterWeakness;
 	use App\Entity\RewardCondition;
+	use App\Entity\Strings\MonsterStrings;
+	use App\Entity\Strings\MonsterWeaknessStrings;
+	use App\Entity\Strings\RewardConditionStrings;
+	use App\Localization\L10nUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\IntegrityException;
@@ -34,7 +38,7 @@
 			if ($missing)
 				throw ValidationException::missingFields($missing);
 
-			return new Monster($data->name, $data->type, $data->species);
+			return new Monster($data->type, $data->species);
 		}
 
 		/**
@@ -57,7 +61,7 @@
 				throw EntityTransformerException::subjectNotSupported($entity);
 
 			if (ObjectUtil::isset($data, 'name'))
-				$entity->setName($data->name);
+				$this->getMonsterStrings($entity)->setName($data->name);
 
 			if (ObjectUtil::isset($data, 'type'))
 				$entity->setType($data->type);
@@ -66,7 +70,7 @@
 				$entity->setSpecies($data->species);
 
 			if (ObjectUtil::isset($data, 'description'))
-				$entity->setDescription($data->description);
+				$this->getMonsterStrings($entity)->setDescription($data->description);
 
 			if (ObjectUtil::isset($data, 'elements'))
 				$entity->setElements($data->elements);
@@ -111,7 +115,7 @@
 					$entity->getWeaknesses()->add($weakness);
 
 					if (ObjectUtil::isset($definition, 'condition'))
-						$weakness->setCondition($definition->condition);
+						$this->getWeaknessStrings($weakness)->setCondition($definition->condition);
 				}
 			}
 
@@ -178,7 +182,7 @@
 							if (is_string($subtype))
 								$subtype = strtolower($subtype);
 
-							$condition->setSubtype($subtype);
+							$this->getRewardConditionStrings($condition)->setSubtype($subtype);
 						}
 					}
 				}
@@ -188,5 +192,41 @@
 						$entity->getRewards()->removeElement($reward);
 				}
 			}
+		}
+
+		/**
+		 * @param Monster $monster
+		 *
+		 * @return MonsterStrings
+		 */
+		protected function getMonsterStrings(Monster $monster): MonsterStrings {
+			$strings = L10nUtil::findOrCreateStrings($this->getCurrentLocale(), $monster);
+			assert($strings instanceof MonsterStrings);
+
+			return $strings;
+		}
+
+		/**
+		 * @param MonsterWeakness $weakness
+		 *
+		 * @return MonsterWeaknessStrings
+		 */
+		protected function getWeaknessStrings(MonsterWeakness $weakness): MonsterWeaknessStrings {
+			$strings = L10nUtil::findOrCreateStrings($this->getCurrentLocale(), $weakness);
+			assert($strings instanceof MonsterWeaknessStrings);
+
+			return $strings;
+		}
+
+		/**
+		 * @param RewardCondition $rewardCondition
+		 *
+		 * @return RewardConditionStrings
+		 */
+		protected function getRewardConditionStrings(RewardCondition $rewardCondition): RewardConditionStrings {
+			$strings = L10nUtil::findOrCreateStrings($this->getCurrentLocale(), $rewardCondition);
+			assert($strings instanceof RewardConditionStrings);
+
+			return $strings;
 		}
 	}

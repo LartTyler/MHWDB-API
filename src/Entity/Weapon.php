@@ -1,6 +1,7 @@
 <?php
 	namespace App\Entity;
 
+	use App\Entity\Strings\WeaponStrings;
 	use App\Game\BowCoatingType;
 	use App\Game\BowgunDeviation;
 	use App\Game\BowgunSpecialAmmo;
@@ -8,6 +9,7 @@
 	use App\Game\Elderseal;
 	use App\Game\InsectGlaiveBoostType;
 	use App\Game\WeaponType;
+	use App\Localization\TranslatableEntityInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
@@ -29,18 +31,9 @@
 	 *
 	 * @package App\Entity
 	 */
-	class Weapon implements EntityInterface, LengthCachingEntityInterface {
+	class Weapon implements EntityInterface, TranslatableEntityInterface, LengthCachingEntityInterface {
 		use EntityTrait;
 		use AttributableTrait;
-
-		/**
-		 * @Assert\NotBlank()
-		 *
-		 * @ORM\Column(type="string", length=64, unique=true)
-		 *
-		 * @var string
-		 */
-		private $name;
 
 		/**
 		 * @Assert\NotBlank()
@@ -117,6 +110,21 @@
 		 * @var Collection|Selectable|Ammo[]
 		 */
 		private $ammo;
+
+		/**
+		 * @Assert\Valid()
+		 *
+		 * @ORM\OneToMany(
+		 *     targetEntity="App\Entity\Strings\WeaponStrings",
+		 *     mappedBy="weapon",
+		 *     orphanRemoval=true,
+		 *     cascade={"all"},
+		 *     fetch="EAGER"
+		 * )
+		 *
+		 * @var Collection|Selectable|WeaponStrings[]
+		 */
+		private $strings;
 
 		/**
 		 * @Assert\Choice(choices=App\Game\Elderseal::ALL)
@@ -261,12 +269,10 @@
 		/**
 		 * Weapon constructor.
 		 *
-		 * @param string $name
 		 * @param string $type
 		 * @param int    $rarity
 		 */
-		public function __construct(string $name, string $type, int $rarity) {
-			$this->name = $name;
+		public function __construct(string $type, int $rarity) {
 			$this->type = $type;
 			$this->rarity = $rarity;
 
@@ -276,24 +282,7 @@
 			$this->elements = new ArrayCollection();
 			$this->durability = new ArrayCollection();
 			$this->ammo = new ArrayCollection();
-		}
-
-		/**
-		 * @return string
-		 */
-		public function getName(): string {
-			return $this->name;
-		}
-
-		/**
-		 * @param string $name
-		 *
-		 * @return $this
-		 */
-		public function setName($name) {
-			$this->name = $name;
-
-			return $this;
+			$this->strings = new ArrayCollection();
 		}
 
 		/**
@@ -611,5 +600,23 @@
 			$this->durabilityLength = $this->durability->count();
 			$this->ammoLength = $this->ammo->count();
 			$this->coatingsLength = sizeof($this->coatings);
+		}
+
+		/**
+		 * @return Collection|Selectable|WeaponStrings[]
+		 */
+		public function getStrings(): Collection {
+			return $this->strings;
+		}
+
+		/**
+		 * @param string $language
+		 *
+		 * @return WeaponStrings
+		 */
+		public function addStrings(string $language): EntityInterface {
+			$this->getStrings()->add($strings = new WeaponStrings($this, $language));
+
+			return $strings;
 		}
 	}
