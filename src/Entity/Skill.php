@@ -15,7 +15,7 @@
 	 * @ORM\Entity()
 	 * @ORM\Table(name="skills")
 	 */
-	class Skill implements EntityInterface, TranslatableEntityInterface, LengthCachingEntityInterface {
+	class Skill implements EntityInterface, TranslatableEntityInterface {
 		use EntityTrait;
 
 		/**
@@ -41,14 +41,6 @@
 		 * @var Collection|Selectable|SkillStrings[]
 		 */
 		private $strings;
-
-		/**
-		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
-		 *
-		 * @var int
-		 * @internal Used to allow API queries against "ranks.length"
-		 */
-		private $ranksLength = 0;
 
 		/**
 		 * Skill constructor.
@@ -81,13 +73,6 @@
 				return $matched->first();
 
 			return null;
-		}
-
-		/**
-		 * {@inheritdoc}
-		 */
-		public function syncLengthFields(): void {
-			$this->ranksLength = $this->ranks->count();
 		}
 
 		/**

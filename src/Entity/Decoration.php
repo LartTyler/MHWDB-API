@@ -18,7 +18,7 @@
 	 *
 	 * @package App\Entity
 	 */
-	class Decoration implements EntityInterface, TranslatableEntityInterface, LengthCachingEntityInterface {
+	class Decoration implements EntityInterface, TranslatableEntityInterface {
 		use EntityTrait;
 
 		/**
@@ -63,14 +63,6 @@
 		 * @var Collection|Selectable|DecorationStrings[]
 		 */
 		private $strings;
-
-		/**
-		 * @ORM\Column(type="integer", options={"unsigned": true})
-		 *
-		 * @var int
-		 * @internal Used to allow API queries against "skills.length"
-		 */
-		private $skillsLength = 0;
 
 		/**
 		 * Decoration constructor.
@@ -145,12 +137,5 @@
 			$this->getStrings()->add($strings = new DecorationStrings($this, $language));
 
 			return $strings;
-		}
-
-		/**
-		 * {@inheritdoc}
-		 */
-		public function syncLengthFields(): void {
-			$this->skillsLength = $this->skills->count();
 		}
 	}

@@ -22,7 +22,7 @@
 	 *
 	 * @package App\Entity
 	 */
-	class Monster implements EntityInterface, TranslatableEntityInterface, LengthCachingEntityInterface {
+	class Monster implements EntityInterface, TranslatableEntityInterface {
 		use EntityTrait;
 
 		/**
@@ -127,38 +127,6 @@
 		 * @see Element::DAMAGE
 		 */
 		private $elements = [];
-
-		/**
-		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
-		 *
-		 * @var int
-		 * @internal Used to allow API queries against "ailments.length"
-		 */
-		private $ailmentsLength = 0;
-
-		/**
-		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
-		 *
-		 * @var int
-		 * @internal Used to allow API queries against "locations.length"
-		 */
-		private $locationsLength = 0;
-
-		/**
-		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
-		 *
-		 * @var int
-		 * @internal Used to allow API queries against "elements.length"
-		 */
-		private $elementsLength = 0;
-
-		/**
-		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
-		 *
-		 * @var int
-		 * @internal Used to allow API queries against "rewards.length"
-		 */
-		private $rewardsLength = 0;
 
 		/**
 		 * Monster constructor.
@@ -280,16 +248,6 @@
 			$matched = $this->getRewards()->matching($criteria);
 
 			return $matched->count() ? $matched->first() : null;
-		}
-
-		/**
-		 * {@inheritdoc}
-		 */
-		public function syncLengthFields(): void {
-			$this->ailmentsLength = $this->ailments->count();
-			$this->locationsLength = $this->locations->count();
-			$this->elementsLength = sizeof($this->elements);
-			$this->rewardsLength = $this->rewards->count();
 		}
 
 		/**

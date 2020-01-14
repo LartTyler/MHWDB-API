@@ -16,7 +16,7 @@
 	 *
 	 * @package App\Entity
 	 */
-	class CharmRankCraftingInfo implements EntityInterface, LengthCachingEntityInterface {
+	class CharmRankCraftingInfo implements EntityInterface {
 		use EntityTrait;
 
 		/**
@@ -35,14 +35,6 @@
 		 * @var Collection|Selectable|CraftingMaterialCost[]
 		 */
 		private $materials;
-
-		/**
-		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
-		 *
-		 * @var int
-		 * @internal Used to allow API queries against "materials.length"
-		 */
-		private $materialsLength = 0;
 
 		/**
 		 * CharmCraftingInfo constructor.
@@ -77,12 +69,5 @@
 		 */
 		public function getMaterials() {
 			return $this->materials;
-		}
-
-		/**
-		 * {@inheritdoc}
-		 */
-		public function syncLengthFields(): void {
-			$this->materialsLength = $this->materials->count();
 		}
 	}

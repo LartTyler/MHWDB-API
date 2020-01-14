@@ -19,7 +19,7 @@
 	 *
 	 * @package App\Entity
 	 */
-	class Location implements EntityInterface, TranslatableEntityInterface, LengthCachingEntityInterface {
+	class Location implements EntityInterface, TranslatableEntityInterface {
 		use EntityTrait;
 
 		/**
@@ -55,14 +55,6 @@
 		 * @var Collection|Selectable|LocationStrings[]
 		 */
 		private $strings;
-
-		/**
-		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
-		 *
-		 * @var int
-		 * @internal Used to allow API queries against "camps.length"
-		 */
-		private $campsLength = 0;
 
 		/**
 		 * Location constructor.
@@ -117,13 +109,6 @@
 				return null;
 
 			return $matching->first();
-		}
-
-		/**
-		 * {@inheritdoc}
-		 */
-		public function syncLengthFields(): void {
-			$this->campsLength = $this->camps->count();
 		}
 
 		/**

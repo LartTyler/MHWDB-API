@@ -16,7 +16,7 @@
 	 *
 	 * @package App\Entity
 	 */
-	class ArmorCraftingInfo implements EntityInterface, LengthCachingEntityInterface {
+	class ArmorCraftingInfo implements EntityInterface {
 		use EntityTrait;
 
 		/**
@@ -35,14 +35,6 @@
 		private $materials;
 
 		/**
-		 * @ORM\Column(type="integer", nullable=false, options={"unsigned": true, "default": 0})
-		 *
-		 * @var int
-		 * @internal Used to allow API queries against "materials.length"
-		 */
-		private $materialsLength = 0;
-
-		/**
 		 * ArmorCraftingInfo constructor.
 		 */
 		public function __construct() {
@@ -54,12 +46,5 @@
 		 */
 		public function getMaterials() {
 			return $this->materials;
-		}
-
-		/**
-		 * {@inheritdoc}
-		 */
-		public function syncLengthFields(): void {
-			$this->materialsLength = $this->materials->count();
 		}
 	}

@@ -31,7 +31,7 @@
 	 *
 	 * @package App\Entity
 	 */
-	class Weapon implements EntityInterface, TranslatableEntityInterface, LengthCachingEntityInterface {
+	class Weapon implements EntityInterface, TranslatableEntityInterface {
 		use EntityTrait;
 		use AttributableTrait;
 
@@ -225,46 +225,6 @@
 		 * @var WeaponAssets|null
 		 */
 		private $assets = null;
-
-		/**
-		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
-		 *
-		 * @var int
-		 * @internal Used to allow API queries against "elements.length"
-		 */
-		private $elementsLength = 0;
-
-		/**
-		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
-		 *
-		 * @var int
-		 * @internal Used to allow API queries against "slots.length"
-		 */
-		private $slotsLength = 0;
-
-		/**
-		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
-		 *
-		 * @var int
-		 * @internal Used to allow API queries against "durability.length"
-		 */
-		private $durabilityLength = 0;
-
-		/**
-		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
-		 *
-		 * @var int
-		 * @internal Used to allow API queries against "ammo.length"
-		 */
-		private $ammoLength = 0;
-
-		/**
-		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
-		 *
-		 * @var int
-		 * @internal Used to allow API queries against "coatings.length"
-		 */
-		private $coatingsLength = 0;
 
 		/**
 		 * Weapon constructor.
@@ -589,17 +549,6 @@
 			$this->shelling = $shelling;
 
 			return $this;
-		}
-
-		/**
-		 * {@inheritdoc}
-		 */
-		public function syncLengthFields(): void {
-			$this->elementsLength = $this->elements->count();
-			$this->slotsLength = $this->slots->count();
-			$this->durabilityLength = $this->durability->count();
-			$this->ammoLength = $this->ammo->count();
-			$this->coatingsLength = sizeof($this->coatings);
 		}
 
 		/**

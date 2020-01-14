@@ -16,7 +16,7 @@
 	 *
 	 * @package App\Entity
 	 */
-	class WeaponCraftingInfo implements EntityInterface, LengthCachingEntityInterface {
+	class WeaponCraftingInfo implements EntityInterface {
 		use EntityTrait;
 
 		/**
@@ -62,30 +62,6 @@
 		private $upgradeMaterials;
 
 		/**
-		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
-		 *
-		 * @var int
-		 * @internal Used to allow API queries against "branches.length"
-		 */
-		private $branchesLength = 0;
-
-		/**
-		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
-		 *
-		 * @var int
-		 * @internal Used to allow API queries against "craftingMaterials.length"
-		 */
-		private $craftingMaterialsLength = 0;
-
-		/**
-		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
-		 *
-		 * @var int
-		 * @internal Used to allow API queries against "upgradeMaterials.length"
-		 */
-		private $upgradeMaterialsLength = 0;
-
-		/**
 		 * WeaponCraftingInfo constructor.
 		 *
 		 * @param bool        $craftable
@@ -114,6 +90,7 @@
 		 */
 		public function setCraftable(bool $craftable) {
 			$this->craftable = $craftable;
+
 			return $this;
 		}
 
@@ -154,14 +131,5 @@
 		 */
 		public function getUpgradeMaterials() {
 			return $this->upgradeMaterials;
-		}
-
-		/**
-		 * {@inheritdoc}
-		 */
-		public function syncLengthFields(): void {
-			$this->branchesLength = $this->branches->count();
-			$this->craftingMaterialsLength = $this->craftingMaterials->count();
-			$this->upgradeMaterialsLength = $this->upgradeMaterials->count();
 		}
 	}

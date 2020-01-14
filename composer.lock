@@ -95,16 +95,16 @@
         },
         {
             "name": "dbstudios/doctrine-query-document",
-            "version": "1.2.0",
+            "version": "1.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/LartTyler/doctrine-query-document.git",
-                "reference": "3ec706bf4bb7e835e5f62ab412a7eed69ab205b4"
+                "reference": "a55306daf4e3a5ffc5358ccb090caa05c03a39f4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/LartTyler/doctrine-query-document/zipball/3ec706bf4bb7e835e5f62ab412a7eed69ab205b4",
-                "reference": "3ec706bf4bb7e835e5f62ab412a7eed69ab205b4",
+                "url": "https://api.github.com/repos/LartTyler/doctrine-query-document/zipball/a55306daf4e3a5ffc5358ccb090caa05c03a39f4",
+                "reference": "a55306daf4e3a5ffc5358ccb090caa05c03a39f4",
                 "shasum": ""
             },
             "require": {
@@ -135,7 +135,7 @@
                 }
             ],
             "description": "Allows building Doctrine queries using MongoDB-style query documents",
-            "time": "2019-11-27T15:37:23+00:00"
+            "time": "2020-01-14T16:30:09+00:00"
         },
         {
             "name": "dbstudios/entity-transformers",
@@ -6069,6 +6069,7 @@
                 "code",
                 "zf"
             ],
+            "abandoned": "laminas/laminas-code",
             "time": "2019-12-10T19:21:15+00:00"
         },
         {
@@ -6123,6 +6124,7 @@
                 "events",
                 "zf2"
             ],
+            "abandoned": "laminas/laminas-eventmanager",
             "time": "2018-04-25T15:33:34+00:00"
         }
     ],
