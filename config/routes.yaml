@@ -6,7 +6,7 @@ app._annotations:
 
 index:
     path: /
-    controller: 'FrameworkBundle:Redirect:urlRedirect'
+    controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController
     defaults:
         path: 'https://docs.mhw-db.com/'
 
