@@ -116,7 +116,7 @@
 										'id' => $skillRank->getId(),
 										'level' => $skillRank->getLevel(),
 										'description' => $skillRank->getDescription(),
-										'modifiers' => $skillRank->getModifiers(),
+										'modifiers' => $skillRank->getModifiers() ?: new \stdClass(),
 									];
 
 									if ($projection->isAllowed('ranks.skills.skill'))
