@@ -9,9 +9,14 @@ services:
         arguments:
             -
                 - '@serializer.normalizer.datetime'
-                - '@serializer.normalizer.object'
+                - '@App\Serializer\CustomObjectNormalizer'
             -
                 - '@serializer.encoder.json'
+
+    App\Serializer\CustomObjectNormalizer:
+        bind:
+            $defaultContext:
+                preserve_empty_objects: true
 
     DaybreakStudios\RestApiCommon\Responder:
         bind:
