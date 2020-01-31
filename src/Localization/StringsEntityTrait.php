@@ -11,7 +11,7 @@
 
 		/**
 		 * @Assert\NotBlank()
-		 * @Assert\Choice(callback={"App\LanguageTag", "values"})
+		 * @Assert\Choice(callback={"App\Localization\LanguageTag", "values"})
 		 *
 		 * @ORM\Column(type="string", length=7)
 		 *

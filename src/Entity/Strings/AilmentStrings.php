@@ -38,11 +38,9 @@
 		private $name;
 
 		/**
-		 * @Assert\NotBlank()
+		 * @ORM\Column(type="text", nullable=true)
 		 *
-		 * @ORM\Column(type="text")
-		 *
-		 * @var string
+		 * @var string|null
 		 */
 		private $description;
 
@@ -76,18 +74,18 @@
 		}
 
 		/**
-		 * @return string
+		 * @return string|null
 		 */
-		public function getDescription(): string {
+		public function getDescription(): ?string {
 			return $this->description;
 		}
 
 		/**
-		 * @param string $description
+		 * @param string|null $description
 		 *
 		 * @return $this
 		 */
-		public function setDescription(string $description) {
+		public function setDescription(?string $description) {
 			$this->description = $description;
 
 			return $this;
