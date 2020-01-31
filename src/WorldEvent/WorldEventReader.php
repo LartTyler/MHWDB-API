@@ -21,6 +21,7 @@
 			],
 			PlatformType::PC => [
 				Expansion::BASE => 'http://game.capcom.com/world/steam/us/schedule.html',
+				Expansion::ICEBORNE => 'http://game.capcom.com/world/steam/us/schedule-master.html',
 			],
 		];
 
@@ -88,6 +89,9 @@
 			$tables = $crawler
 				->filter('#schedule .tableArea > table');
 
+			// Used to infer years for event terms during parsing.
+			$currentTimestamp = new \DateTimeImmutable();
+
 			for ($tableIndex = 0, $tablesLength = $tables->count(); $tableIndex < $tablesLength; $tableIndex++) {
 				$rows = $tables->eq($tableIndex)->filter('tbody > tr');
 
@@ -122,40 +126,54 @@
 					if ($row->filter('.image > .ps4')->count() > 0)
 						$exclusive = PlatformExclusivityType::PS4;
 
-					$termText = trim(
-						str_replace(
-							[
-								'availability',
-								'-',
-							],
-							[
-								'',
-								'/',
-							],
-							mb_strtolower($questInfo->filter('.terms')->text())
-						)
+					$termStrings = preg_split(
+						'/(\d{2}-\d{2} \d{2}:\d{2} 〜 \d{2}-\d{2} \d{2}:\d{2})/',
+						$questInfo->filter('.terms')->text(),
+						null,
+						PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE
 					);
 
+					/** @var \DateTimeImmutable[] $terms */
 					$terms = [];
 
-					foreach (explode("\n", $termText) as $item) {
+					foreach ($termStrings as $item) {
+						// Fix for duplicated values in terms node
+						if (isset($terms[$item]))
+							continue;
+
 						$text = trim($item);
 
-						$start = (new \DateTimeImmutable(substr($text, 0, 10), new \DateTimeZone('UTC')))
+						if (!$text || !is_numeric($text[0]))
+							continue;
+
+						$text = str_replace('-', '/', $text);
+
+						$start = (new \DateTime(substr($text, 0, 10), new \DateTimeZone('UTC')))
 							->sub($offsetInterval);
 
-						$end = (new \DateTimeImmutable(substr($text, 15), new \DateTimeZone('UTC')))
+						if ($start->diff($currentTimestamp)->days >= 90) {
+							$start->setDate(
+								(int)$start->format('Y') - 1,
+								(int)$start->format('m'),
+								(int)$start->format('d')
+							);
+						}
+
+						$end = (new \DateTime(substr($text, 15), new \DateTimeZone('UTC')))
 							->sub($offsetInterval);
 
-						if ((int)$end->format('m') < (int)$start->format('m')) {
-							$end = $end->setDate(
+						if ($end->diff($currentTimestamp)->days >= 90) {
+							$end->setDate(
 								(int)$end->format('Y') + 1,
 								(int)$end->format('m'),
 								(int)$end->format('d')
 							);
 						}
 
-						$terms[] = [$start, $end];
+						$terms[$item] = [
+							\DateTimeImmutable::createFromMutable($start),
+							\DateTimeImmutable::createFromMutable($end),
+						];
 					}
 
 					foreach ($terms as $term) {
