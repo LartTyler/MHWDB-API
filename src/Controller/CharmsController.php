@@ -6,6 +6,7 @@
 	use App\Entity\CharmRank;
 	use App\Entity\CraftingMaterialCost;
 	use App\Entity\SkillRank;
+	use App\Entity\Strings\CharmRankStrings;
 	use App\Entity\Strings\CharmStrings;
 	use App\Entity\Strings\ItemStrings;
 	use App\Entity\Strings\SkillRankStrings;
@@ -113,10 +114,16 @@
 				$output['ranks'] = array_map(
 					function(CharmRank $rank) use ($projection): array {
 						$output = [
-							'name' => $rank->getName(),
 							'level' => $rank->getLevel(),
 							'rarity' => $rank->getRarity(),
 						];
+
+						if ($projection->isAllowed('ranks.name')) {
+							/** @var CharmRankStrings $strings */
+							$strings = $this->getStrings($rank);
+
+							$output['name'] = $strings->getName();
+						}
 
 						// region SkillRank Fields
 						if ($projection->isAllowed('ranks.skills')) {
