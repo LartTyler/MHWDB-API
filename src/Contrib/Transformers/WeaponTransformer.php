@@ -12,6 +12,7 @@
 	use App\Entity\WeaponSlot;
 	use App\Game\Attribute;
 	use App\Game\RawDamageMultiplier;
+	use App\Game\Sharpness;
 	use App\Localization\L10nUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
@@ -216,17 +217,7 @@
 				$entity->getDurability()->clear();
 
 				foreach ($data->durability as $index => $definition) {
-					$missing = ObjectUtil::getMissingProperties(
-						$definition,
-						[
-							'red',
-							'orange',
-							'yellow',
-							'green',
-							'blue',
-							'white',
-						]
-					);
+					$missing = ObjectUtil::getMissingProperties($definition, Sharpness::values());
 
 					if ($missing)
 						throw ValidationException::missingNestedFields('durability', $index, $missing);
@@ -238,7 +229,8 @@
 						->setYellow($definition->yellow)
 						->setGreen($definition->green)
 						->setBlue($definition->blue)
-						->setWhite($definition->white);
+						->setWhite($definition->white)
+						->setPurple($definition->purple);
 
 					$entity->getDurability()->add($durability);
 				}

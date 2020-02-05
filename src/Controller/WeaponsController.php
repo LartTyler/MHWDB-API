@@ -131,10 +131,8 @@
 
 			// region Durability Fields
 			if (WeaponType::isMelee($entity->getType()) && $projection->isAllowed('durability')) {
-				$durability = $entity->getDurability();
-
-				$output['durability'] = array_map(
-					function(WeaponSharpness $sharpness): array {
+				$output['durability'] = $entity->getDurability()->map(
+					function(WeaponSharpness $sharpness) {
 						return [
 							'red' => $sharpness->getRed(),
 							'orange' => $sharpness->getOrange(),
@@ -142,10 +140,10 @@
 							'green' => $sharpness->getGreen(),
 							'blue' => $sharpness->getBlue(),
 							'white' => $sharpness->getWhite(),
+							'purple' => $sharpness->getPurple(),
 						];
-					},
-					$durability->toArray()
-				);
+					}
+				)->toArray();
 			}
 			// endregion
 
