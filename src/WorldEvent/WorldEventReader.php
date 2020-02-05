@@ -23,6 +23,7 @@
 			],
 			PlatformType::PC => [
 				Expansion::BASE => 'http://game.capcom.com/world/steam/%s/schedule.html',
+				Expansion::ICEBORNE => 'http://game.capcom.com/world/steam/%s/schedule-master.html',
 			],
 		];
 
