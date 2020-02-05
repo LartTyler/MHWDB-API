@@ -71,6 +71,15 @@
 		private $white = 0;
 
 		/**
+		 * @Assert\Range(min="0")
+		 *
+		 * @ORM\Column(type="integer", options={"unsigned": true})
+		 *
+		 * @var int
+		 */
+		private $purple = 0;
+
+		/**
 		 * @return int
 		 */
 		public function getRed(): int {
@@ -179,18 +188,19 @@
 		}
 
 		/**
-		 * @param WeaponSharpness $other
+		 * @return int
+		 */
+		public function getPurple(): int {
+			return $this->purple;
+		}
+
+		/**
+		 * @param int $purple
 		 *
 		 * @return $this
 		 */
-		public function import(WeaponSharpness $other) {
-			$this
-				->setRed($other->getRed())
-				->setOrange($other->getOrange())
-				->setYellow($other->getYellow())
-				->setGreen($other->getGreen())
-				->setBlue($other->getBlue())
-				->setWhite($other->getWhite());
+		public function setPurple(int $purple) {
+			$this->purple = $purple;
 
 			return $this;
 		}

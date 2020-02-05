@@ -1,7 +1,12 @@
 <?php
 	namespace App\Entity;
 
+	use App\Entity\Strings\AilmentStrings;
+	use App\Localization\TranslatableEntityInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
+	use Doctrine\Common\Collections\ArrayCollection;
+	use Doctrine\Common\Collections\Collection;
+	use Doctrine\Common\Collections\Selectable;
 	use Doctrine\ORM\Mapping as ORM;
 	use Symfony\Component\Validator\Constraints as Assert;
 
@@ -13,25 +18,8 @@
 	 *
 	 * @package App\Entity
 	 */
-	class Ailment implements EntityInterface {
+	class Ailment implements EntityInterface, TranslatableEntityInterface {
 		use EntityTrait;
-
-		/**
-		 * @Assert\NotBlank()
-		 * @Assert\Length(max=32)
-		 *
-		 * @ORM\Column(type="string", length=32, unique=true)
-		 *
-		 * @var string
-		 */
-		private $name;
-
-		/**
-		 * @ORM\Column(type="text")
-		 *
-		 * @var string
-		 */
-		private $description;
 
 		/**
 		 * @Assert\Valid()
@@ -62,53 +50,28 @@
 		private $protection;
 
 		/**
-		 * Ailment constructor.
+		 * @Assert\Valid()
 		 *
-		 * @param string $name
-		 * @param string $description
+		 * @ORM\OneToMany(
+		 *     targetEntity="App\Entity\Strings\AilmentStrings",
+		 *     mappedBy="ailment",
+		 *     orphanRemoval=true,
+		 *     cascade={"all"},
+		 *     fetch="EAGER"
+		 * )
+		 *
+		 * @var Collection|Selectable|AilmentStrings[]
 		 */
-		public function __construct(string $name, string $description) {
-			$this->name = $name;
-			$this->description = $description;
+		private $strings;
 
+		/**
+		 * Ailment constructor.
+		 */
+		public function __construct() {
 			$this->recovery = new AilmentRecovery($this);
 			$this->protection = new AilmentProtection($this);
-		}
 
-		/**
-		 * @return string
-		 */
-		public function getName(): string {
-			return $this->name;
-		}
-
-		/**
-		 * @param string $name
-		 *
-		 * @return $this
-		 */
-		public function setName(string $name) {
-			$this->name = $name;
-
-			return $this;
-		}
-
-		/**
-		 * @return string
-		 */
-		public function getDescription(): string {
-			return $this->description;
-		}
-
-		/**
-		 * @param string $description
-		 *
-		 * @return $this
-		 */
-		public function setDescription(string $description) {
-			$this->description = $description;
-
-			return $this;
+			$this->strings = new ArrayCollection();
 		}
 
 		/**
@@ -123,5 +86,23 @@
 		 */
 		public function getProtection(): AilmentProtection {
 			return $this->protection;
+		}
+
+		/**
+		 * @return AilmentStrings[]|Collection|Selectable
+		 */
+		public function getStrings(): Collection {
+			return $this->strings;
+		}
+
+		/**
+		 * @param string $language
+		 *
+		 * @return AilmentStrings
+		 */
+		public function addStrings(string $language): EntityInterface {
+			$this->getStrings()->add($strings = new AilmentStrings($this, $language));
+
+			return $strings;
 		}
 	}

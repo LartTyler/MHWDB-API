@@ -4,6 +4,8 @@
 	use App\Contrib\Transformers\SkillTransformer;
 	use App\Entity\Skill;
 	use App\Entity\SkillRank;
+	use App\Entity\Strings\SkillRankStrings;
+	use App\Entity\Strings\SkillStrings;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -92,28 +94,49 @@
 
 			$output = [
 				'id' => $entity->getId(),
-				'name' => $entity->getName(),
-				'description' => $entity->getDescription(),
 			];
+
+			if ($projection->isAllowed('name') || $projection->isAllowed('description')) {
+				/** @var SkillStrings $strings */
+				$strings = $this->getStrings($entity);
+
+				$output += [
+					'name' => $strings->getName(),
+					'description' => $strings->getDescription(),
+				];
+			}
 
 			// region SkillRank Fields
 			if ($projection->isAllowed('ranks')) {
 				$output['ranks'] = array_map(
-					function(SkillRank $rank): array {
-						// No related field optimizations needed for each SkillRank, as the parent skill is already loaded
-
-						return [
+					function(SkillRank $rank) use ($projection): array {
+						$output = [
 							'id' => $rank->getId(),
 							'skill' => $rank->getSkill()->getId(),
-							'skillName' => $rank->getSkill()->getName(),
 							'level' => $rank->getLevel(),
-							'description' => $rank->getDescription(),
 							'modifiers' => $rank->getModifiers() ?: new \stdClass(),
 						];
+
+						if ($projection->isAllowed('ranks.description')) {
+							/** @var SkillRankStrings $strings */
+							$strings = $this->getStrings($rank);
+
+							$output['description'] = $strings->getDescription();
+						}
+
+						if ($projection->isAllowed('ranks.skillName')) {
+							/** @var SkillStrings $strings */
+							$strings = $this->getStrings($rank->getSkill());
+
+							$output['skillName'] = $strings->getName();
+						}
+
+						return $output;
 					},
 					$entity->getRanks()->toArray()
 				);
 			}
+
 			// endregion
 
 			return $output;

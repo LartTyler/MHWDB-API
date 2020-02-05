@@ -4,6 +4,8 @@
 	use App\Entity\ArmorSet;
 	use App\Entity\ArmorSetBonus;
 	use App\Entity\ArmorSetBonusRank;
+	use App\Entity\Strings\ArmorSetBonusStrings;
+	use App\Localization\L10nUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\ValidationException;
@@ -19,27 +21,7 @@
 			if (!ObjectUtil::isset($data, 'name'))
 				throw ValidationException::missingFields(['name']);
 
-			return new ArmorSetBonus($data->name);
-		}
-
-		/**
-		 * @param EntityInterface $entity
-		 *
-		 * @return void
-		 */
-		public function doDelete(EntityInterface $entity): void {
-			if (!($entity instanceof ArmorSetBonus))
-				throw EntityTransformerException::subjectNotSupported($entity);
-
-			/** @var ArmorSet[] $sets */
-			$sets = $this->entityManager->getRepository(ArmorSet::class)->findBy(
-				[
-					'bonus' => $entity,
-				]
-			);
-
-			foreach ($sets as $set)
-				$set->setBonus(null);
+			return new ArmorSetBonus();
 		}
 
 		/**
@@ -53,7 +35,7 @@
 				throw EntityTransformerException::subjectNotSupported($entity);
 
 			if (ObjectUtil::isset($data, 'name'))
-				$entity->setName($data->name);
+				$this->getStrings($entity)->setName($data->name);
 
 			if (ObjectUtil::isset($data, 'ranks')) {
 				$entity->getRanks()->clear();
@@ -82,5 +64,37 @@
 					$entity->getRanks()->add($rank);
 				}
 			}
+		}
+
+		/**
+		 * @param EntityInterface $entity
+		 *
+		 * @return void
+		 */
+		public function doDelete(EntityInterface $entity): void {
+			if (!($entity instanceof ArmorSetBonus))
+				throw EntityTransformerException::subjectNotSupported($entity);
+
+			/** @var ArmorSet[] $sets */
+			$sets = $this->entityManager->getRepository(ArmorSet::class)->findBy(
+				[
+					'bonus' => $entity,
+				]
+			);
+
+			foreach ($sets as $set)
+				$set->setBonus(null);
+		}
+
+		/**
+		 * @param ArmorSetBonus $bonus
+		 *
+		 * @return ArmorSetBonusStrings
+		 */
+		protected function getStrings(ArmorSetBonus $bonus): ArmorSetBonusStrings {
+			$strings = L10nUtil::findOrCreateStrings($this->getCurrentLocale(), $bonus);
+			assert($strings instanceof ArmorSetBonusStrings);
+
+			return $strings;
 		}
 	}

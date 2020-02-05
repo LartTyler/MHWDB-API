@@ -1,6 +1,8 @@
 <?php
 	namespace App\Entity;
 
+	use App\Entity\Strings\ArmorSetBonusStrings;
+	use App\Localization\TranslatableEntityInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
@@ -17,17 +19,8 @@
 	 *
 	 * @package App\Entity
 	 */
-	class ArmorSetBonus implements EntityInterface, LengthCachingEntityInterface {
+	class ArmorSetBonus implements EntityInterface, TranslatableEntityInterface {
 		use EntityTrait;
-
-		/**
-		 * @Assert\NotBlank()
-		 *
-		 * @ORM\Column(type="string", length=64, unique=true)
-		 *
-		 * @var string
-		 */
-		private $name;
 
 		/**
 		 * @Assert\Valid()
@@ -44,40 +37,26 @@
 		private $ranks;
 
 		/**
-		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
+		 * @Assert\Valid()
 		 *
-		 * @var int
-		 * @internal Used to allow API queries against "ranks.length"
+		 * @ORM\OneToMany(
+		 *     targetEntity="App\Entity\Strings\ArmorSetBonusStrings",
+		 *     mappedBy="armorSetBonus",
+		 *     orphanRemoval=true,
+		 *     cascade={"all"},
+		 *     fetch="EAGER"
+		 * )
+		 *
+		 * @var Collection|Selectable|ArmorSetBonusStrings[]
 		 */
-		private $ranksLength = 0;
+		private $strings;
 
 		/**
 		 * ArmorSetBonus constructor.
-		 *
-		 * @param string $name
 		 */
-		public function __construct(string $name) {
-			$this->name = $name;
-
+		public function __construct() {
 			$this->ranks = new ArrayCollection();
-		}
-
-		/**
-		 * @return string
-		 */
-		public function getName(): string {
-			return $this->name;
-		}
-
-		/**
-		 * @param string $name
-		 *
-		 * @return $this
-		 */
-		public function setName(string $name) {
-			$this->name = $name;
-
-			return $this;
+			$this->strings = new ArrayCollection();
 		}
 
 		/**
@@ -106,9 +85,20 @@
 		}
 
 		/**
-		 * {@inheritdoc}
+		 * @return ArmorSetBonusStrings[]|Collection|Selectable
 		 */
-		public function syncLengthFields(): void {
-			$this->ranksLength = $this->ranks->count();
+		public function getStrings(): Collection {
+			return $this->strings;
+		}
+
+		/**
+		 * @param string $language
+		 *
+		 * @return ArmorSetBonusStrings
+		 */
+		public function addStrings(string $language): EntityInterface {
+			$this->getStrings()->add($strings = new ArmorSetBonusStrings($this, $language));
+
+			return $strings;
 		}
 	}

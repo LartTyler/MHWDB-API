@@ -4,6 +4,10 @@ services:
         autowire: true
         autoconfigure: true
 
+    DaybreakStudios\RestApiCommon\Event\Listeners\ApiErrorExceptionSubscriber:
+        tags:
+            - kernel.event_subscriber
+
     App\Contrib\BucketManager:
         bind:
             $bucket: '%env(resolve:ASSETS_BUCKET_NAME)%'
@@ -21,3 +25,5 @@ services:
     App\Contrib\Transformers\SkillTransformer: ~
     App\Contrib\Transformers\UserTransformer: ~
     App\Contrib\Transformers\WeaponTransformer: ~
+
+    App\Localization\QueryLocalizationHelper: ~

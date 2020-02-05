@@ -1,6 +1,8 @@
 <?php
 	namespace App\Entity;
 
+	use App\Entity\Strings\CharmRankStrings;
+	use App\Localization\TranslatableEntityInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
@@ -16,7 +18,7 @@
 	 *
 	 * @package App\Entity
 	 */
-	class CharmRank implements EntityInterface, LengthCachingEntityInterface {
+	class CharmRank implements EntityInterface, TranslatableEntityInterface {
 		use EntityTrait;
 
 		/**
@@ -26,15 +28,6 @@
 		 * @var Charm
 		 */
 		private $charm;
-
-		/**
-		 * @Assert\NotBlank()
-		 *
-		 * @ORM\Column(type="string", length=64, unique=true)
-		 *
-		 * @var string
-		 */
-		private $name;
 
 		/**
 		 * @Assert\NotBlank()
@@ -53,6 +46,18 @@
 		 * @var Collection|Selectable|SkillRank[]
 		 */
 		private $skills;
+
+		/**
+		 * @ORM\OneToMany(
+		 *     targetEntity="App\Entity\Strings\CharmRankStrings",
+		 *     mappedBy="charmRank",
+		 *     orphanRemoval=true,
+		 *     cascade={"all"}
+		 * )
+		 *
+		 * @var Collection|Selectable|CharmRankStrings[]
+		 */
+		private $strings;
 
 		/**
 		 * @Assert\NotBlank()
@@ -74,23 +79,13 @@
 		private $crafting = null;
 
 		/**
-		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
-		 *
-		 * @var int
-		 * @internal Used to allow API queries against "skills.length"
-		 */
-		private $skillsLength = 0;
-
-		/**
 		 * CharmRank constructor.
 		 *
-		 * @param Charm  $charm
-		 * @param string $name
-		 * @param int    $level
+		 * @param Charm $charm
+		 * @param int   $level
 		 */
-		public function __construct(Charm $charm, string $name, int $level) {
+		public function __construct(Charm $charm, int $level) {
 			$this->charm = $charm;
-			$this->name = $name;
 			$this->level = $level;
 			$this->skills = new ArrayCollection();
 		}
@@ -100,24 +95,6 @@
 		 */
 		public function getCharm(): Charm {
 			return $this->charm;
-		}
-
-		/**
-		 * @return string
-		 */
-		public function getName(): string {
-			return $this->name;
-		}
-
-		/**
-		 * @param string $name
-		 *
-		 * @return $this
-		 */
-		public function setName(string $name) {
-			$this->name = $name;
-
-			return $this;
 		}
 
 		/**
@@ -184,7 +161,17 @@
 		/**
 		 * {@inheritdoc}
 		 */
-		public function syncLengthFields(): void {
-			$this->skillsLength = $this->skills->count();
+		public function getStrings(): Collection {
+			return $this->strings;
 		}
+
+		/**
+		 * {@inheritdoc}
+		 */
+		public function addStrings(string $language): EntityInterface {
+			$this->getStrings()->add($strings = new CharmRankStrings($this, $language));
+
+			return $strings;
+		}
+
 	}

@@ -2,6 +2,8 @@
 	namespace App\Contrib\Transformers;
 
 	use App\Entity\Decoration;
+	use App\Entity\Strings\DecorationStrings;
+	use App\Localization\L10nUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\ValidationException;
@@ -26,16 +28,7 @@
 			if ($missing)
 				throw ValidationException::missingFields($missing);
 
-			return new Decoration($data->name, $data->slot, $data->rarity);
-		}
-
-		/**
-		 * @param EntityInterface $entity
-		 *
-		 * @return void
-		 */
-		public function doDelete(EntityInterface $entity): void {
-			// noop
+			return new Decoration($data->slot, $data->rarity);
 		}
 
 		/**
@@ -49,7 +42,7 @@
 				throw EntityTransformerException::subjectNotSupported($entity);
 
 			if (ObjectUtil::isset($data, 'name'))
-				$entity->setName($data->name);
+				$this->getStrings($entity)->setName($data->name);
 
 			if (ObjectUtil::isset($data, 'slot'))
 				$entity->setSlot($data->slot);
@@ -59,5 +52,26 @@
 
 			if (ObjectUtil::isset($data, 'skills'))
 				$this->populateFromSimpleSkillsArray('skills', $entity->getSkills(), $data->skills);
+		}
+
+		/**
+		 * @param EntityInterface $entity
+		 *
+		 * @return void
+		 */
+		public function doDelete(EntityInterface $entity): void {
+			// noop
+		}
+
+		/**
+		 * @param Decoration $decoration
+		 *
+		 * @return DecorationStrings
+		 */
+		protected function getStrings(Decoration $decoration): DecorationStrings {
+			$strings = L10nUtil::findOrCreateStrings($this->getCurrentLocale(), $decoration);
+			assert($strings instanceof DecorationStrings);
+
+			return $strings;
 		}
 	}

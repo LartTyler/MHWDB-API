@@ -1,7 +1,8 @@
 <?php
 	namespace App\Entity;
 
-	use App\Utility\StringUtil;
+	use App\Entity\Strings\DecorationStrings;
+	use App\Localization\TranslatableEntityInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
@@ -17,17 +18,8 @@
 	 *
 	 * @package App\Entity
 	 */
-	class Decoration implements EntityInterface, LengthCachingEntityInterface {
+	class Decoration implements EntityInterface, TranslatableEntityInterface {
 		use EntityTrait;
-
-		/**
-		 * @Assert\NotBlank()
-		 *
-		 * @ORM\Column(type="string", length=64, unique=true)
-		 *
-		 * @var string
-		 */
-		private $name;
 
 		/**
 		 * @Assert\NotBlank()
@@ -58,43 +50,32 @@
 		private $skills;
 
 		/**
-		 * @ORM\Column(type="integer", options={"unsigned": true})
+		 * @Assert\Valid()
 		 *
-		 * @var int
-		 * @internal Used to allow API queries against "skills.length"
+		 * @ORM\OneToMany(
+		 *     targetEntity="App\Entity\Strings\DecorationStrings",
+		 *     mappedBy="decoration",
+		 *     orphanRemoval=true,
+		 *     cascade={"all"},
+		 *     fetch="EAGER"
+		 * )
+		 *
+		 * @var Collection|Selectable|DecorationStrings[]
 		 */
-		private $skillsLength = 0;
+		private $strings;
 
 		/**
 		 * Decoration constructor.
 		 *
-		 * @param string $name
-		 * @param int    $slot
-		 * @param int    $rarity
+		 * @param int $slot
+		 * @param int $rarity
 		 */
-		public function __construct(string $name, int $slot, int $rarity) {
-			$this->name = $name;
+		public function __construct(int $slot, int $rarity) {
 			$this->slot = $slot;
 			$this->rarity = $rarity;
+
 			$this->skills = new ArrayCollection();
-		}
-
-		/**
-		 * @return string
-		 */
-		public function getName(): string {
-			return $this->name;
-		}
-
-		/**
-		 * @param string $name
-		 *
-		 * @return $this
-		 */
-		public function setName(string $name) {
-			$this->name = $name;
-
-			return $this;
+			$this->strings = new ArrayCollection();
 		}
 
 		/**
@@ -141,9 +122,20 @@
 		}
 
 		/**
-		 * {@inheritdoc}
+		 * @return DecorationStrings[]|Collection|Selectable
 		 */
-		public function syncLengthFields(): void {
-			$this->skillsLength = $this->skills->count();
+		public function getStrings(): Collection {
+			return $this->strings;
+		}
+
+		/**
+		 * @param string $language
+		 *
+		 * @return DecorationStrings
+		 */
+		public function addStrings(string $language): EntityInterface {
+			$this->getStrings()->add($strings = new DecorationStrings($this, $language));
+
+			return $strings;
 		}
 	}

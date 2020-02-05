@@ -3,6 +3,8 @@
 
 	use App\Contrib\Transformers\WeaponTransformer;
 	use App\Entity\CraftingMaterialCost;
+	use App\Entity\Strings\ItemStrings;
+	use App\Entity\Strings\WeaponStrings;
 	use App\Entity\Weapon;
 	use App\Entity\WeaponElement;
 	use App\Entity\WeaponSharpness;
@@ -98,7 +100,6 @@
 
 			$output = [
 				'id' => $entity->getId(),
-				'name' => $entity->getName(),
 				'type' => $entity->getType(),
 				'rarity' => $entity->getRarity(),
 				'attack' => [
@@ -110,6 +111,13 @@
 				'attributes' => $entity->getAttributes() ?: new \stdClass(),
 				'damageType' => $entity->getDamageType(),
 			];
+
+			if ($projection->isAllowed('name')) {
+				/** @var WeaponStrings $strings */
+				$strings = $this->getStrings($entity);
+
+				$output['name'] = $strings->getName();
+			}
 
 			if ($entity->getType() === WeaponType::GUNLANCE && $projection->isAllowed('shelling')) {
 				if ($shelling = $entity->getShelling()) {
@@ -123,10 +131,8 @@
 
 			// region Durability Fields
 			if (WeaponType::isMelee($entity->getType()) && $projection->isAllowed('durability')) {
-				$durability = $entity->getDurability();
-
-				$output['durability'] = array_map(
-					function(WeaponSharpness $sharpness): array {
+				$output['durability'] = $entity->getDurability()->map(
+					function(WeaponSharpness $sharpness) {
 						return [
 							'red' => $sharpness->getRed(),
 							'orange' => $sharpness->getOrange(),
@@ -134,10 +140,10 @@
 							'green' => $sharpness->getGreen(),
 							'blue' => $sharpness->getBlue(),
 							'white' => $sharpness->getWhite(),
+							'purple' => $sharpness->getPurple(),
 						];
-					},
-					$durability->toArray()
-				);
+					}
+				)->toArray();
 			}
 			// endregion
 
@@ -235,12 +241,23 @@
 
 									$output['item'] = [
 										'id' => $item->getId(),
-										'name' => $item->getName(),
-										'description' => $item->getDescription(),
 										'rarity' => $item->getRarity(),
 										'carryLimit' => $item->getCarryLimit(),
 										'value' => $item->getValue(),
 									];
+
+									if (
+										$projection->isAllowed(sprintf('crafting.%s.item.name', $type)) ||
+										$projection->isAllowed(sprintf('crafting.%s.item.description', $type))
+									) {
+										/** @var ItemStrings $strings */
+										$strings = $this->getStrings($item);
+
+										$output['item'] += [
+											'name' => $strings->getName(),
+											'description' => $strings->getDescription(),
+										];
+									}
 								}
 
 								// endregion
@@ -323,6 +340,7 @@
 				} else
 					$output['assets'] = null;
 			}
+
 			// endregion
 
 			return $output;

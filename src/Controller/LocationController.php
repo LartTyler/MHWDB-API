@@ -4,6 +4,8 @@
 	use App\Contrib\Transformers\LocationTransformer;
 	use App\Entity\Camp;
 	use App\Entity\Location;
+	use App\Entity\Strings\CampStrings;
+	use App\Entity\Strings\LocationStrings;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -93,18 +95,32 @@
 
 			$output = [
 				'id' => $entity->getId(),
-				'name' => $entity->getName(),
 				'zoneCount' => $entity->getZoneCount(),
 			];
 
+			if ($projection->isAllowed('name')) {
+				/** @var LocationStrings $strings */
+				$strings = $this->getStrings($entity);
+
+				$output['name'] = $strings->getName();
+			}
+
 			if ($projection->isAllowed('camps')) {
 				$output['camps'] = array_map(
-					function(Camp $camp): array {
-						return [
+					function(Camp $camp) use ($projection): array {
+						$output = [
 							'id' => $camp->getId(),
-							'name' => $camp->getName(),
 							'zone' => $camp->getZone(),
 						];
+
+						if ($projection->isAllowed('camps.name')) {
+							/** @var CampStrings $strings */
+							$strings = $this->getStrings($camp);
+
+							$output['name'] = $strings->getName();
+						}
+
+						return $output;
 					},
 					$entity->getCamps()->toArray()
 				);

@@ -3,6 +3,7 @@
 
 	use App\Contrib\Transformers\MotionValueTransformer;
 	use App\Entity\MotionValue;
+	use App\Entity\Strings\MotionValueStrings;
 	use App\Game\WeaponType;
 	use App\Response\UnknownWeaponTypeError;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
@@ -120,14 +121,22 @@
 		protected function normalizeOne(EntityInterface $entity, Projection $projection): array {
 			assert($entity instanceof MotionValue);
 
-			return [
+			$output = [
 				'id' => $entity->getId(),
-				'name' => $entity->getName(),
 				'weaponType' => $entity->getWeaponType(),
 				'damageType' => $entity->getDamageType(),
 				'stun' => $entity->getStun(),
 				'exhaust' => $entity->getExhaust(),
 				'hits' => $entity->getHits(),
 			];
+
+			if ($projection->isAllowed('name')) {
+				/** @var MotionValueStrings $strings */
+				$strings = $this->getStrings($entity);
+
+				$output['name'] = $strings->getName();
+			}
+
+			return $output;
 		}
 	}

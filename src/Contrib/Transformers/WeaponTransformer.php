@@ -4,6 +4,7 @@
 	use App\Entity\Ammo;
 	use App\Entity\Phial;
 	use App\Entity\Shelling;
+	use App\Entity\Strings\WeaponStrings;
 	use App\Entity\Weapon;
 	use App\Entity\WeaponCraftingInfo;
 	use App\Entity\WeaponElement;
@@ -11,6 +12,8 @@
 	use App\Entity\WeaponSlot;
 	use App\Game\Attribute;
 	use App\Game\RawDamageMultiplier;
+	use App\Game\Sharpness;
+	use App\Localization\L10nUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\IntegrityException;
@@ -37,7 +40,7 @@
 			if ($missing)
 				throw ValidationException::missingFields($missing);
 
-			return new Weapon($data->name, $data->type, $data->rarity);
+			return new Weapon($data->type, $data->rarity);
 		}
 
 		/**
@@ -76,7 +79,7 @@
 				throw EntityTransformerException::subjectNotSupported($entity);
 
 			if (ObjectUtil::isset($data, 'name'))
-				$entity->setName($data->name);
+				$this->getStrings($entity)->setName($data->name);
 
 			if (ObjectUtil::isset($data, 'type'))
 				$entity->setType($data->type);
@@ -214,17 +217,7 @@
 				$entity->getDurability()->clear();
 
 				foreach ($data->durability as $index => $definition) {
-					$missing = ObjectUtil::getMissingProperties(
-						$definition,
-						[
-							'red',
-							'orange',
-							'yellow',
-							'green',
-							'blue',
-							'white',
-						]
-					);
+					$missing = ObjectUtil::getMissingProperties($definition, Sharpness::values());
 
 					if ($missing)
 						throw ValidationException::missingNestedFields('durability', $index, $missing);
@@ -236,7 +229,8 @@
 						->setYellow($definition->yellow)
 						->setGreen($definition->green)
 						->setBlue($definition->blue)
-						->setWhite($definition->white);
+						->setWhite($definition->white)
+						->setPurple($definition->purple);
 
 					$entity->getDurability()->add($durability);
 				}
@@ -424,5 +418,17 @@
 
 			if (ObjectUtil::isset($data, 'assets'))
 				throw ValidationException::fieldNotSupported('assets');
+		}
+
+		/**
+		 * @param Weapon $weapon
+		 *
+		 * @return WeaponStrings
+		 */
+		protected function getStrings(Weapon $weapon): WeaponStrings {
+			$strings = L10nUtil::findOrCreateStrings($this->getCurrentLocale(), $weapon);
+			assert($strings instanceof WeaponStrings);
+
+			return $strings;
 		}
 	}

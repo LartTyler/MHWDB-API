@@ -7,6 +7,11 @@
 	use App\Entity\Asset;
 	use App\Entity\CraftingMaterialCost;
 	use App\Entity\SkillRank;
+	use App\Entity\Strings\ArmorSetStrings;
+	use App\Entity\Strings\ArmorStrings;
+	use App\Entity\Strings\ItemStrings;
+	use App\Entity\Strings\SkillRankStrings;
+	use App\Entity\Strings\SkillStrings;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -99,7 +104,6 @@
 
 			$output = [
 				'id' => $entity->getId(),
-				'name' => $entity->getName(),
 				'type' => $entity->getType(),
 				'rank' => $entity->getRank(),
 				'rarity' => $entity->getRarity(),
@@ -118,6 +122,13 @@
 				// default to \stdClass to fix an empty array being returned instead of an empty object
 				'attributes' => $entity->getAttributes() ?: new \stdClass(),
 			];
+
+			if ($projection->isAllowed('name')) {
+				/** @var ArmorStrings $strings */
+				$strings = $this->getStrings($entity);
+
+				$output['name'] = $strings->getName();
+			}
 
 			// region Slots Fields
 			if ($projection->isAllowed('slots')) {
@@ -139,15 +150,25 @@
 						$output = [
 							'id' => $rank->getId(),
 							'level' => $rank->getLevel(),
-							'description' => $rank->getDescription(),
 							'modifiers' => $rank->getModifiers() ?: new \stdClass(),
 						];
+
+						if ($projection->isAllowed('skills.description')) {
+							/** @var SkillRankStrings $strings */
+							$strings = $this->getStrings($rank);
+
+							$output['description'] = $strings->getDescription();
+						}
 
 						if ($projection->isAllowed('skills.skill'))
 							$output['skill'] = $rank->getSkill()->getId();
 
-						if ($projection->isAllowed('skills.skillName'))
-							$output['skillName'] = $rank->getSkill()->getName();
+						if ($projection->isAllowed('skills.skillName')) {
+							/** @var SkillStrings $strings */
+							$strings = $this->getStrings($rank->getSkill());
+
+							$output['skillName'] = $strings->getName();
+						}
 
 						return $output;
 					},
@@ -163,9 +184,15 @@
 				if ($armorSet) {
 					$output['armorSet'] = [
 						'id' => $armorSet->getId(),
-						'name' => $armorSet->getName(),
 						'rank' => $armorSet->getRank(),
 					];
+
+					if ($projection->isAllowed('armorSet.name')) {
+						/** @var ArmorSetStrings $strings */
+						$strings = $this->getStrings($armorSet);
+
+						$output['armorSet']['name'] = $strings->getName();
+					}
 
 					if ($projection->isAllowed('armorSet.pieces')) {
 						$output['armorSet']['pieces'] = array_map(
@@ -228,12 +255,23 @@
 
 									$output['item'] = [
 										'id' => $item->getId(),
-										'name' => $item->getName(),
-										'description' => $item->getDescription(),
 										'rarity' => $item->getRarity(),
 										'carryLimit' => $item->getCarryLimit(),
 										'value' => $item->getValue(),
 									];
+
+									if (
+										$projection->isAllowed('crafting.materials.item.name') ||
+										$projection->isAllowed('crafting.materials.item.description')
+									) {
+										/** @var ItemStrings $strings */
+										$strings = $this->getStrings($item);
+
+										$output['item'] += [
+											'name' => $strings->getName(),
+											'description' => $strings->getDescription(),
+										];
+									}
 								}
 
 								// endregion

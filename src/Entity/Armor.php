@@ -1,7 +1,10 @@
 <?php
 	namespace App\Entity;
 
+	use App\Entity\Strings\ArmorStrings;
+	use App\Game\ArmorType;
 	use App\Game\Rank;
+	use App\Localization\TranslatableEntityInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
@@ -22,19 +25,9 @@
 	 *
 	 * @package App\Entity
 	 */
-	class Armor implements EntityInterface, LengthCachingEntityInterface {
+	class Armor implements EntityInterface, TranslatableEntityInterface {
 		use EntityTrait;
 		use AttributableTrait;
-
-		/**
-		 * @Assert\NotBlank()
-		 * @Assert\Length(max="64")
-		 *
-		 * @ORM\Column(type="string", length=64, unique=true)
-		 *
-		 * @var string
-		 */
-		private $name;
 
 		/**
 		 * @Assert\NotBlank()
@@ -43,6 +36,7 @@
 		 * @ORM\Column(type="string", length=32)
 		 *
 		 * @var string
+		 * @see ArmorType
 		 */
 		private $type;
 
@@ -101,6 +95,21 @@
 		private $slots;
 
 		/**
+		 * @Assert\Valid()
+		 *
+		 * @ORM\OneToMany(
+		 *     targetEntity="App\Entity\Strings\ArmorStrings",
+		 *     mappedBy="armor",
+		 *     orphanRemoval=true,
+		 *     cascade={"all"},
+		 *     fetch="EAGER"
+		 * )
+		 *
+		 * @var Collection|Selectable|ArmorStrings[]
+		 */
+		private $strings;
+
+		/**
 		 * @ORM\ManyToOne(targetEntity="App\Entity\ArmorSet", inversedBy="pieces")
 		 *
 		 * @var ArmorSet|null
@@ -126,31 +135,13 @@
 		private $crafting = null;
 
 		/**
-		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
-		 *
-		 * @var int
-		 * @internal Used to allow API queries against "skills.length"
-		 */
-		private $skillsLength = 0;
-
-		/**
-		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
-		 *
-		 * @var int
-		 * @internal Used to allow API queries against "slots.length"
-		 */
-		private $slotsLength = 0;
-
-		/**
 		 * Armor constructor.
 		 *
-		 * @param string $name
 		 * @param string $type
 		 * @param string $rank
 		 * @param int    $rarity
 		 */
-		public function __construct(string $name, string $type, string $rank, int $rarity) {
-			$this->name = $name;
+		public function __construct(string $type, string $rank, int $rarity) {
 			$this->type = $type;
 			$this->rank = $rank;
 			$this->rarity = $rarity;
@@ -160,24 +151,7 @@
 
 			$this->skills = new ArrayCollection();
 			$this->slots = new ArrayCollection();
-		}
-
-		/**
-		 * @return string
-		 */
-		public function getName(): string {
-			return $this->name;
-		}
-
-		/**
-		 * @param string $name
-		 *
-		 * @return $this
-		 */
-		public function setName(string $name) {
-			$this->name = $name;
-
-			return $this;
+			$this->strings = new ArrayCollection();
 		}
 
 		/**
@@ -323,10 +297,20 @@
 		}
 
 		/**
-		 * @return void
+		 * @return ArmorStrings[]|Collection|Selectable
 		 */
-		public function syncLengthFields(): void {
-			$this->skillsLength = $this->skills->count();
-			$this->slotsLength = $this->slots->count();
+		public function getStrings(): Collection {
+			return $this->strings;
+		}
+
+		/**
+		 * @param string $language
+		 *
+		 * @return ArmorStrings
+		 */
+		public function addStrings(string $language): EntityInterface {
+			$this->getStrings()->add($strings = new ArmorStrings($this, $language));
+
+			return $strings;
 		}
 	}

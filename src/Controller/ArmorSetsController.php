@@ -9,6 +9,12 @@
 	use App\Entity\Asset;
 	use App\Entity\CraftingMaterialCost;
 	use App\Entity\SkillRank;
+	use App\Entity\Strings\ArmorSetBonusStrings;
+	use App\Entity\Strings\ArmorSetStrings;
+	use App\Entity\Strings\ArmorStrings;
+	use App\Entity\Strings\ItemStrings;
+	use App\Entity\Strings\SkillRankStrings;
+	use App\Entity\Strings\SkillStrings;
 	use App\Game\Element;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
@@ -99,9 +105,15 @@
 
 			$output = [
 				'id' => $entity->getId(),
-				'name' => $entity->getName(),
 				'rank' => $entity->getRank(),
 			];
+
+			if ($projection->isAllowed('name')) {
+				/** @var ArmorSetStrings $strings */
+				$strings = $this->getStrings($entity);
+
+				$output['name'] = $strings->getName();
+			}
 
 			// region Armor Fields
 			if ($projection->isAllowed('pieces')) {
@@ -112,7 +124,6 @@
 
 						$output = [
 							'id' => $armor->getId(),
-							'name' => $armor->getName(),
 							'type' => $armor->getType(),
 							'rank' => $armor->getRank(),
 							'rarity' => $armor->getRarity(),
@@ -131,6 +142,13 @@
 								Element::DRAGON => $resists->getDragon(),
 							],
 						];
+
+						if ($projection->isAllowed('pieces.name')) {
+							/** @var ArmorStrings $strings */
+							$strings = $this->getStrings($armor);
+
+							$output['name'] = $strings->getName();
+						}
 
 						// region Slot Fields
 						if ($projection->isAllowed('pieces.slots')) {
@@ -152,17 +170,26 @@
 									$output = [
 										'id' => $rank->getId(),
 										'level' => $rank->getLevel(),
-										'description' => $rank->getDescription(),
 										'modifiers' => $rank->getModifiers(),
 										'skill' => $rank->getSkill()->getId(),
-										'skillName' => $rank->getSkill()->getName(),
 									];
+
+									if ($projection->isAllowed('pieces.skills.description')) {
+										/** @var SkillRankStrings $strings */
+										$strings = $this->getStrings($rank);
+
+										$output['description'] = $strings->getDescription();
+									}
 
 									if ($projection->isAllowed('pieces.skills.skill'))
 										$output['skill'] = $rank->getSkill()->getId();
 
-									if ($projection->isAllowed('pieces.skills.skillName'))
-										$output['skill'] = $rank->getSkill()->getName();
+									if ($projection->isAllowed('pieces.skills.skillName')) {
+										/** @var SkillStrings $strings */
+										$strings = $this->getStrings($rank->getSkill());
+
+										$output['skillName'] = $strings->getName();
+									}
 
 									return $output;
 								},
@@ -220,12 +247,23 @@
 
 												$output['item'] = [
 													'id' => $item->getId(),
-													'name' => $item->getName(),
-													'description' => $item->getDescription(),
 													'rarity' => $item->getRarity(),
 													'carryLimit' => $item->getCarryLimit(),
 													'value' => $item->getValue(),
 												];
+
+												if (
+													$projection->isAllowed('pieces.crafting.materials.item.name') ||
+													$projection->isAllowed('pieces.crafting.materials.item.description')
+												) {
+													/** @var ItemStrings $strings */
+													$strings = $this->getStrings($item);
+
+													$output['item'] += [
+														'name' => $strings->getName(),
+														'description' => $strings->getDescription(),
+													];
+												}
 											}
 
 											// endregion
@@ -256,8 +294,14 @@
 				if ($bonus) {
 					$output['bonus'] = [
 						'id' => $bonus->getId(),
-						'name' => $bonus->getName(),
 					];
+
+					if ($projection->isAllowed('bonus.name')) {
+						/** @var ArmorSetBonusStrings $strings */
+						$strings = $this->getStrings($bonus);
+
+						$output['bonus']['name'] = $strings->getName();
+					}
 
 					// region ArmorSetBonusRank Fields
 					if ($projection->isAllowed('bonus.ranks')) {
@@ -274,15 +318,25 @@
 									$output['skill'] = [
 										'id' => $skillRank->getId(),
 										'level' => $skillRank->getLevel(),
-										'description' => $skillRank->getDescription(),
 										'modifiers' => $skillRank->getModifiers() ?: new \stdClass(),
 									];
+
+									if ($projection->isAllowed('bonus.ranks.skill.description')) {
+										/** @var SkillRankStrings $strings */
+										$strings = $this->getStrings($skillRank);
+
+										$output['description'] = $strings->getDescription();
+									}
 
 									if ($projection->isAllowed('bonus.ranks.skill.skill'))
 										$output['skill']['skill'] = $skillRank->getSkill()->getId();
 
-									if ($projection->isAllowed('bonus.ranks.skill.skillName'))
-										$output['skill']['skillName'] = $skillRank->getSkill()->getName();
+									if ($projection->isAllowed('bonus.ranks.skill.skillName')) {
+										/** @var SkillStrings $strings */
+										$strings = $this->getStrings($skillRank->getSkill());
+
+										$output['skill']['skillName'] = $strings->getName();
+									}
 								}
 
 								// endregion
@@ -296,6 +350,7 @@
 				} else
 					$output['bonus'] = null;
 			}
+
 			// endregion
 
 			return $output;

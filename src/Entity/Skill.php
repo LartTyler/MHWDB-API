@@ -1,6 +1,8 @@
 <?php
 	namespace App\Entity;
 
+	use App\Entity\Strings\SkillStrings;
+	use App\Localization\TranslatableEntityInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
@@ -12,29 +14,9 @@
 	/**
 	 * @ORM\Entity()
 	 * @ORM\Table(name="skills")
-	 *
-	 * Class Skill
-	 *
-	 * @package App\Entity
 	 */
-	class Skill implements EntityInterface, LengthCachingEntityInterface {
+	class Skill implements EntityInterface, TranslatableEntityInterface {
 		use EntityTrait;
-
-		/**
-		 * @Assert\NotBlank()
-		 *
-		 * @ORM\Column(type="string", length=64, unique=true)
-		 *
-		 * @var string
-		 */
-		private $name;
-
-		/**
-		 * @ORM\Column(type="text")
-		 *
-		 * @var string
-		 */
-		private $description;
 
 		/**
 		 * @Assert\Valid()
@@ -46,42 +28,26 @@
 		private $ranks;
 
 		/**
-		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
+		 * @Assert\Valid()
 		 *
-		 * @var int
-		 * @internal Used to allow API queries against "ranks.length"
+		 * @ORM\OneToMany(
+		 *     targetEntity="App\Entity\Strings\SkillStrings",
+		 *     mappedBy="skill",
+		 *     orphanRemoval=true,
+		 *     cascade={"all"},
+		 *     fetch="EAGER"
+		 * )
+		 *
+		 * @var Collection|Selectable|SkillStrings[]
 		 */
-		private $ranksLength = 0;
+		private $strings;
 
 		/**
 		 * Skill constructor.
-		 *
-		 * @param string $name
-		 * @param string $description
 		 */
-		public function __construct(string $name, string $description) {
-			$this->name = $name;
-			$this->description = $description;
-
+		public function __construct() {
 			$this->ranks = new ArrayCollection();
-		}
-
-		/**
-		 * @return string
-		 */
-		public function getName(): string {
-			return $this->name;
-		}
-
-		/**
-		 * @param string $name
-		 *
-		 * @return $this
-		 */
-		public function setName(string $name) {
-			$this->name = $name;
-
-			return $this;
+			$this->strings = new ArrayCollection();
 		}
 
 		/**
@@ -110,27 +76,20 @@
 		}
 
 		/**
-		 * @return string
+		 * @return Collection|Selectable|SkillStrings[]
 		 */
-		public function getDescription(): string {
-			return $this->description;
+		public function getStrings(): Collection {
+			return $this->strings;
 		}
 
 		/**
-		 * @param string $description
+		 * @param string $language
 		 *
-		 * @return $this
+		 * @return SkillStrings
 		 */
-		public function setDescription(string $description) {
-			$this->description = $description;
+		public function addStrings(string $language): EntityInterface {
+			$this->getStrings()->add($strings = new SkillStrings($this, $language));
 
-			return $this;
-		}
-
-		/**
-		 * {@inheritdoc}
-		 */
-		public function syncLengthFields(): void {
-			$this->ranksLength = $this->ranks->count();
+			return $strings;
 		}
 	}

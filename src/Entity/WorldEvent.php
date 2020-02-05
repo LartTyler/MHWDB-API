@@ -1,34 +1,25 @@
 <?php
 	namespace App\Entity;
 
+	use App\Entity\Strings\WorldEventStrings;
 	use App\Game\Expansion;
 	use App\Game\PlatformExclusivityType;
 	use App\Game\PlatformType;
 	use App\Game\WorldEventType;
+	use App\Localization\TranslatableEntityInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
+	use Doctrine\Common\Collections\ArrayCollection;
+	use Doctrine\Common\Collections\Collection;
+	use Doctrine\Common\Collections\Selectable;
 	use Doctrine\ORM\Mapping as ORM;
 	use Symfony\Component\Validator\Constraints as Assert;
 
 	/**
-	 * @ORM\Entity()
-	 * @ORM\Table(
-	 *     name="world_events",
-	 *     uniqueConstraints={
-	 *     		@ORM\UniqueConstraint(columns={"platform", "name", "expansion", "start_timestamp"})
-	 *     }
-	 * )
+	 * @ORM\Entity(repositoryClass="App\Repository\WorldEventRepository")
+	 * @ORM\Table(name="world_events")
 	 */
-	class WorldEvent implements EntityInterface {
+	class WorldEvent implements EntityInterface, TranslatableEntityInterface {
 		use EntityTrait;
-
-		/**
-		 * @Assert\NotBlank()
-		 *
-		 * @ORM\Column(type="string", length=128)
-		 *
-		 * @var string
-		 */
-		private $name;
 
 		/**
 		 * @Assert\NotBlank()
@@ -96,25 +87,19 @@
 		private $questRank;
 
 		/**
-		 * @ORM\Column(type="text", nullable=true)
+		 * @Assert\Valid()
 		 *
-		 * @var string|null
-		 */
-		private $description = null;
-
-		/**
-		 * @ORM\Column(type="text", nullable=true)
+		 * @ORM\OneToMany(
+		 *     targetEntity="App\Entity\Strings\WorldEventStrings",
+		 *     mappedBy="event",
+		 *     orphanRemoval=true,
+		 *     cascade={"all"},
+		 *     fetch="EAGER"
+		 * )
 		 *
-		 * @var string|null
+		 * @var Collection|Selectable|WorldEventStrings[]
 		 */
-		private $requirements = null;
-
-		/**
-		 * @ORM\Column(type="text", nullable=true)
-		 *
-		 * @var string|null
-		 */
-		private $successConditions = null;
+		private $strings;
 
 		/**
 		 * @Assert\Choice(callback={"App\Game\PlatformExclusivityType", "all"})
@@ -136,7 +121,6 @@
 		/**
 		 * WorldEvent constructor.
 		 *
-		 * @param string             $name
 		 * @param string             $type
 		 * @param string             $expansion
 		 * @param string             $platform
@@ -146,7 +130,6 @@
 		 * @param int                $questRank
 		 */
 		public function __construct(
-			string $name,
 			string $type,
 			string $expansion,
 			string $platform,
@@ -155,7 +138,6 @@
 			Location $location,
 			int $questRank
 		) {
-			$this->name = $name;
 			$this->type = $type;
 			$this->expansion = $expansion;
 			$this->platform = $platform;
@@ -163,13 +145,8 @@
 			$this->endTimestamp = $endTimestamp;
 			$this->location = $location;
 			$this->questRank = $questRank;
-		}
 
-		/**
-		 * @return string
-		 */
-		public function getName(): string {
-			return $this->name;
+			$this->strings = new ArrayCollection();
 		}
 
 		/**
@@ -225,60 +202,6 @@
 		/**
 		 * @return string|null
 		 */
-		public function getDescription(): ?string {
-			return $this->description;
-		}
-
-		/**
-		 * @param string|null $description
-		 *
-		 * @return $this
-		 */
-		public function setDescription(?string $description) {
-			$this->description = $description;
-
-			return $this;
-		}
-
-		/**
-		 * @return string|null
-		 */
-		public function getRequirements(): ?string {
-			return $this->requirements;
-		}
-
-		/**
-		 * @param string|null $requirements
-		 *
-		 * @return $this
-		 */
-		public function setRequirements(?string $requirements) {
-			$this->requirements = $requirements;
-
-			return $this;
-		}
-
-		/**
-		 * @return string|null
-		 */
-		public function getSuccessConditions(): ?string {
-			return $this->successConditions;
-		}
-
-		/**
-		 * @param string|null $successConditions
-		 *
-		 * @return $this
-		 */
-		public function setSuccessConditions(?string $successConditions) {
-			$this->successConditions = $successConditions;
-
-			return $this;
-		}
-
-		/**
-		 * @return string|null
-		 */
 		public function getExclusive(): ?string {
 			return $this->exclusive;
 		}
@@ -310,5 +233,23 @@
 			$this->masterRank = $masterRank;
 
 			return $this;
+		}
+
+		/**
+		 * @return Collection|Selectable|WorldEventStrings[]
+		 */
+		public function getStrings(): Collection {
+			return $this->strings;
+		}
+
+		/**
+		 * @param string $language
+		 *
+		 * @return WorldEventStrings
+		 */
+		public function addStrings(string $language): EntityInterface {
+			$this->getStrings()->add($strings = new WorldEventStrings($this, $language));
+
+			return $strings;
 		}
 	}

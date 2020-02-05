@@ -10,6 +10,9 @@
 	use App\Entity\Decoration;
 	use App\Entity\Skill;
 	use App\Entity\SkillRank;
+	use App\Entity\Strings\SkillRankStrings;
+	use App\Entity\Strings\SkillStrings;
+	use App\Localization\L10nUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\IntegrityException;
@@ -37,42 +40,7 @@
 			if ($missing)
 				throw ValidationException::missingFields($missing);
 
-			return new Skill($data->name, $data->description);
-		}
-
-		/**
-		 * @param EntityInterface $entity
-		 *
-		 * @return void
-		 */
-		public function doDelete(EntityInterface $entity): void {
-			if (!($entity instanceof Skill))
-				throw EntityTransformerException::subjectNotSupported($entity);
-
-			$results = $this->entityManager->getRepository(AilmentProtection::class)->findBySkill($entity);
-
-			foreach ($results as $result)
-				$result->getSkills()->removeElement($entity);
-
-			$results = $this->entityManager->getRepository(Armor::class)->findBySkill($entity);
-
-			foreach ($results as $result)
-				$this->removeFromRanksCollection($result->getSkills(), $entity);
-
-			$results = $this->entityManager->getRepository(ArmorSetBonusRank::class)->findBySkill($entity);
-
-			foreach ($results as $result)
-				$this->entityManager->remove($result);
-
-			$results = $this->entityManager->getRepository(CharmRank::class)->findBySkill($entity);
-
-			foreach ($results as $result)
-				$this->removeFromRanksCollection($result->getSkills(), $entity);
-
-			$results = $this->entityManager->getRepository(Decoration::class)->findBySkill($entity);
-
-			foreach ($results as $result)
-				$this->removeFromRanksCollection($result->getSkills(), $entity);
+			return new Skill();
 		}
 
 		/**
@@ -86,10 +54,10 @@
 				throw EntityTransformerException::subjectNotSupported($entity);
 
 			if (ObjectUtil::isset($data, 'name'))
-				$entity->setName($data->name);
+				$this->getSkillStrings($entity)->setName($data->name);
 
 			if (ObjectUtil::isset($data, 'description'))
-				$entity->setDescription($data->description);
+				$this->getSkillStrings($entity)->setDescription($data->description);
 
 			if (ObjectUtil::isset($data, 'ranks')) {
 				$levels = [];
@@ -110,12 +78,10 @@
 
 					$rank = $entity->getRank($definition->level);
 
-					if (!$rank) {
-						$rank = new SkillRank($entity, $definition->level, $definition->description);
+					if (!$rank)
+						$entity->getRanks()->add($rank = new SkillRank($entity, $definition->level));
 
-						$entity->getRanks()->add($rank);
-					} else
-						$rank->setDescription($definition->description);
+					$this->getRankStrings($rank)->setDescription($definition->description);
 
 					if (ObjectUtil::isset($definition, 'modifiers'))
 						$rank->setModifiers((array)$definition->modifiers);
@@ -160,6 +126,46 @@
 		}
 
 		/**
+		 * @param EntityInterface $entity
+		 *
+		 * @return void
+		 */
+		public function doDelete(EntityInterface $entity): void {
+			if (!($entity instanceof Skill))
+				throw EntityTransformerException::subjectNotSupported($entity);
+
+			/** @var AilmentProtection[] $results */
+			$results = $this->entityManager->getRepository(AilmentProtection::class)->findBySkill($entity);
+
+			foreach ($results as $result)
+				$result->getSkills()->removeElement($entity);
+
+			/** @var Armor[] $results */
+			$results = $this->entityManager->getRepository(Armor::class)->findBySkill($entity);
+
+			foreach ($results as $result)
+				$this->removeFromRanksCollection($result->getSkills(), $entity);
+
+			/** @var ArmorSetBonusRank[] $results */
+			$results = $this->entityManager->getRepository(ArmorSetBonusRank::class)->findBySkill($entity);
+
+			foreach ($results as $result)
+				$this->entityManager->remove($result);
+
+			/** @var CharmRank[] $results */
+			$results = $this->entityManager->getRepository(CharmRank::class)->findBySkill($entity);
+
+			foreach ($results as $result)
+				$this->removeFromRanksCollection($result->getSkills(), $entity);
+
+			/** @var Decoration[] $results */
+			$results = $this->entityManager->getRepository(Decoration::class)->findBySkill($entity);
+
+			foreach ($results as $result)
+				$this->removeFromRanksCollection($result->getSkills(), $entity);
+		}
+
+		/**
 		 * @param Collection|Selectable $collection
 		 * @param Skill                 $skill
 		 *
@@ -196,5 +202,29 @@
 				return [Decoration::class, $count];
 
 			return null;
+		}
+
+		/**
+		 * @param Skill $skill
+		 *
+		 * @return SkillStrings
+		 */
+		protected function getSkillStrings(Skill $skill): SkillStrings {
+			$strings = L10nUtil::findOrCreateStrings($this->getCurrentLocale(), $skill);
+			assert($strings instanceof SkillStrings);
+
+			return $strings;
+		}
+
+		/**
+		 * @param SkillRank $rank
+		 *
+		 * @return SkillRankStrings
+		 */
+		protected function getRankStrings(SkillRank $rank): SkillRankStrings {
+			$strings = L10nUtil::findOrCreateStrings($this->getCurrentLocale(), $rank);
+			assert($strings instanceof SkillRankStrings);
+
+			return $strings;
 		}
 	}

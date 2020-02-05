@@ -1,6 +1,8 @@
 <?php
 	namespace App\Entity;
 
+	use App\Entity\Strings\CharmStrings;
+	use App\Localization\TranslatableEntityInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
@@ -17,17 +19,8 @@
 	 *
 	 * @package App\Entity
 	 */
-	class Charm implements EntityInterface, LengthCachingEntityInterface {
+	class Charm implements EntityInterface, TranslatableEntityInterface {
 		use EntityTrait;
-
-		/**
-		 * @Assert\NotBlank()
-		 *
-		 * @ORM\Column(type="string", length=64, unique=true)
-		 *
-		 * @var string
-		 */
-		private $name;
 
 		/**
 		 * @ORM\OneToMany(targetEntity="App\Entity\CharmRank", mappedBy="charm", orphanRemoval=true, cascade={"all"})
@@ -38,39 +31,26 @@
 		private $ranks;
 
 		/**
-		 * @ORM\Column(type="integer", options={"unsigned": true, "default": 0})
+		 * @Assert\Valid()
 		 *
-		 * @var int
-		 * @internal Used to allow API queries against "ranks.length"
+		 * @ORM\OneToMany(
+		 *     targetEntity="App\Entity\Strings\CharmStrings",
+		 *     mappedBy="charm",
+		 *     orphanRemoval=true,
+		 *     cascade={"all"},
+		 *     fetch="EAGER"
+		 * )
+		 *
+		 * @var Collection|Selectable|CharmStrings[]
 		 */
-		private $ranksLength = 0;
+		private $strings;
 
 		/**
 		 * Charm constructor.
-		 *
-		 * @param string $name
 		 */
-		public function __construct(string $name) {
-			$this->name = $name;
+		public function __construct() {
 			$this->ranks = new ArrayCollection();
-		}
-
-		/**
-		 * @return string
-		 */
-		public function getName(): string {
-			return $this->name;
-		}
-
-		/**
-		 * @param string $name
-		 *
-		 * @return $this
-		 */
-		public function setName(string $name) {
-			$this->name = $name;
-
-			return $this;
+			$this->strings = new ArrayCollection();
 		}
 
 		/**
@@ -99,9 +79,20 @@
 		}
 
 		/**
-		 * {@inheritdoc}
+		 * @return CharmStrings[]|Collection|Selectable
 		 */
-		public function syncLengthFields(): void {
-			$this->ranksLength = $this->ranks->count();
+		public function getStrings(): Collection {
+			return $this->strings;
+		}
+
+		/**
+		 * @param string $language
+		 *
+		 * @return CharmStrings
+		 */
+		public function addStrings(string $language): EntityInterface {
+			$this->getStrings()->add($strings = new CharmStrings($this, $language));
+
+			return $strings;
 		}
 	}

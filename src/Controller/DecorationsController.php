@@ -4,6 +4,9 @@
 	use App\Contrib\Transformers\DecorationTransformer;
 	use App\Entity\Decoration;
 	use App\Entity\SkillRank;
+	use App\Entity\Strings\DecorationStrings;
+	use App\Entity\Strings\SkillRankStrings;
+	use App\Entity\Strings\SkillStrings;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -93,10 +96,16 @@
 
 			$output = [
 				'id' => $entity->getId(),
-				'name' => $entity->getName(),
 				'rarity' => $entity->getRarity(),
 				'slot' => $entity->getSlot(),
 			];
+
+			if ($projection->isAllowed('name')) {
+				/** @var DecorationStrings $strings */
+				$strings = $this->getStrings($entity);
+
+				$output['name'] = $strings->getName();
+			}
 
 			// region SkillRank Fields
 			if ($projection->isAllowed('skills')) {
@@ -104,22 +113,33 @@
 					function(SkillRank $rank) use ($projection): array {
 						$output = [
 							'id' => $rank->getId(),
-							'description' => $rank->getDescription(),
 							'level' => $rank->getLevel(),
 							'modifiers' => $rank->getModifiers() ?: new \stdClass(),
 						];
 
+						if ($projection->isAllowed('skills.description')) {
+							/** @var SkillRankStrings $strings */
+							$strings = $this->getStrings($rank);
+
+							$output['description'] = $strings->getDescription();
+						}
+
 						if ($projection->isAllowed('skills.skill'))
 							$output['skill'] = $rank->getSkill()->getId();
 
-						if ($projection->isAllowed('skills.skillName'))
-							$output['skillName'] = $rank->getSkill()->getName();
+						if ($projection->isAllowed('skills.skillName')) {
+							/** @var SkillStrings $strings */
+							$strings = $this->getStrings($rank->getSkill());
+
+							$output['skillName'] = $strings->getName();
+						}
 
 						return $output;
 					},
 					$entity->getSkills()->toArray()
 				);
 			}
+
 			// endregion
 
 			return $output;

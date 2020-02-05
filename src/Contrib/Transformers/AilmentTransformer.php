@@ -5,6 +5,8 @@
 	use App\Entity\Item;
 	use App\Entity\Monster;
 	use App\Entity\Skill;
+	use App\Entity\Strings\AilmentStrings;
+	use App\Localization\L10nUtil;
 	use App\Utility\ObjectUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use DaybreakStudios\Utility\EntityTransformers\Exceptions\EntityTransformerException;
@@ -17,30 +19,17 @@
 		 * @return EntityInterface
 		 */
 		public function doCreate(object $data): EntityInterface {
-			$missing = ObjectUtil::getMissingProperties($data, [
-				'name',
-				'description',
-			]);
+			$missing = ObjectUtil::getMissingProperties(
+				$data,
+				[
+					'strings',
+				]
+			);
 
 			if ($missing)
 				throw ValidationException::missingFields($missing);
 
-			return new Ailment($data->name, $data->description);
-		}
-
-		/**
-		 * @param EntityInterface $entity
-		 *
-		 * @return void
-		 */
-		public function doDelete(EntityInterface $entity): void {
-			if (!($entity instanceof Ailment))
-				throw EntityTransformerException::subjectNotSupported($entity);
-
-			$monsters = $this->entityManager->getRepository(Monster::class)->findByAilment($entity);
-
-			foreach ($monsters as $monster)
-				$monster->getAilments()->removeElement($entity);
+			return new Ailment();
 		}
 
 		/**
@@ -54,10 +43,10 @@
 				throw EntityTransformerException::subjectNotSupported($entity);
 
 			if (ObjectUtil::isset($data, 'name'))
-				$entity->setName($data->name);
+				$this->getStrings($entity)->setName($data->name);
 
 			if (ObjectUtil::isset($data, 'description'))
-				$entity->setDescription($data->description);
+				$this->getStrings($entity)->setDescription($data->description);
 
 			if (ObjectUtil::isset($data, 'recovery')) {
 				$recovery = $entity->getRecovery();
@@ -98,5 +87,33 @@
 					);
 				}
 			}
+		}
+
+		/**
+		 * @param EntityInterface $entity
+		 *
+		 * @return void
+		 */
+		public function doDelete(EntityInterface $entity): void {
+			if (!($entity instanceof Ailment))
+				throw EntityTransformerException::subjectNotSupported($entity);
+
+			/** @var Monster[] $monsters */
+			$monsters = $this->entityManager->getRepository(Monster::class)->findByAilment($entity);
+
+			foreach ($monsters as $monster)
+				$monster->getAilments()->removeElement($entity);
+		}
+
+		/**
+		 * @param Ailment $ailment
+		 *
+		 * @return AilmentStrings
+		 */
+		protected function getStrings(Ailment $ailment): AilmentStrings {
+			$strings = L10nUtil::findOrCreateStrings($this->getCurrentLocale(), $ailment);
+			assert($strings instanceof AilmentStrings);
+
+			return $strings;
 		}
 	}

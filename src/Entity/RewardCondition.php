@@ -1,6 +1,7 @@
 <?php
 	namespace App\Entity;
 
+	use App\Game\Rank;
 	use App\Game\RewardConditionType;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\ORM\Mapping as ORM;
@@ -33,6 +34,7 @@
 		 * @ORM\Column(type="string", length=16)
 		 *
 		 * @var string
+		 * @see Rank
 		 */
 		private $rank;
 
@@ -57,7 +59,7 @@
 		private $chance;
 
 		/**
-		 * @Assert\Length(max=128)
+		 * @Assert\Length(max="128")
 		 *
 		 * @ORM\Column(type="string", length=128, nullable=true)
 		 *
