@@ -123,6 +123,9 @@
 				if ($timezoneOffset < 0)
 					$offsetInterval->invert = true;
 
+				// Used to infer years for event terms during parsing.
+				$currentTimestamp = new \DateTimeImmutable();
+
 				$tables = $crawler->filter('#schedule .tableArea > table');
 				$eventIndex = 0;
 
@@ -148,6 +151,10 @@
 						$terms = [];
 
 						foreach ($termStrings as $item) {
+							// Fix for duplicated values in terms node
+							if (isset($terms[$item]))
+								continue;
+
 							$text = trim($item);
 
 							if (!$text || !is_numeric($text[0]))
@@ -155,29 +162,32 @@
 
 							$text = str_replace('-', '/', $text);
 
-							$start = (new \DateTimeImmutable(substr($text, 0, 10), new \DateTimeZone('UTC')))
+							$start = (new \DateTime(substr($text, 0, 10), new \DateTimeZone('UTC')))
 								->sub($offsetInterval);
 
 							if ($start->diff($currentTimestamp)->days >= 90) {
-								$start = $start->setDate(
+								$start->setDate(
 									(int)$start->format('Y') - 1,
 									(int)$start->format('m'),
 									(int)$start->format('d')
 								);
 							}
 
-							$end = (new \DateTimeImmutable(substr($text, 15), new \DateTimeZone('UTC')))
+							$end = (new \DateTime(substr($text, 15), new \DateTimeZone('UTC')))
 								->sub($offsetInterval);
 
 							if ($end->diff($currentTimestamp)->days >= 90) {
-								$end = $end->setDate(
+								$end->setDate(
 									(int)$end->format('Y') + 1,
 									(int)$end->format('m'),
 									(int)$end->format('d')
 								);
 							}
 
-							$terms[] = [$start, $end];
+							$terms[$item] = [
+								\DateTimeImmutable::createFromMutable($start),
+								\DateTimeImmutable::createFromMutable($end),
+							];
 						}
 
 						foreach ($terms as $term) {

@@ -114,7 +114,7 @@
 						$output = [
 							'id' => $rank->getId(),
 							'level' => $rank->getLevel(),
-							'modifiers' => $rank->getModifiers(),
+							'modifiers' => $rank->getModifiers() ?: new \stdClass(),
 						];
 
 						if ($projection->isAllowed('skills.description')) {
