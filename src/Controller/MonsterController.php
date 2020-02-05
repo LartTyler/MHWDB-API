@@ -16,7 +16,6 @@
 	use App\Entity\Strings\LocationStrings;
 	use App\Entity\Strings\MonsterStrings;
 	use App\Entity\Strings\MonsterWeaknessStrings;
-	use App\Entity\Strings\RewardConditionStrings;
 	use App\Entity\Strings\SkillStrings;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
@@ -334,21 +333,13 @@
 						if ($projection->isAllowed('rewards.condition')) {
 							$output['conditions'] = $reward->getConditions()->map(
 								function(RewardCondition $condition) use ($projection): array {
-									$output = [
+									return [
 										'type' => $condition->getType(),
 										'rank' => $condition->getRank(),
 										'quantity' => $condition->getQuantity(),
 										'chance' => $condition->getChance(),
+										'subtype' => $condition->getSubtype(),
 									];
-
-									if ($projection->isAllowed('rewards.condition.subtype')) {
-										/** @var RewardConditionStrings $strings */
-										$strings = $this->getStrings($condition);
-
-										$output['subtype'] = $strings->getSubtype();
-									}
-
-									return $output;
 								}
 							)->toArray();
 						}

@@ -5,7 +5,6 @@
 	use App\Entity\RewardCondition;
 	use App\Entity\Strings\ItemStrings;
 	use App\Entity\Strings\MonsterStrings;
-	use App\Entity\Strings\RewardConditionStrings;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -59,21 +58,13 @@
 			if ($projection->isAllowed('conditions')) {
 				$output['conditions'] = $entity->getConditions()->map(
 					function(RewardCondition $condition) use ($projection): array {
-						$output = [
+						return [
 							'type' => $condition->getType(),
 							'rank' => $condition->getRank(),
 							'quantity' => $condition->getQuantity(),
 							'chance' => $condition->getChance(),
+							'subtype' => $condition->getSubtype(),
 						];
-
-						if ($projection->isAllowed('conditions.subtype')) {
-							/** @var RewardConditionStrings $strings */
-							$strings = $this->getStrings($condition);
-
-							$output['subtype'] = $strings->getSubtype();
-						}
-
-						return $output;
 					}
 				);
 			}
