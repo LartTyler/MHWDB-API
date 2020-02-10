@@ -88,6 +88,7 @@
 			$this->charm = $charm;
 			$this->level = $level;
 			$this->skills = new ArrayCollection();
+			$this->strings = new ArrayCollection();
 		}
 
 		/**
