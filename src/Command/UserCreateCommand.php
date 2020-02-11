@@ -89,7 +89,7 @@
 				$input->setArgument('displayName', $io->ask('Enter a display name (may be changed later)'));
 
 			if (!$input->getOption('role')) {
-				$question = new ChoiceQuestion('Choose one or more roles for the user', array_values(Role::all()));
+				$question = new ChoiceQuestion('Choose one or more roles for the user', array_values(Role::values()));
 				$question->setMultiselect(true);
 
 				$input->setOption('role', $io->askQuestion($question));

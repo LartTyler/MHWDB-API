@@ -224,23 +224,13 @@
 		protected function normalizeOne(EntityInterface $entity, Projection $projection): array {
 			assert($entity instanceof User);
 
-			$output = [
+			return [
 				'id' => $entity->getId(),
 				'createdDate' => $entity->getCreatedDate()->format(\DateTime::ISO8601),
 				'disabled' => $entity->isDisabled(),
 				'displayName' => $entity->getDisplayName(),
 				'email' => $entity->getEmail(),
+				'roles' => $entity->getRoles(),
 			];
-
-			if ($projection->isAllowed('roles')) {
-				$output['roles'] = array_map(
-					function(UserRole $role): string {
-						return $role->getRole();
-					},
-					$entity->getRoles()
-				);
-			}
-
-			return $output;
 		}
 	}
