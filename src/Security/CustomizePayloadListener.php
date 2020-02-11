@@ -19,7 +19,7 @@
 			$payload = $event->getData();
 
 			$payload['displayName'] = $user->getDisplayName();
-			$payload['roles'] = $user->getRoleNames();
+			$payload['roles'] = $user->getRoles();
 
 			$event->setData($payload);
 		}

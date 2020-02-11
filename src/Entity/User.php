@@ -216,21 +216,6 @@
 		}
 
 		/**
-		 * @Assert\All(
-		 *     @Assert\Choice(callback={"App\Security\Role", "all"})
-		 * )
-		 *
-		 * @return string[]
-		 */
-		public function getRoleNames(): array {
-			return $this->roles->map(
-				function(UserRole $role): string {
-					return $role->getRole();
-				}
-			)->toArray();
-		}
-
-		/**
 		 * @param string $name
 		 *
 		 * @return bool
