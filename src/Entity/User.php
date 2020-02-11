@@ -187,6 +187,10 @@
 		}
 
 		/**
+		 * @Assert\All(
+		 *     @Assert\Choice(callback={"App\Security\Role", "values"})
+		 * )
+		 *
 		 * @return string[]
 		 */
 		public function getRoles(): array {
