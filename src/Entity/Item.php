@@ -64,7 +64,7 @@
 		/**
 		 * @Assert\Range(min="0")
 		 *
-		 * @ORM\Column(type="int", options={"unsigned": true})
+		 * @ORM\Column(type="integer", options={"unsigned": true})
 		 *
 		 * @var int
 		 */
@@ -73,7 +73,7 @@
 		/**
 		 * @Assert\Range(min="0")
 		 *
-		 * @ORM\Column(type="int", options={"unsigned": true})
+		 * @ORM\Column(type="integer", options={"unsigned": true})
 		 *
 		 * @var int
 		 */
