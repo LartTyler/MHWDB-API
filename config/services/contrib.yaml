@@ -22,6 +22,7 @@ services:
     App\Contrib\Transformers\LocationTransformer: ~
     App\Contrib\Transformers\MonsterTransformer: ~
     App\Contrib\Transformers\MotionValueTransformer: ~
+    App\Contrib\Transformers\QuestTransformer: ~
     App\Contrib\Transformers\SkillTransformer: ~
     App\Contrib\Transformers\UserTransformer: ~
     App\Contrib\Transformers\WeaponTransformer: ~
