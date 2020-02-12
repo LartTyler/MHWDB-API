@@ -1,6 +1,7 @@
 <?php
 	namespace App\Entity\Quests;
 
+	use App\Entity\Location;
 	use App\Entity\Monster;
 	use App\Entity\Quest;
 	use Doctrine\Common\Collections\ArrayCollection;
@@ -20,12 +21,13 @@
 		/**
 		 * AbstractMonsterTargetQuest constructor.
 		 *
-		 * @param string $type
-		 * @param string $rank
-		 * @param int    $stars
+		 * @param Location $location
+		 * @param string   $type
+		 * @param string   $rank
+		 * @param int      $stars
 		 */
-		public function __construct(string $type, string $rank, int $stars) {
-			parent::__construct($type, $rank, $stars);
+		public function __construct(Location $location, string $type, string $rank, int $stars) {
+			parent::__construct($location, $type, $rank, $stars);
 
 			$this->monsters = new ArrayCollection();
 		}

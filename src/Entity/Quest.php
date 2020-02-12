@@ -106,6 +106,15 @@
 		protected $maxHunters = 4;
 
 		/**
+		 * @Assert\Range(min="1")
+		 *
+		 * @ORM\Column(type="smallint", options={"unsigned": true})
+		 *
+		 * @var int
+		 */
+		protected $maxFaints = 3;
+
+		/**
 		 * Quest constructor.
 		 *
 		 * @param Location $location
@@ -113,7 +122,7 @@
 		 * @param string   $rank
 		 * @param int      $stars
 		 */
-		protected function __construct(Location $location, string $type, string $rank, int $stars) {
+		public function __construct(Location $location, string $type, string $rank, int $stars) {
 			assert($this->objective !== null);
 
 			$this->location = $location;
@@ -246,6 +255,24 @@
 		 */
 		public function setMaxHunters(int $maxHunters) {
 			$this->maxHunters = $maxHunters;
+
+			return $this;
+		}
+
+		/**
+		 * @return int
+		 */
+		public function getMaxFaints(): int {
+			return $this->maxFaints;
+		}
+
+		/**
+		 * @param int $maxFaints
+		 *
+		 * @return $this
+		 */
+		public function setMaxFaints(int $maxFaints) {
+			$this->maxFaints = $maxFaints;
 
 			return $this;
 		}

@@ -2,9 +2,11 @@
 	namespace App\Entity\Quests;
 
 	use App\Entity\Item;
+	use App\Entity\Location;
 	use App\Entity\Quest;
 	use App\Game\Quest\Objective;
 	use Doctrine\ORM\Mapping as ORM;
+	use Symfony\Component\Validator\Constraints as Assert;
 
 	/**
 	 * @ORM\Entity()
@@ -16,30 +18,21 @@
 		protected $objective = Objective::GATHER;
 
 		/**
+		 * @ORM\OneToOne(targetEntity="App\Entity\Item")
+		 * @ORM\JoinColumn(nullable=false)
+		 *
 		 * @var Item
 		 */
 		private $item;
 
 		/**
+		 * @Assert\Range(min="1")
+		 *
+		 * @ORM\Column(type="smallint", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		private $amount;
-
-		/**
-		 * GatherQuest constructor.
-		 *
-		 * @param Item   $item
-		 * @param int    $amount
-		 * @param string $type
-		 * @param string $rank
-		 * @param int    $stars
-		 */
-		public function __construct(Item $item, int $amount, string $type, string $rank, int $stars) {
-			parent::__construct($type, $rank, $stars);
-
-			$this->item = $item;
-			$this->amount = $amount;
-		}
 
 		/**
 		 * @return Item
