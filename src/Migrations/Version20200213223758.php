@@ -9,7 +9,7 @@
 	/**
 	 * Auto-generated Migration: Please modify to your needs!
 	 */
-	final class Version20200213222709 extends AbstractMigration {
+	final class Version20200213223758 extends AbstractMigration {
 		public function getDescription(): string {
 			return '';
 		}
@@ -21,7 +21,7 @@
 				'Migration can only be executed safely on \'mysql\'.'
 			);
 
-			$this->addSql('CREATE TABLE quests (id INT UNSIGNED AUTO_INCREMENT NOT NULL, location_id INT UNSIGNED NOT NULL, item_id INT UNSIGNED DEFAULT NULL, objective VARCHAR(18) NOT NULL, rank VARCHAR(6) NOT NULL, stars SMALLINT UNSIGNED NOT NULL, time_limit SMALLINT UNSIGNED NOT NULL, max_hunters SMALLINT UNSIGNED NOT NULL, max_faints SMALLINT UNSIGNED NOT NULL, subject VARCHAR(7) NOT NULL, amount SMALLINT UNSIGNED DEFAULT NULL, INDEX IDX_989E5D3464D218E (location_id), INDEX IDX_989E5D34126F525E (item_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+			$this->addSql('CREATE TABLE quests (id INT UNSIGNED AUTO_INCREMENT NOT NULL, location_id INT UNSIGNED NOT NULL, item_id INT UNSIGNED DEFAULT NULL, objective VARCHAR(18) NOT NULL, type VARCHAR(18) NOT NULL, rank VARCHAR(6) NOT NULL, stars SMALLINT UNSIGNED NOT NULL, time_limit SMALLINT UNSIGNED NOT NULL, max_hunters SMALLINT UNSIGNED NOT NULL, max_faints SMALLINT UNSIGNED NOT NULL, subject VARCHAR(7) NOT NULL, amount SMALLINT UNSIGNED DEFAULT NULL, INDEX IDX_989E5D3464D218E (location_id), INDEX IDX_989E5D34126F525E (item_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
 			$this->addSql('CREATE TABLE quest_strings (id INT UNSIGNED AUTO_INCREMENT NOT NULL, quest_id INT UNSIGNED NOT NULL, name VARCHAR(128) NOT NULL, description LONGTEXT NOT NULL, object_name VARCHAR(64) DEFAULT NULL, language VARCHAR(7) NOT NULL, UNIQUE INDEX UNIQ_E0BDD7BE5E237E06 (name), INDEX IDX_E0BDD7BE209E9EF4 (quest_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
 			$this->addSql('CREATE TABLE endemic_life_strings (id INT UNSIGNED AUTO_INCREMENT NOT NULL, endemic_life_id INT UNSIGNED NOT NULL, name VARCHAR(64) NOT NULL, description LONGTEXT DEFAULT NULL, language VARCHAR(7) NOT NULL, INDEX IDX_2CBF2B1C20AAC085 (endemic_life_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
 			$this->addSql('CREATE TABLE endemic_life (id INT UNSIGNED AUTO_INCREMENT NOT NULL, type VARCHAR(12) NOT NULL, research_point_value SMALLINT UNSIGNED NOT NULL, spawn_conditions VARCHAR(5) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');

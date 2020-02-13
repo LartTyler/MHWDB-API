@@ -58,6 +58,8 @@
 		 * @Assert\NotBlank()
 		 * @Assert\Choice(callback={"App\Game\Quest\QuestType", "values"})
 		 *
+		 * @ORM\Column(type="string", length=18)
+		 *
 		 * @var string
 		 * @see QuestType
 		 */
