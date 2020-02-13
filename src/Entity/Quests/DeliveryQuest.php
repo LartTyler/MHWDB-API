@@ -10,12 +10,6 @@
 
 	/**
 	 * @ORM\Entity()
-	 * @ORM\InheritanceType("SINGLE_TABLE")
-	 * @ORM\DiscriminatorColumn(name="targetType", type="string", length=12)
-	 * @ORM\DiscriminatorMap(
-	 *     "endemic life" = "App\Entity\Quest\EndemicLifeDeliveryQuest",
-	 *     "object" = "App\Entity\Quest\ObjectDeliveryQuest"
-	 * )
 	 */
 	class DeliveryQuest extends Quest {
 		/**
@@ -24,22 +18,13 @@
 		protected $subject = QuestSubject::ENTITY;
 
 		/**
-		 * @Assert\NotBlank()
-		 * @Assert\Choice(callback={"App\Game\Quest\DeliveryTarget", "values"})
-		 *
-		 * @var string|null
-		 */
-		protected $targetType = null;
-
-		/**
 		 * @Assert\NotNull()
-		 * @Assert\Range(min="1")
 		 *
-		 * @ORM\Column(type="smallint", options={"unsigned": true}, nullable=true)
+		 * @ORM\OneToOne(targetEntity="App\Entity\Quests\DeliveryQuestTarget", mappedBy="quest", fetch="EAGER")
 		 *
-		 * @var int|null
+		 * @var DeliveryQuestTarget
 		 */
-		private $amount = null;
+		private $target = null;
 
 		/**
 		 * DeliveryQuest constructor.
@@ -51,24 +36,22 @@
 		 */
 		public function __construct(Location $location, string $type, string $rank, int $stars) {
 			parent::__construct($location, QuestObjective::DELIVER, $type, $rank, $stars);
-
-			assert($this->targetType !== null);
 		}
 
 		/**
-		 * @return int|null
+		 * @return DeliveryQuestTarget
 		 */
-		public function getAmount(): ?int {
-			return $this->amount;
+		public function getTarget(): DeliveryQuestTarget {
+			return $this->target;
 		}
 
 		/**
-		 * @param int|null $amount
+		 * @param DeliveryQuestTarget $target
 		 *
 		 * @return $this
 		 */
-		public function setAmount(?int $amount) {
-			$this->amount = $amount;
+		public function setTarget(DeliveryQuestTarget $target) {
+			$this->target = $target;
 
 			return $this;
 		}

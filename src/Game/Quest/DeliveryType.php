@@ -6,7 +6,7 @@
 	/**
 	 * Longest value: ENDEMIC_LIFE = 12
 	 */
-	final class DeliveryTarget {
+	final class DeliveryType {
 		use ConstantsClassTrait;
 
 		public const ENDEMIC_LIFE = 'endemic life';

@@ -4,11 +4,11 @@
 	use App\Contrib\Transformers\QuestTransformer;
 	use App\Entity\Quest;
 	use App\Entity\Quests\DeliveryQuest;
-	use App\Entity\Quests\EndemicLifeDeliveryQuest;
+	use App\Entity\Quests\DeliveryQuestEndemicLifeTarget;
+	use App\Entity\Quests\DeliveryQuestObjectTarget;
 	use App\Entity\Quests\GatherQuest;
 	use App\Entity\Quests\MonsterQuest;
 	use App\Entity\Quests\MonsterQuestTarget;
-	use App\Entity\Quests\ObjectDeliveryQuest;
 	use App\Entity\Strings\EndemicLifeStrings;
 	use App\Entity\Strings\ItemStrings;
 	use App\Entity\Strings\LocationStrings;
@@ -166,13 +166,15 @@
 			} else if ($entity instanceof DeliveryQuest) {
 				$output['amount'] = $entity->getAmount();
 
-				if ($entity instanceof ObjectDeliveryQuest && $projection->isAllowed('objectName')) {
+				$target = $entity->getTarget();
+
+				if ($target instanceof DeliveryQuestObjectTarget && $projection->isAllowed('objectName')) {
 					/** @var QuestStrings $strings */
 					$strings = $this->getStrings($entity);
 
 					$output['objectName'] = $strings->getObjectName();
-				} else if ($entity instanceof EndemicLifeDeliveryQuest && $projection->isAllowed('endemicLife')) {
-					$endemicLife = $entity->getEndemicLife();
+				} else if ($target instanceof DeliveryQuestEndemicLifeTarget && $projection->isAllowed('endemicLife')) {
+					$endemicLife = $target->getEndemicLife();
 
 					$output['endemicLife'] = [
 						'id' => $endemicLife->getId(),

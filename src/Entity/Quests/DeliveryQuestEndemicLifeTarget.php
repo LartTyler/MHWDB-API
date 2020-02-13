@@ -2,23 +2,23 @@
 	namespace App\Entity\Quests;
 
 	use App\Entity\EndemicLife;
-	use App\Game\Quest\DeliveryTarget;
+	use App\Game\Quest\DeliveryType;
 	use Doctrine\ORM\Mapping as ORM;
 	use Symfony\Component\Validator\Constraints as Assert;
 
 	/**
 	 * @ORM\Entity()
 	 */
-	class EndemicLifeDeliveryQuest extends DeliveryQuest {
+	class DeliveryQuestEndemicLifeTarget extends DeliveryQuestTarget {
 		/**
 		 * {@inheritdoc}
 		 */
-		protected $targetType = DeliveryTarget::ENDEMIC_LIFE;
+		protected $deliveryType = DeliveryType::ENDEMIC_LIFE;
 
 		/**
 		 * @Assert\NotNull()
 		 *
-		 * @ORM\ManyToOne(targetEntity="App\Entity\EndemicLife")
+		 * @ORM\ManyToOne(targetEntity="App\Entity\EndemicLife", fetch="EAGER")
 		 *
 		 * @var EndemicLife|null
 		 */

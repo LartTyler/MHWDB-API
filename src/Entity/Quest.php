@@ -18,10 +18,11 @@
 	 * @ORM\Table(name="quests")
 	 * @ORM\InheritanceType("SINGLE_TABLE")
 	 * @ORM\DiscriminatorColumn(name="subject", type="string", length=7)
-	 * @ORM\DiscriminatorMap(
+	 * @ORM\DiscriminatorMap({
+	 *     "entity" = "App\Entity\Quests\DeliveryQuest",
 	 *     "item" = "App\Entity\Quests\GatherQuest",
 	 *     "monster" = "App\Entity\Quests\MonsterQuest"
-	 * )
+	 * })
 	 */
 	abstract class Quest implements EntityInterface, TranslatableEntityInterface {
 		use EntityTrait;

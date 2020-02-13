@@ -9,6 +9,8 @@
 	use App\Entity\Quests\AbstractMonsterTargetQuest;
 	use App\Entity\Quests\CaptureQuest;
 	use App\Entity\Quests\DeliveryQuest;
+	use App\Entity\Quests\DeliveryQuestEndemicLifeTarget;
+	use App\Entity\Quests\DeliveryQuestObjectTarget;
 	use App\Entity\Quests\EndemicLifeDeliveryQuest;
 	use App\Entity\Quests\GatherQuest;
 	use App\Entity\Quests\HuntQuest;
@@ -17,7 +19,7 @@
 	use App\Entity\Quests\ObjectDeliveryQuest;
 	use App\Entity\Quests\SlayQuest;
 	use App\Entity\Strings\QuestStrings;
-	use App\Game\Quest\DeliveryTarget;
+	use App\Game\Quest\DeliveryType;
 	use App\Game\Quest\QuestSubject;
 	use App\Localization\L10nUtil;
 	use App\Utility\ObjectUtil;
@@ -66,33 +68,10 @@
 
 				return new GatherQuest($location, $data->type, $data->rank, $data->stars);
 			} else if ($data->subject === QuestSubject::ENTITY) {
-				$missing = ObjectUtil::getMissingProperties(
-					$data,
-					[
-						'targetType',
-						'amount',
-					]
-				);
+				if (!isset($data->target))
+					throw ValidationException::missingFields(['target']);
 
-				if ($missing)
-					throw ValidationException::missingFields($missing);
-
-				switch ($data->targetType) {
-					case DeliveryTarget::OBJECT:
-						if (!isset($data->objectName))
-							throw ValidationException::missingFields(['objectName']);
-
-						return new ObjectDeliveryQuest($location, $data->type, $data->rank, $data->stars);
-
-					case DeliveryTarget::ENDEMIC_LIFE:
-						if (!isset($data->endemicLife))
-							throw ValidationException::missingFields(['endemicLife']);
-
-						return new EndemicLifeDeliveryQuest($location, $data->type, $data->rank, $data->stars);
-
-					default:
-						throw ValidationException::invalidFieldType('targetType', 'delivery target type');
-				}
+				return new DeliveryQuest($location, $data->type, $data->rank, $data->stars);
 			} else if ($data->subject === QuestSubject::MONSTER) {
 				if (!isset($data->targets))
 					throw ValidationException::missingFields(['targets']);
@@ -160,16 +139,68 @@
 				if (ObjectUtil::isset($data, 'amount'))
 					$entity->setAmount($data->amount);
 
-				if ($entity instanceof ObjectDeliveryQuest && isset($data->objectName))
-					$this->getStrings($entity)->setObjectName($data->objectName);
-				else if ($entity instanceof EndemicLifeDeliveryQuest) {
-					/** @var EndemicLife|null $endemicLife */
-					$endemicLife = $this->entityManager->find(EndemicLife::class, $data->endemicLife);
+				if (ObjectUtil::isset($data, 'target')) {
+					$missing = ObjectUtil::getMissingProperties(
+						$definition = $data->target,
+						[
+							'amount',
+							'deliveryType',
+						]
+					);
 
-					if (!$endemicLife)
-						throw IntegrityException::missingReference('endemicLife', 'Endemic Life');
+					if ($missing) {
+						throw ValidationException::missingFields(
+							array_map(
+								function(string $item) {
+									return 'target.' . $item;
+								},
+								$missing
+							)
+						);
+					}
 
-					$entity->setEndemicLife($endemicLife);
+					switch ($definition->deliveryType) {
+						case DeliveryType::OBJECT:
+							if (!isset($definition->objectName))
+								throw ValidationException::missingFields(['target.objectName']);
+
+							$target = $entity->getTarget();
+
+							if (!$target || !($target instanceof DeliveryQuestObjectTarget))
+								$entity->setTarget(new DeliveryQuestObjectTarget($entity, $definition->amount));
+
+							$this->getStrings($entity)->setObjectName($definition->objectName);
+
+							break;
+
+						case DeliveryType::ENDEMIC_LIFE:
+							if (!isset($definition->endemicLife))
+								throw ValidationException::missingFields(['target.endemicLife']);
+
+							/** @var EndemicLife|null $endemicLife */
+							$endemicLife = $this->entityManager->find(EndemicLife::class, $definition->endemicLife);
+
+							if (!$endemicLife)
+								throw IntegrityException::missingReference('target.endemicLife', 'Endemic Life');
+
+							$target = $entity->getTarget();
+
+							if (!$target || !($target instanceof DeliveryQuestEndemicLifeTarget)) {
+								$entity->setTarget(
+									$target = new DeliveryQuestEndemicLifeTarget($entity, $definition->amount)
+								);
+							}
+
+							$target->setEndemicLife($endemicLife);
+
+							break;
+
+						default:
+							throw ValidationException::invalidFieldType(
+								'target.deliveryType',
+								'delivery quest target type'
+							);
+					}
 				}
 			} else if ($entity instanceof MonsterQuest) {
 				if (ObjectUtil::isset($data, 'objective'))
