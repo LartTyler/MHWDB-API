@@ -2,6 +2,7 @@
 	namespace App\Entity\Strings;
 
 	use App\Entity\Quest;
+	use App\Entity\Quests\DeliveryQuest;
 	use App\Localization\StringsEntityInterface;
 	use App\Localization\StringsEntityTrait;
 	use Doctrine\ORM\Mapping as ORM;
@@ -40,6 +41,15 @@
 		 * @var string
 		 */
 		private $description = null;
+
+		/**
+		 * Only used by {@see DeliveryQuest} to specify the name of the quest target object or endemic life.
+		 *
+		 * @ORM\Column(type="string", length=128, nullable=true)
+		 *
+		 * @var string|null
+		 */
+		private $target = null;
 
 		/**
 		 * QuestStrings constructor.
@@ -84,6 +94,24 @@
 		 */
 		public function setDescription(string $description) {
 			$this->description = $description;
+
+			return $this;
+		}
+
+		/**
+		 * @return string|null
+		 */
+		public function getTarget(): ?string {
+			return $this->target;
+		}
+
+		/**
+		 * @param string|null $target
+		 *
+		 * @return $this
+		 */
+		public function setTarget(?string $target) {
+			$this->target = $target;
 
 			return $this;
 		}

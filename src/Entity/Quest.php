@@ -20,6 +20,7 @@
 	 * @ORM\DiscriminatorColumn(name="objective", type="string", length=18)
 	 * @ORM\DiscriminatorMap(
 	 *     "capture" = "App\Entity\Quests\CaptureQuest",
+	 *     "deliver" = "App\Entity\Quests\DeliveryQuest",
 	 *     "gather" = "App\Entity\Quests\GatherQuest",
 	 *     "hunt" = "App\Entity\Quests\HuntQuest",
 	 *     "slay" = "App\Entity\Quests\SlayQuest"

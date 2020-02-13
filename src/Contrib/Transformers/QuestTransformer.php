@@ -7,6 +7,7 @@
 	use App\Entity\Quest;
 	use App\Entity\Quests\AbstractMonsterTargetQuest;
 	use App\Entity\Quests\CaptureQuest;
+	use App\Entity\Quests\DeliveryQuest;
 	use App\Entity\Quests\GatherQuest;
 	use App\Entity\Quests\HuntQuest;
 	use App\Entity\Quests\SlayQuest;
@@ -57,6 +58,20 @@
 					throw ValidationException::missingFields($missing);
 
 				return new GatherQuest($location, $data->type, $data->rank, $data->stars);
+			} else if ($data->objective === Objective::DELIVER) {
+				$missing = ObjectUtil::getMissingProperties(
+					$data,
+					[
+						'amount',
+						'target',
+					]
+				);
+
+				// We only need to valid that the extra fields exist. Setting the value is deferred to doUpdate().
+				if ($missing)
+					throw ValidationException::missingFields($missing);
+
+				return new DeliveryQuest($location, $data->type, $data->rank, $data->stars);
 			} else { // All other objective types involve targeting a monster or monsters
 				// We only need to validate that the field exists. Setting the value is deferred to doUpdate().
 				if (!isset($data->monsters))
@@ -119,6 +134,9 @@
 			}
 
 			if ($entity instanceof GatherQuest) {
+				if (ObjectUtil::isset($data, 'amount'))
+					$entity->setAmount($data->amount);
+
 				if (ObjectUtil::isset($data, 'item')) {
 					/** @var Item|null $item */
 					$item = $this->entityManager->find(Item::class, $data->item);
@@ -128,9 +146,12 @@
 
 					$entity->setItem($item);
 				}
-
+			} else if ($entity instanceof DeliveryQuest) {
 				if (ObjectUtil::isset($data, 'amount'))
 					$entity->setAmount($data->amount);
+
+				if (ObjectUtil::isset($data, 'target'))
+					$this->getStrings($entity)->setTarget($data->target);
 			} else if ($entity instanceof AbstractMonsterTargetQuest && ObjectUtil::isset($data, 'monsters'))
 				$this->populateFromIdArray('monsters', $entity->getMonsters(), Monster::class, $data->monsters);
 		}
@@ -140,7 +161,6 @@
 		 */
 		public function doDelete(EntityInterface $entity): void {
 			assert($entity instanceof Quest);
-
 			// TODO Remove events related to deleted quest
 		}
 
