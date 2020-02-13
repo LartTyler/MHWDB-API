@@ -6,18 +6,12 @@
 	use App\Entity\Location;
 	use App\Entity\Monster;
 	use App\Entity\Quest;
-	use App\Entity\Quests\AbstractMonsterTargetQuest;
-	use App\Entity\Quests\CaptureQuest;
 	use App\Entity\Quests\DeliveryQuest;
 	use App\Entity\Quests\DeliveryQuestEndemicLifeTarget;
 	use App\Entity\Quests\DeliveryQuestObjectTarget;
-	use App\Entity\Quests\EndemicLifeDeliveryQuest;
 	use App\Entity\Quests\GatherQuest;
-	use App\Entity\Quests\HuntQuest;
 	use App\Entity\Quests\MonsterQuest;
 	use App\Entity\Quests\MonsterQuestTarget;
-	use App\Entity\Quests\ObjectDeliveryQuest;
-	use App\Entity\Quests\SlayQuest;
 	use App\Entity\Strings\QuestStrings;
 	use App\Game\Quest\DeliveryType;
 	use App\Game\Quest\QuestSubject;
