@@ -137,8 +137,6 @@
 		 * @param int      $stars
 		 */
 		public function __construct(Location $location, string $objective, string $type, string $rank, int $stars) {
-			assert($this->objective !== null);
-
 			$this->location = $location;
 			$this->objective = $objective;
 			$this->type = $type;
