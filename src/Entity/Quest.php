@@ -2,7 +2,7 @@
 	namespace App\Entity;
 
 	use App\Entity\Strings\QuestStrings;
-	use App\Game\Quest\Objective;
+	use App\Game\Quest\QuestObjective;
 	use App\Game\Quest\QuestType;
 	use App\Game\Rank;
 	use App\Localization\TranslatableEntityInterface;
@@ -17,13 +17,10 @@
 	 * @ORM\Entity()
 	 * @ORM\Table(name="quests")
 	 * @ORM\InheritanceType("SINGLE_TABLE")
-	 * @ORM\DiscriminatorColumn(name="objective", type="string", length=18)
+	 * @ORM\DiscriminatorColumn(name="subject", type="string", length=7)
 	 * @ORM\DiscriminatorMap(
-	 *     "capture" = "App\Entity\Quests\CaptureQuest",
-	 *     "deliver" = "App\Entity\Quests\DeliveryQuest",
-	 *     "gather" = "App\Entity\Quests\GatherQuest",
-	 *     "hunt" = "App\Entity\Quests\HuntQuest",
-	 *     "slay" = "App\Entity\Quests\SlayQuest"
+	 *     "item" = "App\Entity\Quests\GatherQuest",
+	 *     "monster" = "App\Entity\Quests\MonsterQuest"
 	 * )
 	 */
 	abstract class Quest implements EntityInterface, TranslatableEntityInterface {
@@ -31,12 +28,11 @@
 
 		/**
 		 * @Assert\NotBlank()
-		 * @Assert\Choice(callback={"App\Game\Quest\Objective", "values"})
+		 * @Assert\Choice(callback={"App\Game\Quest\QuestSubject", "values"})
 		 *
-		 * @var string
-		 * @see Objective
+		 * @var string|null
 		 */
-		protected $objective = null;
+		protected $subject = null;
 
 		/**
 		 * @ORM\ManyToOne(targetEntity="App\Entity\Location")
@@ -45,6 +41,17 @@
 		 * @var Location
 		 */
 		protected $location;
+
+		/**
+		 * @Assert\NotBlank()
+		 * @Assert\Choice(callback={"App\Game\Quest\QuestObjective", "values"})
+		 *
+		 * @ORM\Column(type="string", length=18)
+		 *
+		 * @var string
+		 * @see QuestObjective
+		 */
+		protected $objective;
 
 		/**
 		 * @Assert\NotBlank()
@@ -76,6 +83,8 @@
 		protected $stars;
 
 		/**
+		 * @Assert\Valid()
+		 *
 		 * @ORM\OneToMany(
 		 *     targetEntity="App\Entity\Strings\QuestStrings",
 		 *     mappedBy="quest",
@@ -119,19 +128,28 @@
 		 * Quest constructor.
 		 *
 		 * @param Location $location
+		 * @param string   $objective
 		 * @param string   $type
 		 * @param string   $rank
 		 * @param int      $stars
 		 */
-		public function __construct(Location $location, string $type, string $rank, int $stars) {
+		public function __construct(Location $location, string $objective, string $type, string $rank, int $stars) {
 			assert($this->objective !== null);
 
 			$this->location = $location;
+			$this->objective = $objective;
 			$this->type = $type;
 			$this->rank = $rank;
 			$this->stars = $stars;
 
 			$this->strings = new ArrayCollection();
+		}
+
+		/**
+		 * @return string|null
+		 */
+		public function getSubject(): ?string {
+			return $this->subject;
 		}
 
 		/**

@@ -1,6 +1,7 @@
 <?php
 	namespace App\Contrib\Transformers;
 
+	use App\Entity\EndemicLife;
 	use App\Entity\Item;
 	use App\Entity\Location;
 	use App\Entity\Monster;
@@ -8,11 +9,16 @@
 	use App\Entity\Quests\AbstractMonsterTargetQuest;
 	use App\Entity\Quests\CaptureQuest;
 	use App\Entity\Quests\DeliveryQuest;
+	use App\Entity\Quests\EndemicLifeDeliveryQuest;
 	use App\Entity\Quests\GatherQuest;
 	use App\Entity\Quests\HuntQuest;
+	use App\Entity\Quests\MonsterQuest;
+	use App\Entity\Quests\MonsterQuestTarget;
+	use App\Entity\Quests\ObjectDeliveryQuest;
 	use App\Entity\Quests\SlayQuest;
 	use App\Entity\Strings\QuestStrings;
-	use App\Game\Quest\Objective;
+	use App\Game\Quest\DeliveryTarget;
+	use App\Game\Quest\QuestSubject;
 	use App\Localization\L10nUtil;
 	use App\Utility\ObjectUtil;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -27,11 +33,12 @@
 			$missing = ObjectUtil::getMissingProperties(
 				$data,
 				[
-					'objective',
+					'subject',
 					'location',
 					'type',
 					'rank',
 					'stars',
+					'name',
 				]
 			);
 
@@ -44,7 +51,7 @@
 			if (!$location)
 				throw IntegrityException::missingReference('location', 'Location');
 
-			if ($data->objective === Objective::GATHER) {
+			if ($data->subject === QuestSubject::ITEM) {
 				$missing = ObjectUtil::getMissingProperties(
 					$data,
 					[
@@ -58,39 +65,42 @@
 					throw ValidationException::missingFields($missing);
 
 				return new GatherQuest($location, $data->type, $data->rank, $data->stars);
-			} else if ($data->objective === Objective::DELIVER) {
+			} else if ($data->subject === QuestSubject::ENTITY) {
 				$missing = ObjectUtil::getMissingProperties(
 					$data,
 					[
+						'targetType',
 						'amount',
-						'target',
 					]
 				);
 
-				// We only need to valid that the extra fields exist. Setting the value is deferred to doUpdate().
 				if ($missing)
 					throw ValidationException::missingFields($missing);
 
-				return new DeliveryQuest($location, $data->type, $data->rank, $data->stars);
-			} else { // All other objective types involve targeting a monster or monsters
-				// We only need to validate that the field exists. Setting the value is deferred to doUpdate().
-				if (!isset($data->monsters))
-					throw ValidationException::missingFields(['monsters']);
+				switch ($data->targetType) {
+					case DeliveryTarget::OBJECT:
+						if (!isset($data->objectName))
+							throw ValidationException::missingFields(['objectName']);
 
-				switch ($data->objective) {
-					case Objective::CAPTURE:
-						return new CaptureQuest($location, $data->type, $data->rank, $data->stars);
+						return new ObjectDeliveryQuest($location, $data->type, $data->rank, $data->stars);
 
-					case Objective::HUNT:
-						return new HuntQuest($location, $data->type, $data->rank, $data->stars);
+					case DeliveryTarget::ENDEMIC_LIFE:
+						if (!isset($data->endemicLife))
+							throw ValidationException::missingFields(['endemicLife']);
 
-					case Objective::SLAY:
-						return new SlayQuest($location, $data->type, $data->rank, $data->stars);
+						return new EndemicLifeDeliveryQuest($location, $data->type, $data->rank, $data->stars);
 
 					default:
-						throw ValidationException::invalidFieldValue('objective', 'unrecognized objective name');
+						throw ValidationException::invalidFieldType('targetType', 'delivery target type');
 				}
+			} else if ($data->subject === QuestSubject::MONSTER) {
+				if (!isset($data->targets))
+					throw ValidationException::missingFields(['targets']);
+
+				return new MonsterQuest($location, $data->objective, $data->type, $data->rank, $data->stars);
 			}
+
+			throw ValidationException::invalidFieldType('subject', 'quest subject type');
 		}
 
 		/**
@@ -150,10 +160,47 @@
 				if (ObjectUtil::isset($data, 'amount'))
 					$entity->setAmount($data->amount);
 
-				if (ObjectUtil::isset($data, 'target'))
-					$this->getStrings($entity)->setTarget($data->target);
-			} else if ($entity instanceof AbstractMonsterTargetQuest && ObjectUtil::isset($data, 'monsters'))
-				$this->populateFromIdArray('monsters', $entity->getMonsters(), Monster::class, $data->monsters);
+				if ($entity instanceof ObjectDeliveryQuest && isset($data->objectName))
+					$this->getStrings($entity)->setObjectName($data->objectName);
+				else if ($entity instanceof EndemicLifeDeliveryQuest) {
+					/** @var EndemicLife|null $endemicLife */
+					$endemicLife = $this->entityManager->find(EndemicLife::class, $data->endemicLife);
+
+					if (!$endemicLife)
+						throw IntegrityException::missingReference('endemicLife', 'Endemic Life');
+
+					$entity->setEndemicLife($endemicLife);
+				}
+			} else if ($entity instanceof MonsterQuest) {
+				if (ObjectUtil::isset($data, 'objective'))
+					$entity->setObjective($data->objective);
+
+				if (ObjectUtil::isset($data, 'targets')) {
+					$entity->getTargets()->clear();
+
+					foreach ($data->targets as $index => $definition) {
+						$missing = ObjectUtil::getMissingProperties(
+							$definition,
+							[
+								'amount',
+								'monster',
+							]
+						);
+
+						if ($missing)
+							throw ValidationException::missingNestedFields('targets', $index, $missing);
+
+						/** @var Monster|null $monster */
+						$monster = $this->entityManager->find(Monster::class, $definition->monster);
+
+						if (!$monster)
+							throw IntegrityException::missingReference('targets[' . $index . '].monster', 'Monster');
+
+						$entity->getTargets()->add(new MonsterQuestTarget($entity, $monster, $definition->amount));
+					}
+				}
+			} else
+				throw new \InvalidArgumentException(get_class($entity) . ' is not yet supported');
 		}
 
 		/**

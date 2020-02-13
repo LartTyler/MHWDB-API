@@ -4,7 +4,8 @@
 	use App\Entity\Item;
 	use App\Entity\Location;
 	use App\Entity\Quest;
-	use App\Game\Quest\Objective;
+	use App\Game\Quest\QuestObjective;
+	use App\Game\Quest\QuestSubject;
 	use Doctrine\ORM\Mapping as ORM;
 	use Symfony\Component\Validator\Constraints as Assert;
 
@@ -15,56 +16,70 @@
 		/**
 		 * {@inheritdoc}
 		 */
-		protected $objective = Objective::GATHER;
+		protected $subject = QuestSubject::ITEM;
 
 		/**
-		 * @ORM\OneToOne(targetEntity="App\Entity\Item")
-		 * @ORM\JoinColumn(nullable=false)
+		 * @Assert\NotNull()
 		 *
-		 * @var Item
+		 * @ORM\ManyToOne(targetEntity="App\Entity\Item")
+		 *
+		 * @var Item|null
 		 */
-		private $item;
+		private $item = null;
 
 		/**
+		 * @Assert\NotNull()
 		 * @Assert\Range(min="1")
 		 *
-		 * @ORM\Column(type="smallint", options={"unsigned": true})
+		 * @ORM\Column(type="smallint", options={"unsigned": true}, nullable=true)
 		 *
-		 * @var int
+		 * @var int|null
 		 */
-		private $amount;
+		private $amount = null;
 
 		/**
-		 * @return Item
+		 * GatherQuest constructor.
+		 *
+		 * @param Location $location
+		 * @param string   $type
+		 * @param string   $rank
+		 * @param int      $stars
 		 */
-		public function getItem(): Item {
+		public function __construct(Location $location, string $type, string $rank, int $stars) {
+			parent::__construct($location, QuestObjective::GATHER, $type, $rank, $stars);
+		}
+
+		/**
+		 * @return Item|null
+		 */
+		public function getItem(): ?Item {
 			return $this->item;
 		}
 
 		/**
-		 * @param Item $item
+		 * @param Item|null $item
 		 *
 		 * @return $this
 		 */
-		public function setItem(Item $item) {
+		public function setItem(?Item $item) {
 			$this->item = $item;
 
 			return $this;
 		}
 
 		/**
-		 * @return int
+		 * @return int|null
 		 */
-		public function getAmount(): int {
+		public function getAmount(): ?int {
 			return $this->amount;
 		}
 
 		/**
-		 * @param int $amount
+		 * @param int|null $amount
 		 *
 		 * @return $this
 		 */
-		public function setAmount(int $amount) {
+		public function setAmount(?int $amount) {
 			$this->amount = $amount;
 
 			return $this;
