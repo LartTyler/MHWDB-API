@@ -35,6 +35,7 @@
 					'rank',
 					'stars',
 					'name',
+					'description',
 				]
 			);
 
