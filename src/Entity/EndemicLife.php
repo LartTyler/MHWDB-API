@@ -67,7 +67,7 @@
 		/**
 		 * @Assert\Choice(multiple=true, callback={"App\Game\EndemicLifeSpawnCondition", "values"})
 		 *
-		 * @ORM\Column(type="string", length=5)
+		 * @ORM\Column(type="json")
 		 *
 		 * @var string[]
 		 * @see EndemicLifeSpawnCondition
