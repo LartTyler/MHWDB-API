@@ -18,6 +18,7 @@ services:
     App\Contrib\Transformers\ArmorSetBonusTransformer: ~
     App\Contrib\Transformers\CharmTransformer: ~
     App\Contrib\Transformers\DecorationTransformer: ~
+    App\Contrib\Transformers\EndemicLifeTransformer: ~
     App\Contrib\Transformers\ItemTransformer: ~
     App\Contrib\Transformers\LocationTransformer: ~
     App\Contrib\Transformers\MonsterTransformer: ~
