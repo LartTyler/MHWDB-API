@@ -18,6 +18,7 @@
 				$data,
 				[
 					'name',
+					'description',
 					'type',
 					'researchPointValue',
 				]
