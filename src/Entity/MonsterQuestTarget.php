@@ -1,8 +1,6 @@
 <?php
-	namespace App\Entity\Quests;
+	namespace App\Entity;
 
-	use App\Entity\EntityTrait;
-	use App\Entity\Monster;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\ORM\Mapping as ORM;
 	use Symfony\Component\Validator\Constraints as Assert;
@@ -15,10 +13,10 @@
 		use EntityTrait;
 
 		/**
-		 * @ORM\ManyToOne(targetEntity="App\Entity\Quests\MonsterQuest", inversedBy="targets")
+		 * @ORM\ManyToOne(targetEntity="App\Entity\Quest", inversedBy="targets")
 		 * @ORM\JoinColumn(nullable=false)
 		 *
-		 * @var MonsterQuest
+		 * @var Quest
 		 */
 		private $quest;
 
@@ -42,11 +40,11 @@
 		/**
 		 * MonsterQuestTarget constructor.
 		 *
-		 * @param MonsterQuest $quest
-		 * @param Monster      $monster
-		 * @param int          $amount
+		 * @param Quest   $quest
+		 * @param Monster $monster
+		 * @param int     $amount
 		 */
-		public function __construct(MonsterQuest $quest, Monster $monster, int $amount) {
+		public function __construct(Quest $quest, Monster $monster, int $amount) {
 			$this->quest = $quest;
 			$this->monster = $monster;
 			$this->amount = $amount;

@@ -2,6 +2,7 @@
 	namespace App\Entity;
 
 	use App\Entity\Strings\QuestStrings;
+	use App\Game\Quest\DeliveryType;
 	use App\Game\Quest\QuestObjective;
 	use App\Game\Quest\QuestType;
 	use App\Game\Rank;
@@ -16,24 +17,9 @@
 	/**
 	 * @ORM\Entity()
 	 * @ORM\Table(name="quests")
-	 * @ORM\InheritanceType("SINGLE_TABLE")
-	 * @ORM\DiscriminatorColumn(name="subject", type="string", length=7)
-	 * @ORM\DiscriminatorMap({
-	 *     "entity" = "App\Entity\Quests\DeliveryQuest",
-	 *     "item" = "App\Entity\Quests\GatherQuest",
-	 *     "monster" = "App\Entity\Quests\MonsterQuest"
-	 * })
 	 */
-	abstract class Quest implements EntityInterface, TranslatableEntityInterface {
+	class Quest implements EntityInterface, TranslatableEntityInterface {
 		use EntityTrait;
-
-		/**
-		 * @Assert\NotBlank()
-		 * @Assert\Choice(callback={"App\Game\Quest\QuestSubject", "values"})
-		 *
-		 * @var string|null
-		 */
-		protected $subject = null;
 
 		/**
 		 * @ORM\ManyToOne(targetEntity="App\Entity\Location")
@@ -41,7 +27,7 @@
 		 *
 		 * @var Location
 		 */
-		protected $location;
+		private $location;
 
 		/**
 		 * @Assert\NotBlank()
@@ -52,7 +38,7 @@
 		 * @var string
 		 * @see QuestObjective
 		 */
-		protected $objective;
+		private $objective;
 
 		/**
 		 * @Assert\NotBlank()
@@ -63,7 +49,7 @@
 		 * @var string
 		 * @see QuestType
 		 */
-		protected $type;
+		private $type;
 
 		/**
 		 * @Assert\NotBlank()
@@ -74,7 +60,7 @@
 		 * @var string
 		 * @see Rank
 		 */
-		protected $rank;
+		private $rank;
 
 		/**
 		 * @Assert\Range(min="1")
@@ -83,7 +69,7 @@
 		 *
 		 * @var int
 		 */
-		protected $stars;
+		private $stars;
 
 		/**
 		 * @Assert\Valid()
@@ -98,7 +84,25 @@
 		 *
 		 * @var Collection|Selectable|QuestStrings[]
 		 */
-		protected $strings;
+		private $strings;
+
+		/**
+		 * Used by {@see QuestObjective::HUNT}, {@see QuestObjective::CAPTURE}, and {@see QuestObjective::SLAY}
+		 * objectives to store quest target information.
+		 *
+		 * @Assert\Valid()
+		 *
+		 * @ORM\OneToMany(
+		 *     targetEntity="App\Entity\MonsterQuestTarget",
+		 *     mappedBy="quest",
+		 *     orphanRemoval=true,
+		 *     cascade={"all"},
+		 *     fetch="EAGER"
+		 * )
+		 *
+		 * @var Collection|Selectable|MonsterQuestTarget[]
+		 */
+		private $targets;
 
 		/**
 		 * @Assert\Range(min="1")
@@ -107,7 +111,7 @@
 		 *
 		 * @var int
 		 */
-		protected $timeLimit = 3000;
+		private $timeLimit = 3000;
 
 		/**
 		 * @Assert\Range(min="1")
@@ -116,7 +120,7 @@
 		 *
 		 * @var int
 		 */
-		protected $maxHunters = 4;
+		private $maxHunters = 4;
 
 		/**
 		 * @Assert\Range(min="1")
@@ -125,7 +129,50 @@
 		 *
 		 * @var int
 		 */
-		protected $maxFaints = 3;
+		private $maxFaints = 3;
+
+		/**
+		 * Used by {@see QuestObjective::DELIVER} objectives to indicate the delivery targets classification.
+		 *
+		 * @Assert\Choice(callback={"App\Game\Quest\DeliveryType", "values"})
+		 *
+		 * @ORM\Column(type="string", length=12, nullable=true)
+		 *
+		 * @var string|null
+		 * @see DeliveryType
+		 */
+		private $deliveryType = null;
+
+		/**
+		 * Used by {@see QuestObjective::DELIVER} and {@see QuestObjective::GATHER} to indicate the quantity of the
+		 * target that must be delivered.
+		 *
+		 * @Assert\Range(min="1")
+		 *
+		 * @ORM\Column(type="smallint", options={"unsigned": true}, nullable=true)
+		 *
+		 * @var int|null
+		 */
+		private $amount = null;
+
+		/**
+		 * Used by {@see QuestObjective::DELIVER} + {@see DeliveryType::ENDEMIC_LIFE} to indicate the target endemic
+		 * life.
+		 *
+		 * @ORM\ManyToOne(targetEntity="App\Entity\EndemicLife", fetch="EAGER")
+		 *
+		 * @var EndemicLife|null
+		 */
+		private $endemicLife = null;
+
+		/**
+		 * Used by {@see QuestObjective::GATHER} to indicate the item that must be gathered.
+		 *
+		 * @ORM\ManyToOne(targetEntity="App\Entity\Item", fetch="EAGER")
+		 *
+		 * @var Item|null
+		 */
+		private $item = null;
 
 		/**
 		 * Quest constructor.
@@ -144,13 +191,7 @@
 			$this->stars = $stars;
 
 			$this->strings = new ArrayCollection();
-		}
-
-		/**
-		 * @return string|null
-		 */
-		public function getSubject(): ?string {
-			return $this->subject;
+			$this->targets = new ArrayCollection();
 		}
 
 		/**
@@ -176,17 +217,6 @@
 		 */
 		public function getObjective(): string {
 			return $this->objective;
-		}
-
-		/**
-		 * @param string $objective
-		 *
-		 * @return $this
-		 */
-		public function setObjective(string $objective) {
-			$this->objective = $objective;
-
-			return $this;
 		}
 
 		/**
@@ -293,6 +323,85 @@
 		 */
 		public function setMaxFaints(int $maxFaints) {
 			$this->maxFaints = $maxFaints;
+
+			return $this;
+		}
+
+		/**
+		 * @return MonsterQuestTarget[]|Collection|Selectable
+		 */
+		public function getTargets() {
+			return $this->targets;
+		}
+
+		/**
+		 * @return string|null
+		 */
+		public function getDeliveryType(): ?string {
+			return $this->deliveryType;
+		}
+
+		/**
+		 * @param string|null $deliveryType
+		 *
+		 * @return $this
+		 */
+		public function setDeliveryType(?string $deliveryType) {
+			$this->deliveryType = $deliveryType;
+
+			return $this;
+		}
+
+		/**
+		 * @return int|null
+		 */
+		public function getAmount(): ?int {
+			return $this->amount;
+		}
+
+		/**
+		 * @param int|null $amount
+		 *
+		 * @return $this
+		 */
+		public function setAmount(?int $amount) {
+			$this->amount = $amount;
+
+			return $this;
+		}
+
+		/**
+		 * @return EndemicLife|null
+		 */
+		public function getEndemicLife(): ?EndemicLife {
+			return $this->endemicLife;
+		}
+
+		/**
+		 * @param EndemicLife|null $endemicLife
+		 *
+		 * @return $this
+		 */
+		public function setEndemicLife(?EndemicLife $endemicLife) {
+			$this->endemicLife = $endemicLife;
+
+			return $this;
+		}
+
+		/**
+		 * @return Item|null
+		 */
+		public function getItem(): ?Item {
+			return $this->item;
+		}
+
+		/**
+		 * @param Item|null $item
+		 *
+		 * @return $this
+		 */
+		public function setItem(?Item $item) {
+			$this->item = $item;
 
 			return $this;
 		}

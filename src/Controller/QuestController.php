@@ -2,18 +2,16 @@
 	namespace App\Controller;
 
 	use App\Contrib\Transformers\QuestTransformer;
+	use App\Entity\Location;
+	use App\Entity\MonsterQuestTarget;
 	use App\Entity\Quest;
-	use App\Entity\Quests\DeliveryQuest;
-	use App\Entity\Quests\DeliveryQuestEndemicLifeTarget;
-	use App\Entity\Quests\DeliveryQuestObjectTarget;
-	use App\Entity\Quests\GatherQuest;
-	use App\Entity\Quests\MonsterQuest;
-	use App\Entity\Quests\MonsterQuestTarget;
 	use App\Entity\Strings\EndemicLifeStrings;
 	use App\Entity\Strings\ItemStrings;
 	use App\Entity\Strings\LocationStrings;
 	use App\Entity\Strings\MonsterStrings;
 	use App\Entity\Strings\QuestStrings;
+	use App\Game\Quest\DeliveryType;
+	use App\Game\Quest\QuestObjective;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -39,7 +37,6 @@
 		 * @return Response
 		 */
 		public function list(Request $request): Response {
-			// TODO Normal doList() code might not work properly for inheritance mapping. Check that this won't break.
 			return $this->doList($request);
 		}
 
@@ -103,7 +100,6 @@
 
 			$output = [
 				'id' => $entity->getId(),
-				'subject' => $entity->getSubject(),
 				'objective' => $entity->getObjective(),
 				'type' => $entity->getType(),
 				'rank' => $entity->getRank(),
@@ -138,22 +134,23 @@
 				}
 			}
 
-			if ($entity instanceof GatherQuest) {
-				$output['amount'] = $entity->getAmount();
-
-				if ($projection->isAllowed('item')) {
+			switch ($entity->getObjective()) {
+				case QuestObjective::GATHER:
 					$item = $entity->getItem();
 
-					$output['item'] = [
-						'id' => $item->getId(),
-						'rarity' => $item->getRarity(),
-						'value' => $item->getValue(),
-						'carryLimit' => $item->getCarryLimit(),
-						'buyPrice' => $item->getBuyPrice(),
-						'sellPrice' => $item->getSellPrice(),
+					$output += [
+						'amount' => $entity->getAmount(),
+						'item' => [
+							'id' => $item->getId(),
+							'rarity' => $item->getRarity(),
+							'value' => $item->getValue(),
+							'carryLimit' => $item->getCarryLimit(),
+							'buyPrice' => $item->getBuyPrice(),
+							'sellPrice' => $item->getSellPrice(),
+						],
 					];
 
-					if ($projection->isAllowed('item.name') || $projection->isAllowed('description')) {
+					if ($projection->isAllowed('item.name') || $projection->isAllowed('item.description')) {
 						/** @var ItemStrings $strings */
 						$strings = $this->getStrings($item);
 
@@ -162,42 +159,71 @@
 							'description' => $strings->getDescription(),
 						];
 					}
-				}
-			} else if ($entity instanceof DeliveryQuest) {
-				$target = $entity->getTarget();
 
-				$output['target']['amount'] = $target->getAmount();
+					break;
 
-				if ($target instanceof DeliveryQuestObjectTarget && $projection->isAllowed('objectName')) {
-					/** @var QuestStrings $strings */
-					$strings = $this->getStrings($entity);
-
-					$output['target']['objectName'] = $strings->getObjectName();
-				} else if ($target instanceof DeliveryQuestEndemicLifeTarget && $projection->isAllowed('endemicLife')) {
-					$endemicLife = $target->getEndemicLife();
-
-					$output['target']['endemicLife'] = [
-						'id' => $endemicLife->getId(),
-						'type' => $endemicLife->getType(),
-						'researchPointValue' => $endemicLife->getResearchPointValue(),
-						'spawnConditions' => $endemicLife->getSpawnConditions(),
-					];
+				case QuestObjective::DELIVER:
+					$output['amount'] = $entity->getAmount();
 
 					if (
-						$projection->isAllowed('endemicLife.name') ||
-						$projection->isAllowed('endemicLife.description')
+						$entity->getDeliveryType() === DeliveryType::ENDEMIC_LIFE &&
+						$projection->isAllowed('endemicLife')
 					) {
-						/** @var EndemicLifeStrings $strings */
-						$strings = $this->getStrings($endemicLife);
+						$endemicLife = $entity->getEndemicLife();
 
-						$output['target']['endemicLife'] += [
-							'name' => $strings->getName(),
-							'description' => $strings->getDescription(),
+						$output['endemicLife'] = [
+							'id' => $endemicLife->getId(),
+							'type' => $endemicLife->getType(),
+							'researchPointValue' => $endemicLife->getResearchPointValue(),
+							'spawnConditions' => $endemicLife->getSpawnConditions(),
 						];
+
+						if (
+							$projection->isAllowed('endemicLife.name') ||
+							$projection->isAllowed('endemicLife.description')
+						) {
+							/** @var EndemicLifeStrings $strings */
+							$strings = $this->getStrings($endemicLife);
+
+							$output['endemicLife'] += [
+								'name' => $strings->getName(),
+								'description' => $strings->getDescription(),
+							];
+						}
+
+						if ($projection->isAllowed('endemicLife.locations')) {
+							$output['endemicLife']['locations'] = $endemicLife->getLocations()->map(
+								function(Location $location) use ($projection) {
+									$output = [
+										'id' => $location->getId(),
+									];
+
+									if ($projection->isAllowed('endemicLife.locations.name')) {
+										/** @var LocationStrings $strings */
+										$strings = $this->getStrings($location);
+
+										$output['name'] = $strings->getName();
+									}
+
+									return $output;
+								}
+							)->toArray();
+						}
+					} else if (
+						$entity->getDeliveryType() === DeliveryType::OBJECT &&
+						$projection->isAllowed('objectName')
+					) {
+						/** @var QuestStrings $strings */
+						$strings = $this->getStrings($entity);
+
+						$output['objectName'] = $strings->getObjectName();
 					}
-				}
-			} else if ($entity instanceof MonsterQuest) {
-				if ($projection->isAllowed('targets')) {
+
+					break;
+
+				case QuestObjective::HUNT:
+				case QuestObjective::CAPTURE:
+				case QuestObjective::SLAY:
 					$output['targets'] = $entity->getTargets()->map(
 						function(MonsterQuestTarget $target) use ($projection) {
 							$monster = $target->getMonster();
@@ -218,7 +244,7 @@
 								/** @var MonsterStrings $strings */
 								$strings = $this->getStrings($monster);
 
-								$output['monster'] += [
+								$output += [
 									'name' => $strings->getName(),
 									'description' => $strings->getDescription(),
 								];
@@ -227,9 +253,7 @@
 							return $output;
 						}
 					)->toArray();
-				}
-			} else
-				throw new \InvalidArgumentException(get_class($entity) . ' is not fully supported by ' . static::class);
+			}
 
 			return $output;
 		}
