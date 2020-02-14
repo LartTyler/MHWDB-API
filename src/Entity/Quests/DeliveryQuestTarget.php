@@ -37,6 +37,10 @@
 		protected $quest;
 
 		/**
+		 * @Assert\Range(min="1")
+		 *
+		 * @ORM\Column(type="smallint", options={"unsigned": true})
+		 *
 		 * @var int
 		 */
 		protected $amount;
