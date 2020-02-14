@@ -1,9 +1,9 @@
-/.idea
+# Vagrant files
 /.vagrant
 /*-cloudimg-console.log
 
-# Data Repo
-/data
+# IDE Files
+/.idea
 
 ###> symfony/framework-bundle ###
 .env
