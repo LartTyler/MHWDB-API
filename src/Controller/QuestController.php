@@ -164,19 +164,19 @@
 					}
 				}
 			} else if ($entity instanceof DeliveryQuest) {
-				$output['amount'] = $entity->getAmount();
-
 				$target = $entity->getTarget();
+
+				$output['target']['amount'] = $target->getAmount();
 
 				if ($target instanceof DeliveryQuestObjectTarget && $projection->isAllowed('objectName')) {
 					/** @var QuestStrings $strings */
 					$strings = $this->getStrings($entity);
 
-					$output['objectName'] = $strings->getObjectName();
+					$output['target']['objectName'] = $strings->getObjectName();
 				} else if ($target instanceof DeliveryQuestEndemicLifeTarget && $projection->isAllowed('endemicLife')) {
 					$endemicLife = $target->getEndemicLife();
 
-					$output['endemicLife'] = [
+					$output['target']['endemicLife'] = [
 						'id' => $endemicLife->getId(),
 						'type' => $endemicLife->getType(),
 						'researchPointValue' => $endemicLife->getResearchPointValue(),
@@ -190,7 +190,7 @@
 						/** @var EndemicLifeStrings $strings */
 						$strings = $this->getStrings($endemicLife);
 
-						$output['endemicLife'] += [
+						$output['target']['endemicLife'] += [
 							'name' => $strings->getName(),
 							'description' => $strings->getDescription(),
 						];
