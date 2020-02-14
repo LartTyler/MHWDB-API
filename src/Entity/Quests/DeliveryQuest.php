@@ -20,7 +20,12 @@
 		/**
 		 * @Assert\NotNull()
 		 *
-		 * @ORM\OneToOne(targetEntity="App\Entity\Quests\DeliveryQuestTarget", mappedBy="quest", fetch="EAGER")
+		 * @ORM\OneToOne(
+		 *     targetEntity="App\Entity\Quests\DeliveryQuestTarget",
+		 *     mappedBy="quest",
+		 *     fetch="EAGER",
+		 *     cascade={"all"}
+		 * )
 		 *
 		 * @var DeliveryQuestTarget
 		 */
