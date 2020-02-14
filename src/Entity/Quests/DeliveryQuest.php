@@ -44,9 +44,9 @@
 		}
 
 		/**
-		 * @return DeliveryQuestTarget
+		 * @return DeliveryQuestTarget|null
 		 */
-		public function getTarget(): DeliveryQuestTarget {
+		public function getTarget(): ?DeliveryQuestTarget {
 			return $this->target;
 		}
 
