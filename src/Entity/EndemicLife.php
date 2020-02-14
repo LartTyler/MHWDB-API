@@ -58,7 +58,7 @@
 		 * @Assert\Count(min="1")
 		 *
 		 * @ORM\ManyToMany(targetEntity="App\Entity\Location")
-		 * @ORM\JoinTable(name="endemic_life_locations", inverseJoinColumns={@ORM\JoinColumn(unique=true)})
+		 * @ORM\JoinTable(name="endemic_life_locations")
 		 *
 		 * @var Collection|Selectable|Location[]
 		 */
