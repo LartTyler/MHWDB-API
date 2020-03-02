@@ -138,6 +138,10 @@
 				$entity->setLocation($location);
 			}
 
+			if (isset($data->rewards)) {
+				// TODO Load updated rewards into quest object
+			}
+
 			switch ($entity->getObjective()) {
 				case QuestObjective::GATHER:
 					if (isset($data->amount))

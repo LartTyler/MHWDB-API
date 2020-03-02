@@ -105,6 +105,16 @@
 		private $targets;
 
 		/**
+		 * @Assert\Valid()
+		 * @Assert\Count(min="1")
+		 *
+		 * @ORM\OneToMany(targetEntity="App\Entity\QuestReward", mappedBy="quest", cascade={"all"}, orphanRemoval=true)
+		 *
+		 * @var Collection|Selectable|QuestReward[]
+		 */
+		private $rewards;
+
+		/**
 		 * @Assert\Range(min="1")
 		 *
 		 * @ORM\Column(type="smallint", options={"unsigned": true})
@@ -192,6 +202,7 @@
 
 			$this->strings = new ArrayCollection();
 			$this->targets = new ArrayCollection();
+			$this->rewards = new ArrayCollection();
 		}
 
 		/**
@@ -404,6 +415,13 @@
 			$this->item = $item;
 
 			return $this;
+		}
+
+		/**
+		 * @return QuestReward[]|Collection|Selectable
+		 */
+		public function getRewards(): Collection {
+			return $this->rewards;
 		}
 
 		/**

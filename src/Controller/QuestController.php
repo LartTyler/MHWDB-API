@@ -5,6 +5,8 @@
 	use App\Entity\Location;
 	use App\Entity\MonsterQuestTarget;
 	use App\Entity\Quest;
+	use App\Entity\QuestReward;
+	use App\Entity\RewardCondition;
 	use App\Entity\Strings\EndemicLifeStrings;
 	use App\Entity\Strings\ItemStrings;
 	use App\Entity\Strings\LocationStrings;
@@ -132,6 +134,26 @@
 
 					$output['location']['name'] = $strings->getName();
 				}
+			}
+
+			if ($projection->isAllowed('rewards')) {
+				$output['rewards'] = $entity->getRewards()->map(
+					function(QuestReward $reward) use ($projection) {
+						$output = [];
+
+						if ($projection->isAllowed('rewards.item'))
+							$output['item'] = $this->normalizeItem($projection, 'rewards.item', $reward->getItem());
+
+						if ($projection->isAllowed('rewards.conditions'))
+							$output['conditions'] = $reward->getConditions()->map(
+								function(RewardCondition $condition) {
+									return $this->normalizeRewardCondition($condition);
+								}
+							)->toArray();
+
+						return $output;
+					}
+				)->toArray();
 			}
 
 			switch ($entity->getObjective()) {
