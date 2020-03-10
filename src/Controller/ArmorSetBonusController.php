@@ -122,7 +122,7 @@
 							$output['skill'] = [
 								'id' => $skill->getId(),
 								'level' => $skill->getLevel(),
-								'modifiers' => $skill->getModifiers(),
+								'modifiers' => $skill->getModifiers() ?: new \stdClass(),
 							];
 
 							if ($projection->isAllowed('ranks.skill.description')) {
