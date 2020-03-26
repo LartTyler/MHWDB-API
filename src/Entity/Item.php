@@ -50,6 +50,7 @@
 		 * @ORM\Column(type="integer", options={"unsigned": true}, name="_value")
 		 *
 		 * @var int
+		 * @deprecated Will be removed in 1.20.0
 		 */
 		private $value = 0;
 
@@ -59,6 +60,24 @@
 		 * @var int
 		 */
 		private $carryLimit = 0;
+
+		/**
+		 * @Assert\Range(min="0")
+		 *
+		 * @ORM\Column(type="integer", options={"unsigned": true})
+		 *
+		 * @var int
+		 */
+		private $buyPrice = 0;
+
+		/**
+		 * @Assert\Range(min="0")
+		 *
+		 * @ORM\Column(type="integer", options={"unsigned": true})
+		 *
+		 * @var int
+		 */
+		private $sellPrice = 0;
 
 		/**
 		 * Item constructor.
@@ -91,6 +110,7 @@
 
 		/**
 		 * @return int
+		 * @deprecated Will be removed in 1.20.0
 		 */
 		public function getValue(): int {
 			return $this->value;
@@ -100,6 +120,7 @@
 		 * @param int $value
 		 *
 		 * @return $this
+		 * @deprecated Will be removed in 1.20.0
 		 */
 		public function setValue(int $value) {
 			$this->value = $value;
@@ -121,6 +142,42 @@
 		 */
 		public function setCarryLimit(int $carryLimit) {
 			$this->carryLimit = $carryLimit;
+
+			return $this;
+		}
+
+		/**
+		 * @return int
+		 */
+		public function getBuyPrice(): int {
+			return $this->buyPrice;
+		}
+
+		/**
+		 * @param int $buyPrice
+		 *
+		 * @return $this
+		 */
+		public function setBuyPrice(int $buyPrice) {
+			$this->buyPrice = $buyPrice;
+
+			return $this;
+		}
+
+		/**
+		 * @return int
+		 */
+		public function getSellPrice(): int {
+			return $this->sellPrice;
+		}
+
+		/**
+		 * @param int $sellPrice
+		 *
+		 * @return $this
+		 */
+		public function setSellPrice(int $sellPrice) {
+			$this->sellPrice = $sellPrice;
 
 			return $this;
 		}

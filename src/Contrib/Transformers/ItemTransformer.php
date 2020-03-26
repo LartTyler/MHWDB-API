@@ -53,8 +53,16 @@
 			if (ObjectUtil::isset($data, 'rarity'))
 				$entity->setRarity($data->rarity);
 
-			if (ObjectUtil::isset($data, 'value'))
-				$entity->setValue($data->value);
+			if (ObjectUtil::isset($data, 'buyPrice'))
+				$entity->setBuyPrice($data->buyPrice);
+
+			if (ObjectUtil::isset($data, 'sellPrice')) {
+				$entity->setSellPrice($data->sellPrice);
+
+				// Preserves BC with 1.18
+				// TODO Remove in 1.20.0
+				$entity->setValue($data->sellPrice);
+			}
 
 			if (ObjectUtil::isset($data, 'carryLimit'))
 				$entity->setCarryLimit($data->carryLimit);

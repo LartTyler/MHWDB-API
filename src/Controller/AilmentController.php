@@ -124,6 +124,8 @@
 								'rarity' => $item->getRarity(),
 								'value' => $item->getValue(),
 								'carryLimit' => $item->getCarryLimit(),
+								'buyPrice' => $item->getBuyPrice(),
+								'sellPrice' => $item->getSellPrice(),
 							];
 
 							if (

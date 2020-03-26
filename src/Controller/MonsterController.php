@@ -153,6 +153,7 @@
 											'rarity' => $item->getRarity(),
 											'value' => $item->getValue(),
 											'carryLimit' => $item->getCarryLimit(),
+											'sellPrice' => $item->getSellPrice(),
 										];
 
 										if (
@@ -214,6 +215,8 @@
 											'rarity' => $item->getRarity(),
 											'value' => $item->getValue(),
 											'carryLimit' => $item->getCarryLimit(),
+											'buyPrice' => $item->getBuyPrice(),
+											'sellPrice' => $item->getSellPrice(),
 										];
 
 										if (
@@ -314,6 +317,8 @@
 								'rarity' => $item->getRarity(),
 								'carryLimit' => $item->getCarryLimit(),
 								'value' => $item->getValue(),
+								'buyPrice' => $item->getBuyPrice(),
+								'sellPrice' => $item->getSellPrice(),
 							];
 
 							if (
