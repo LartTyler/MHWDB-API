@@ -3,6 +3,7 @@
 
 	final class RewardConditionType {
 		public const CARVE = 'carve';
+		public const GUIDING_LANDS = 'guiding lands';
 		public const INVESTIGATION = 'investigation';
 		public const MINING = 'mining';
 		public const PALICO = 'palico';
