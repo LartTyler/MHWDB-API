@@ -2,18 +2,8 @@
 	namespace App\Controller;
 
 	use App\Contrib\Transformers\QuestTransformer;
-	use App\Entity\Location;
-	use App\Entity\MonsterQuestTarget;
 	use App\Entity\Quest;
-	use App\Entity\QuestReward;
-	use App\Entity\RewardCondition;
-	use App\Entity\Strings\EndemicLifeStrings;
-	use App\Entity\Strings\ItemStrings;
-	use App\Entity\Strings\LocationStrings;
-	use App\Entity\Strings\MonsterStrings;
-	use App\Entity\Strings\QuestStrings;
-	use App\Game\Quest\DeliveryType;
-	use App\Game\Quest\QuestObjective;
+	use App\Entity\WorldEvent;
 	use DaybreakStudios\DoctrineQueryDocument\Projection\Projection;
 	use DaybreakStudios\DoctrineQueryDocument\QueryManagerInterface;
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
@@ -100,181 +90,14 @@
 		protected function normalizeOne(EntityInterface $entity, Projection $projection): array {
 			assert($entity instanceof Quest);
 
-			$output = [
-				'id' => $entity->getId(),
-				'objective' => $entity->getObjective(),
-				'type' => $entity->getType(),
-				'rank' => $entity->getRank(),
-				'stars' => $entity->getStars(),
-				'timeLimit' => $entity->getTimeLimit(),
-				'maxHunters' => $entity->getMaxHunters(),
-				'maxFaints' => $entity->getMaxFaints(),
-			];
+			$output = $this->normalizeQuest($projection, '', $entity);
 
-			if ($projection->isAllowed('name') || $projection->isAllowed('description')) {
-				/** @var QuestStrings $strings */
-				$strings = $this->getStrings($entity);
-
-				$output += [
-					'name' => $strings->getName(),
-					'description' => $strings->getDescription(),
-				];
-			}
-
-			if ($projection->isAllowed('location')) {
-				$location = $entity->getLocation();
-
-				$output['location'] = [
-					'id' => $location->getId(),
-				];
-
-				if ($projection->isAllowed('location.name')) {
-					/** @var LocationStrings $strings */
-					$strings = $this->getStrings($location);
-
-					$output['location']['name'] = $strings->getName();
-				}
-			}
-
-			if ($projection->isAllowed('rewards')) {
-				$output['rewards'] = $entity->getRewards()->map(
-					function(QuestReward $reward) use ($projection) {
-						$output = [];
-
-						if ($projection->isAllowed('rewards.item'))
-							$output['item'] = $this->normalizeItem($projection, 'rewards.item', $reward->getItem());
-
-						if ($projection->isAllowed('rewards.conditions'))
-							$output['conditions'] = $reward->getConditions()->map(
-								function(RewardCondition $condition) {
-									return $this->normalizeRewardCondition($condition);
-								}
-							)->toArray();
-
-						return $output;
+			if ($projection->isAllowed('events')) {
+				$output['events'] = $entity->getEvents()->map(
+					function(WorldEvent $event) use ($projection) {
+						return $this->normalizeWorldEvent($projection, 'events', $event);
 					}
 				)->toArray();
-			}
-
-			switch ($entity->getObjective()) {
-				case QuestObjective::GATHER:
-					$item = $entity->getItem();
-
-					$output += [
-						'amount' => $entity->getAmount(),
-						'item' => [
-							'id' => $item->getId(),
-							'rarity' => $item->getRarity(),
-							'value' => $item->getValue(),
-							'carryLimit' => $item->getCarryLimit(),
-							'buyPrice' => $item->getBuyPrice(),
-							'sellPrice' => $item->getSellPrice(),
-						],
-					];
-
-					if ($projection->isAllowed('item.name') || $projection->isAllowed('item.description')) {
-						/** @var ItemStrings $strings */
-						$strings = $this->getStrings($item);
-
-						$output['item'] += [
-							'name' => $strings->getName(),
-							'description' => $strings->getDescription(),
-						];
-					}
-
-					break;
-
-				case QuestObjective::DELIVER:
-					$output['amount'] = $entity->getAmount();
-
-					if (
-						$entity->getDeliveryType() === DeliveryType::ENDEMIC_LIFE &&
-						$projection->isAllowed('endemicLife')
-					) {
-						$endemicLife = $entity->getEndemicLife();
-
-						$output['endemicLife'] = [
-							'id' => $endemicLife->getId(),
-							'type' => $endemicLife->getType(),
-							'researchPointValue' => $endemicLife->getResearchPointValue(),
-							'spawnConditions' => $endemicLife->getSpawnConditions(),
-						];
-
-						if (
-							$projection->isAllowed('endemicLife.name') ||
-							$projection->isAllowed('endemicLife.description')
-						) {
-							/** @var EndemicLifeStrings $strings */
-							$strings = $this->getStrings($endemicLife);
-
-							$output['endemicLife'] += [
-								'name' => $strings->getName(),
-								'description' => $strings->getDescription(),
-							];
-						}
-
-						if ($projection->isAllowed('endemicLife.locations')) {
-							$output['endemicLife']['locations'] = $endemicLife->getLocations()->map(
-								function(Location $location) use ($projection) {
-									$output = [
-										'id' => $location->getId(),
-									];
-
-									if ($projection->isAllowed('endemicLife.locations.name')) {
-										/** @var LocationStrings $strings */
-										$strings = $this->getStrings($location);
-
-										$output['name'] = $strings->getName();
-									}
-
-									return $output;
-								}
-							)->toArray();
-						}
-					} else if (
-						$entity->getDeliveryType() === DeliveryType::OBJECT &&
-						$projection->isAllowed('objectName')
-					) {
-						/** @var QuestStrings $strings */
-						$strings = $this->getStrings($entity);
-
-						$output['objectName'] = $strings->getObjectName();
-					}
-
-					break;
-
-				case QuestObjective::HUNT:
-				case QuestObjective::CAPTURE:
-				case QuestObjective::SLAY:
-					$output['targets'] = $entity->getTargets()->map(
-						function(MonsterQuestTarget $target) use ($projection) {
-							$monster = $target->getMonster();
-
-							$output = [
-								'amount' => $target->getAmount(),
-								'monster' => [
-									'id' => $monster->getId(),
-									'type' => $monster->getType(),
-									'species' => $monster->getSpecies(),
-								],
-							];
-
-							if (
-								$projection->isAllowed('targets.monster.name') ||
-								$projection->isAllowed('targets.monster.description')
-							) {
-								/** @var MonsterStrings $strings */
-								$strings = $this->getStrings($monster);
-
-								$output += [
-									'name' => $strings->getName(),
-									'description' => $strings->getDescription(),
-								];
-							}
-
-							return $output;
-						}
-					)->toArray();
 			}
 
 			return $output;

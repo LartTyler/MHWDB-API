@@ -116,6 +116,13 @@
 		private $rewards;
 
 		/**
+		 * @ORM\OneToMany(targetEntity="App\Entity\WorldEvent", mappedBy="quest", orphanRemoval=true, cascade={"all"})
+		 *
+		 * @var WorldEvent[]|Collection|Selectable
+		 */
+		private $events;
+
+		/**
 		 * @Assert\Range(min="1")
 		 *
 		 * @ORM\Column(type="smallint", options={"unsigned": true})
@@ -204,6 +211,7 @@
 			$this->strings = new ArrayCollection();
 			$this->targets = new ArrayCollection();
 			$this->rewards = new ArrayCollection();
+			$this->events = new ArrayCollection();
 		}
 
 		/**
@@ -436,6 +444,13 @@
 					->where(Criteria::expr()->eq('item', $item))
 					->setMaxResults(1)
 			)->first() ?: null;
+		}
+
+		/**
+		 * @return Collection|Selectable|WorldEvent[]
+		 */
+		public function getEvents(): Collection {
+			return $this->events;
 		}
 
 		/**
