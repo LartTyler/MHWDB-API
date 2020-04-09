@@ -7,7 +7,10 @@
 	use App\Entity\Monster;
 	use App\Entity\MonsterQuestTarget;
 	use App\Entity\Quest;
+	use App\Entity\QuestReward;
+	use App\Entity\RewardCondition;
 	use App\Entity\Strings\QuestStrings;
+	use App\Entity\WorldEvent;
 	use App\Game\Quest\DeliveryType;
 	use App\Game\Quest\QuestObjective;
 	use App\Localization\L10nUtil;
@@ -139,7 +142,78 @@
 			}
 
 			if (isset($data->rewards)) {
-				// TODO Load updated rewards into quest object
+				/** @var int[] $itemIds */
+				$itemIds = [];
+
+				foreach ($data->rewards as $rewardIndex => $rewardDefinition) {
+					$missing = ObjectUtil::getMissingProperties(
+						$rewardDefinition,
+						[
+							'item',
+							'conditions',
+						]
+					);
+
+					if ($missing)
+						throw ValidationException::missingNestedFields('rewards', $rewardIndex, $missing);
+
+					/** @var Item|null $item */
+					$item = $this->entityManager->find(Item::class, $rewardDefinition->item);
+
+					if (!$item)
+						throw IntegrityException::missingReference('rewards[' . $rewardIndex . '].item', 'Item');
+
+					$itemIds[] = $item->getId();
+					$reward = $entity->getRewardForItem($item);
+
+					if (!$reward)
+						$entity->getRewards()->add($reward = new QuestReward($entity, $item));
+
+					$reward->getConditions()->clear();
+
+					foreach ($rewardDefinition->conditions as $index => $definition) {
+						$missing = ObjectUtil::getMissingProperties(
+							$definition,
+							[
+								'type',
+								'rank',
+								'quantity',
+								'chance',
+							]
+						);
+
+						if ($missing) {
+							throw ValidationException::missingNestedFields(
+								'rewards[' . $rewardIndex . '].conditions',
+								$index,
+								$missing
+							);
+						}
+
+						$reward->getConditions()->add(
+							$condition = new RewardCondition(
+								$definition->type,
+								$definition->rank,
+								$definition->quantity,
+								$definition->chance
+							)
+						);
+
+						if (ObjectUtil::isset($definition, 'subtype')) {
+							$subtype = $definition->subtype;
+
+							if (is_string($subtype))
+								$subtype = strtolower($subtype);
+
+							$condition->setSubtype($subtype);
+						}
+					}
+
+					foreach ($entity->getRewards() as $reward) {
+						if (!in_array($reward->getItem()->getId(), $itemIds))
+							$entity->getRewards()->removeElement($reward);
+					}
+				}
 			}
 
 			switch ($entity->getObjective()) {
@@ -182,7 +256,7 @@
 					if (isset($data->targets)) {
 						$entity->getTargets()->clear();
 
-						foreach ($data->targets as $index => $definition) {
+						foreach ($data->targets as $rewardIndex => $definition) {
 							$missing = ObjectUtil::getMissingProperties(
 								$definition,
 								[
@@ -192,14 +266,14 @@
 							);
 
 							if ($missing)
-								throw ValidationException::missingNestedFields('targets', $index, $missing);
+								throw ValidationException::missingNestedFields('targets', $rewardIndex, $missing);
 
 							/** @var Monster|null $monster */
 							$monster = $this->entityManager->find(Monster::class, $definition->monster);
 
 							if (!$monster) {
 								throw IntegrityException::missingReference(
-									'targets[' . $index . '].monster',
+									'targets[' . $rewardIndex . '].monster',
 									'Monster'
 								);
 							}
@@ -217,6 +291,7 @@
 		 */
 		public function doDelete(EntityInterface $entity): void {
 			assert($entity instanceof Quest);
+
 			// TODO Remove events related to deleted quest
 		}
 

@@ -10,6 +10,7 @@
 	use DaybreakStudios\Utility\DoctrineEntities\EntityInterface;
 	use Doctrine\Common\Collections\ArrayCollection;
 	use Doctrine\Common\Collections\Collection;
+	use Doctrine\Common\Collections\Criteria;
 	use Doctrine\Common\Collections\Selectable;
 	use Doctrine\ORM\Mapping as ORM;
 	use Symfony\Component\Validator\Constraints as Assert;
@@ -422,6 +423,19 @@
 		 */
 		public function getRewards(): Collection {
 			return $this->rewards;
+		}
+
+		/**
+		 * @param Item $item
+		 *
+		 * @return QuestReward|null
+		 */
+		public function getRewardForItem(Item $item): ?QuestReward {
+			return $this->getRewards()->matching(
+				Criteria::create()
+					->where(Criteria::expr()->eq('item', $item))
+					->setMaxResults(1)
+			)->first() ?: null;
 		}
 
 		/**
