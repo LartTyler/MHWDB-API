@@ -10,7 +10,7 @@
 	use Symfony\Component\Validator\Constraints as Assert;
 
 	/**
-	 * @ORM\Entity(repositoryClass="App\Repository\WorldEventRepository")
+	 * @ORM\Entity()
 	 * @ORM\Table(name="world_events")
 	 */
 	class WorldEvent implements EntityInterface {

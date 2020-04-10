@@ -16,7 +16,7 @@
 	use Symfony\Component\Validator\Constraints as Assert;
 
 	/**
-	 * @ORM\Entity()
+	 * @ORM\Entity(repositoryClass="App\Repository\QuestRepository")
 	 * @ORM\Table(name="quests")
 	 */
 	class Quest implements EntityInterface, TranslatableEntityInterface {
