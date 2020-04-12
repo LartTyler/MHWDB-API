@@ -66,7 +66,12 @@
 
 			foreach ($query as $key => $value) {
 				if ($key[0] === '$') {
-					$this->addTranslationClauses($resolver, $qb, $value, $visited, $entities);
+					// Resolves an issue with operators that use an array of sub-documents
+					if (!isset($value[0]))
+						$value = [$value];
+
+					foreach ($value as $item)
+						$this->addTranslationClauses($resolver, $qb, $item, $visited, $entities);
 
 					continue;
 				}
