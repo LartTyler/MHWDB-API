@@ -4,12 +4,11 @@
 	use DaybreakStudios\RestApiCommon\Utility\ConstantsClassTrait;
 
 	/**
-	 * Longest value: MASTER = 6
+	 * Longest value: NIGHT = 5
 	 */
-	final class Rank {
+	final class EndemicLifeSpawnCondition {
 		use ConstantsClassTrait;
 
-		const LOW = 'low';
-		const HIGH = 'high';
-		const MASTER = 'master';
+		public const RAIN = 'rain';
+		public const NIGHT = 'night';
 	}

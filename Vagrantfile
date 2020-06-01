@@ -62,6 +62,9 @@ Vagrant.configure("2") do |config|
 		echo '[Assertion]' > /etc/php/7.3/cli/conf.d/99-assert.ini
 		echo 'zend.assertions = 1' >> /etc/php/7.3/cli/conf.d/99-assert.ini
 		echo 'assert.exception = On' >> /etc/php/7.3/cli/conf.d/99-assert.ini
+
+		wget https://get.symfony.com/cli/installer -O /root/installer.sh && bash /root/installer.sh
+		mv /root/.symfony/bin/symfony /usr/local/bin/symfony
 	SHELL
 
 	config.vm.provision "install", type: "shell", privileged: false, inline: <<-SHELL

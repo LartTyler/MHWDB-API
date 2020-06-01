@@ -42,8 +42,7 @@
 		protected function configure(): void {
 			$this
 				->addArgument('platform', InputArgument::REQUIRED)
-				->addArgument('expansion', InputArgument::OPTIONAL, '', Expansion::BASE)
-				->addOption('sleep', null, InputOption::VALUE_REQUIRED, '', 5);
+				->addArgument('expansion', InputArgument::OPTIONAL, '', Expansion::BASE);
 		}
 
 		/**
@@ -55,8 +54,7 @@
 		protected function execute(InputInterface $input, OutputInterface $output): int {
 			$events = $this->eventReader->read(
 				$input->getArgument('platform'),
-				$input->getArgument('expansion'),
-				(int)$input->getOption('sleep')
+				$input->getArgument('expansion')
 			);
 
 			$added = 0;

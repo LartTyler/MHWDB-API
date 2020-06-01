@@ -23,7 +23,7 @@
 		use EntityTrait;
 
 		/**
-		 * @Assert\Choice(callback={"App\Game\Rank", "all"})
+		 * @Assert\Choice(callback={"App\Game\Rank", "values"})
 		 *
 		 * @ORM\Column(type="string", length=16)
 		 *
