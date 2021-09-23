@@ -94,6 +94,8 @@
 					'rarity' => $item->getRarity(),
 					'carryLimit' => $item->getCarryLimit(),
 					'value' => $item->getValue(),
+					'buyPrice' => $item->getBuyPrice(),
+					'sellPrice' => $item->getSellPrice(),
 				];
 
 				if ($projection->isAllowed('item.name') || $projection->isAllowed('item.description')) {
